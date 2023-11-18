@@ -1,0 +1,19 @@
+(defvar Player (make_define MonoDefine
+	&ref    0
+	&id     &player
+	&props  [
+		&position   (vec2 0 0)
+		&visible    #t
+		&texture    "./assert/scifitiles-sheet.png"
+		&region     (rect2 0 0 32 32)
+	]))
+
+(mono &player
+	&props	[
+		&position	(vec2 5 5)
+	])
+
+(mono &player
+	&props	[
+		&position	(vec2 6 5)
+	])

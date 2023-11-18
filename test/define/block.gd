@@ -1,0 +1,1 @@
+class_name BlockDefine extends RealDefine

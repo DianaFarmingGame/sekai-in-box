@@ -1,0 +1,13 @@
+(rule
+	(union Person Item)
+	:move-x
+	(let (monos ($.predict-collision-x))
+		(if (any monos (fn $:solid))
+			($.stop-x))))
+
+(rule
+	(union Person Item)
+	:move-y
+	(let (monos ($.predict-collision-y))
+		(if (any monos (fn $:solid))
+			($.stop-y))))

@@ -1,0 +1,1 @@
+class_name EntityDefine extends RealDefine
