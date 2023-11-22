@@ -1,0 +1,5 @@
+(echo {
+	&hello 1
+	&name "lanesun"
+	&id &player
+})

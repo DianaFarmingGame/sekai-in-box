@@ -9,6 +9,10 @@ var gss_ctx: Lisper.Context
 
 @export var unit_size := Vector2(16, 16)
 
+static var root_vars := {
+	&"MonoDefine": MonoDefine.new()
+}
+
 func _init(): pass
 
 func _ready():
@@ -59,39 +63,41 @@ func _init_defines() -> void:
 		print("[sekai] exec gss: ", gss_path)
 		gss_ctx.eval(expr)
 
+func _make_define(ctx: Lisper.Context, body: Array) -> Variant:
+	var def = ctx.exec_item(body[0])
+	if def != null:
+		var args = body.slice(1).map(ctx.exec_item)
+		for i in args.size() / 2.0:
+			var key = args[2 * i]
+			var value = args[2 * i + 1]
+			match key:
+				&"props":
+					var props := {}
+					for idx in (value.size() / 2):
+						props[value[2 * idx]] = value[2 * idx + 1]
+					def.do_override_props(props)
+				_:
+					def.set(key, value)
+		return def
+	else:
+		ctx.log_error(body[0], str("make_define: ", body[0], " is not a valid token"))
+		return null
+
 func make_lisper_context() -> Lisper.Context:
 	var ctx := Lisper.Context.common()
+	ctx.vars.merge(root_vars)
+	ctx.rawfns.merge({
+		&"make_define": _make_define,
+	})
 	ctx.macros.merge({
-		&"make_define": func (ctx: Lisper.Context, body: Array) -> Variant:
-			@warning_ignore("shadowed_variable_base_class")
-			var name = body[0][1]
-			if name is String or name is StringName:
-				var def: MonoDefine
-				var pre_def = ctx.get_var(name)
-				if pre_def != null:
-					def = (pre_def as MonoDefine).fork()
-				else:
-					print(ClassDB.get_class_list())
-					if ClassDB.class_exists(name):
-						def = ClassDB.instantiate(name) as MonoDefine
-						def.finalize()
-					else:
-						ctx.log_error(body[0], str("make_define: define class ", name, " not found"))
-						return null
-				var args = body.slice(1).map(ctx.exec_item)
-				for i in args.size() / 2.0:
-					var key = args[2 * i]
-					var value = args[2 * i + 1]
-					match key:
-						&"props":
-							var props := {}
-							for idx in (value.size() / 2):
-								props[value[2 * idx]] = value[2 * idx + 1]
-							def.do_override_props(props)
-				return def
-			else:
-				ctx.log_error(body[0], str("make_define: ", body[0], " is not a valid token"))
-				return null,
+		&"define": func (body: Array) -> Array:
+			return Lisper.Call(&"defvar", [
+				[body[0]],
+				[Lisper.Call(&"make_define", [
+					[body[1]],
+					body.slice(2),
+				])],
+			])
 	})
 	ctx.functions.merge({
 		

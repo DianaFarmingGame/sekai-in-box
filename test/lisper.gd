@@ -12,11 +12,31 @@ static func tokenize(expr: String) -> Variant:
 	else:
 		return null
 
+static func List(items: Array) -> Array: return [&"list", items]
+
+static func Token(name: StringName) -> Array: return [&"token", name]
+
+static func Keyword(name: StringName) -> Array: return [&"keyword", name]
+
+static func String(content: String) -> Array: return [&"string", content]
+
+static func Bool(value: bool) -> Array: return [&"bool", value]
+
+static func Number(value: float) -> Array: return [&"number", value]
+
+static func Array(items: Array) -> Array: return [&"array", items]
+
+static func Call(name: StringName, tails = null) -> Array:
+	var body := [Token(name)]
+	if tails != null: for tail in tails:
+		body.append_array(tail)
+	return List(body)
+
 static var CommonContext := _make_common_context()
 
 static func _make_common_context() -> Context:
 	var ctx := Context.new()
-	ctx.macros.merge({
+	ctx.rawfns.merge({
 		&"echo": func (ctx: Context, body: Array) -> void:
 			var msg := []
 			for item in body:
@@ -35,13 +55,15 @@ static func _make_common_context() -> Context:
 			var name = body[0][1]
 			if name is String or name is StringName:
 				var data = ctx.exec_item(body[1])
-				ctx.def_var(name, data)
-				return data
+				return ctx.def_var(name, data)
 			else:
 				ctx.log_error(body[0], str("defvar: ", body[0], " is not a valid token"))
 				return null,
 	})
 	ctx.functions.merge({
+		&"debug": func (value) -> Variant:
+			assert(false)
+			return value,
 		&"vec2": func (x_p = null, y = null) -> Vector2:
 			if x_p == null: return Vector2()
 			if y == null: return Vector2(x_p)
@@ -91,6 +113,7 @@ static func test_common() -> void:
 
 class Context:
 	var parent = null
+	var rawfns := {}
 	var macros := {}
 	var functions := {}
 	var vars := {}
@@ -102,6 +125,7 @@ class Context:
 	func clone() -> Context:
 		var ctx := Context.new()
 		ctx.parent = parent
+		ctx.rawfns = rawfns
 		ctx.macros = macros
 		ctx.functions = functions
 		ctx.vars = vars
@@ -112,6 +136,14 @@ class Context:
 		var ctx := Context.new()
 		ctx.parent = weakref(self)
 		return ctx
+	
+	func get_rawfn(name: StringName) -> Variant:
+		var handle = rawfns.get(name)
+		if handle != null:
+			return handle
+		else:
+			var par = parent.get_ref() if parent != null else null
+			return par.get_rawfn(name) if par != null else null
 	
 	func get_macro(name: StringName) -> Variant:
 		var handle = macros.get(name)
@@ -190,6 +222,13 @@ class Context:
 				return item[1]
 			&"array":
 				return (item[1] as Array).map(exec_item)
+			&"map":
+				var res := {}
+				for i in item[1].size() / 2:
+					var k = exec_item(item[1][2 * i])
+					var v = exec_item(item[1][2 * i + 1])
+					res[k] = v
+				return res
 			&"token":
 				return get_var(item[1])
 			&"list":
@@ -198,9 +237,12 @@ class Context:
 				if head[0] == &"token":
 					var name = head[1]
 					var body = (item[1] as Array).slice(1)
-					handle = get_macro(name)
+					handle = get_rawfn(name)
 					if handle != null:
 						return handle.call(self, body)
+					handle = get_macro(name)
+					if handle != null:
+						return exec_item(handle.call(body))
 					handle = get_func(name)
 					if handle != null:
 						return handle.callv(body.map(exec_item))
@@ -412,9 +454,24 @@ class Parser:
 				return true
 		return false
 	
+	func r_map() -> bool:
+		var np := fork()
+		if np.stream.ref(np.offset) == '{':
+			np.offset += 1
+			while np.r_blank() and (np.r_keyword() or np.r_string()) and np.r_blank() and np.r_item(): pass
+			np.r_blank()
+			if np.stream.ref(np.offset) == '}':
+				if np.result.size() % 2 == 0:
+					np.offset += 1
+					offset = np.offset
+					push(&"map", np.result)
+					return true
+		return false
+	
 	func r_set() -> bool:
 		if r_list() \
-		or r_array():
+		or r_array() \
+		or r_map():
 			return true
 		return false
 	
