@@ -1,5 +1,5 @@
-(echo {
-	&hello 1
-	&name "lanesun"
+(mono
 	&id &player
-})
+	&props {
+		
+	})

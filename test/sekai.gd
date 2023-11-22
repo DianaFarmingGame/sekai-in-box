@@ -72,10 +72,7 @@ func _make_define(ctx: Lisper.Context, body: Array) -> Variant:
 			var value = args[2 * i + 1]
 			match key:
 				&"props":
-					var props := {}
-					for idx in (value.size() / 2):
-						props[value[2 * idx]] = value[2 * idx + 1]
-					def.do_override_props(props)
+					def.do_override_props(value)
 				_:
 					def.set(key, value)
 		return def
