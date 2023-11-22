@@ -69,7 +69,14 @@ func merge_traits(sets: Array[Dictionary], traits: Array[TraitLike]) -> Array[Di
 	return sets
 
 func do_override_props(props: Dictionary) -> void:
-	_props.merge(props, true)
+	_props = _merge_prop_entry(_props, props)
+
+func _merge_prop_entry(tar: Variant, src: Variant) -> Variant:
+	if tar == null: return src
+	if not tar is Dictionary: return src
+	for key in src.keys():
+		tar[key] = _merge_prop_entry(tar.get(key), src[key])
+	return tar
 
 func get_prop(key: StringName) -> Variant:
 	return _props.get(key)

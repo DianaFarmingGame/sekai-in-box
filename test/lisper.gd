@@ -223,12 +223,7 @@ class Context:
 			&"array":
 				return (item[1] as Array).map(exec_item)
 			&"map":
-				var res := {}
-				for i in item[1].size() / 2:
-					var k = exec_item(item[1][2 * i])
-					var v = exec_item(item[1][2 * i + 1])
-					res[k] = v
-				return res
+				return exec_map_part(item[1])
 			&"token":
 				return get_var(item[1])
 			&"list":
@@ -252,6 +247,15 @@ class Context:
 				return null
 		log_error(item, str("unknown item: ", item))
 		return null
+	
+	@warning_ignore("integer_division")
+	func exec_map_part(pairs: Array) -> Dictionary:
+		var res := {}
+		for i in pairs.size() / 2:
+			var k = exec_item(pairs[2 * i])
+			var v = exec_item(pairs[2 * i + 1])
+			res[k] = v
+		return res
 
 class Stream:
 	var raw: String

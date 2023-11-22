@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://chs8jjku04btj"
-path="res://.godot/imported/cat_fighter_sprite2.png-5643047df00e2d487bb77eaa91a7bb5a.ctex"
+uid="uid://co6ivkhpc6b1g"
+path="res://.godot/imported/cat_fighter.png-072fdcedb5bc7ab306211f0a0021fb78.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://test/game/assert/cat_fighter_sprite2.png"
-dest_files=["res://.godot/imported/cat_fighter_sprite2.png-5643047df00e2d487bb77eaa91a7bb5a.ctex"]
+source_file="res://test/game/assert/cat_fighter.png"
+dest_files=["res://.godot/imported/cat_fighter.png-072fdcedb5bc7ab306211f0a0021fb78.ctex"]
 
 [params]
 

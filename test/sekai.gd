@@ -10,7 +10,8 @@ var gss_ctx: Lisper.Context
 @export var unit_size := Vector2(16, 16)
 
 static var root_vars := {
-	&"MonoDefine": MonoDefine.new()
+	&"MonoDefine": MonoDefine.new(),
+	&"MonoEntity": MonoEntity,
 }
 
 func _init(): pass
@@ -62,29 +63,45 @@ func _init_defines() -> void:
 		var expr := FileAccess.get_file_as_string(gss_path)
 		print("[sekai] exec gss: ", gss_path)
 		gss_ctx.eval(expr)
-
-func _make_define(ctx: Lisper.Context, body: Array) -> Variant:
-	var def = ctx.exec_item(body[0])
-	if def != null:
-		var args = body.slice(1).map(ctx.exec_item)
-		for i in args.size() / 2.0:
-			var key = args[2 * i]
-			var value = args[2 * i + 1]
-			match key:
-				&"props":
-					def.do_override_props(value)
-				_:
-					def.set(key, value)
-		return def
-	else:
-		ctx.log_error(body[0], str("make_define: ", body[0], " is not a valid token"))
-		return null
+	
+	queue_redraw()
 
 func make_lisper_context() -> Lisper.Context:
 	var ctx := Lisper.Context.common()
 	ctx.vars.merge(root_vars)
 	ctx.rawfns.merge({
-		&"make_define": _make_define,
+		&"make_define": func (ctx: Lisper.Context, body: Array) -> Variant:
+			var def = ctx.exec_item(body[0])
+			if def != null:
+				def = def.fork()
+				var args = ctx.exec_map_part(body.slice(1))
+				for k in args.keys():
+					match k:
+						&"props":
+							def.do_override_props(args[k])
+						_:
+							def.set(k, args[k])
+				return def
+			else:
+				ctx.log_error(body[0], str("make_define: ", body[0], " is not a valid token"))
+				return null,
+		&"make_mono": func (ctx: Lisper.Context, body: Array) -> Mono:
+			var mono_class = ctx.exec_item(body[0])
+			if mono_class != null:
+				var mono = mono_class.new()
+				var args = ctx.exec_map_part(body.slice(1))
+				for k in args.keys():
+					match k:
+						_:
+							mono.set(k, args[k])
+				return mono
+			else:
+				ctx.log_error(body[0], str("make_mono: ", body[0], " is not a valid token"))
+				return null,
+		&"mono": func (ctx: Lisper.Context, body: Array) -> Mono:
+			var mono = ctx.exec_item(Lisper.Call(&"make_mono", [body]))
+			add_child(mono)
+			return mono,
 	})
 	ctx.macros.merge({
 		&"define": func (body: Array) -> Array:
@@ -94,7 +111,7 @@ func make_lisper_context() -> Lisper.Context:
 					[body[1]],
 					body.slice(2),
 				])],
-			])
+			]),
 	})
 	ctx.functions.merge({
 		

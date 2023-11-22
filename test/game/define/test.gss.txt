@@ -1,5 +1,23 @@
-(mono
-	&id &player
-	&props {
-		
+(mono MonoEntity
+	&define_id &player
+	&override {
+		&position (vec2 4 4)
+	})
+
+(mono MonoEntity
+	&define_id &player
+	&override {
+		&position (vec2 5 4)
+	})
+
+(mono MonoEntity
+	&define_id &player
+	&override {
+		&position (vec2 6 4)
+	})
+
+(mono MonoEntity
+	&define_id &player
+	&override {
+		&position (vec2 7 4)
 	})

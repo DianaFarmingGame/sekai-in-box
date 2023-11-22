@@ -4,6 +4,7 @@ var texture := preload("./assert/scifitiles-sheet.png")
 
 func do_merge(sets: Array[Dictionary]) -> Array[Dictionary]:
 	merge_props(sets, {
+		&"asserts": {},
 		&"position": Vector2(0, 0),
 		&"visible": true,
 	})
