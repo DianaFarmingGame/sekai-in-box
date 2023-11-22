@@ -1,8 +1,0 @@
-[gd_scene load_steps=2 format=3 uid="uid://cw72ht6v4ge7a"]
-
-[ext_resource type="Script" path="res://test/sekai.gd" id="1_hv0yw"]
-
-[node name="Test" type="Node2D"]
-
-[node name="Sekai" type="Node" parent="."]
-script = ExtResource("1_hv0yw")
