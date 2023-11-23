@@ -1,23 +1,107 @@
-(mono MonoEntity
-	&define_id &player
-	&override {
-		&position (vec2 4 4)
+(define Block
+	&ref 0
+	&props {
+		&asserts {
+			&main "scifitiles-sheet.png"
+		}
+		&draw_data {
+			&normal [&static &main (rect2 -0.5 -0.5 1 1) (rect2 192 32 32 32)]
+		}
 	})
 
-(mono MonoEntity
-	&define_id &player
-	&override {
-		&position (vec2 5 4)
+(define Block
+	&ref 101
+	&props {
+		&asserts {
+			&main "scifitiles-sheet.png"
+		}
+		&draw_data {
+			&normal [&fixed &main 0.4 [
+				[(rect2 -0.5 -0.5 1 1) (rect2 64 0 32 32)]
+				[(rect2 -0.5 -0.5 1 1) (rect2 64 160 32 32)]
+			]]
+		}
 	})
 
-(mono MonoEntity
-	&define_id &player
-	&override {
-		&position (vec2 6 4)
+(define Block
+	&ref 102
+	&props {
+		&asserts {
+			&main "scifitiles-sheet.png"
+		}
+		&draw_data {
+			&normal [&fixed &main 1 [
+				[(rect2 -0.5 -0.5 1 1) (rect2 128 32 32 32)]
+				[(rect2 -0.5 -0.5 1 1) (rect2 128 33 32 32)]
+				[(rect2 -0.5 -0.5 1 1) (rect2 128 34 32 32)]
+				[(rect2 -0.5 -0.5 1 1) (rect2 128 35 32 32)]
+				[(rect2 -0.5 -0.5 1 1) (rect2 128 36 32 32)]
+				[(rect2 -0.5 -0.5 1 1) (rect2 128 37 32 32)]
+				[(rect2 -0.5 -0.5 1 1) (rect2 128 38 32 32)]
+				[(rect2 -0.5 -0.5 1 1) (rect2 128 39 32 32)]
+				[(rect2 -0.5 -0.5 1 1) (rect2 128 40 32 32)]
+				[(rect2 -0.5 -0.5 1 1) (rect2 128 41 32 32)]
+				[(rect2 -0.5 -0.5 1 1) (rect2 128 42 32 32)]
+				[(rect2 -0.5 -0.5 1 1) (rect2 128 43 32 32)]
+				[(rect2 -0.5 -0.5 1 1) (rect2 128 44 32 32)]
+				[(rect2 -0.5 -0.5 1 1) (rect2 128 45 32 32)]
+				[(rect2 -0.5 -0.5 1 1) (rect2 128 46 32 32)]
+				[(rect2 -0.5 -0.5 1 1) (rect2 128 47 32 32)]
+				[(rect2 -0.5 -0.5 1 1) (rect2 128 48 32 32)]
+				[(rect2 -0.5 -0.5 1 1) (rect2 128 49 32 32)]
+				[(rect2 -0.5 -0.5 1 1) (rect2 128 50 32 32)]
+				[(rect2 -0.5 -0.5 1 1) (rect2 128 51 32 32)]
+				[(rect2 -0.5 -0.5 1 1) (rect2 128 52 32 32)]
+				[(rect2 -0.5 -0.5 1 1) (rect2 128 53 32 32)]
+				[(rect2 -0.5 -0.5 1 1) (rect2 128 54 32 32)]
+				[(rect2 -0.5 -0.5 1 1) (rect2 128 55 32 32)]
+				[(rect2 -0.5 -0.5 1 1) (rect2 128 56 32 32)]
+				[(rect2 -0.5 -0.5 1 1) (rect2 128 57 32 32)]
+				[(rect2 -0.5 -0.5 1 1) (rect2 128 58 32 32)]
+				[(rect2 -0.5 -0.5 1 1) (rect2 128 59 32 32)]
+				[(rect2 -0.5 -0.5 1 1) (rect2 128 60 32 32)]
+				[(rect2 -0.5 -0.5 1 1) (rect2 128 61 32 32)]
+				[(rect2 -0.5 -0.5 1 1) (rect2 128 62 32 32)]
+				[(rect2 -0.5 -0.5 1 1) (rect2 128 63 32 32)]
+			]]
+		}
 	})
 
+(define Block
+	&ref 103
+	&props {
+		&asserts {
+			&main "scifitiles-sheet.png"
+		}
+		&draw_data {
+			&normal [&static &main (rect2 -0.5 -0.5 1 1) (rect2 0 0 32 32)]
+		}
+	})
+
+(define Block
+	&ref 104
+	&props {
+		&asserts {
+			&main "scifitiles-sheet.png"
+		}
+		&draw_data {
+			&normal [&static &main (rect2 -0.5 -0.5 1 1) (rect2 32 0 32 32)]
+		}
+	})
+
+(mono_map (vec2 1 1) (vec2 8 8) [
+	103	0	0	0	0	0	0	0
+	102	101	101	101	101	101	101	0
+	102	101	0	0	0	0	101	0
+	102	101	0	101	101	0	101	0
+	102	101	0	101	101	0	101	0
+	102	101	0	0	0	0	101	0
+	102	101	101	101	101	101	101	0
+	104	0	0	0	0	0	0	0
+])
+
 (mono MonoEntity
-	&define_id &player
-	&override {
-		&position (vec2 7 4)
+	&define_ref 102
+	&overrides {
+		&position (vec2 0 0)
 	})

@@ -9,7 +9,7 @@ func do_merge(sets: Array[Dictionary]) -> Array[Dictionary]:
 		&"visible": true,
 	})
 	merge_methods(sets, {
-		&"draw": func (sekai: Sekai, this: Mono) -> void:
+		&"draw": func (sekai: Sekai, this, _dt, _t) -> void:
 			var pos := this.get_prop(&"position") as Vector2
 			sekai.pen_draw_texture_region(texture, Rect2(pos, Vector2(1, 1)), Rect2(0, 0, 32, 32))
 	})

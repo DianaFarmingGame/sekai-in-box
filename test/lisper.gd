@@ -325,7 +325,7 @@ class Parser:
 			c = stream.ref(offset)
 		return true
 	
-	var _cs_n_token_head := "&()[]{}$#\"'"
+	var _cs_n_token_head := "&()[]{}$#\"'-"
 	var _cs_n_token_body := "()[]{}\"'"
 	
 	func r_token() -> bool:
@@ -392,7 +392,7 @@ class Parser:
 				c = stream.ref(offset)
 		return false
 	
-	var _cs_number := "0123456789."
+	var _cs_number := "0123456789.-"
 	
 	func r_number() -> bool:
 		var num := []

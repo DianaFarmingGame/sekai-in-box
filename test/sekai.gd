@@ -1,31 +1,23 @@
 class_name Sekai extends Node2D
 
 @export_dir var define_dir: String
+@export_dir var assert_dir: String
 
 var defines: Array[MonoDefine]
 var defines_by_id := {}
-var base_transform: Transform2D
 var gss_ctx: Lisper.Context
 
 @export var unit_size := Vector2(16, 16)
 
 static var root_vars := {
 	&"MonoDefine": MonoDefine.new(),
+	&"Block": GBlock.new(),
+	
 	&"MonoEntity": MonoEntity,
 }
 
-func _init(): pass
-
-func _ready():
-	base_transform = Transform2D(0, unit_size, 0, Vector2(0, 0))
-	queue_redraw()
-
-func _draw():
-	pen_clear_transform()
-	for child in get_children():
-		if child is MonoLike:
-			var mono := child as MonoLike
-			mono.draw()
+func _init() -> void:
+	y_sort_enabled = true
 
 func _enter_tree() -> void:
 	_init_defines()
@@ -44,18 +36,9 @@ func _init_defines() -> void:
 				if extd == "gdf":
 					var res := ResourceLoader.load(file_path)
 					if res is MonoDefine:
-						var define := res as MonoDefine
-						if define.ref >= defines.size(): defines.resize(define.ref + 1)
-						defines[define.ref] = define
+						sign_define(res)
 				elif extd == "gss":
 					gsses.append(file_path)
-	
-	for d in defines:
-		if defines_by_id.has(d.id):
-			var pd := defines_by_id[d.id] as MonoDefine
-			push_error("duplicated define id: ", pd.name, "(", pd.id, ") and ", d.name, "(", d.id, ")")
-		else:
-			defines_by_id[d.id] = d
 	
 	gss_ctx = make_lisper_context()
 	gsses.sort()
@@ -63,8 +46,6 @@ func _init_defines() -> void:
 		var expr := FileAccess.get_file_as_string(gss_path)
 		print("[sekai] exec gss: ", gss_path)
 		gss_ctx.eval(expr)
-	
-	queue_redraw()
 
 func make_lisper_context() -> Lisper.Context:
 	var ctx := Lisper.Context.common()
@@ -85,6 +66,10 @@ func make_lisper_context() -> Lisper.Context:
 			else:
 				ctx.log_error(body[0], str("make_define: ", body[0], " is not a valid token"))
 				return null,
+		&"sign_define": func (ctx: Lisper.Context, body: Array) -> Variant:
+			var def = ctx.exec_item(body[0])
+			sign_define(def)
+			return def,
 		&"make_mono": func (ctx: Lisper.Context, body: Array) -> Mono:
 			var mono_class = ctx.exec_item(body[0])
 			if mono_class != null:
@@ -104,19 +89,38 @@ func make_lisper_context() -> Lisper.Context:
 			return mono,
 	})
 	ctx.macros.merge({
-		&"define": func (body: Array) -> Array:
+		&"Define": func (body: Array) -> Array:
 			return Lisper.Call(&"defvar", [
 				[body[0]],
 				[Lisper.Call(&"make_define", [
-					[body[1]],
-					body.slice(2),
+					body.slice(1),
 				])],
+			]),
+		&"define": func (body: Array) -> Array:
+			return Lisper.Call(&"sign_define", [
+				[Lisper.Call(&"make_define", [body])],
 			]),
 	})
 	ctx.functions.merge({
-		
+		&"mono_map": func (offset: Vector2, size: Vector2, data := []) -> MonoMap:
+			var map := MonoMap.new()
+			map.offset = offset
+			map.size = size
+			map.data = PackedInt32Array(data)
+			add_child(map)
+			return map,
 	})
 	return ctx
+
+func sign_define(define: MonoDefine) -> void:
+	if define.ref >= defines.size(): defines.resize(define.ref + 1)
+	defines[define.ref] = define
+	if define.id != null and define.id != &"":
+		if defines_by_id.has(define.id):
+			var pd := defines_by_id[define.id] as MonoDefine
+			push_error("duplicated define id: ", pd.name, "(", pd.id, ") and ", define.name, "(", define.id, ")")
+		else:
+			defines_by_id[define.id] = define
 
 func call_ref_method(ref: int, method: StringName, argv := []) -> Variant:
 	var handle := defines[ref].get_method(method) as Callable
@@ -127,17 +131,24 @@ func call_ref_method(ref: int, method: StringName, argv := []) -> Variant:
 	else:
 		return null
 
+func get_define(ref: int) -> Variant:
+	return defines[ref]
+
 func get_define_by_id(id: StringName) -> Variant:
 	return defines_by_id.get(id)
 
-func pen_draw_texture(texture: Texture2D, rect: Rect2, pmodulate := Color(1, 1, 1, 1)) -> void:
-	draw_texture_rect(texture, rect, false, pmodulate)
+var assert_cache := {}
 
-func pen_draw_texture_region(texture: Texture2D, rect: Rect2, region: Rect2, pmodulate := Color(1, 1, 1, 1)) -> void:
-	draw_texture_rect_region(texture, rect, region, pmodulate)
+func get_assert(path: String) -> Variant:
+	var res = assert_cache.get(path)
+	if res != null: return res
+	res = load(assert_dir.path_join(path))
+	if res != null:
+		assert_cache[path] = res
+		return res
+	return null
 
-func pen_set_transform(pposition: Vector2, protation := 0.0, pscale := Vector2(1, 1)) -> void:
-	draw_set_transform_matrix(base_transform * Transform2D(protation, pscale, 0, pposition))
-
-func pen_clear_transform() -> void:
-	draw_set_transform_matrix(base_transform)
+func make_item() -> SekaiItem:
+	var item := SekaiItem.new()
+	item.unit_size = unit_size
+	return item

@@ -24,7 +24,7 @@
 	&id &player
 	&props {
 		&asserts {
-			&main "assert/cat_fighter.png"
+			&main "cat_fighter.png"
 		}
 		&anims {
 			&idle (anim &main (vec2 64 64) (rect2 16 16 32 32) (rect2 -0.5 -1 1 1) [

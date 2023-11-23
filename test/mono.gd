@@ -22,12 +22,26 @@ func _enter_tree() -> void:
 			push_error("not found define ref: ", define_ref); return
 	define.finalize()
 
-func get_prop(key: StringName) -> Variant:
-	var ovalue = override.get(key)
-	if ovalue != null: return ovalue
-	return define.get_prop(key)
+func get_prop(key: Variant) -> Variant:
+#	if key is Array:
+#		return null # TODO
+#	else:
+		var ovalue = override.get(key)
+		if ovalue != null: return ovalue
+		return define.get_prop(key)
+
+func set_prop(key: Variant, value) -> Variant:
+	var rawv = define.get_prop(key)
+	if rawv != value:
+		override[key] = value
+	else:
+		override.erase(key)
+	return value
 
 func get_method(key: StringName) -> Variant:
 	return define.get_method(key)
 
-func draw() -> void: pass
+func call_method(key: StringName, argv: Array) -> Variant:
+	var vargv := [sekai, self]
+	vargv.append_array(argv)
+	return define.get_method(key).callv(vargv)
