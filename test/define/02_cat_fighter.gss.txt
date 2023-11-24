@@ -1,4 +1,4 @@
-(define Charactor
+(define Character
 	&ref 200
 	&id &cat_fighter
 	&props {

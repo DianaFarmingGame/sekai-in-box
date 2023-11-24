@@ -23,6 +23,14 @@ func _into_sekai(psekai: Sekai) -> void:
 	for iy in size.y:
 		var layer := sekai.make_item()
 		layer.set_y(iy + offset.y)
+		var need_process := false
+		for i in range(iy * size.x, (iy + 1) * size.x):
+			if map[i].get_prop(&"need_process"): need_process = true; break
+		if need_process:
+			layer.on_process.connect(func ():
+				for i in range(iy * size.x, (iy + 1) * size.x):
+					if map[i].get_prop(&"processing"):
+						map[i].call_method(&"process"))
 		layer.on_draw.connect(func () -> void:
 			for i in range(iy * size.x, (iy + 1) * size.x):
 				map[i].draw())

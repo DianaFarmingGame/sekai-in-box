@@ -14,7 +14,7 @@ var control_target = null
 static var root_vars := {
 	&"MonoDefine": MonoDefine.new(),
 	&"Block": GBlock.new(),
-	&"Charactor": GCharactor.new(),
+	&"Character": GCharacter.new(),
 	
 	&"MonoEntity": MonoEntity,
 }

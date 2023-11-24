@@ -7,8 +7,10 @@ func _into_sekai(psekai: Sekai) -> void:
 	
 	_clear_item()
 	item = sekai.make_item()
-	item.on_process.connect(func ():
-		pass)
+	if get_prop(&"need_process"):
+		item.on_process.connect(func ():
+			if get_prop(&"processing"):
+				call_method(&"process"))
 	item.on_draw.connect(func ():
 		if get_prop(&"visible"):
 			var pos = get_prop(&"position")
