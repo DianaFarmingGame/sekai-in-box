@@ -1,4 +1,4 @@
-class_name GBlock extends MonoDefine
+class_name GCharactor extends MonoDefine
 
 func do_merge(sets: Array[Dictionary]) -> Array[Dictionary]:
 	merge_trait(sets, TVisible)

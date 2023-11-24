@@ -1,6 +1,6 @@
 class_name MonoTrait extends TraitLike
 
-var id := &""
+# var id := &""
 # var props: Dictionary
 # var methods: Dictionary
 # var traits: Array[TraitLike]
@@ -47,4 +47,7 @@ func ready() -> void:
 	pass
 
 func get_uid() -> StringName:
-	return id
+	var vid = get(&"id")
+	if vid == null:
+		return &""
+	return vid

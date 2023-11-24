@@ -6,8 +6,12 @@ var _finalized := false
 var _inited := false
 var _uids: Array[StringName]
 
+#var f_trait := true
+const f_trait := false
+
 func _init() -> void:
 	_inited = true
+	set(&"f_trait", true)
 
 func _get_uid() -> StringName:
 	return &""
@@ -55,7 +59,8 @@ func merge_methods(sets: Array[Dictionary], methods: Dictionary) -> Array[Dictio
 	sets[1].merge(methods)
 	return sets
 
-func merge_trait(sets: Array[Dictionary], t: TraitLike) -> Array[Dictionary]:
+func merge_trait(sets: Array[Dictionary], t) -> Array[Dictionary]:
+	if not t is TraitLike: t = t.new()
 	t.finalize()
 	do_merge_uid(t._get_uid())
 	sets[0].merge(t.get_props())
@@ -63,7 +68,7 @@ func merge_trait(sets: Array[Dictionary], t: TraitLike) -> Array[Dictionary]:
 	do_merge_uids(t.get_uids())
 	return sets
 
-func merge_traits(sets: Array[Dictionary], traits: Array[TraitLike]) -> Array[Dictionary]:
+func merge_traits(sets: Array[Dictionary], traits: Array) -> Array[Dictionary]:
 	for t in traits:
 		sets = merge_trait(sets, t)
 	return sets
