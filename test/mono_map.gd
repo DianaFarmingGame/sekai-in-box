@@ -24,9 +24,9 @@ func _ready() -> void:
 	for iy in size.y:
 		var layer := sekai.make_item()
 		layer.set_y(iy + offset.y)
-		layer.on_draw.connect(func (delta: float, time: float) -> void:
+		layer.on_draw.connect(func () -> void:
 			for i in range(iy * size.x, (iy + 1) * size.x):
-				map[i].draw(delta, time))
+				map[i].draw())
 		layers[iy] = layer
 		sekai.add_child.call_deferred(layer)
 
@@ -57,14 +57,14 @@ class MapPointer:
 	func get_method(key: StringName) -> Variant:
 		return define.get_method(key)
 
-	func call_method(key: StringName, argv: Array) -> Variant:
+	func call_method(key: StringName, argv := []) -> Variant:
 		var vargv := [map.sekai, self]
 		vargv.append_array(argv)
 		return define.get_method(key).callv(vargv)
 
-	func draw(delta: float, time: float) -> void:
+	func draw() -> void:
 		if get_prop(&"visible"):
-			call_method(&"draw", [delta, time])
+			call_method(&"draw")
 	
 	func get_item() -> SekaiItem:
 		if item != null: return item

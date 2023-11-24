@@ -12,16 +12,25 @@ func _ready() -> void:
 var _time := 0.0
 var _t_delta := 0.0
 
+signal on_process
+
 func _process(delta: float) -> void:
 	_time += delta
 	_t_delta = delta
+	on_process.emit()
 	queue_redraw()
 
-signal on_draw(delta: float, time: float)
+signal on_draw
 
 func _draw() -> void:
 	pen_clear_transform()
-	on_draw.emit(_t_delta, _time)
+	on_draw.emit()
+
+func get_time() -> float:
+	return _time
+
+func get_delta_time() -> float:
+	return _t_delta
 
 func set_y(y: float) -> void:
 	position.y = y
