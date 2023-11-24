@@ -14,7 +14,7 @@ func _into_sekai(psekai: Sekai) -> void:
 	item.on_draw.connect(func ():
 		if get_prop(&"visible"):
 			var pos = get_prop(&"position")
-			if pos != null: item.set_y(pos.y)
+			if pos != null: item.set_y(pos.y + floorf(get_prop(&"position_z", 0.0)) * 64)
 			call_method(&"draw"))
 	sekai.add_child.call_deferred(item)
 

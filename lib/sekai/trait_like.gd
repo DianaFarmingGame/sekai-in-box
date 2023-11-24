@@ -91,8 +91,8 @@ func _merge_prop_entry(tar: Variant, src: Variant) -> Variant:
 		tar[key] = _merge_prop_entry(tar.get(key), src[key])
 	return tar
 
-func get_prop(key: StringName) -> Variant:
-	return _props.get(key)
+func get_prop(key: StringName, default = null) -> Variant:
+	return _props.get(key, default)
 
 func get_props() -> Dictionary:
 	return _props

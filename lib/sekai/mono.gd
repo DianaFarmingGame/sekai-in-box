@@ -21,10 +21,10 @@ func _into_sekai(psekai: Sekai) -> void:
 			push_error("not found define ref: ", define_ref); return
 	define.finalize()
 
-func get_prop(key: Variant) -> Variant:
+func get_prop(key: Variant, default = null) -> Variant:
 	var ovalue = override.get(key)
 	if ovalue != null: return ovalue
-	return define.get_prop(key)
+	return define.get_prop(key, default)
 
 func set_prop(key: Variant, value) -> Variant:
 	var prev = get_prop(key)
