@@ -6,6 +6,7 @@ class_name Sekai extends Node2D
 var defines: Array[MonoDefine]
 var defines_by_id := {}
 var gss_ctx: Lisper.Context
+var monos := []
 
 @export var unit_size := Vector2(16, 16)
 
@@ -19,7 +20,7 @@ static var root_vars := {
 func _init() -> void:
 	y_sort_enabled = true
 
-func _enter_tree() -> void:
+func _ready() -> void:
 	_init_defines()
 
 func _init_defines() -> void:
@@ -85,7 +86,7 @@ func make_lisper_context() -> Lisper.Context:
 				return null,
 		&"mono": func (ctx: Lisper.Context, body: Array) -> Mono:
 			var mono = ctx.exec_item(Lisper.Call(&"make_mono", [body]))
-			add_child(mono)
+			add_mono(mono)
 			return mono,
 	})
 	ctx.macros.merge({
@@ -107,7 +108,7 @@ func make_lisper_context() -> Lisper.Context:
 			map.offset = offset
 			map.size = size
 			map.data = PackedInt32Array(data)
-			add_child(map)
+			add_mono(map)
 			return map,
 	})
 	return ctx
@@ -121,6 +122,10 @@ func sign_define(define: MonoDefine) -> void:
 			push_error("duplicated define id: ", pd.name, "(", pd.id, ") and ", define.name, "(", define.id, ")")
 		else:
 			defines_by_id[define.id] = define
+
+func add_mono(mono) -> void:
+	monos.append(mono)
+	mono._into_sekai(self)
 
 func call_ref_method(ref: int, method: StringName, argv := []) -> Variant:
 	var handle := defines[ref].get_method(method) as Callable

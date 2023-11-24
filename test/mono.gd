@@ -1,15 +1,14 @@
-class_name Mono extends MonoLike
+class_name Mono
 
-@export var define_ref := -1
-@export var define_id := &""
-@export var override := {}
+var define_ref := -1
+var define_id: StringName
+var override := {}
 
+var sekai: Sekai
 var define: MonoDefine
 
-func _enter_tree() -> void:
-	super._enter_tree()
-	if sekai == null:
-		push_error("parent isn't Sekai"); return
+func _into_sekai(psekai: Sekai) -> void:
+	sekai = psekai
 	if define_ref < 0:
 		var d := sekai.get_define_by_id(define_id) as MonoDefine
 		if d == null:
@@ -45,3 +44,6 @@ func call_method(key: StringName, argv := []) -> Variant:
 	var vargv := [sekai, self]
 	vargv.append_array(argv)
 	return define.get_method(key).callv(vargv)
+
+func get_item() -> SekaiItem:
+	return SekaiItem.new()

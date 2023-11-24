@@ -2,7 +2,9 @@ class_name MonoEntity extends Mono
 
 var item: SekaiItem
 
-func _ready() -> void:
+func _into_sekai(psekai: Sekai) -> void:
+	super._into_sekai(psekai)
+	
 	_clear_item()
 	item = sekai.make_item()
 	item.on_process.connect(func ():
@@ -14,9 +16,6 @@ func _ready() -> void:
 			if pos != null: item.set_y(pos.y)
 			call_method(&"draw"))
 	sekai.add_child.call_deferred(item)
-
-func _exit_tree() -> void:
-	_clear_item()
 
 func _clear_item() -> void:
 	if item: sekai.remove_child(item)
