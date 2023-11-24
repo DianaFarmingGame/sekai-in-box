@@ -68,6 +68,10 @@ static func _make_common_context() -> Context:
 			if x_p == null: return Vector2()
 			if y == null: return Vector2(x_p)
 			return Vector2(x_p, y),
+		&"vec3": func (x_p = null, y = null, z = null) -> Vector3:
+			if x_p == null: return Vector3()
+			if y == null: return Vector3(x_p)
+			return Vector3(x_p, y, z),
 		&"rect2": func (x_p = null, y_s = null, w = null, h = null) -> Rect2:
 			if x_p == null: return Rect2()
 			if y_s == null: return Rect2(x_p)
@@ -413,7 +417,8 @@ class Parser:
 			offset += 1
 			c = stream.ref(offset)
 		if num.size() > 0:
-			push(&"number", ''.join(num).to_float())
+			var cnum := ''.join(num)
+			push(&"number", -1.0 if cnum == '-' else cnum.to_float())
 			return true
 		else:
 			return false

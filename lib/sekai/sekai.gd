@@ -108,9 +108,13 @@ func make_lisper_context() -> Lisper.Context:
 			]),
 	})
 	ctx.functions.merge({
-		&"mono_map": func (offset: Vector2, size: Vector2, data := []) -> MonoMap:
+		&"mono_map": func (offset, size: Vector2, data := []) -> MonoMap:
 			var map := MonoMap.new()
-			map.offset = offset
+			if offset is Vector2:
+				map.offset = offset
+			else:
+				map.offset = Vector2(offset.x, offset.y)
+				map.offset_z = offset.z
 			map.size = size
 			map.data = PackedInt32Array(data)
 			add_mono(map)

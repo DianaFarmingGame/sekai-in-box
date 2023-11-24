@@ -1,7 +1,6 @@
 class_name GCharacter extends MonoDefine
 
 func do_merge(sets: Array[Dictionary]) -> Array[Dictionary]:
-	merge_traits(sets, [TVisible, TInputKey, TProcess])
 	merge_props(sets, {
 		&"position": Vector2(0, 0),
 		&"state": &"normal",
@@ -11,6 +10,13 @@ func do_merge(sets: Array[Dictionary]) -> Array[Dictionary]:
 		&"process": func (_sekai, this: Mono) -> void:
 			var delta := this.get_item().get_delta_time()
 			this.set_prop(&"position", this.get_prop(&"position") + this.get_prop(&"cur_speed") * delta),
+		&"draw": func (sekai: Sekai, this: Mono) -> void:
+			var item := this.get_item() as SekaiItem
+			var pos := this.get_prop(&"position") as Vector2
+			item.pen_set_transform(pos, 0, Vector2(1, 0.4))
+			item.draw_circle(Vector2(0, 0), 0.25, 0x00000055)
+			item.pen_clear_transform()
+			TVisible.draw(sekai, this),
 	})
 	merge_watchers(sets, {
 		&"input_keys": func (_sekai, this: Mono, _prev, keys: Dictionary):
@@ -29,4 +35,5 @@ func do_merge(sets: Array[Dictionary]) -> Array[Dictionary]:
 				this.call_method(&"reset_to_drawer", [&"walk"])
 			return keys,
 	})
+	merge_traits(sets, [TVisible, TInputKey, TProcess])
 	return super.do_merge(sets)

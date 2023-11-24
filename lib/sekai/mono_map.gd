@@ -12,13 +12,14 @@ var layers := []
 
 func _into_sekai(psekai: Sekai) -> void:
 	sekai = psekai
+	var length := (size.x * size.y) as int
 	map.clear()
-	map.resize(data.size())
-	for i in data.size():
-		var ref := data[i]
+	map.resize(length)
+	for i in length:
+		var ref := data[i % data.size()]
 		if ref >= 0:
 			var ptr := MapPointer.new(self, i)
-			ptr.define_ref = data[i]
+			ptr.define_ref = ref
 			ptr._into_sekai(sekai)
 			map[i] = ptr
 	
