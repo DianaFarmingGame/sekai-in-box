@@ -1,9 +1,9 @@
 class_name MonoTrait extends TraitLike
 
 # var id := &""
+# var traits: Array
 # var props: Dictionary
 # var methods: Dictionary
-# var traits: Array[TraitLike]
 
 func _finalize() -> void:
 	prepare()
@@ -30,10 +30,10 @@ func _get_own_methods() -> Dictionary:
 	else:
 		return vmethods
 
-func _get_own_traits() -> Array[TraitLike]:
+func _get_own_traits() -> Array:
 	var vtraits = get(&"traits")
 	if vtraits == null:
-		return [] as Array[TraitLike]
+		return [] as Array
 	else:
 		return vtraits
 

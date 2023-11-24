@@ -2,6 +2,8 @@ class_name TVisible extends MonoTrait
 
 var id := &"visible"
 
+var traits := [TAssert]
+
 var props := {
 	&"visible": true,
 	&"draw_data": {},

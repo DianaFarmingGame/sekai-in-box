@@ -3,15 +3,15 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://cnwnq14me0m7s"
-path="res://.godot/imported/scifitiles-sheet.png-1e595109d83dee8859683a4d26ea7e66.ctex"
+path="res://.godot/imported/scifitiles-sheet.png-262e8aab92ef9920f8b22e6013107518.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://test/game/assert/scifitiles-sheet.png"
-dest_files=["res://.godot/imported/scifitiles-sheet.png-1e595109d83dee8859683a4d26ea7e66.ctex"]
+source_file="res://test/assert/scifitiles-sheet.png"
+dest_files=["res://.godot/imported/scifitiles-sheet.png-262e8aab92ef9920f8b22e6013107518.ctex"]
 
 [params]
 
