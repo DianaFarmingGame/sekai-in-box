@@ -12,7 +12,7 @@ var props := {
 }
 
 var methods := {
-	&"draw": func (_sekai: Sekai, this) -> void:
+	&"draw": func (_sekai, this: Mono) -> void:
 		var item := this.get_item() as SekaiItem
 		var t := (item.get_time() - this.get_prop(&"draw_timer")) as float
 		var pos := this.get_prop(&"position") as Vector2
@@ -31,6 +31,6 @@ var methods := {
 			_:
 				push_error("unknown draw type: ", this.get_prop(&"draw_type"))
 		,
-	&"reset_draw_timer": func (_sekai: Sekai, this) -> void:
+	&"reset_draw_timer": func (_sekai, this: Mono) -> void:
 		this.set_prop(&"draw_timer", this.get_item().get_time()),
 }

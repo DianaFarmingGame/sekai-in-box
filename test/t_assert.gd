@@ -7,6 +7,6 @@ var props := {
 }
 
 var methods := {
-	&"get_assert": func (sekai: Sekai, this, pid: StringName) -> Variant:
+	&"get_assert": func (sekai: Sekai, this: Mono, pid: StringName) -> Variant:
 		return sekai.get_assert(this.get_prop(&"asserts")[pid]),
 }

@@ -90,7 +90,9 @@ static func test_parser() -> void:
 	print(Lisper.tokenize("token t$&.#"))
 	print(Lisper.tokenize("() (list tail) (nested (1 2 3))"))
 	print(Lisper.tokenize("[] [array 1 2 3] [nested [1 2 3]]"))
+	print(Lisper.tokenize("{} {&map [1 2 3] &nested {&id &123}}"))
 	print(Lisper.tokenize("; comment\n token ; another comment"))
+	print(Lisper.tokenize("#;[ skiper comment ]"))
 
 static func test_common() -> void:
 	print(Lisper.eval("""

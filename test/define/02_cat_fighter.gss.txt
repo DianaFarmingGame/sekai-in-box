@@ -1,2 +1,32 @@
-#;(mono
-	asdvoin)
+(define Charactor
+	&ref 200
+	&id &cat_fighter
+	&props {
+		&asserts {
+			&main "cat_fighter.png"
+		}
+		&draw_data {
+			&normal [&fixed &main 0.8 [
+				[(rect2 -1 -1.6 2 2) (rect2 0 0 64 64)]
+				[(rect2 -1 -1.6 2 2) (rect2 64 0 64 64)]
+				[(rect2 -1 -1.6 2 2) (rect2 128 0 64 64)]
+				[(rect2 -1 -1.6 2 2) (rect2 192 0 64 64)]
+			]]
+			&walk [&fixed &main 0.8 [
+				[(rect2 -1 -1.6 2 2) (rect2 0 64 64 64)]
+				[(rect2 -1 -1.6 2 2) (rect2 64 64 64 64)]
+				[(rect2 -1 -1.6 2 2) (rect2 128 64 64 64)]
+				[(rect2 -1 -1.6 2 2) (rect2 192 64 64 64)]
+				[(rect2 -1 -1.6 2 2) (rect2 256 64 64 64)]
+				[(rect2 -1 -1.6 2 2) (rect2 320 64 64 64)]
+				[(rect2 -1 -1.6 2 2) (rect2 384 64 64 64)]
+				[(rect2 -1 -1.6 2 2) (rect2 448 64 64 64)]
+			]]
+		}
+	})
+
+(set_control (mono MonoEntity
+	&define_id &cat_fighter
+	&override {
+		&position (vec2 2 2)
+	}))

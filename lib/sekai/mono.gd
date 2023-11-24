@@ -43,7 +43,9 @@ func get_method(key: StringName) -> Variant:
 func call_method(key: StringName, argv := []) -> Variant:
 	var vargv := [sekai, self]
 	vargv.append_array(argv)
-	return define.get_method(key).callv(vargv)
+	var handle = define.get_method(key)
+	if handle != null: return handle.callv(vargv)
+	return null
 
 func get_item() -> SekaiItem:
 	return SekaiItem.new()

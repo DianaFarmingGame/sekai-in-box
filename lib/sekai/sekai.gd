@@ -7,12 +7,14 @@ var defines: Array[MonoDefine]
 var defines_by_id := {}
 var gss_ctx: Lisper.Context
 var monos := []
+var control_target = null
 
 @export var unit_size := Vector2(16, 16)
 
 static var root_vars := {
 	&"MonoDefine": MonoDefine.new(),
 	&"Block": GBlock.new(),
+	&"Charactor": GCharactor.new(),
 	
 	&"MonoEntity": MonoEntity,
 }
@@ -22,6 +24,11 @@ func _init() -> void:
 
 func _ready() -> void:
 	_init_defines()
+
+func _input(event: InputEvent) -> void:
+	if control_target != null:
+		if event is InputEventKey:
+			control_target.call_method(&"input_key", [event])
 
 func _init_defines() -> void:
 	var gsses := []
@@ -45,7 +52,7 @@ func _init_defines() -> void:
 	gsses.sort()
 	for gss_path in gsses:
 		var expr := FileAccess.get_file_as_string(gss_path)
-		print("[sekai] exec gss: ", gss_path)
+		print("[sekai] load gss: ", gss_path)
 		gss_ctx.eval(expr)
 
 func make_lisper_context() -> Lisper.Context:
@@ -110,6 +117,11 @@ func make_lisper_context() -> Lisper.Context:
 			map.data = PackedInt32Array(data)
 			add_mono(map)
 			return map,
+		&"set_control": func (mono: Mono) -> Mono:
+			control_target = mono
+			return mono,
+		&"clear_control": func () -> void:
+			control_target = null,
 	})
 	return ctx
 
