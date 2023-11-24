@@ -84,9 +84,7 @@ func make_lisper_context() -> Lisper.Context:
 				var mono = mono_class.new()
 				var args = ctx.exec_map_part(body.slice(1))
 				for k in args.keys():
-					match k:
-						_:
-							mono.set(k, args[k])
+					mono.set(k, args[k])
 				return mono
 			else:
 				ctx.log_error(body[0], str("make_mono: ", body[0], " is not a valid token"))

@@ -22,14 +22,15 @@ func _into_sekai(psekai: Sekai) -> void:
 	define.finalize()
 
 func get_prop(key: Variant) -> Variant:
-#	if key is Array:
-#		return null # TODO
-#	else:
-		var ovalue = override.get(key)
-		if ovalue != null: return ovalue
-		return define.get_prop(key)
+	var ovalue = override.get(key)
+	if ovalue != null: return ovalue
+	return define.get_prop(key)
 
 func set_prop(key: Variant, value) -> Variant:
+	var prev = get_prop(key)
+	if prev != value:
+		var watcher = define.get_watcher(key)
+		if watcher != null: value = watcher.call(sekai, self, prev, value)
 	var rawv = define.get_prop(key)
 	if rawv != value:
 		override[key] = value
