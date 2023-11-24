@@ -305,7 +305,7 @@ class Parser:
 	var _cs_blank := "\u0009\u000B\u000C\u0020\u00A0\u000A\u000D\u2028\u2029"
 	
 	func r_blank() -> bool:
-		while r_whitespace() and r_comment(): pass
+		while r_whitespace() and (r_comment() or r_skiper()): pass
 		return true
 	
 	func r_comment() -> bool:
@@ -315,6 +315,15 @@ class Parser:
 			while c != null and c != '\n':
 				offset += 1
 				c = stream.ref(offset)
+			return true
+		return false
+	
+	func r_skiper() -> bool:
+		if stream.ref(offset) == '#' and stream.ref(offset + 1) == ';':
+			offset += 2
+			var np := fork()
+			np.r_blank(); np.r_item()
+			offset = np.offset
 			return true
 		return false
 	

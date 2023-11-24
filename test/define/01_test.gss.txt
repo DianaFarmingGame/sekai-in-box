@@ -30,7 +30,7 @@
 			&main "scifitiles-sheet.png"
 		}
 		&draw_data {
-			&normal [&fixed &main 0.2 [
+			&normal [&fixed &main 1 [
 				[(rect2 -0.5 -0.5 1 1) (rect2 128 32 32 32)]
 				[(rect2 -0.5 -0.5 1 1) (rect2 128 33 32 32)]
 				[(rect2 -0.5 -0.5 1 1) (rect2 128 34 32 32)]

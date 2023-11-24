@@ -8,8 +8,7 @@ func _into_sekai(psekai: Sekai) -> void:
 	_clear_item()
 	item = sekai.make_item()
 	item.on_process.connect(func ():
-		set_prop(&"position", get_prop(&"position") + Vector2(item.get_delta_time(), item.get_delta_time()))
-		call_method(&"reset_draw_timer"))
+		pass)
 	item.on_draw.connect(func ():
 		if get_prop(&"visible"):
 			var pos = get_prop(&"position")
