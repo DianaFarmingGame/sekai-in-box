@@ -55,7 +55,9 @@ func _init_defines() -> void:
 	for gss_path in gsses:
 		var expr := FileAccess.get_file_as_string(gss_path)
 		print("[sekai] loading gss: ", gss_path)
+		var stime := Time.get_ticks_usec()
 		gss_ctx.eval(expr)
+		print("[sekai] loaded in ", Time.get_ticks_usec() - stime, " us")
 
 func make_lisper_context() -> Lisper.Context:
 	var ctx := Lisper.Context.common()

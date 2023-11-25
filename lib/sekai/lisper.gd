@@ -6,7 +6,8 @@ static func eval(expr: String) -> Variant:
 	return [ctx, res]
 
 static func tokenize(expr: String) -> Variant:
-	var parser := Parser.new(GispStream.make(expr))
+#	var parser := GispParser.make(GispStream.make(expr))
+	var parser := Parser.new(Stream.new(expr))
 	if parser.r_root():
 		return parser.result
 	else:
@@ -263,12 +264,24 @@ class Context:
 			res[k] = v
 		return res
 
+class Stream:
+	var raw: String
+	var vlen: int
+	
+	func _init(praw: String) -> void:
+		raw = praw
+		vlen = praw.length()
+	
+	func pick(offset: int) -> Variant:
+		@warning_ignore("incompatible_ternary")
+		return raw[offset] if offset < vlen else null
+
 class Parser:
-	var stream: GispStream
+	var stream: Stream
 	var offset: int
 	var result := []
 	
-	func _init(pstream: GispStream, poffset := 0) -> void:
+	func _init(pstream: Stream, poffset := 0) -> void:
 		stream = pstream
 		offset = poffset
 	
@@ -289,14 +302,12 @@ class Parser:
 	func r_root() -> bool:
 		var np := fork()
 		while np.r_blank() and np.r_item(): pass
-		if np.offset == np.stream.len():
+		if np.offset == np.stream.vlen:
 			offset = np.offset
 			result = np.result
 			return true
 		else:
 			return false
-	
-	var _cs_blank := "\u0009\u000B\u000C\u0020\u00A0\u000A\u000D\u2028\u2029"
 	
 	func r_blank() -> bool:
 		while r_whitespace() and (r_comment() or r_skiper()): pass
@@ -321,9 +332,11 @@ class Parser:
 			return true
 		return false
 	
+	var _cs_blank := "\u0009\u000B\u000C\u0020\u00A0\u000A\u000D\u2028\u2029"
+	
 	func r_whitespace() -> bool:
 		var c = stream.pick(offset)
-		while c != null and _cs_blank.contains(stream.pick(offset)):
+		while c != null and _cs_blank.contains(c):
 			offset += 1
 			c = stream.pick(offset)
 		return true
@@ -333,10 +346,9 @@ class Parser:
 	
 	func r_token() -> bool:
 		var poffset := offset
-		var token := []
 		var c = stream.pick(offset)
 		if c != null and not _cs_blank.contains(c) and not _cs_n_token_head.contains(c) and not _cs_number.contains(c):
-			token.append(c)
+			var token := [c]
 			offset += 1
 			c = stream.pick(offset)
 			while c != null and not _cs_blank.contains(c) and not _cs_n_token_body.contains(c):
@@ -349,9 +361,9 @@ class Parser:
 	
 	func r_keyword() -> bool:
 		var poffset := offset
-		var keyword := []
 		var c = stream.pick(offset)
 		if c == '&':
+			var keyword := []
 			offset += 1
 			c = stream.pick(offset)
 			while c != null and not _cs_blank.contains(c) and not _cs_n_token_body.contains(c):
@@ -468,12 +480,11 @@ class Parser:
 			np.offset += 1
 			while np.r_blank() and (np.r_keyword() or np.r_string()) and np.r_blank() and np.r_item(): pass
 			np.r_blank()
-			if np.stream.pick(np.offset) == '}':
-				if np.result.size() % 2 == 0:
-					np.offset += 1
-					offset = np.offset
-					push(&"map", np.result)
-					return true
+			if np.stream.pick(np.offset) == '}' and np.result.size() % 2 == 0:
+				np.offset += 1
+				offset = np.offset
+				push(&"map", np.result)
+				return true
 		return false
 	
 	func r_set() -> bool:
