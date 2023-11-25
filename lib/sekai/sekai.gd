@@ -54,7 +54,7 @@ func _init_defines() -> void:
 	gsses.sort()
 	for gss_path in gsses:
 		var expr := FileAccess.get_file_as_string(gss_path)
-		print("[sekai] load gss: ", gss_path)
+		print("[sekai] loading gss: ", gss_path)
 		gss_ctx.eval(expr)
 
 func make_lisper_context() -> Lisper.Context:
