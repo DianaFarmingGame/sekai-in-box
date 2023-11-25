@@ -25,9 +25,8 @@
 		}
 	})
 
-(set_control (mono MonoEntity
-	&define_id &cat_fighter
-	&override {
+(set_control (mono MonoEntity &cat_fighter
+	&props {
 		&position (vec2 2 2)
 		&position_z 1.0
 	}))

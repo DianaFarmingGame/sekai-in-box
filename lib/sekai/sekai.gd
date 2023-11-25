@@ -7,6 +7,8 @@ var defines: Array[MonoDefine]
 var defines_by_id := {}
 var gss_ctx: Lisper.Context
 var monos := []
+var monos_need_route := []
+var monos_need_collision := []
 var control_target = null
 
 @export var unit_size := Vector2(16, 16)
@@ -81,10 +83,13 @@ func make_lisper_context() -> Lisper.Context:
 		&"make_mono": func (ctx: Lisper.Context, body: Array) -> Mono:
 			var mono_class = ctx.exec_item(body[0])
 			if mono_class != null:
+				var define = get_define(ctx.exec_item(body[1]))
+				if define == null: return null
 				var mono = mono_class.new()
-				var args = ctx.exec_map_part(body.slice(1))
+				var args = ctx.exec_map_part(body.slice(2))
 				for k in args.keys():
 					mono.set(k, args[k])
+				mono.set_define(define)
 				return mono
 			else:
 				ctx.log_error(body[0], str("make_mono: ", body[0], " is not a valid token"))
@@ -93,6 +98,10 @@ func make_lisper_context() -> Lisper.Context:
 			var mono = ctx.exec_item(Lisper.Call(&"make_mono", [body]))
 			add_mono(mono)
 			return mono,
+		&"mono_map": func (ctx: Lisper.Context, body: Array) -> MonoMap:
+			var map = ctx.exec_item(Lisper.Call(&"make_mono_map", [body]))
+			add_mono(map)
+			return map,
 	})
 	ctx.macros.merge({
 		&"Define": func (body: Array) -> Array:
@@ -108,7 +117,7 @@ func make_lisper_context() -> Lisper.Context:
 			]),
 	})
 	ctx.functions.merge({
-		&"mono_map": func (offset, size: Vector2, data := []) -> MonoMap:
+		&"make_mono_map": func (offset, size: Vector2, data := []) -> MonoMap:
 			var map := MonoMap.new()
 			if offset is Vector2:
 				map.offset = offset
@@ -117,7 +126,6 @@ func make_lisper_context() -> Lisper.Context:
 				map.offset_z = offset.z
 			map.size = size
 			map.data = PackedInt32Array(data)
-			add_mono(map)
 			return map,
 		&"set_control": func (mono: Mono) -> Mono:
 			control_target = mono
@@ -150,11 +158,25 @@ func call_ref_method(ref: int, method: StringName, argv := []) -> Variant:
 	else:
 		return null
 
-func get_define(ref: int) -> Variant:
+func get_define_by_ref(ref: int) -> Variant:
 	return defines[ref]
 
 func get_define_by_id(id: StringName) -> Variant:
 	return defines_by_id.get(id)
+
+func get_define(ref_id: Variant) -> Variant:
+	var define: MonoDefine
+	if ref_id is int:
+		define = get_define_by_ref(ref_id) as MonoDefine
+		if define == null:
+			push_error("not found define ref: ", ref_id); return null
+	elif ref_id is StringName or ref_id is String:
+		define = get_define_by_id(ref_id) as MonoDefine
+		if define == null:
+			push_error("not found define id: ", ref_id); return null
+	else:
+		push_error("unable to parse define pointer: ", ref_id); return null
+	return define
 
 var assert_cache := {}
 
@@ -171,3 +193,6 @@ func make_item() -> SekaiItem:
 	var item := SekaiItem.new()
 	item.unit_size = unit_size
 	return item
+
+func is_routable(region: Rect2) -> bool:
+	return true

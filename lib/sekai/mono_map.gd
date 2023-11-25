@@ -19,7 +19,7 @@ func _into_sekai(psekai: Sekai) -> void:
 		var ref := data[i % data.size()]
 		if ref >= 0:
 			var ptr := MapPointer.new(self, i)
-			ptr.define_ref = ref
+			ptr.set_define(sekai.get_define(ref))
 			ptr._into_sekai(sekai)
 			map[i] = ptr
 	
