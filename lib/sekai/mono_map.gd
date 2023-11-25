@@ -1,9 +1,9 @@
 class_name MonoMap
 
-@export var size := Vector2(0, 0)
-@export var offset := Vector2(0, 0)
-@export var offset_z := 0.0
-@export var data := PackedInt32Array([])
+var size := Vector2(0, 0)
+var offset := Vector2(0, 0)
+var offset_z := 0.0
+var data := PackedInt32Array([])
 
 var sekai: Sekai
 
@@ -47,6 +47,11 @@ func _clear_layers() -> void:
 	for layer in layers: sekai.remove_child(layer)
 	layers.clear()
 
+func get_ptr(pos: Vector2i) -> Variant:
+	if Rect2i(Vector2i(), size).has_point(pos):
+		return map[size.x * pos.y + pos.x]
+	return null
+
 class MapPointer extends Mono:
 	var idx: int
 	var map: MonoMap
@@ -61,11 +66,82 @@ class MapPointer extends Mono:
 			call_method(&"draw")
 	
 	func get_prop(key: Variant, default = null) -> Variant:
-		if key == &"position":
-			return Vector2(idx % (map.size.x as int), (idx / map.size.x) as int) + map.offset
+		match key:
+			&"position":
+				return Vector2(idx % (map.size.x as int), (idx / map.size.x) as int) + map.offset
+			&"position_z":
+				return map.offset_z
 		return super.get_prop(key, default)
 	
 	func get_item() -> SekaiItem:
 		if item != null: return item
 		item = map.layers[(idx / map.size.x) as int]
 		return item
+
+func is_need_collision() -> bool:
+	var need_collision := false
+	for ptr in map:
+		if ptr != null and ptr.is_need_collision(): need_collision = true
+	return need_collision
+
+func is_need_route() -> bool:
+	var need_route := false
+	for ptr in map:
+		if ptr != null and ptr.is_need_route(): need_route = true
+	return need_route
+
+func will_route(point: Vector2, z_pos: int) -> Mono:
+	if floori(offset_z) == z_pos:
+		var cen := Vector2i((point - offset).round())
+		if Rect2i(Vector2i(), size).grow(1).has_point(cen):
+			# center
+			var ptr = get_ptr(cen)
+			if ptr and ptr.will_route(point, z_pos): return ptr
+			# sides
+			ptr = get_ptr(cen + Vector2i(1, 0))
+			if ptr and ptr.will_route(point, z_pos): return ptr
+			ptr = get_ptr(cen + Vector2i(0, 1))
+			if ptr and ptr.will_route(point, z_pos): return ptr
+			ptr = get_ptr(cen + Vector2i(-1, 0))
+			if ptr and ptr.will_route(point, z_pos): return ptr
+			ptr = get_ptr(cen + Vector2i(0, -1))
+			if ptr and ptr.will_route(point, z_pos): return ptr
+			# corners
+			ptr = get_ptr(cen + Vector2i(1, 1))
+			if ptr and ptr.will_route(point, z_pos): return ptr
+			ptr = get_ptr(cen + Vector2i(1, -1))
+			if ptr and ptr.will_route(point, z_pos): return ptr
+			ptr = get_ptr(cen + Vector2i(-1, 1))
+			if ptr and ptr.will_route(point, z_pos): return ptr
+			ptr = get_ptr(cen + Vector2i(-1, -1))
+			if ptr and ptr.will_route(point, z_pos): return ptr
+			return null
+	return null
+
+func will_collide(region: Rect2, z_pos: int) -> Mono:
+	if floori(offset_z) == z_pos:
+		var cen := Vector2i((region.get_center() - offset).round())
+		if Rect2i(Vector2i(), size).grow(1).has_point(cen):
+			# center
+			var ptr = get_ptr(cen)
+			if ptr and ptr.will_collide(region, z_pos): return ptr
+			# sides
+			ptr = get_ptr(cen + Vector2i(1, 0))
+			if ptr and ptr.will_collide(region, z_pos): return ptr
+			ptr = get_ptr(cen + Vector2i(0, 1))
+			if ptr and ptr.will_collide(region, z_pos): return ptr
+			ptr = get_ptr(cen + Vector2i(-1, 0))
+			if ptr and ptr.will_collide(region, z_pos): return ptr
+			ptr = get_ptr(cen + Vector2i(0, -1))
+			if ptr and ptr.will_collide(region, z_pos): return ptr
+			# corners
+			ptr = get_ptr(cen + Vector2i(1, 1))
+			if ptr and ptr.will_collide(region, z_pos): return ptr
+			ptr = get_ptr(cen + Vector2i(1, -1))
+			if ptr and ptr.will_collide(region, z_pos): return ptr
+			ptr = get_ptr(cen + Vector2i(-1, 1))
+			if ptr and ptr.will_collide(region, z_pos): return ptr
+			ptr = get_ptr(cen + Vector2i(-1, -1))
+			if ptr and ptr.will_collide(region, z_pos): return ptr
+			return null
+	return null

@@ -43,7 +43,26 @@ func get_item() -> SekaiItem:
 	return SekaiItem.new()
 
 func is_need_collision() -> bool:
-	return get_prop(&"need_collision")
+	return get_prop(&"need_collision", false)
 
 func is_need_route() -> bool:
-	return get_prop(&"need_route")
+	return get_prop(&"need_route", false)
+
+func will_route(point: Vector2, z_pos: int) -> Mono:
+	if floori(get_prop(&"position_z")) == z_pos:
+		if get_prop(&"routable"):
+			var box := get_prop(&"route_box") as Rect2
+			var pos := get_prop(&"position") as Vector2
+			box = Rect2(pos + box.position, box.size)
+			if box.has_point(point):
+				return self
+	return null
+
+func will_collide(region: Rect2, z_pos: int) -> Mono:
+	if floori(get_prop(&"position_z")) == z_pos:
+		if get_prop(&"collisible"):
+			var box := get_prop(&"collision_box") as Rect2
+			var pos := get_prop(&"position") as Vector2
+			if Rect2(pos + box.position, box.size).intersects(region):
+				return self
+	return null

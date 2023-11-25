@@ -8,5 +8,5 @@ func do_merge(sets: Array[Dictionary]) -> Array[Dictionary]:
 	merge_methods(sets, {
 		
 	})
-	merge_trait(sets, TVisible)
+	merge_traits(sets, [TVisible, TCollisible, TRoutable])
 	return super.do_merge(sets)

@@ -1,5 +1,7 @@
 class_name TraitLike extends Resource
 
+const DETECT_DUPLICATE_TRAIT := false
+
 var _props: Dictionary
 var _methods: Dictionary
 var _watchers: Dictionary
@@ -47,7 +49,8 @@ func _do_merge(sets: Array[Dictionary]) -> Array[Dictionary]:
 func do_merge_uid(uid: StringName) -> void:
 	if uid != &"":
 		if _uids.has(uid):
-			push_warning("duplicated trait, uid: ", uid)
+			if DETECT_DUPLICATE_TRAIT:
+				push_warning("duplicated trait, uid: ", uid)
 		else:
 			_uids.append(uid)
 

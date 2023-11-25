@@ -148,6 +148,8 @@ func sign_define(define: MonoDefine) -> void:
 func add_mono(mono) -> void:
 	monos.append(mono)
 	mono._into_sekai(self)
+	if mono.is_need_collision(): monos_need_collision.append(mono)
+	if mono.is_need_route(): monos_need_route.append(mono)
 
 func call_ref_method(ref: int, method: StringName, argv := []) -> Variant:
 	var handle := defines[ref].get_method(method) as Callable
@@ -194,5 +196,17 @@ func make_item() -> SekaiItem:
 	item.unit_size = unit_size
 	return item
 
-func is_routable(region: Rect2) -> bool:
-	return true
+func will_route(point: Vector2, z_pos: int) -> Mono:
+	for mono in monos_need_route:
+		var res = mono.will_route(point, z_pos)
+		if res: return res
+	return null
+
+func will_collide(region: Rect2, z_pos: int) -> Mono:
+	for mono in monos_need_collision:
+		var res = mono.will_collide(region, z_pos)
+		if res: return res
+	return null
+
+func can_pass(region: Rect2, z_pos: int) -> bool:
+	return not will_collide(region, z_pos) and will_route(region.get_center(), z_pos - 1)
