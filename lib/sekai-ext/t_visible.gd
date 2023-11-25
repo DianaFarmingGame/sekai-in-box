@@ -52,4 +52,5 @@ static func draw(_sekai, this: Mono) -> void:
 				item.pen_draw_texture_region(texture, Rect2(pos + frame[0].position, frame[0].size), frame[1])
 		_:
 			push_error("unknown draw type: ", this.get_prop(&"draw_type"))
-	TCollisible.draw_debug(_sekai, this)
+#	TCollisible.draw_debug(_sekai, this)
+#	TRoutable.draw_debug(_sekai, this)
