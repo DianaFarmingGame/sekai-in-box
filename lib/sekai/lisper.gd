@@ -6,7 +6,7 @@ static func eval(expr: String) -> Variant:
 	return [ctx, res]
 
 static func tokenize(expr: String) -> Variant:
-	var parser := GispParser.make(GispStream.make(expr))
+	var parser := GispParser.make(expr)
 	if parser.parse():
 		return parser.result
 	else:
@@ -191,14 +191,15 @@ class Context:
 	
 	func eval(expr: String) -> Variant:
 		var tokens = Lisper.tokenize(expr)
-		source = expr
-		if tokens != null:
-			var res = exec(tokens)
-			source = null
-			return res
-		else:
-			push_error("failed to tokenize expression")
-			return null
+#		source = expr
+#		if tokens != null:
+#			var res = exec(tokens)
+#			source = null
+#			return res
+#		else:
+#			push_error("failed to tokenize expression")
+#			return null
+		return null
 	
 	func exec(tokens: Array) -> Variant:
 		return tokens.map(exec_item)
