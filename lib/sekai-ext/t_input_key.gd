@@ -7,7 +7,7 @@ var props := {
 }
 
 var methods := {
-	&"input_key": func (_sekai, this: Mono, event: InputEventKey) -> void:
+	&"input_key": func (sekai: Sekai, this: Mono, event: InputEventKey) -> void:
 		if event.echo == false:
 			var pre_keys := this.get_prop(&"input_keys") as Dictionary
 			var code := StringName(event.as_text_keycode())
@@ -19,5 +19,5 @@ var methods := {
 				var keys = pre_keys.duplicate()
 				keys.erase(code)
 				this.set_prop(&"input_keys", keys)
-		this.get_item().get_viewport().set_input_as_handled()
+		sekai.get_viewport().set_input_as_handled(),
 }

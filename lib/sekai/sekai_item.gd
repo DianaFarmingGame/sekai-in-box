@@ -9,6 +9,9 @@ func _init() -> void:
 func _ready() -> void:
 	base_transform = Transform2D(0, unit_size, 0, Vector2(0, -position.y))
 
+#func _exit_tree() -> void:
+#	print("SekaiItem exit")
+
 var _time := 0.0
 var _t_delta := 0.0
 

@@ -18,9 +18,15 @@ func _into_sekai(psekai: Sekai) -> void:
 			call_method(&"draw"))
 	sekai.add_child.call_deferred(item)
 
+func _outof_sekai() -> void:
+	_clear_item()
+	super._outof_sekai()
+
 func _clear_item() -> void:
-	if item: sekai.remove_child(item)
-	item = null
+	if item:
+		sekai.remove_child(item)
+		item.queue_free()
+		item = null
 
 func get_item() -> SekaiItem:
 	return item

@@ -27,6 +27,16 @@ func _init() -> void:
 func _ready() -> void:
 	_init_defines()
 
+func _exit_tree() -> void:
+#	print("Sekai exit")
+	_clear_monos()
+
+func _clear_monos() -> void:
+	for mono in monos: mono._outof_sekai()
+	monos.clear()
+	monos_need_collision.clear()
+	monos_need_route.clear()
+
 func _input(event: InputEvent) -> void:
 	if control_target != null:
 		if event is InputEventKey:

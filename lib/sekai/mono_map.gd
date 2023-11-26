@@ -13,7 +13,7 @@ var layers := []
 func _into_sekai(psekai: Sekai) -> void:
 	sekai = psekai
 	var length := (size.x * size.y) as int
-	map.clear()
+	_clear_map()
 	map.resize(length)
 	for i in length:
 		var ref := data[i % data.size()]
@@ -43,9 +43,19 @@ func _into_sekai(psekai: Sekai) -> void:
 		layers[iy] = layer
 		sekai.add_child.call_deferred(layer)
 
+func _outof_sekai() -> void:
+	_clear_layers()
+	_clear_map()
+	sekai = null
+
 func _clear_layers() -> void:
-	for layer in layers: sekai.remove_child(layer)
+	for layer in layers:
+		sekai.remove_child(layer)
+		layer.queue_free()
 	layers.clear()
+
+func _clear_map() -> void:
+	map.clear()
 
 func get_ptr(pos: Vector2i) -> Variant:
 	if Rect2i(Vector2i(), size).has_point(pos):
@@ -53,30 +63,30 @@ func get_ptr(pos: Vector2i) -> Variant:
 	return null
 
 class MapPointer extends Mono:
-	var idx: int
 	var map: MonoMap
 	var item: SekaiItem
+	var position: Vector2
+	var position_z: float
 	
-	func _init(pmap: MonoMap, pidx: int) -> void:
+	func _init(pmap: MonoMap, idx: int) -> void:
 		map = pmap
-		idx = pidx
+		position = Vector2(idx % (map.size.x as int), (idx / map.size.x) as int) + map.offset
+		position_z = map.offset_z
 
 	func draw() -> void:
 		if get_prop(&"visible"):
 			call_method(&"draw")
 	
-	func get_prop(key: Variant, default = null) -> Variant:
-		match key:
-			&"position":
-				return Vector2(idx % (map.size.x as int), (idx / map.size.x) as int) + map.offset
-			&"position_z":
-				return map.offset_z
-		return super.get_prop(key, default)
-	
 	func get_item() -> SekaiItem:
 		if item != null: return item
-		item = map.layers[(idx / map.size.x) as int]
+		item = map.layers[get_position().y - map.offset.y]
 		return item
+	
+	func get_position() -> Vector2:
+		return position
+	
+	func get_position_z() -> float:
+		return position_z
 
 func is_need_collision() -> bool:
 	var need_collision := false
@@ -96,24 +106,6 @@ func will_route(point: Vector2, z_pos: int) -> Mono:
 		if Rect2i(Vector2i(), size).grow(1).has_point(cen):
 			# center
 			var ptr = get_ptr(cen)
-			if ptr and ptr.will_route(point, z_pos): return ptr
-			# sides
-			ptr = get_ptr(cen + Vector2i(1, 0))
-			if ptr and ptr.will_route(point, z_pos): return ptr
-			ptr = get_ptr(cen + Vector2i(0, 1))
-			if ptr and ptr.will_route(point, z_pos): return ptr
-			ptr = get_ptr(cen + Vector2i(-1, 0))
-			if ptr and ptr.will_route(point, z_pos): return ptr
-			ptr = get_ptr(cen + Vector2i(0, -1))
-			if ptr and ptr.will_route(point, z_pos): return ptr
-			# corners
-			ptr = get_ptr(cen + Vector2i(1, 1))
-			if ptr and ptr.will_route(point, z_pos): return ptr
-			ptr = get_ptr(cen + Vector2i(1, -1))
-			if ptr and ptr.will_route(point, z_pos): return ptr
-			ptr = get_ptr(cen + Vector2i(-1, 1))
-			if ptr and ptr.will_route(point, z_pos): return ptr
-			ptr = get_ptr(cen + Vector2i(-1, -1))
 			if ptr and ptr.will_route(point, z_pos): return ptr
 			return null
 	return null

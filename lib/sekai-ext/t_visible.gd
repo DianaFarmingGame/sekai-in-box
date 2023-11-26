@@ -27,7 +27,7 @@ var methods := {
 static func draw(_sekai, this: Mono) -> void:
 	var item := this.get_item() as SekaiItem
 	var t := (item.get_time() - this.get_prop(&"draw_timer")) as float
-	var pos := this.get_prop(&"position") as Vector2
+	var pos := this.get_position() as Vector2
 	var drawer = this.get_prop(&"draw_data")[this.get_prop(&"cur_drawer")]
 	match drawer[0]:
 		&"static":
