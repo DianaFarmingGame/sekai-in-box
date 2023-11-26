@@ -2,7 +2,6 @@ class_name GCharacter extends MonoDefine
 
 func do_merge(sets: Array[Dictionary]) -> Array[Dictionary]:
 	merge_props(sets, {
-		&"position": Vector2(0, 0),
 		&"state": &"normal",
 		&"cur_speed": Vector2(0, 0),
 	})
@@ -10,18 +9,18 @@ func do_merge(sets: Array[Dictionary]) -> Array[Dictionary]:
 		&"process": func (sekai: Sekai, this: Mono) -> void:
 			var cur_speed := this.get_prop(&"cur_speed") as Vector2
 			if cur_speed != Vector2(0, 0):
-				var delta := this.get_item().get_delta_time()
-				var pos_z := floori(this.get_position_z())
-				var pos := this.get_position() as Vector2
+				var delta := this.item.get_delta_time() as float
+				var pos_z := floori(this.position.z)
+				var pos := Vector2(this.position.x, this.position.y)
 				var dpos := this.get_prop(&"cur_speed") * delta as Vector2
 				if sekai.can_pass(Rect2(pos.x + dpos.x, pos.y, 0, 0).grow(0.25), pos_z):
 					pos.x += dpos.x
 				if sekai.can_pass(Rect2(pos.x, pos.y + dpos.y, 0, 0).grow(0.25), pos_z):
 					pos.y += dpos.y
-				this.set_position(pos),
+				this.position = Vector3(pos.x, pos.y, this.position.z),
 		&"draw": func (sekai: Sekai, this: Mono) -> void:
-			var item := this.get_item() as SekaiItem
-			var pos := this.get_position() as Vector2
+			var item := this.item as SekaiItem
+			var pos := Vector2(this.position.x, this.position.y)
 			item.pen_set_transform(pos, 0, Vector2(1, 0.4))
 			item.draw_circle(Vector2(0, 0), 0.25, 0x00000055)
 			item.pen_clear_transform()

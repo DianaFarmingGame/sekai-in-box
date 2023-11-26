@@ -15,7 +15,7 @@ var props := {
 var methods := {
 	&"draw": TVisible.draw ,
 	&"reset_drawer": func (_sekai, this: Mono) -> void:
-		this.set_prop(&"draw_timer", this.get_item().get_time()),
+		this.set_prop(&"draw_timer", this.item.get_time()),
 	&"to_drawer": func (_sekai, this: Mono, drawer_id: StringName) -> void:
 		this.set_prop(&"cur_drawer", drawer_id),
 	&"reset_to_drawer": func (_sekai, this: Mono, drawer_id: StringName) -> void:
@@ -25,9 +25,9 @@ var methods := {
 }
 
 static func draw(_sekai, this: Mono) -> void:
-	var item := this.get_item() as SekaiItem
+	var item := this.item as SekaiItem
 	var t := (item.get_time() - this.get_prop(&"draw_timer")) as float
-	var pos := this.get_position() as Vector2
+	var pos := Vector2(this.position.x, this.position.y)
 	var drawer = this.get_prop(&"draw_data")[this.get_prop(&"cur_drawer")]
 	match drawer[0]:
 		&"static":

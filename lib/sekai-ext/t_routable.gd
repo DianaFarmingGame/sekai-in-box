@@ -11,9 +11,9 @@ var props := {
 }
 
 static func draw_debug(sekai: Sekai, this: Mono) -> void:
-	if this.get_prop(&"routable") and floori(this.get_position_z()) == floori(sekai.control_target.get_position_z()) - 1:
+	if this.get_prop(&"routable") and floori(this.position.z) == floori(sekai.control_target.position.z) - 1:
 		var item := this.get_item() as SekaiItem
-		var pos := this.get_position() as Vector2
+		var pos := Vector2(this.position.x, this.position.y)
 		var rbox := this.get_prop(&"route_box") as Rect2
 		var box := Rect2(pos + rbox.position, rbox.size)
 		item.draw_rect(box, 0x00ff0044)

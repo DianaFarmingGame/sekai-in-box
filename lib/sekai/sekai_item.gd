@@ -36,8 +36,9 @@ func get_delta_time() -> float:
 	return _t_delta
 
 func set_y(y: float) -> void:
-	position.y = y
-	base_transform = Transform2D(0, unit_size, 0, Vector2(0, -position.y))
+	if y != position.y:
+		position.y = y
+		base_transform = Transform2D(0, unit_size, 0, Vector2(0, -position.y))
 
 func pen_draw_texture(texture: Texture2D, rect: Rect2, pmodulate := Color(1, 1, 1, 1)) -> void:
 	draw_texture_rect(texture, rect, false, pmodulate)

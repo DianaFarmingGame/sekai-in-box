@@ -5,6 +5,8 @@ var item: SekaiItem
 func _into_sekai(psekai: Sekai) -> void:
 	super._into_sekai(psekai)
 	
+	position = get_prop(&"position")
+	
 	_clear_item()
 	item = sekai.make_item()
 	if get_prop(&"need_process"):
@@ -13,8 +15,7 @@ func _into_sekai(psekai: Sekai) -> void:
 				call_method(&"process"))
 	item.on_draw.connect(func ():
 		if get_prop(&"visible"):
-			var pos = get_prop(&"position")
-			if pos != null: item.set_y(pos.y + floorf(get_prop(&"position_z", 0.0)) * 64)
+			item.set_y(position.y + floorf(position.z) * 64)
 			call_method(&"draw"))
 	sekai.add_child.call_deferred(item)
 
@@ -27,6 +28,3 @@ func _clear_item() -> void:
 		sekai.remove_child(item)
 		item.queue_free()
 		item = null
-
-func get_item() -> SekaiItem:
-	return item

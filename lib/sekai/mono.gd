@@ -5,6 +5,8 @@ var props := {}
 var sekai: Sekai
 var define: MonoDefine
 
+var position := Vector3(0, 0, 0)
+
 func _into_sekai(psekai: Sekai) -> void:
 	sekai = psekai
 	define.finalize()
@@ -43,10 +45,6 @@ func call_method(key: StringName, argv := []) -> Variant:
 	if handle != null: return handle.callv(vargv)
 	return null
 
-func get_item() -> SekaiItem:
-	push_error("visual method called")
-	return SekaiItem.new()
-
 func is_need_collision() -> bool:
 	return get_prop(&"need_collision", false)
 
@@ -54,29 +52,18 @@ func is_need_route() -> bool:
 	return get_prop(&"need_route", false)
 
 func will_route(point: Vector2, z_pos: int) -> Mono:
-	if floori(get_position_z()) == z_pos:
+	if floori(position.z) == z_pos:
 		if get_prop(&"routable"):
 			var box := get_prop(&"route_box") as Rect2
-			var pos := get_position() as Vector2
-			box = Rect2(pos + box.position, box.size)
+			box = Rect2(Vector2(position.x, position.y) + box.position, box.size)
 			if box.has_point(point):
 				return self
 	return null
 
 func will_collide(region: Rect2, z_pos: int) -> Mono:
-	if floori(get_position_z()) == z_pos:
+	if floori(position.z) == z_pos:
 		if get_prop(&"collisible"):
 			var box := get_prop(&"collision_box") as Rect2
-			var pos := get_position() as Vector2
-			if Rect2(pos + box.position, box.size).intersects(region):
+			if Rect2(Vector2(position.x, position.y) + box.position, box.size).intersects(region):
 				return self
 	return null
-
-func get_position() -> Vector2:
-	return get_prop(&"position")
-
-func set_position(value: Vector2) -> Variant:
-	return set_prop(&"position", value)
-
-func get_position_z() -> float:
-	return get_prop(&"position_z")

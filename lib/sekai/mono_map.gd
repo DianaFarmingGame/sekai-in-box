@@ -1,8 +1,8 @@
 class_name MonoMap
 
 var size := Vector2(0, 0)
-var offset := Vector2(0, 0)
-var offset_z := 0.0
+var offset := Vector3(0, 0, 0)
+var offset_xy: Vector2
 var data := PackedInt32Array([])
 
 var sekai: Sekai
@@ -12,22 +12,32 @@ var layers := []
 
 func _into_sekai(psekai: Sekai) -> void:
 	sekai = psekai
+	offset_xy = Vector2(offset.x, offset.y)
 	var length := (size.x * size.y) as int
-	_clear_map()
-	map.resize(length)
-	for i in length:
-		var ref := data[i % data.size()]
-		if ref >= 0:
-			var ptr := MapPointer.new(self, i)
-			ptr.set_define(sekai.get_define(ref))
-			ptr._into_sekai(sekai)
-			map[i] = ptr
 	
 	_clear_layers()
 	layers.resize(size.y as int)
 	for iy in size.y:
 		var layer := sekai.make_item()
-		layer.set_y(iy + offset.y + floorf(offset_z) * 64)
+		layers[iy] = layer
+	
+	_clear_map()
+	map.resize(length)
+	for i in length:
+		var ref := data[i % data.size()]
+		if ref >= 0:
+			var ptr := MapPointer.new(
+				self,
+				Vector3(i % int(size.x) + offset.x, int(i / size.x) + offset.y, offset.z),
+				layers[int(i / size.x)],
+			)
+			ptr.set_define(sekai.get_define(ref))
+			ptr._into_sekai(sekai)
+			map[i] = ptr
+	
+	for iy in size.y:
+		var layer := layers[iy] as SekaiItem
+		layer.set_y(iy + offset.y + floorf(offset.z) * 64)
 		var need_process := false
 		for i in range(iy * size.x, (iy + 1) * size.x):
 			if map[i] != null and map[i].get_prop(&"need_process"): need_process = true; break
@@ -40,7 +50,6 @@ func _into_sekai(psekai: Sekai) -> void:
 			for i in range(iy * size.x, (iy + 1) * size.x):
 				if map[i] != null:
 					map[i].draw())
-		layers[iy] = layer
 		sekai.add_child.call_deferred(layer)
 
 func _outof_sekai() -> void:
@@ -65,28 +74,16 @@ func get_ptr(pos: Vector2i) -> Variant:
 class MapPointer extends Mono:
 	var map: MonoMap
 	var item: SekaiItem
-	var position: Vector2
 	var position_z: float
 	
-	func _init(pmap: MonoMap, idx: int) -> void:
+	func _init(pmap: MonoMap, pos: Vector3, pitem: SekaiItem) -> void:
 		map = pmap
-		position = Vector2(idx % (map.size.x as int), (idx / map.size.x) as int) + map.offset
-		position_z = map.offset_z
+		position = pos
+		item = pitem
 
 	func draw() -> void:
 		if get_prop(&"visible"):
 			call_method(&"draw")
-	
-	func get_item() -> SekaiItem:
-		if item != null: return item
-		item = map.layers[get_position().y - map.offset.y]
-		return item
-	
-	func get_position() -> Vector2:
-		return position
-	
-	func get_position_z() -> float:
-		return position_z
 
 func is_need_collision() -> bool:
 	var need_collision := false
@@ -101,8 +98,8 @@ func is_need_route() -> bool:
 	return need_route
 
 func will_route(point: Vector2, z_pos: int) -> Mono:
-	if floori(offset_z) == z_pos:
-		var cen := Vector2i((point - offset).round())
+	if floori(offset.z) == z_pos:
+		var cen := Vector2i((point - offset_xy).round())
 		if Rect2i(Vector2i(), size).grow(1).has_point(cen):
 			# center
 			var ptr = get_ptr(cen)
@@ -111,8 +108,8 @@ func will_route(point: Vector2, z_pos: int) -> Mono:
 	return null
 
 func will_collide(region: Rect2, z_pos: int) -> Mono:
-	if floori(offset_z) == z_pos:
-		var cen := Vector2i((region.get_center() - offset).round())
+	if floori(offset.z) == z_pos:
+		var cen := Vector2i((region.get_center() - offset_xy).round())
 		if Rect2i(Vector2i(), size).grow(1).has_point(cen):
 			# center
 			var ptr = get_ptr(cen)

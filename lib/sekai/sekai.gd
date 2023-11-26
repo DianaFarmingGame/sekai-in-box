@@ -132,10 +132,9 @@ func make_lisper_context() -> Lisper.Context:
 		&"make_mono_map": func (offset, size: Vector2, data := []) -> MonoMap:
 			var map := MonoMap.new()
 			if offset is Vector2:
-				map.offset = offset
+				map.offset = Vector3(offset.x, offset.y, 0)
 			else:
-				map.offset = Vector2(offset.x, offset.y)
-				map.offset_z = offset.z
+				map.offset = offset
 			map.size = size
 			map.data = PackedInt32Array(data)
 			return map,
