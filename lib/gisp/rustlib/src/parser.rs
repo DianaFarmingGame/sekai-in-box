@@ -1,5 +1,4 @@
 use std::rc::Rc;
-
 use godot::prelude::*;
 
 #[derive(Default)]
@@ -9,7 +8,7 @@ struct GispStream {
 
 impl GispStream {
     pub fn make(raw: GString) -> GispStream {
-        GispStream { raw: raw.chars_checked().to_owned() }
+        GispStream { raw: unsafe { raw.chars_unchecked().to_owned() } }
     }
 
     fn rpick(&self, offset: usize) -> Option<char> {
@@ -23,38 +22,11 @@ impl GispStream {
     }
 }
 
-#[derive(GodotClass)]
-#[class(init, rename=GispParser)]
-struct GdGispParser { raw: GispParser }
-
-#[godot_api]
-impl GdGispParser {
-    #[func]
-    pub fn make(source: GString) -> Gd<GdGispParser> {
-        Gd::from_object(GdGispParser { raw: GispParser::make(source) })
-    }
-
-    #[func]
-    fn duplicate(&self) -> Gd<GdGispParser> {
-        Gd::from_object(GdGispParser { raw: self.raw.clone() })
-    }
-
-    #[func]
-    fn parse(&mut self) -> bool {
-        self.raw.r_root()
-    }
-
-    #[func]
-    fn get_result(&self) -> Array<VariantArray> {
-        self.raw.get_result()
-    }
-}
-
 #[derive(Clone, Default)]
-struct GispParser {
+pub struct GispParser {
     stream: Rc<GispStream>,
     offset: usize,
-    result: Vec<VariantArray>,
+    result: Vec<Variant>,
 }
 
 impl GispParser {
@@ -75,10 +47,10 @@ impl GispParser {
     }
 
     fn push(&mut self, ptype: StringName, data: Variant) {
-        self.result.push((&[ptype.to_variant(), data]).into());
+        self.result.push(Array::from(&[ptype.to_variant(), data]).to_variant());
     }
 
-    fn r_root(&mut self) -> bool {
+    pub fn r_root(&mut self) -> bool {
         let mut np = self.rfork();
         while np.r_blank() && np.r_item() {}
         if np.offset == np.stream.len() {
@@ -334,7 +306,7 @@ impl GispParser {
     fn rpick_offset(&self, offset: usize) -> Option<char> {
         self.stream.rpick(self.offset + offset)
     }
-    fn get_result(&self) -> Array<VariantArray> {
+    pub fn get_result(&self) -> VariantArray {
         Array::from(self.result.as_slice())
     }
 }
