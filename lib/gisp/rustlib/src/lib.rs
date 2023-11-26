@@ -6,10 +6,6 @@ struct GispExtension;
 #[gdextension]
 unsafe impl ExtensionLibrary for GispExtension {}
 
-#[derive(GodotClass)]
-#[class(base=Object)]
-struct Gisp {}
-
 #[derive(GodotClass, Default)]
 struct GispStream {
     raw: Vec<char>,

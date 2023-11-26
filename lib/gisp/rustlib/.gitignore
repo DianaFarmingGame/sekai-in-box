@@ -1,2 +1,11 @@
-/target
-/Cargo.lock
+target/debug
+target/release
+target/**/deps
+target/**/incremental
+target/**/examples
+target/**/build
+target/**/.**
+CACHEDIR.TAG
+libgisp.d
+gisp.d
+Cargo.lock
