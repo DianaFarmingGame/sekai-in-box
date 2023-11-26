@@ -12,61 +12,73 @@ impl GispStream {
         GispStream { raw: raw.chars_checked().to_owned() }
     }
 
-    fn rpick(&self, offset: u32) -> Option<char> {
-        if (offset as usize) < self.raw.len() {
-            Some(self.raw[offset as usize])
+    fn rpick(&self, offset: usize) -> Option<char> {
+        if (offset) < self.raw.len() {
+            Some(self.raw[offset])
         } else { None }
     }
 
-    fn len(&self) -> u32 {
-        self.raw.len() as u32
+    fn len(&self) -> usize {
+        self.raw.len()
     }
 }
 
-#[derive(GodotClass, Default)]
-struct GispParser {
-    stream: Rc<GispStream>,
-    offset: u32,
-
-    #[var]
-    result: Array<VariantArray>,
-}
+#[derive(GodotClass)]
+#[class(init, rename=GispParser)]
+struct GdGispParser { raw: GispParser }
 
 #[godot_api]
-impl GispParser {
+impl GdGispParser {
     #[func]
-    pub fn make(source: GString) -> Gd<GispParser> {
-        Gd::from_object(GispParser {
-            stream: Rc::new(GispStream::make(source)),
-            offset: 0,
-            result: Array::new(),
-        })
+    pub fn make(source: GString) -> Gd<GdGispParser> {
+        Gd::from_object(GdGispParser { raw: GispParser::make(source) })
     }
 
     #[func]
-    fn duplicate(&self) -> Gd<GispParser> {
-        Gd::from_object(self.clone())
+    fn duplicate(&self) -> Gd<GdGispParser> {
+        Gd::from_object(GdGispParser { raw: self.raw.clone() })
+    }
+
+    #[func]
+    fn parse(&mut self) -> bool {
+        self.raw.r_root()
+    }
+
+    #[func]
+    fn get_result(&self) -> Array<VariantArray> {
+        self.raw.get_result()
+    }
+}
+
+#[derive(Clone, Default)]
+struct GispParser {
+    stream: Rc<GispStream>,
+    offset: usize,
+    result: Vec<VariantArray>,
+}
+
+impl GispParser {
+    pub fn make(source: GString) -> GispParser {
+        GispParser {
+            stream: Rc::new(GispStream::make(source)),
+            offset: 0,
+            result: Vec::new(),
+        }
     }
 
     fn rfork(&self) -> GispParser {
         GispParser {
             stream: self.stream.clone(),
             offset: self.offset,
-            result: Array::new(),
+            result: Vec::new(),
         }
-    }
-
-    #[func]
-    fn fork(&self) -> Gd<GispParser> {
-        Gd::from_object(self.rfork())
     }
 
     fn push(&mut self, ptype: StringName, data: Variant) {
         self.result.push((&[ptype.to_variant(), data]).into());
     }
 
-    #[func]
-    fn parse(&mut self) -> bool {
+    fn r_root(&mut self) -> bool {
         let mut np = self.rfork();
         while np.r_blank() && np.r_item() {}
         if np.offset == np.stream.len() {
@@ -248,7 +260,7 @@ impl GispParser {
             np.r_blank();
             if np.rpick() == Some(')') {
                 self.offset = np.offset + 1;
-                self.push(StringName::from(&"list"), np.result.to_variant());
+                self.push(StringName::from(&"list"), np.get_result().to_variant());
                 return true
             }
         }
@@ -263,7 +275,7 @@ impl GispParser {
             np.r_blank();
             if np.rpick() == Some(']') {
                 self.offset = np.offset + 1;
-                self.push(StringName::from(&"array"), np.result.to_variant());
+                self.push(StringName::from(&"array"), np.get_result().to_variant());
                 return true
             }
         }
@@ -278,7 +290,7 @@ impl GispParser {
             np.r_blank();
             if np.rpick() == Some('}') && np.result.len() % 2 == 0 {
                 self.offset = np.offset + 1;
-                self.push(StringName::from(&"map"), np.result.to_variant());
+                self.push(StringName::from(&"map"), np.get_result().to_variant());
                 return true
             }
         }
@@ -319,24 +331,10 @@ impl GispParser {
     fn rpick(&self) -> Option<char> {
         self.stream.rpick(self.offset)
     }
-    fn rpick_offset(&self, offset: u32) -> Option<char> {
+    fn rpick_offset(&self, offset: usize) -> Option<char> {
         self.stream.rpick(self.offset + offset)
     }
-}
-
-impl Clone for GispParser {
-    fn clone(&self) -> Self {
-        Self {
-            stream: self.stream.clone(),
-            offset: self.offset,
-            result: self.result.duplicate_shallow(),
-        }
-    }
-}
-
-#[godot_api]
-impl IRefCounted for GispParser {
-    fn init(_base: Base<RefCounted>) -> Self {
-        Self::default()
+    fn get_result(&self) -> Array<VariantArray> {
+        Array::from(self.result.as_slice())
     }
 }

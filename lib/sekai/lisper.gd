@@ -8,7 +8,7 @@ static func eval(expr: String) -> Variant:
 static func tokenize(expr: String) -> Variant:
 	var parser := GispParser.make(expr)
 	if parser.parse():
-		return parser.result
+		return parser.get_result()
 	else:
 		return null
 
