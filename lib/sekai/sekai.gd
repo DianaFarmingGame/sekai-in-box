@@ -74,7 +74,7 @@ func make_lisper_context() -> Lisper.Context:
 	ctx.vars.merge(root_vars)
 	ctx.rawfns.merge({
 		&"make_define": func (ctx: Lisper.Context, body: Array) -> Variant:
-			var def = ctx.exec_item(body[0])
+			var def = ctx.exec_node(body[0])
 			if def != null:
 				def = def.fork()
 				var args = ctx.exec_map_part(body.slice(1))
@@ -89,13 +89,13 @@ func make_lisper_context() -> Lisper.Context:
 				ctx.log_error(body[0], str("make_define: ", body[0], " is not a valid token"))
 				return null,
 		&"sign_define": func (ctx: Lisper.Context, body: Array) -> Variant:
-			var def = ctx.exec_item(body[0])
+			var def = ctx.exec_node(body[0])
 			sign_define(def)
 			return def,
 		&"make_mono": func (ctx: Lisper.Context, body: Array) -> Mono:
-			var mono_class = ctx.exec_item(body[0])
+			var mono_class = ctx.exec_node(body[0])
 			if mono_class != null:
-				var define = get_define(ctx.exec_item(body[1]))
+				var define = get_define(ctx.exec_node(body[1]))
 				if define == null: return null
 				var mono = mono_class.new()
 				var args = ctx.exec_map_part(body.slice(2))
@@ -107,11 +107,11 @@ func make_lisper_context() -> Lisper.Context:
 				ctx.log_error(body[0], str("make_mono: ", body[0], " is not a valid token"))
 				return null,
 		&"mono": func (ctx: Lisper.Context, body: Array) -> Mono:
-			var mono = ctx.exec_item(Lisper.Call(&"make_mono", [body]))
+			var mono = ctx.exec_node(Lisper.Call(&"make_mono", [body]))
 			add_mono(mono)
 			return mono,
 		&"mono_map": func (ctx: Lisper.Context, body: Array) -> MonoMap:
-			var map = ctx.exec_item(Lisper.Call(&"make_mono_map", [body]))
+			var map = ctx.exec_node(Lisper.Call(&"make_mono_map", [body]))
 			add_mono(map)
 			return map,
 	})

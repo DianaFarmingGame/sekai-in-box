@@ -40,7 +40,7 @@ static func _make_common_context() -> Context:
 		&"echo": func (ctx: Context, body: Array) -> void:
 			var msg := []
 			for item in body:
-				var res = ctx.exec_item(item)
+				var res = ctx.exec_node(item)
 				msg.append(str(res))
 			print(' '.join(msg)),
 		&"raw": func (_ctx: Context, body: Array) -> Array:
@@ -48,17 +48,16 @@ static func _make_common_context() -> Context:
 		&"eval": func (ctx: Context, body: Array) -> Variant:
 			var result = null
 			for item in body:
-				var res = ctx.exec_item(item)
-				result = ctx.exec_item(res)
+				var res = ctx.exec_node(item)
+				result = ctx.exec_node(res)
 			return result,
-		&"defvar": func (ctx: Context, body: Array) -> Variant:
+		&"defvar": func (ctx: Context, body: Array) -> void:
 			var name = body[0][1]
 			if name is String or name is StringName:
-				var data = ctx.exec_item(body[1])
-				return ctx.def_var(name, data)
+				var data = ctx.exec_node(body[1])
+				ctx.def_var(name, data)
 			else:
-				ctx.log_error(body[0], str("defvar: ", body[0], " is not a valid token"))
-				return null,
+				ctx.log_error(body[0], str("defvar: ", body[0], " is not a valid token")),
 	})
 	ctx.functions.merge({
 		&"debug": func (value) -> Variant:
@@ -119,9 +118,7 @@ static func test_common() -> void:
 
 class Context:
 	var parent = null
-	var rawfns := {}
-	var macros := {}
-	var functions := {}
+	var fns := {}
 	var vars := {}
 	var source = null
 	
@@ -131,9 +128,7 @@ class Context:
 	func clone() -> Context:
 		var ctx := Context.new()
 		ctx.parent = parent
-		ctx.rawfns = rawfns
-		ctx.macros = macros
-		ctx.functions = functions
+		ctx.fns = fns
 		ctx.vars = vars
 		ctx.source = source
 		return ctx
@@ -143,51 +138,23 @@ class Context:
 		ctx.parent = weakref(self)
 		return ctx
 	
-	func get_rawfn(name: StringName) -> Variant:
-		var handle = rawfns.get(name)
-		if handle != null:
-			return handle
-		else:
-			var par = parent.get_ref() if parent != null else null
-			return par.get_rawfn(name) if par != null else null
-	
-	func get_macro(name: StringName) -> Variant:
-		var handle = macros.get(name)
-		if handle != null:
-			return handle
-		else:
-			var par = parent.get_ref() if parent != null else null
-			return par.get_macro(name) if par != null else null
-	
-	func get_func(name: StringName) -> Variant:
-		var handle = functions.get(name)
-		if handle != null:
-			return handle
-		else:
-			var par = parent.get_ref() if parent != null else null
-			return par.get_func(name) if par != null else null
+	func get_fn(name: StringName) -> Variant:
+		var res = fns.get(name)
+		return res if res != null else parent.get_fn(name) if parent != null else null
 	
 	func get_var(name: StringName) -> Variant:
-		var data = vars.get(name)
-		if data != null:
-			return data
-		else:
-			var par = parent.get_ref() if parent != null else null
-			return par.get_var(name) if par != null else null
+		var res = vars.get(name)
+		return res if res != null else parent.get_var(name) if parent != null else null
 	
 	func set_var(name: StringName, data: Variant) -> Variant:
 		var pdata = vars.get(name)
 		if pdata != null:
 			vars[name] = data
 			return pdata
-		else:
-			var par = parent.get_ref() if parent != null else null
-			return par.set_var(name, data) if par != null else null
+		return parent.set_var(name, data) if parent != null else null
 	
-	func def_var(name: StringName, data: Variant) -> Variant:
-		var pdata = vars.get(name)
+	func def_var(name: StringName, data: Variant) -> void:
 		vars[name] = data
-		return pdata
 	
 	func eval(expr: String) -> Variant:
 		var tokens = Lisper.tokenize(expr)
@@ -201,12 +168,10 @@ class Context:
 			return null
 	
 	func exec(tokens: Array) -> Variant:
-		return tokens.map(exec_item)
+		return tokens.map(exec_node)
 	
 	func get_source() -> Variant:
-		var par = parent.get_ref() if parent != null else null
-		if source != null or par == null: return source
-		return par.get_source()
+		return source if source != null else parent.get_source() if parent != null else null
 	
 	func log_error(item: Array, msg) -> void:
 		var src = get_source()
@@ -222,35 +187,35 @@ class Context:
 			printerr(msg)
 		print('')
 	
-	func exec_item(item: Array) -> Variant:
+	func exec_node(item: Array) -> Variant:
 		match item[0]:
 			&"number", &"bool", &"keyword", &"string":
 				return item[1]
-			&"array":
-				return (item[1] as Array).map(exec_item)
-			&"map":
-				return exec_map_part(item[1])
-			&"token":
-				return get_var(item[1])
 			&"list":
 				var handle
 				var head = item[1][0]
 				if head[0] == &"token":
 					var name = head[1]
 					var body = (item[1] as Array).slice(1)
-					handle = get_rawfn(name)
+					handle = get_fn(name)
 					if handle != null:
 						return handle.call(self, body)
-					handle = get_macro(name)
+					handle = get_fn(name)
 					if handle != null:
-						return exec_item(handle.call(body))
-					handle = get_func(name)
+						return exec_node(handle.call(body))
+					handle = get_fn(name)
 					if handle != null:
-						return handle.callv(body.map(exec_item))
+						return handle.callv(body.map(exec_node))
 					log_error(item, str("method not found: ", name))
 					return null
 				log_error(item, "unexpected call list head: " + head)
 				return null
+			&"token":
+				return get_var(item[1])
+			&"array":
+				return (item[1] as Array).map(exec_node)
+			&"map":
+				return exec_map_part(item[1])
 		log_error(item, str("unknown item: ", item))
 		return null
 	
@@ -258,7 +223,7 @@ class Context:
 	func exec_map_part(pairs: Array) -> Dictionary:
 		var res := {}
 		for i in pairs.size() / 2:
-			var k = exec_item(pairs[2 * i])
-			var v = exec_item(pairs[2 * i + 1])
+			var k = exec_node(pairs[2 * i])
+			var v = exec_node(pairs[2 * i + 1])
 			res[k] = v
 		return res
