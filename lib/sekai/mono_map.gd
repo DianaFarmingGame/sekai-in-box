@@ -82,7 +82,7 @@ class MapPointer extends Mono:
 
 	func draw() -> void:
 		if get_prop(&"visible"):
-			call_method(&"draw")
+			emit_method(&"draw")
 
 func is_need_collision() -> bool:
 	var need_collision := false

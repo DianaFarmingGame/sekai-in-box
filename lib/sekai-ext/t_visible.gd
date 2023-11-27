@@ -20,8 +20,8 @@ var methods := {
 		this.set_prop(&"cur_drawer", drawer_id),
 	&"reset_to_drawer": func (_sekai, this: Mono, drawer_id: StringName) -> void:
 		if drawer_id != this.get_prop(&"cur_drawer"):
-			this.call_method(&"to_drawer", [drawer_id])
-			this.call_method(&"reset_drawer"),
+			this.set_prop(&"cur_drawer", drawer_id)
+			this.emit_method(&"reset_drawer"),
 }
 
 static func draw(_sekai, this: Mono) -> void:

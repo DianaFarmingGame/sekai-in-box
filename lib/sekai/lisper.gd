@@ -36,7 +36,7 @@ static var CommonContext := _make_common_context()
 
 static func _make_common_context() -> Context:
 	var ctx := Context.new()
-	ctx.def_fns(FnType.GD_RAW, {
+	ctx.def_fns(VarType.GD_RAW, {
 		&"echo": func (ctx: Context, body: Array) -> void:
 			var msg := []
 			for node in body:
@@ -59,23 +59,16 @@ static func _make_common_context() -> Context:
 			else:
 				ctx.log_error(body[0], str("defvar: ", body[0], " is not a valid token")),
 	})
-	ctx.def_fns(FnType.GD_CALL, {
-		&"debug": func (value) -> Variant:
+	ctx.def_fns(VarType.GD_CALL, {
+		&"debug": func (value: Variant) -> Variant:
 			assert(false)
 			return value,
-		&"vec2": func (x_p = null, y = null) -> Vector2:
-			if x_p == null: return Vector2()
-			if y == null: return Vector2(x_p)
-			return Vector2(x_p, y),
-		&"vec3": func (x_p = null, y = null, z = null) -> Vector3:
-			if x_p == null: return Vector3()
-			if y == null: return Vector3(x_p)
-			return Vector3(x_p, y, z),
-		&"rect2": func (x_p = null, y_s = null, w = null, h = null) -> Rect2:
-			if x_p == null: return Rect2()
-			if y_s == null: return Rect2(x_p)
-			if w == null: return Rect2(x_p, y_s)
-			return Rect2(x_p, y_s, w, h),
+		&"vec2": func (x: float, y: float) -> Vector2:
+			return Vector2(x, y),
+		&"vec3": func (x: float, y: float, z: float) -> Vector3:
+			return Vector3(x, y, z),
+		&"rect2": func (x: float, y: float, w: float, h: float) -> Rect2:
+			return Rect2(x, y, w, h),
 		&"color": func (r_c = null, g_a = null, b = null, a = null) -> Color:
 			if r_c == null: return Color()
 			if g_a == null: return Color(r_c)
@@ -119,6 +112,8 @@ static func test_common() -> void:
 class Context:
 	var parent = null
 	var vars := {}
+	var fixs := []
+	var fix_map := {}
 	var source = null
 	
 	static func common() -> Context:
@@ -130,12 +125,15 @@ class Context:
 	func clone() -> Context:
 		var ctx := Context.new()
 		ctx.parent = parent
-		ctx.vars = vars
+		ctx.vars = vars.duplicate(true)
+		ctx.fixs = fixs.duplicate(true)
+		ctx.fix_map = fix_map.duplicate(true)
 		ctx.source = source
 		return ctx
 	
 	func fork() -> Context:
 		var ctx := Context.new()
+		ctx.fixs = fixs
 		ctx.parent = self
 		return ctx
 	
@@ -153,10 +151,10 @@ class Context:
 	func def_var(name: StringName, data: Variant) -> void:
 		vars[name] = data
 	
-	func def_fn(type: FnType, name: StringName, handle) -> void:
+	func def_fn(type: VarType, name: StringName, handle) -> void:
 		vars[name] = [type, handle]
 	
-	func def_fns(type: FnType, handle_map: Dictionary) -> void:
+	func def_fns(type: VarType, handle_map: Dictionary) -> void:
 		for k in handle_map.keys():
 			vars[k] = [type, handle_map[k]]
 	
@@ -203,11 +201,11 @@ class Context:
 				var handle = exec_node(head)
 				if handle is Array:
 					match handle[0]:
-						FnType.GD_RAW:
+						VarType.GD_RAW:
 							return handle[1].call(self, body)
-						FnType.GD_MACRO:
+						VarType.GD_MACRO:
 							return exec_node(handle[1].call(body))
-						FnType.GD_CALL:
+						VarType.GD_CALL:
 							return handle[1].callv(body.map(exec_node))
 						_:
 							log_error(node, str("unknown call handle type: ", handle))
@@ -243,8 +241,14 @@ enum TType {
 	MAP,
 }
 
-enum FnType {
+enum VarType {
+	VAR,
 	GD_RAW,
 	GD_MACRO,
 	GD_CALL,
+}
+
+enum VarFlag {
+	Pure,	# 纯函数，输出与输入绝对对应
+	Fix,	# 固定点，定义可以修改但不能被掩盖
 }

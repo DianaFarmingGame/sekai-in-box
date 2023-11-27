@@ -1,5 +1,9 @@
 class_name Mono
 
+enum FP {
+	draw,
+}
+
 var props := {}
 
 var sekai: Sekai
@@ -35,14 +39,16 @@ func set_prop(key: StringName, value) -> Variant:
 		props.erase(key)
 	return value
 
-func get_method(key: StringName) -> Variant:
-	return define.get_method(key)
-
-func call_method(key: StringName, argv := []) -> Variant:
+func call_method(key: StringName, argv: Array) -> Variant:
 	var vargv := [sekai, self]
 	vargv.append_array(argv)
 	var handle = define.get_method(key)
 	if handle != null: return handle.callv(vargv)
+	return null
+
+func emit_method(key: StringName) -> Variant:
+	var handle = define.get_method(key)
+	if handle != null: return handle.call(sekai, self)
 	return null
 
 func is_need_collision() -> bool:
