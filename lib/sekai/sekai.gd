@@ -72,7 +72,7 @@ func _init_defines() -> void:
 func make_lisper_context() -> Lisper.Context:
 	var ctx := Lisper.Context.common()
 	ctx.vars.merge(root_vars)
-	ctx.rawfns.merge({
+	ctx.def_fns(Lisper.FnType.GD_RAW, {
 		&"make_define": func (ctx: Lisper.Context, body: Array) -> Variant:
 			var def = ctx.exec_node(body[0])
 			if def != null:
@@ -115,7 +115,7 @@ func make_lisper_context() -> Lisper.Context:
 			add_mono(map)
 			return map,
 	})
-	ctx.macros.merge({
+	ctx.def_fns(Lisper.FnType.GD_MACRO, {
 		&"Define": func (body: Array) -> Array:
 			return Lisper.Call(&"defvar", [
 				[body[0]],
@@ -128,7 +128,7 @@ func make_lisper_context() -> Lisper.Context:
 				[Lisper.Call(&"make_define", [body])],
 			]),
 	})
-	ctx.functions.merge({
+	ctx.def_fns(Lisper.FnType.GD_CALL, {
 		&"make_mono_map": func (offset, size: Vector2, data := []) -> MonoMap:
 			var map := MonoMap.new()
 			if offset is Vector2:

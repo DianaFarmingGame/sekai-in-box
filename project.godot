@@ -15,6 +15,11 @@ run/main_scene="res://test/test.tscn"
 config/features=PackedStringArray("4.1", "Forward Plus")
 config/icon="res://icon.svg"
 
+[display]
+
+window/size/viewport_width=576
+window/size/viewport_height=576
+
 [rendering]
 
 environment/defaults/default_clear_color=Color(0, 0, 0, 1)

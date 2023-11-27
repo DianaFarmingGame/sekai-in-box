@@ -22,6 +22,17 @@ impl GispStream {
     }
 }
 
+enum TType {
+    TOKEN,
+    NUMBER,
+    BOOL,
+    KEYWORD,
+    STRING,
+    LIST,
+    ARRAY,
+    MAP,
+}
+
 #[derive(Clone, Default)]
 pub struct GispParser {
     stream: Rc<GispStream>,
@@ -46,8 +57,8 @@ impl GispParser {
         }
     }
 
-    fn push(&mut self, ptype: StringName, data: Variant) {
-        self.result.push(Array::from(&[ptype.to_variant(), data]).to_variant());
+    fn push(&mut self, ptype: TType, data: Variant) {
+        self.result.push(Array::from(&[(ptype as u32).to_variant(), data]).to_variant());
     }
 
     pub fn r_root(&mut self) -> bool {
@@ -108,7 +119,7 @@ impl GispParser {
                 chars.push(c);
                 self.offset += 1;
             }
-            self.push(StringName::from(&"token"), StringName::from(chars.into_iter().collect::<String>()).to_variant());
+            self.push(TType::TOKEN, StringName::from(chars.into_iter().collect::<String>()).to_variant());
             true
         } else {
             false
@@ -125,7 +136,7 @@ impl GispParser {
                 self.offset += 1;
             }
             if chars.len() > 0 {
-                self.push(StringName::from(&"keyword"), StringName::from(chars.into_iter().collect::<String>()).to_variant());
+                self.push(TType::KEYWORD, StringName::from(chars.into_iter().collect::<String>()).to_variant());
                 true
             } else {
                 self.offset = poffset;
@@ -145,7 +156,7 @@ impl GispParser {
                 self.offset += 1;
                 match c {
                     '"' => {
-                        self.push(StringName::from(&"string"), chars.into_iter().collect::<String>().to_variant());
+                        self.push(TType::STRING, chars.into_iter().collect::<String>().to_variant());
                         return true;
                     }
                     '\\' => {
@@ -182,9 +193,9 @@ impl GispParser {
         if chars.len() > 0 {
             let s = chars.into_iter().collect::<String>();
             if s == "-" {
-                self.push(StringName::from(&"number"), (-1.0).to_variant());
+                self.push(TType::NUMBER, (-1.0).to_variant());
             } else {
-                self.push(StringName::from(&"number"), s.parse::<f32>().unwrap_or(0.0).to_variant());
+                self.push(TType::NUMBER, s.parse::<f32>().unwrap_or(0.0).to_variant());
             }
             true
         } else {
@@ -197,12 +208,12 @@ impl GispParser {
             match c {
                 't' => {
                     self.offset += 2;
-                    self.push(StringName::from(&"bool"), true.to_variant());
+                    self.push(TType::BOOL, true.to_variant());
                     return true;
                 }
                 'f' => {
                     self.offset += 2;
-                    self.push(StringName::from(&"bool"), false.to_variant());
+                    self.push(TType::BOOL, false.to_variant());
                     return true;
                 }
                 _ => {
@@ -232,7 +243,7 @@ impl GispParser {
             np.r_blank();
             if np.rpick() == Some(')') {
                 self.offset = np.offset + 1;
-                self.push(StringName::from(&"list"), np.get_result().to_variant());
+                self.push(TType::LIST, np.get_result().to_variant());
                 return true
             }
         }
@@ -247,7 +258,7 @@ impl GispParser {
             np.r_blank();
             if np.rpick() == Some(']') {
                 self.offset = np.offset + 1;
-                self.push(StringName::from(&"array"), np.get_result().to_variant());
+                self.push(TType::ARRAY, np.get_result().to_variant());
                 return true
             }
         }
@@ -262,7 +273,7 @@ impl GispParser {
             np.r_blank();
             if np.rpick() == Some('}') && np.result.len() % 2 == 0 {
                 self.offset = np.offset + 1;
-                self.push(StringName::from(&"map"), np.get_result().to_variant());
+                self.push(TType::MAP, np.get_result().to_variant());
                 return true
             }
         }

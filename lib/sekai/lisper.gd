@@ -12,19 +12,19 @@ static func tokenize(expr: String) -> Variant:
 	else:
 		return null
 
-static func List(items: Array) -> Array: return [&"list", items]
+static func List(nodes: Array) -> Array: return [TType.LIST, nodes]
 
-static func Token(name: StringName) -> Array: return [&"token", name]
+static func Token(name: StringName) -> Array: return [TType.TOKEN, name]
 
-static func Keyword(name: StringName) -> Array: return [&"keyword", name]
+static func Keyword(name: StringName) -> Array: return [TType.KEYWORD, name]
 
-static func String(content: String) -> Array: return [&"string", content]
+static func String(content: String) -> Array: return [TType.STRING, content]
 
-static func Bool(value: bool) -> Array: return [&"bool", value]
+static func Bool(value: bool) -> Array: return [TType.BOOL, value]
 
-static func Number(value: float) -> Array: return [&"number", value]
+static func Number(value: float) -> Array: return [TType.NUMBER, value]
 
-static func Array(items: Array) -> Array: return [&"array", items]
+static func Array(nodes: Array) -> Array: return [TType.ARRAY, nodes]
 
 static func Call(name: StringName, tails = null) -> Array:
 	var body := [Token(name)]
@@ -36,19 +36,19 @@ static var CommonContext := _make_common_context()
 
 static func _make_common_context() -> Context:
 	var ctx := Context.new()
-	ctx.rawfns.merge({
+	ctx.def_fns(FnType.GD_RAW, {
 		&"echo": func (ctx: Context, body: Array) -> void:
 			var msg := []
-			for item in body:
-				var res = ctx.exec_node(item)
+			for node in body:
+				var res = ctx.exec_node(node)
 				msg.append(str(res))
 			print(' '.join(msg)),
 		&"raw": func (_ctx: Context, body: Array) -> Array:
 			return body,
 		&"eval": func (ctx: Context, body: Array) -> Variant:
 			var result = null
-			for item in body:
-				var res = ctx.exec_node(item)
+			for node in body:
+				var res = ctx.exec_node(node)
 				result = ctx.exec_node(res)
 			return result,
 		&"defvar": func (ctx: Context, body: Array) -> void:
@@ -59,7 +59,7 @@ static func _make_common_context() -> Context:
 			else:
 				ctx.log_error(body[0], str("defvar: ", body[0], " is not a valid token")),
 	})
-	ctx.functions.merge({
+	ctx.def_fns(FnType.GD_CALL, {
 		&"debug": func (value) -> Variant:
 			assert(false)
 			return value,
@@ -118,29 +118,26 @@ static func test_common() -> void:
 
 class Context:
 	var parent = null
-	var fns := {}
 	var vars := {}
 	var source = null
 	
 	static func common() -> Context:
+		return Lisper.CommonContext.clone()
+	
+	static func common_fork() -> Context:
 		return Lisper.CommonContext.fork()
 	
 	func clone() -> Context:
 		var ctx := Context.new()
 		ctx.parent = parent
-		ctx.fns = fns
 		ctx.vars = vars
 		ctx.source = source
 		return ctx
 	
 	func fork() -> Context:
 		var ctx := Context.new()
-		ctx.parent = weakref(self)
+		ctx.parent = self
 		return ctx
-	
-	func get_fn(name: StringName) -> Variant:
-		var res = fns.get(name)
-		return res if res != null else parent.get_fn(name) if parent != null else null
 	
 	func get_var(name: StringName) -> Variant:
 		var res = vars.get(name)
@@ -155,6 +152,13 @@ class Context:
 	
 	func def_var(name: StringName, data: Variant) -> void:
 		vars[name] = data
+	
+	func def_fn(type: FnType, name: StringName, handle) -> void:
+		vars[name] = [type, handle]
+	
+	func def_fns(type: FnType, handle_map: Dictionary) -> void:
+		for k in handle_map.keys():
+			vars[k] = [type, handle_map[k]]
 	
 	func eval(expr: String) -> Variant:
 		var tokens = Lisper.tokenize(expr)
@@ -173,10 +177,10 @@ class Context:
 	func get_source() -> Variant:
 		return source if source != null else parent.get_source() if parent != null else null
 	
-	func log_error(item: Array, msg) -> void:
+	func log_error(node: Array, msg) -> void:
 		var src = get_source()
-		if src != null and item.size() > 2:
-			var offset := item[2] as Array
+		if src != null and node.size() > 2:
+			var offset := node[2] as Array
 			var pre_src := (src as String).substr(offset[0], offset[1] - offset[0])
 			var lines := pre_src.split('\n')
 			var slnum := (src as String).count('\n', 0, offset[0]) if offset[0] > 0 else 0
@@ -187,36 +191,36 @@ class Context:
 			printerr(msg)
 		print('')
 	
-	func exec_node(item: Array) -> Variant:
-		match item[0]:
-			&"number", &"bool", &"keyword", &"string":
-				return item[1]
-			&"list":
-				var handle
-				var head = item[1][0]
-				if head[0] == &"token":
-					var name = head[1]
-					var body = (item[1] as Array).slice(1)
-					handle = get_fn(name)
-					if handle != null:
-						return handle.call(self, body)
-					handle = get_fn(name)
-					if handle != null:
-						return exec_node(handle.call(body))
-					handle = get_fn(name)
-					if handle != null:
-						return handle.callv(body.map(exec_node))
-					log_error(item, str("method not found: ", name))
-					return null
-				log_error(item, "unexpected call list head: " + head)
-				return null
-			&"token":
-				return get_var(item[1])
-			&"array":
-				return (item[1] as Array).map(exec_node)
-			&"map":
-				return exec_map_part(item[1])
-		log_error(item, str("unknown item: ", item))
+	func exec_node(node: Array) -> Variant:
+		match node[0]:
+			TType.TOKEN:
+				return get_var(node[1])
+			TType.NUMBER, TType.BOOL, TType.KEYWORD, TType.STRING:
+				return node[1]
+			TType.LIST:
+				var head = node[1][0]
+				var body = (node[1] as Array).slice(1)
+				var handle = exec_node(head)
+				if handle is Array:
+					match handle[0]:
+						FnType.GD_RAW:
+							return handle[1].call(self, body)
+						FnType.GD_MACRO:
+							return exec_node(handle[1].call(body))
+						FnType.GD_CALL:
+							return handle[1].callv(body.map(exec_node))
+						_:
+							log_error(node, str("unknown call handle type: ", handle))
+							return null
+				elif handle == null:
+					log_error(node, str("call handle not found: ", head))
+				else:
+					log_error(node, str("unexpected call handle: ", handle))
+			TType.ARRAY:
+				return (node[1] as Array).map(exec_node)
+			TType.MAP:
+				return exec_map_part(node[1])
+		log_error(node, str("unknown node: ", node))
 		return null
 	
 	@warning_ignore("integer_division")
@@ -227,3 +231,20 @@ class Context:
 			var v = exec_node(pairs[2 * i + 1])
 			res[k] = v
 		return res
+
+enum TType {
+	TOKEN,
+	NUMBER,
+	BOOL,
+	KEYWORD,
+	STRING,
+	LIST,
+	ARRAY,
+	MAP,
+}
+
+enum FnType {
+	GD_RAW,
+	GD_MACRO,
+	GD_CALL,
+}
