@@ -195,7 +195,7 @@ impl GispParser {
             if s == "-" {
                 self.push(TType::NUMBER, (-1.0).to_variant());
             } else {
-                self.push(TType::NUMBER, s.parse::<f32>().unwrap_or(0.0).to_variant());
+                self.push(TType::NUMBER, s.parse::<f64>().unwrap_or(0.0).to_variant());
             }
             true
         } else {

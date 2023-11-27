@@ -67,12 +67,15 @@ func _init_defines() -> void:
 		print("[sekai] loading gss: ", gss_path)
 		var stime := Time.get_ticks_usec()
 		gss_ctx.eval(expr)
-		print("[sekai] loaded in ", Time.get_ticks_usec() - stime, " us")
+		print("[sekai] completed in ", Time.get_ticks_usec() - stime, " us")
 
 func make_lisper_context() -> Lisper.Context:
 	var ctx := Lisper.Context.common()
-	ctx.vars.merge(root_vars)
-	ctx.def_fns(Lisper.VarType.GD_RAW, {
+	
+	ctx.def_vars([Lisper.VarFlag.CONST, Lisper.VarFlag.FIX], root_vars)
+	
+	ctx.def_fns([Lisper.VarFlag.CONST, Lisper.VarFlag.FIX], Lisper.FnType.GD_RAW_PURE, {
+		
 		&"make_define": func (ctx: Lisper.Context, body: Array) -> Variant:
 			var def = ctx.exec_node(body[0])
 			if def != null:
@@ -88,6 +91,9 @@ func make_lisper_context() -> Lisper.Context:
 			else:
 				ctx.log_error(body[0], str("make_define: ", body[0], " is not a valid token"))
 				return null,
+	})
+	
+	ctx.def_fns([Lisper.VarFlag.CONST, Lisper.VarFlag.FIX], Lisper.FnType.GD_RAW, {
 		&"sign_define": func (ctx: Lisper.Context, body: Array) -> Variant:
 			var def = ctx.exec_node(body[0])
 			sign_define(def)
@@ -115,7 +121,8 @@ func make_lisper_context() -> Lisper.Context:
 			add_mono(map)
 			return map,
 	})
-	ctx.def_fns(Lisper.VarType.GD_MACRO, {
+	
+	ctx.def_fns([Lisper.VarFlag.CONST, Lisper.VarFlag.FIX], Lisper.FnType.GD_MACRO, {
 		&"Define": func (body: Array) -> Array:
 			return Lisper.Call(&"defvar", [
 				[body[0]],
@@ -128,7 +135,16 @@ func make_lisper_context() -> Lisper.Context:
 				[Lisper.Call(&"make_define", [body])],
 			]),
 	})
-	ctx.def_fns(Lisper.VarType.GD_CALL, {
+	
+	ctx.def_fns([Lisper.VarFlag.CONST, Lisper.VarFlag.FIX], Lisper.FnType.GD_CALL, {
+		&"set_control": func (mono: Mono) -> Mono:
+			control_target = mono
+			return mono,
+		&"clear_control": func () -> void:
+			control_target = null,
+	})
+	
+	ctx.def_fns([Lisper.VarFlag.CONST, Lisper.VarFlag.FIX], Lisper.FnType.GD_CALL_PURE, {
 		&"make_mono_map": func (offset, size: Vector2, data := []) -> MonoMap:
 			var map := MonoMap.new()
 			if offset is Vector2:
@@ -138,11 +154,6 @@ func make_lisper_context() -> Lisper.Context:
 			map.size = size
 			map.data = PackedInt32Array(data)
 			return map,
-		&"set_control": func (mono: Mono) -> Mono:
-			control_target = mono
-			return mono,
-		&"clear_control": func () -> void:
-			control_target = null,
 	})
 	return ctx
 

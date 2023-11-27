@@ -27,7 +27,7 @@ func get_prop(key: StringName, default = null) -> Variant:
 	if ovalue != null: return ovalue
 	return define._props.get(key, default)
 
-func set_prop(key: StringName, value) -> Variant:
+func set_prop(key: StringName, value) -> void:
 	var prev = get_prop(key)
 	if prev != value:
 		var watcher = define._watchers.get(key)
@@ -37,7 +37,6 @@ func set_prop(key: StringName, value) -> Variant:
 		props[key] = value
 	else:
 		props.erase(key)
-	return value
 
 func try_emit_method(key: StringName) -> Variant:
 	var handle = define._props.get(key)
