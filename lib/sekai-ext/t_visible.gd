@@ -10,9 +10,7 @@ var props := {
 	&"cur_drawer": &"normal",
 	&"draw_timer": 0.0,
 	&"flip_h": false,
-}
-
-var methods := {
+	
 	&"draw": TVisible.draw ,
 	&"reset_drawer": func (_sekai, this: Mono) -> void:
 		this.set_prop(&"draw_timer", this.item.get_time()),

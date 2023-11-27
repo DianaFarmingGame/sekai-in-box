@@ -4,9 +4,7 @@ var id := &"input_key"
 
 var props := {
 	&"input_keys": {},
-}
-
-var methods := {
+	
 	&"input_key": func (sekai: Sekai, this: Mono, event: InputEventKey) -> void:
 		if event.echo == false:
 			var pre_keys := this.get_prop(&"input_keys") as Dictionary

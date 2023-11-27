@@ -3,7 +3,6 @@ class_name TraitLike extends Resource
 const DETECT_DUPLICATE_TRAIT := false
 
 var _props: Dictionary
-var _methods: Dictionary
 var _watchers: Dictionary
 var _finalized := false
 var _inited := false
@@ -23,7 +22,6 @@ func fork() -> TraitLike:
 	finalize()
 	var nobj := new()
 	nobj._props = _props.duplicate(true)
-	nobj._methods = _methods.duplicate(true)
 	nobj._watchers = _watchers.duplicate(true)
 	nobj._finalized = true
 	return nobj
@@ -38,10 +36,9 @@ func finalize() -> void:
 func _finalize() -> void:
 	_finalized = true
 	_uids = []
-	var sets := _do_merge([{}, {}, {}] as Array[Dictionary])
+	var sets := _do_merge([{}, {}] as Array[Dictionary])
 	_props = sets[0]
-	_methods = sets[1]
-	_watchers = sets[2]
+	_watchers = sets[1]
 
 func _do_merge(sets: Array[Dictionary]) -> Array[Dictionary]:
 	return sets
@@ -61,12 +58,8 @@ func merge_props(sets: Array[Dictionary], props: Dictionary) -> Array[Dictionary
 	sets[0].merge(props)
 	return sets
 
-func merge_methods(sets: Array[Dictionary], methods: Dictionary) -> Array[Dictionary]:
-	sets[1].merge(methods)
-	return sets
-
 func merge_watchers(sets: Array[Dictionary], watchers: Dictionary) -> Array[Dictionary]:
-	sets[2].merge(watchers)
+	sets[1].merge(watchers)
 	return sets
 
 func merge_trait(sets: Array[Dictionary], t) -> Array[Dictionary]:
@@ -74,8 +67,7 @@ func merge_trait(sets: Array[Dictionary], t) -> Array[Dictionary]:
 	t.finalize()
 	do_merge_uid(t._get_uid())
 	sets[0].merge(t.get_props())
-	sets[1].merge(t.get_methods())
-	sets[2].merge(t.get_watchers())
+	sets[1].merge(t.get_watchers())
 	do_merge_uids(t.get_uids())
 	return sets
 
@@ -99,12 +91,6 @@ func get_prop(key: StringName, default = null) -> Variant:
 
 func get_props() -> Dictionary:
 	return _props
-
-func get_method(key: StringName) -> Variant:
-	return _methods.get(key)
-
-func get_methods() -> Dictionary:
-	return _methods
 
 func get_watcher(key: StringName) -> Variant:
 	return _watchers.get(key)

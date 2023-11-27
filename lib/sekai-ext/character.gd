@@ -4,8 +4,7 @@ func do_merge(sets: Array[Dictionary]) -> Array[Dictionary]:
 	merge_props(sets, {
 		&"state": &"normal",
 		&"cur_speed": Vector2(0, 0),
-	})
-	merge_methods(sets, {
+		
 		&"process": func (sekai: Sekai, this: Mono) -> void:
 			var cur_speed := this.get_prop(&"cur_speed") as Vector2
 			if cur_speed != Vector2(0, 0):

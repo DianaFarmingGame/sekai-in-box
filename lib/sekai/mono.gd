@@ -42,12 +42,12 @@ func set_prop(key: StringName, value) -> Variant:
 func call_method(key: StringName, argv: Array) -> Variant:
 	var vargv := [sekai, self]
 	vargv.append_array(argv)
-	var handle = define.get_method(key)
+	var handle = define.get_prop(key)
 	if handle != null: return handle.callv(vargv)
 	return null
 
 func emit_method(key: StringName) -> Variant:
-	var handle = define.get_method(key)
+	var handle = define.get_prop(key)
 	if handle != null: return handle.call(sekai, self)
 	return null
 

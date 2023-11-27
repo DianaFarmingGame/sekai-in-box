@@ -4,8 +4,5 @@ func do_merge(sets: Array[Dictionary]) -> Array[Dictionary]:
 	merge_props(sets, {
 		&"state": &"normal",
 	})
-	merge_methods(sets, {
-		
-	})
 	merge_traits(sets, [TVisible, TCollisible, TRoutable])
 	return super.do_merge(sets)
