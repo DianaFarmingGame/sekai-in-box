@@ -14,9 +14,8 @@ func _into_sekai(psekai: Sekai) -> void:
 			if get_prop(&"processing"):
 				emit_method(&"process"))
 	item.on_draw.connect(func ():
-		if get_prop(&"visible"):
-			item.set_y(position.y + floorf(position.z) * 64)
-			emit_method(&"draw"))
+		item.set_y(position.y + floorf(position.z) * 64)
+		define._props[&"draw"].call(sekai, self))
 	sekai.add_child.call_deferred(item)
 
 func _outof_sekai() -> void:

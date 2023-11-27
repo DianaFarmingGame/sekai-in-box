@@ -46,9 +46,11 @@ func _into_sekai(psekai: Sekai) -> void:
 			layer.on_process.connect(func ():
 				for i in ids:
 					if map[i].get_prop(&"processing"):
-						map[i].call_method(&"process"))
+						map[i].emit_method(&"process"))
 		layer.on_draw.connect(func () -> void:
-			for i in ids: map[i].draw())
+			for i in ids:
+				var ptr = map[i]
+				ptr.define._props[&"draw"].call(sekai, ptr))
 		sekai.add_child.call_deferred(layer)
 
 func _outof_sekai() -> void:
@@ -79,10 +81,6 @@ class MapPointer extends Mono:
 		map = pmap
 		position = pos
 		item = pitem
-
-	func draw() -> void:
-		if get_prop(&"visible"):
-			emit_method(&"draw")
 
 func is_need_collision() -> bool:
 	var need_collision := false

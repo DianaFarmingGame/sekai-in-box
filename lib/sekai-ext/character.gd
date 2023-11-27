@@ -37,9 +37,9 @@ func do_merge(sets: Array[Dictionary]) -> Array[Dictionary]:
 			if speed.x < 0: this.set_prop(&"flip_h", true)
 			if speed.x > 0: this.set_prop(&"flip_h", false)
 			if speed == Vector2(0, 0):
-				this.call_method(&"reset_to_drawer", [&"normal"])
+				this.call_method(&"reset_to_drawer", &"normal")
 			else:
-				this.call_method(&"reset_to_drawer", [&"walk"])
+				this.call_method(&"reset_to_drawer", &"walk")
 			return keys,
 	})
 	merge_traits(sets, [TVisible, TInputKey, TProcess])

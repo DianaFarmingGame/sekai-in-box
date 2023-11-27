@@ -25,31 +25,47 @@ func set_define(pdefine: MonoDefine) -> void:
 func get_prop(key: StringName, default = null) -> Variant:
 	var ovalue = props.get(key)
 	if ovalue != null: return ovalue
-	return define.get_prop(key, default)
+	return define._props.get(key, default)
 
 func set_prop(key: StringName, value) -> Variant:
 	var prev = get_prop(key)
 	if prev != value:
-		var watcher = define.get_watcher(key)
+		var watcher = define._watchers.get(key)
 		if watcher != null: value = watcher.call(sekai, self, prev, value)
-	var rawv = define.get_prop(key)
+	var rawv = define._props.get(key)
 	if rawv != value:
 		props[key] = value
 	else:
 		props.erase(key)
 	return value
 
-func call_method(key: StringName, argv: Array) -> Variant:
+func try_emit_method(key: StringName) -> Variant:
+	var handle = define._props.get(key)
+	if handle != null: return handle.call(sekai, self)
+	return null
+
+func try_call_method(key: StringName, arg: Variant) -> Variant:
+	var handle = define._props.get(key)
+	if handle != null: return handle.call(sekai, self, arg)
+	return null
+
+func try_call_methodv(key: StringName, argv: Array) -> Variant:
 	var vargv := [sekai, self]
 	vargv.append_array(argv)
-	var handle = define.get_prop(key)
+	var handle = define._props.get(key)
 	if handle != null: return handle.callv(vargv)
 	return null
 
 func emit_method(key: StringName) -> Variant:
-	var handle = define.get_prop(key)
-	if handle != null: return handle.call(sekai, self)
-	return null
+	return define._props[key].call(sekai, self)
+
+func call_method(key: StringName, arg: Variant) -> Variant:
+	return define._props[key].call(sekai, self, arg)
+
+func call_methodv(key: StringName, argv: Array) -> Variant:
+	var vargv := [sekai, self]
+	vargv.append_array(argv)
+	return define._props[key].callv(vargv)
 
 func is_need_collision() -> bool:
 	return get_prop(&"need_collision", false)

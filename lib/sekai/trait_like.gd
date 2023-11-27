@@ -8,12 +8,8 @@ var _finalized := false
 var _inited := false
 var _uids: Array[StringName]
 
-#var f_trait := true
-const f_trait := false
-
 func _init() -> void:
 	_inited = true
-	set(&"f_trait", true)
 
 func _get_uid() -> StringName:
 	return &""
