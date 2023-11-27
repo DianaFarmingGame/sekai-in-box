@@ -1,13 +1,13 @@
 [gd_scene load_steps=3 format=3 uid="uid://cy0i20t42382p"]
 
-[ext_resource type="Script" path="res://lib/sekai/sekai.gd" id="1_8840b"]
 [ext_resource type="Script" path="res://test/test.gd" id="1_fugfy"]
+[ext_resource type="Script" path="res://lib/sekai/sekai.gd" id="2_l2l10"]
 
 [node name="test" type="Node2D"]
 script = ExtResource("1_fugfy")
 
 [node name="Sekai" type="Node2D" parent="."]
-script = ExtResource("1_8840b")
+script = ExtResource("2_l2l10")
 define_dir = "res://test/define"
 assert_dir = "res://test/assert"
 unit_size = Vector2(64, 64)
