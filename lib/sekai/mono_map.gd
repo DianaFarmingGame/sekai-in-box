@@ -28,7 +28,7 @@ func _into_sekai(psekai: Sekai) -> void:
 	for i in length:
 		var ref := data[i % data.size()]
 		if ref >= 0:
-			var mono := ConstMapMono.new(
+			var mono := ConstTileMono.new(
 				self,
 				Vector3(i % int(size.x) + offset.x, int(i / size.x) + offset.y, offset.z),
 				layers[int(i / size.x)],
@@ -85,7 +85,7 @@ func set_pos(point: Vector2, mono: Variant) -> void:
 	if size_rti.has_point(pos):
 		map[size.x * pos.y + pos.x] = mono
 
-class VarMapMono extends Mono:
+class VarTileMono extends Mono:
 	var map: MonoMap
 	var item: SekaiItem
 	
@@ -94,7 +94,7 @@ class VarMapMono extends Mono:
 		position = pos
 		item = pitem
 
-class ConstMapMono extends Mono:
+class ConstTileMono extends Mono:
 	var map: MonoMap
 	var item: SekaiItem
 	
@@ -109,7 +109,7 @@ class ConstMapMono extends Mono:
 	func set_prop(key: StringName, value) -> void:
 		var rawv = define._props.get(key)
 		if rawv != value:
-			var nmono := VarMapMono.new(map, position, item)
+			var nmono := VarTileMono.new(map, position, item)
 			nmono.set_define(define)
 			nmono._into_sekai(sekai)
 			map.set_pos(Vector2(position.x, position.y), nmono)
