@@ -3,7 +3,7 @@
 	&id &cat_fighter
 	&props {
 		&asserts {
-			&main "cat_fighter.png"
+			&main "assert/cat_fighter.png"
 		}
 		&draw_data {
 			&normal [&fixed &main 0.6 [
@@ -27,5 +27,5 @@
 
 (set_control (mono MonoEntity &cat_fighter
 	&props {
-		&position (vec3 7 8 1)
+		&position (vec3 6.5 7.5 1)
 	}))

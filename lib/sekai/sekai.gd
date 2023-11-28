@@ -1,7 +1,7 @@
 class_name Sekai extends Node2D
 
-@export_dir var define_dir: String
-@export_dir var assert_dir: String
+@export_file var entry_gss: String
+@export_dir var root_dir: String
 
 var defines: Array[MonoDefine]
 var defines_by_id := {}
@@ -15,8 +15,8 @@ var control_target = null
 
 static var root_vars := {
 	&"MonoDefine": MonoDefine.new(),
-	&"Block": GBlock.new(),
-	&"Character": GCharacter.new(),
+	&"Entity": GEntity.new(),
+	&"Tile": GTile.new(),
 	
 	&"MonoEntity": MonoEntity,
 }
@@ -25,7 +25,7 @@ func _init() -> void:
 	y_sort_enabled = true
 
 func _ready() -> void:
-	_init_defines()
+	_init_sekai()
 
 func _exit_tree() -> void:
 #	print("Sekai exit")
@@ -42,32 +42,10 @@ func _input(event: InputEvent) -> void:
 		if event is InputEventKey:
 			control_target.call_method(&"input_key", event)
 
-func _init_defines() -> void:
-	var gsses := []
-	var dir := DirAccess.open(define_dir)
-	if dir != null:
-		dir.list_dir_begin()
-		while true:
-			var node := dir.get_next()
-			if node == "": break
-			var file_path := define_dir.path_join(node)
-			if not dir.current_is_dir():
-				var extd := file_path.split(".")[-2]
-				if extd == "gdf":
-					var res := ResourceLoader.load(file_path)
-					if res is MonoDefine:
-						sign_define(res)
-				elif extd == "gss":
-					gsses.append(file_path)
-	
+func _init_sekai() -> void:
 	gss_ctx = make_lisper_context()
-	gsses.sort()
-	for gss_path in gsses:
-		var expr := FileAccess.get_file_as_string(gss_path)
-		print("[sekai] loading gss: ", gss_path)
-		var stime := Time.get_ticks_usec()
-		gss_ctx.eval(expr)
-		print("[sekai] completed in ", Time.get_ticks_usec() - stime, " us")
+	load_gss(entry_gss)
+	print()
 
 func make_lisper_context() -> Lisper.Context:
 	var ctx := Lisper.Context.common()
@@ -75,7 +53,6 @@ func make_lisper_context() -> Lisper.Context:
 	ctx.def_vars([Lisper.VarFlag.CONST, Lisper.VarFlag.FIX], root_vars)
 	
 	ctx.def_fns([Lisper.VarFlag.CONST, Lisper.VarFlag.FIX], Lisper.FnType.GD_RAW_PURE, {
-		
 		&"make_define": func (ctx: Lisper.Context, body: Array) -> Variant:
 			var def = ctx.exec_node(body[0])
 			if def != null:
@@ -134,6 +111,20 @@ func make_lisper_context() -> Lisper.Context:
 			return Lisper.Call(&"sign_define", [
 				[Lisper.Call(&"make_define", [body])],
 			]),
+		&"import": func (body: Array) -> Array:
+			return Lisper.Call(&"defvar", [
+				[body[0]],
+				[Lisper.Call(&"load", [
+					body.slice(1),
+				])],
+			]),
+		&"import_define": func (body: Array) -> Array:
+			return Lisper.Call(&"defvar", [
+				[body[0]],
+				[Lisper.Call(&"load_define", [
+					body.slice(1),
+				])],
+			]),
 	})
 	
 	ctx.def_fns([Lisper.VarFlag.CONST, Lisper.VarFlag.FIX], Lisper.FnType.GD_CALL, {
@@ -145,6 +136,12 @@ func make_lisper_context() -> Lisper.Context:
 	})
 	
 	ctx.def_fns([Lisper.VarFlag.CONST, Lisper.VarFlag.FIX], Lisper.FnType.GD_CALL_PURE, {
+		&"load": func (path: String) -> Resource:
+			return get_assert(path),
+		&"load_define": func (path: String) -> Resource:
+			return get_assert(path).new(),
+		&"load_gss": func (path: String) -> void:
+			load_gss(root_dir.path_join(path)),
 		&"make_mono_map": func (offset, size: Vector2, data := []) -> MonoMap:
 			var map := MonoMap.new()
 			if offset is Vector2:
@@ -156,6 +153,23 @@ func make_lisper_context() -> Lisper.Context:
 			return map,
 	})
 	return ctx
+
+var _indent := 0
+
+func _line_head_body() -> String:
+	return '' if _indent == 0 else "[color=gray]" + ''.rpad(_indent - 1, "│ ") + "├╴" + "[/color]"
+
+func _line_head_end() -> String:
+	return '' if _indent == 0 else "[color=gray]" + ''.rpad(_indent - 1, "│ ") + "└╴" + "[/color]"
+
+func load_gss(path: String) -> void:
+	var expr := FileAccess.get_file_as_string(path)
+	print_rich("[sekai] ", _line_head_body(), "[color=green][b]gss: ", path, "[/b][/color]")
+	_indent += 1
+	var stime := Time.get_ticks_usec()
+	gss_ctx.eval(expr)
+	print_rich("[sekai] ", _line_head_end(), "[color=gray]", (Time.get_ticks_usec() - stime) / 1000.0, " ms[/color]")
+	_indent -= 1
 
 func sign_define(define: MonoDefine) -> void:
 	if define.ref >= defines.size(): defines.resize(define.ref + 1)
@@ -207,7 +221,7 @@ var assert_cache := {}
 func get_assert(path: String) -> Variant:
 	var res = assert_cache.get(path)
 	if res != null: return res
-	res = load(assert_dir.path_join(path))
+	res = load(root_dir.path_join(path))
 	if res != null:
 		assert_cache[path] = res
 		return res

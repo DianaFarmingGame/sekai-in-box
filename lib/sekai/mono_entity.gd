@@ -15,7 +15,7 @@ func _into_sekai(psekai: Sekai) -> void:
 				emit_method(&"process"))
 	item.on_draw.connect(func ():
 		item.set_y(position.y + floorf(position.z) * 64)
-		define._props[&"draw"].call(sekai, self))
+		define._props[&"draw"].call(sekai, self, item))
 	sekai.add_child.call_deferred(item)
 
 func _outof_sekai() -> void:

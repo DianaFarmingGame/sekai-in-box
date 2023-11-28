@@ -3,9 +3,6 @@ class_name SekaiItem extends Node2D
 var base_transform: Transform2D
 var unit_size: Vector2
 
-func _init() -> void:
-	texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
-
 func _ready() -> void:
 	base_transform = Transform2D(0, unit_size, 0, Vector2(0, -position.y))
 

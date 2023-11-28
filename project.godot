@@ -17,8 +17,12 @@ config/icon="res://icon.svg"
 
 [display]
 
-window/size/viewport_width=576
-window/size/viewport_height=576
+window/size/viewport_width=512
+window/size/viewport_height=512
+
+[gui]
+
+theme/lcd_subpixel_layout=2
 
 [rendering]
 

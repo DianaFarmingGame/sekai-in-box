@@ -7,7 +7,8 @@
 script = ExtResource("1_fugfy")
 
 [node name="Sekai" type="Node2D" parent="."]
+texture_filter = 3
 script = ExtResource("2_l2l10")
-define_dir = "res://test/define"
-assert_dir = "res://test/assert"
+entry_gss = "res://test/gss/main.gss.txt"
+root_dir = "res://test"
 unit_size = Vector2(64, 64)

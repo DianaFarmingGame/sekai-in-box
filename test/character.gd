@@ -17,20 +17,18 @@ func do_merge(sets: Array[Dictionary]) -> Array[Dictionary]:
 				if sekai.can_pass(Rect2(pos.x, pos.y + dpos.y, 0, 0).grow(0.25), pos_z):
 					pos.y += dpos.y
 				this.position = Vector3(pos.x, pos.y, this.position.z),
-		&"draw": func (sekai: Sekai, this: Mono) -> void:
-			var item := this.item as SekaiItem
+		&"draw": func (sekai: Sekai, this: Mono, item: SekaiItem) -> void:
 			var pos := Vector2(this.position.x, this.position.y)
 			item.pen_set_transform(pos, 0, Vector2(1, 0.4))
 			item.draw_circle(Vector2(0, 0), 0.25, 0x00000055)
 			item.pen_clear_transform()
-			TVisible.draw(sekai, this),
+			TDraw.draw(sekai, this, item),
 		
 #		&"state_data": 
 	})
 	merge_watchers(sets, {
 		&"input_keys": func (_sekai, this: Mono, _prev, keys: Dictionary):
 			var dir := Vector2(0, 0)
-			print(keys)
 			if keys.get(&"Up"): dir += Vector2(0, -1)
 			if keys.get(&"Down"): dir += Vector2(0, 1)
 			if keys.get(&"Left"): dir += Vector2(-1, 0)

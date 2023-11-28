@@ -52,7 +52,7 @@ func _into_sekai(psekai: Sekai) -> void:
 		layer.on_draw.connect(func () -> void:
 			for i in ids:
 				var mono = map[i]
-				mono.define._props[&"draw"].call(sekai, mono))
+				mono.define._props[&"draw"].call(sekai, mono, layer))
 		sekai.add_child.call_deferred(layer)
 
 func _outof_sekai() -> void:

@@ -1,17 +1,16 @@
-class_name TVisible extends MonoTrait
+class_name TDraw extends MonoTrait
 
-var id := &"visible"
+var id := &"draw"
 
 var traits := [TAssert]
 
 var props := {
-	&"visible": true,
 	&"draw_data": {},
 	&"cur_draw": &"normal",
 	&"draw_timer": 0.0,
 	&"flip_h": false,
 	
-	&"draw": TVisible.draw ,
+	&"draw": TDraw.draw,
 	&"reset_draw": func (_sekai, this: Mono) -> void:
 		this.set_prop(&"draw_timer", this.item.get_time()),
 	&"to_draw": func (_sekai, this: Mono, draw_id: StringName) -> void:
@@ -22,9 +21,7 @@ var props := {
 			this.set_prop(&"draw_timer", this.item.get_time()),
 }
 
-static func draw(_sekai, this: Mono) -> void:
-	var item := this.item as SekaiItem
-	var t := (item.get_time() - this.get_prop(&"draw_timer")) as float
+static func draw(_sekai, this: Mono, item: SekaiItem) -> void:
 	var pos := Vector2(this.position.x, this.position.y)
 	@warning_ignore("shadowed_variable")
 	var draw = this.get_prop(&"draw_data")[this.get_prop(&"cur_draw")]
@@ -41,6 +38,7 @@ static func draw(_sekai, this: Mono) -> void:
 			var texture = this.call_method(&"get_assert", draw[1])
 			var timeout := draw[2] as float
 			var frames := draw[3] as Array
+			var t := (item.get_time() - this.get_prop(&"draw_timer")) as float
 			var frame_idx := lerpf(0.0, (frames.size() as float), fmod(t, timeout) / timeout) as int
 			var frame = frames[frame_idx]
 			if this.get_prop(&"flip_h"):
