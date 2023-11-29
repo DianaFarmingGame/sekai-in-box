@@ -5,14 +5,14 @@ var item: SekaiItem
 func _into_sekai(psekai: Sekai) -> void:
 	super._into_sekai(psekai)
 	
-	position = get_prop(&"position")
+	position = getp(&"position")
 	
 	_clear_item()
 	item = sekai.make_item()
-	if get_prop(&"need_process"):
+	if getp(&"need_process"):
 		item.on_process.connect(func ():
-			if get_prop(&"processing"):
-				emit_method(&"process"))
+			if getp(&"processing"):
+				emitm(&"process"))
 	item.on_draw.connect(func ():
 		item.set_y(position.y + floorf(position.z) * 64)
 		define._props[&"draw"].call(sekai, self, item))

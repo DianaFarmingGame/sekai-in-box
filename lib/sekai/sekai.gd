@@ -40,7 +40,7 @@ func _clear_monos() -> void:
 func _input(event: InputEvent) -> void:
 	if control_target != null:
 		if event is InputEventKey:
-			control_target.call_method(&"input_key", event)
+			control_target.callm(&"input_key", event)
 
 func _init_sekai() -> void:
 	gss_ctx = make_lisper_context()

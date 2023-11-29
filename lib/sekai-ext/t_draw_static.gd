@@ -10,11 +10,11 @@ var props := {
 
 static func draw(_sekai, this: Mono, _item) -> void:
 	@warning_ignore("shadowed_variable")
-	var draw = this.get_prop(&"draw_data")[this.get_prop(&"cur_draw")]
+	var draw = this.getp(&"draw_data")[this.getp(&"cur_draw")]
 	match draw[0]:
 		&"static":
-			var texture = this.call_method(&"get_assert", draw[1])
-			if this.get_prop(&"flip_h"):
+			var texture = this.callm(&"get_assert", draw[1])
+			if this.getp(&"flip_h"):
 				this.define._props[&"draw"] = func (_sekai, this: Mono, item: SekaiItem) -> void:
 					var pos := Vector2(this.position.x, this.position.y)
 					item.pen_set_transform(pos + draw[2].position + draw[2].size / 2, 0.0, Vector2(-1, 1))
@@ -25,11 +25,11 @@ static func draw(_sekai, this: Mono, _item) -> void:
 					var pos := Vector2(this.position.x, this.position.y)
 					item.pen_draw_texture_region(texture, Rect2(pos + draw[2].position, draw[2].size), draw[3])
 		&"fixed":
-			var texture = this.call_method(&"get_assert", draw[1])
+			var texture = this.callm(&"get_assert", draw[1])
 			var timeout := draw[2] as float
 			var frames := draw[3] as Array
-			var timer := this.get_prop(&"draw_timer") as float
-			if this.get_prop(&"flip_h"):
+			var timer := this.getp(&"draw_timer") as float
+			if this.getp(&"flip_h"):
 				this.define._props[&"draw"] = func (_sekai, this: Mono, item: SekaiItem) -> void:
 					var pos := Vector2(this.position.x, this.position.y)
 					var t := (item.get_time() - timer) as float
@@ -46,5 +46,5 @@ static func draw(_sekai, this: Mono, _item) -> void:
 					var frame = frames[frame_idx]
 					item.pen_draw_texture_region(texture, Rect2(pos + frame[0].position, frame[0].size), frame[1])
 		_:
-			push_error("unknown draw type: ", this.get_prop(&"draw_type"))
-	this.call_method(&"draw", _item)
+			push_error("unknown draw type: ", this.getp(&"draw_type"))
+	this.callm(&"draw", _item)

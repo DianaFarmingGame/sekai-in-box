@@ -6,12 +6,12 @@ func do_merge(sets: Array[Dictionary]) -> Array[Dictionary]:
 		&"cur_speed": Vector2(0, 0),
 		
 		&"process": func (sekai: Sekai, this: Mono) -> void:
-			var cur_speed := this.get_prop(&"cur_speed") as Vector2
+			var cur_speed := this.getp(&"cur_speed") as Vector2
 			if cur_speed != Vector2(0, 0):
 				var delta := this.item.get_delta_time() as float
 				var pos_z := floori(this.position.z)
 				var pos := Vector2(this.position.x, this.position.y)
-				var dpos := this.get_prop(&"cur_speed") * delta as Vector2
+				var dpos := this.getp(&"cur_speed") * delta as Vector2
 				if sekai.can_pass(Rect2(pos.x + dpos.x, pos.y, 0, 0).grow(0.25), pos_z):
 					pos.x += dpos.x
 				if sekai.can_pass(Rect2(pos.x, pos.y + dpos.y, 0, 0).grow(0.25), pos_z):
@@ -34,13 +34,13 @@ func do_merge(sets: Array[Dictionary]) -> Array[Dictionary]:
 			if keys.get(&"Left"): dir += Vector2(-1, 0)
 			if keys.get(&"Right"): dir += Vector2(1, 0)
 			var speed := dir.normalized() * 4
-			this.set_prop(&"cur_speed", speed)
-			if speed.x < 0: this.set_prop(&"flip_h", true)
-			if speed.x > 0: this.set_prop(&"flip_h", false)
+			this.setp(&"cur_speed", speed)
+			if speed.x < 0: this.setp(&"flip_h", true)
+			if speed.x > 0: this.setp(&"flip_h", false)
 			if speed == Vector2(0, 0):
-				this.call_method(&"reset_to_draw", &"normal")
+				this.callm(&"reset_to_draw", &"normal")
 			else:
-				this.call_method(&"reset_to_draw", &"walk")
+				this.callm(&"reset_to_draw", &"walk")
 			return keys,
 	})
 	merge_traits(sets, [TInputKey, TProcess])

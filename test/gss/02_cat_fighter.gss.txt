@@ -23,6 +23,13 @@
 				[(rect2 -1 -1.65 2 2) (rect2 448 64 64 64)]
 			]]
 		}
+		&state_data {
+			&idle {
+				&enter ...
+				&loop ...
+				&exit ...
+			}
+		}
 	})
 
 (set_control (mono MonoEntity &cat_fighter

@@ -11,10 +11,10 @@ var props := {
 }
 
 static func draw_debug(sekai: Sekai, this: Mono) -> void:
-	if this.get_prop(&"collisible") and floori(this.position.z) == floori(sekai.control_target.position.z):
+	if this.getp(&"collisible") and floori(this.position.z) == floori(sekai.control_target.position.z):
 		var item := this.get_item() as SekaiItem
 		var pos := Vector2(this.position.x, this.position.y)
-		var rbox := this.get_prop(&"collision_box") as Rect2
+		var rbox := this.getp(&"collision_box") as Rect2
 		var box := Rect2(pos + rbox.position, rbox.size)
 		item.draw_rect(box, 0xff000044)
 		item.draw_rect(box, 0xff0000ff, false)

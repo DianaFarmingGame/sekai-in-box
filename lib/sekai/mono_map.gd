@@ -43,12 +43,12 @@ func _into_sekai(psekai: Sekai) -> void:
 		var ids := range(iy * size.x, (iy + 1) * size.x).filter(func (i): return map[i] != null)
 		var need_process := false
 		for i in ids:
-			if map[i].get_prop(&"need_process"): need_process = true; break
+			if map[i].getp(&"need_process"): need_process = true; break
 		if need_process:
 			layer.on_process.connect(func ():
 				for i in ids:
-					if map[i].get_prop(&"processing"):
-						map[i].emit_method(&"process"))
+					if map[i].getp(&"processing"):
+						map[i].emitm(&"process"))
 		layer.on_draw.connect(func () -> void:
 			for i in ids:
 				var mono = map[i]
@@ -103,17 +103,17 @@ class ConstTileMono extends Mono:
 		position = pos
 		item = pitem
 
-	func get_prop(key: StringName, default = null) -> Variant:
+	func getp(key: StringName, default = null) -> Variant:
 		return define._props.get(key, default)
 
-	func set_prop(key: StringName, value) -> void:
+	func setp(key: StringName, value) -> void:
 		var rawv = define._props.get(key)
 		if rawv != value:
 			var nmono := VarTileMono.new(map, position, item)
 			nmono.set_define(define)
 			nmono._into_sekai(sekai)
 			map.set_pos(Vector2(position.x, position.y), nmono)
-			nmono.set_prop(key, value)
+			nmono.setp(key, value)
 
 func is_need_collision() -> bool:
 	var need_collision := false

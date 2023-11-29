@@ -1,9 +1,5 @@
 class_name Mono
 
-enum FP {
-	draw,
-}
-
 var props := {}
 
 var sekai: Sekai
@@ -22,13 +18,16 @@ func _outof_sekai() -> void:
 func set_define(pdefine: MonoDefine) -> void:
 	define = pdefine
 
-func get_prop(key: StringName, default = null) -> Variant:
+func getp(key: StringName, default = null) -> Variant:
 	var ovalue = props.get(key)
 	if ovalue != null: return ovalue
 	return define._props.get(key, default)
 
-func set_prop(key: StringName, value) -> void:
-	var prev = get_prop(key)
+func layer_getp(layer: StringName, key: StringName, default = null) -> void:
+	pass
+
+func setp(key: StringName, value) -> void:
+	var prev = getp(key)
 	if prev != value:
 		var watcher = define._watchers.get(key)
 		if watcher != null: value = watcher.call(sekai, self, prev, value)
@@ -38,44 +37,47 @@ func set_prop(key: StringName, value) -> void:
 	else:
 		props.erase(key)
 
-func try_emit_method(key: StringName) -> Variant:
+func push_stack(key: StringName, value) -> void:
+	pass
+
+func emitmS(key: StringName) -> Variant:
 	var handle = define._props.get(key)
 	if handle != null: return handle.call(sekai, self)
 	return null
 
-func try_call_method(key: StringName, arg: Variant) -> Variant:
+func callmS(key: StringName, arg: Variant) -> Variant:
 	var handle = define._props.get(key)
 	if handle != null: return handle.call(sekai, self, arg)
 	return null
 
-func try_call_methodv(key: StringName, argv: Array) -> Variant:
+func callmvS(key: StringName, argv: Array) -> Variant:
 	var vargv := [sekai, self]
 	vargv.append_array(argv)
 	var handle = define._props.get(key)
 	if handle != null: return handle.callv(vargv)
 	return null
 
-func emit_method(key: StringName) -> Variant:
+func emitm(key: StringName) -> Variant:
 	return define._props[key].call(sekai, self)
 
-func call_method(key: StringName, arg: Variant) -> Variant:
+func callm(key: StringName, arg: Variant) -> Variant:
 	return define._props[key].call(sekai, self, arg)
 
-func call_methodv(key: StringName, argv: Array) -> Variant:
+func callmv(key: StringName, argv: Array) -> Variant:
 	var vargv := [sekai, self]
 	vargv.append_array(argv)
 	return define._props[key].callv(vargv)
 
 func is_need_collision() -> bool:
-	return get_prop(&"need_collision", false)
+	return getp(&"need_collision", false)
 
 func is_need_route() -> bool:
-	return get_prop(&"need_route", false)
+	return getp(&"need_route", false)
 
 func will_route(point: Vector2, z_pos: int) -> Mono:
 	if floori(position.z) == z_pos:
-		if get_prop(&"routable"):
-			var box := get_prop(&"route_box") as Rect2
+		if getp(&"routable"):
+			var box := getp(&"route_box") as Rect2
 			box = Rect2(Vector2(position.x, position.y) + box.position, box.size)
 			if box.has_point(point):
 				return self
@@ -83,8 +85,8 @@ func will_route(point: Vector2, z_pos: int) -> Mono:
 
 func will_collide(region: Rect2, z_pos: int) -> Mono:
 	if floori(position.z) == z_pos:
-		if get_prop(&"collisible"):
-			var box := get_prop(&"collision_box") as Rect2
+		if getp(&"collisible"):
+			var box := getp(&"collision_box") as Rect2
 			if Rect2(Vector2(position.x, position.y) + box.position, box.size).intersects(region):
 				return self
 	return null
