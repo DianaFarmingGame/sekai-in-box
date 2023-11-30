@@ -3,7 +3,6 @@ class_name MonoTrait extends TraitLike
 # var id := &""
 # var traits: Array
 # var props: Dictionary
-# var watchers: Dictionary
 
 func _finalize() -> void:
 	prepare()
@@ -12,7 +11,6 @@ func _finalize() -> void:
 
 func _do_merge(sets: Array[Dictionary]) -> Array[Dictionary]:
 	sets = merge_props(sets, _get_own_props())
-	sets = merge_watchers(sets, _get_own_watchers())
 	sets = merge_traits(sets, _get_own_traits())
 	return sets
 
@@ -29,13 +27,6 @@ func _get_own_props() -> Dictionary:
 		return {}
 	else:
 		return vprops
-
-func _get_own_watchers() -> Dictionary:
-	var vwatchers = get(&"watchers")
-	if vwatchers == null:
-		return {}
-	else:
-		return vwatchers
 
 func _get_uid() -> StringName:
 	return get_uid()

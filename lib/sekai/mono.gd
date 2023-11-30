@@ -26,10 +26,17 @@ func uncover(layer_name: StringName) -> void:
 			layers.remove_at(lidx)
 			return
 
-func emit_watcher(key: StringName, value: Variant) -> void:
+func emit_watcher(key: StringName, value: Variant) -> Variant:
 	if getp(key) != value:
-		var handle = define._watchers.get(key)
-		if handle != null: handle.call(sekai, self, value)
+		var hkey = StringName("on_" + key)
+		var handle = define._props.get(hkey)
+		if handle != null: value = handle.call(sekai, self, value)
+		var lidx = layers.size() - 1
+		while lidx >= 0:
+			handle = layers[lidx][1].get(hkey)
+			if handle != null: value = handle.call(sekai, self, value)
+			lidx -= 1
+	return value
 
 # get property methods
 #
@@ -120,8 +127,7 @@ func setp(key: StringName, value: Variant) -> void:
 		var v = l[1].get(key)
 		if v != null:
 			if v != value:
-				emit_watcher(key, value)
-				l[1][key] = value
+				l[1][key] = emit_watcher(key, value)
 			return
 	var v = define._props.get(key)
 	if define._props.get(key) != value: setpB(key, value)
@@ -139,8 +145,7 @@ func setpD(key: StringName, value: Variant) -> void:
 func setpL(layer_name: StringName, key: StringName, value: Variant) -> void:
 	for l in layers:
 		if l[0] == layer_name:
-			emit_watcher(key, value)
-			l[1][key] = value
+			l[1][key] = emit_watcher(key, value)
 			return
 
 func setpLD(layer_name: StringName, key: StringName, value: Variant) -> void:
@@ -150,7 +155,7 @@ func setpLD(layer_name: StringName, key: StringName, value: Variant) -> void:
 			return
 
 func setpB(key: StringName, value: Variant) -> void:
-	emit_watcher(key, value)
+	value = emit_watcher(key, value)
 	if layers.size() > 0:
 		layers[-1][1][key] = value
 		return

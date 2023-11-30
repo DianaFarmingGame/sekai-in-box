@@ -23,11 +23,7 @@ func do_merge(sets: Array[Dictionary]) -> Array[Dictionary]:
 			item.draw_circle(Vector2(0, 0), 0.25, 0x00000055)
 			item.pen_clear_transform()
 			TDraw.draw(sekai, this, item),
-		
-#		&"state_data": 
-	})
-	merge_watchers(sets, {
-		&"input_keys": func (_sekai, this: Mono, keys: Dictionary):
+		&"on_input_keys": func (_sekai, this: Mono, keys: Dictionary):
 			var dir := Vector2(0, 0)
 			if keys.get(&"Up"): dir += Vector2(0, -1)
 			if keys.get(&"Down"): dir += Vector2(0, 1)
