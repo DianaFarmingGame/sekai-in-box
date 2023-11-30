@@ -1,9 +1,8 @@
 class_name Mono
 
-var props := {}
-
 var sekai: Sekai
 var define: MonoDefine
+var layers := []
 
 var position := Vector3(0, 0, 0)
 
@@ -12,47 +11,199 @@ func _into_sekai(psekai: Sekai) -> void:
 	define.finalize()
 
 func _outof_sekai() -> void:
-	sekai = null
 	define = null
+	sekai = null
 
 func set_define(pdefine: MonoDefine) -> void:
 	define = pdefine
 
+func cover(layer_name: StringName, layer: Dictionary) -> void:
+	layers.push_front([layer_name, layer])
+
+func uncover(layer_name: StringName) -> void:
+	for lidx in layers.size():
+		if layers[lidx][0] == layer_name:
+			layers.remove_at(lidx)
+			return
+
+func emit_watcher(key: StringName, value: Variant) -> void:
+	if getp(key) != value:
+		var handle = define._watchers.get(key)
+		if handle != null: handle.call(sekai, self, value)
+
+# get property methods
+#
+# D -> Default:	get with default value
+# L -> Layer: 	only get on certain layer
+# U -> Under: 	only get under certain layer
+# B -> Base:	only get on base layer
+# R -> Raw:		only get on define
+
 func getp(key: StringName) -> Variant:
-	var ovalue = props.get(key)
-	if ovalue != null: return ovalue
-	return define._props[key]
+	for l in layers:
+		var v = l[1].get(key)
+		if v != null: return v
+	return define._props.get(key)
 
-func getpL(layer: StringName, key: StringName) -> void:
-	pass
-
-func getpD(key: StringName, default = null) -> Variant:
-	var ovalue = props.get(key)
-	if ovalue != null: return ovalue
+func getpD(key: StringName, default: Variant) -> Variant:
+	for l in layers:
+		var v = l[1].get(key)
+		if v != null: return v
 	return define._props.get(key, default)
 
-func getpDL(layer: StringName, key: StringName, default = null) -> void:
-	pass
+func getpL(layer_name: StringName, key: StringName) -> Variant:
+	for l in layers:
+		if l[0] == layer_name:
+			var v = l[1].get(key)
+			if v != null: return v
+			else: return null
+	return null
+
+func getpLD(layer_name: StringName, key: StringName, default: Variant) -> Variant:
+	for l in layers:
+		if l[0] == layer_name:
+			var v = l[1].get(key)
+			if v != null: return v
+			else: return default
+	return default
+
+func getpU(layer_name: StringName, key: StringName) -> Variant:
+	var lidx := 0
+	while lidx < layers.size():
+		if layers[lidx][0] == layer_name:
+			lidx += 1
+			while lidx < layers.size():
+				var v = layers[lidx][1].get(key)
+				if v != null: return v
+				lidx += 1
+			return define._props.get(key)
+		lidx += 1
+	return null
+
+func getpUD(layer_name: StringName, key: StringName, default: Variant) -> Variant:
+	var lidx := 0
+	while lidx < layers.size():
+		if layers[lidx][0] == layer_name:
+			lidx += 1
+			while lidx < layers.size():
+				var v = layers[lidx][1].get(key)
+				if v != null: return v
+				lidx += 1
+			return define._props.get(key, default)
+		lidx += 1
+	return default
+
+func getpB(key: StringName) -> Variant:
+	if layers.size() > 0:
+		return layers[-1][1].get(key)
+	return null
+
+func getpBD(key: StringName, default: Variant) -> Variant:
+	if layers.size() > 0:
+		return layers[-1][1].get(key, default)
+	return default
+
+func getpR(key: StringName) -> Variant:
+	return define._props.get(key)
+
+func getpRD(key: StringName, default: Variant) -> Variant:
+	return define._props.get(key, default)
+
+# set property methods
+#
+# D -> Direct: 	set without trigger watchers
+# L -> Layer: 	only set on certain layer
+# B -> Base:	only set on base layer
 
 func setp(key: StringName, value: Variant) -> void:
-	var prev = getp(key)
-	if prev != value:
-		var watcher = define._watchers.get(key)
-		if watcher != null: value = watcher.call(sekai, self, prev, value)
-	var rawv = define._props.get(key)
-	if rawv != value:
-		props[key] = value
-	else:
-		props.erase(key)
+	for l in layers:
+		var v = l[1].get(key)
+		if v != null:
+			if v != value:
+				emit_watcher(key, value)
+				l[1][key] = value
+			return
+	var v = define._props.get(key)
+	if define._props.get(key) != value: setpB(key, value)
 
-func setpL(layer: StringName, key: StringName, value: Variant) -> void:
+func setpD(key: StringName, value: Variant) -> void:
+	for l in layers:
+		var v = l[1].get(key)
+		if v != null:
+			if v != value:
+				l[1][key] = value
+			return
+	var v = define._props.get(key)
+	if define._props.get(key) != value: setpB(key, value)
+
+func setpL(layer_name: StringName, key: StringName, value: Variant) -> void:
+	for l in layers:
+		if l[0] == layer_name:
+			emit_watcher(key, value)
+			l[1][key] = value
+			return
+
+func setpLD(layer_name: StringName, key: StringName, value: Variant) -> void:
+	for l in layers:
+		if l[0] == layer_name:
+			l[1][key] = value
+			return
+
+func setpB(key: StringName, value: Variant) -> void:
+	emit_watcher(key, value)
+	if layers.size() > 0:
+		layers[-1][1][key] = value
+		return
+	cover(&"base", {key: value})
+
+func setpBD(key: StringName, value: Variant) -> void:
+	if layers.size() > 0:
+		layers[-1][1][key] = value
+		return
+	cover(&"base", {key: value})
+
+# push stack methods
+#
+# S -> Sort: 	push key to the sorted place
+# L -> Layer: 	only push on certain layer
+# B -> Base:	only push on base layer
+
+func pushs(key: StringName, value: Variant) -> void:
 	pass
 
-func pushs(key: StringName, value) -> void:
+func pushsS(key: StringName, value: Variant) -> void:
 	pass
 
-func pushsL(key: StringName, value) -> void:
+func pushsL(layer_name: StringName, key: StringName, value: Variant) -> void:
 	pass
+
+func pushsLS(layer_name: StringName, key: StringName, value: Variant) -> void:
+	pass
+
+func pushsB(key: StringName, value: Variant) -> void:
+	pass
+
+func pushsBS(key: StringName, value: Variant) -> void:
+	pass
+
+# pop stack methods
+#
+# L -> Layer: 	only pop on certain layer
+# B -> Base:	only pop on base layer
+
+func pops(key: StringName) -> void:
+	pass
+
+func popsL(layer_name: StringName, key: StringName) -> void:
+	pass
+
+func popsB(key: StringName) -> void:
+	pass
+
+# call function methods
+#
+# S -> Safe: 	never fail
+# R -> Raw:		only call on define
 
 func emitm(key: StringName) -> Variant:
 	return define._props[key].call(sekai, self)
@@ -70,17 +221,47 @@ func callmS(key: StringName, arg: Variant) -> Variant:
 	if handle != null: return handle.call(sekai, self, arg)
 	return null
 
-func callmv(key: StringName, argv: Array) -> Variant:
+func applym(key: StringName, argv: Array) -> Variant:
 	var vargv := [sekai, self]
 	vargv.append_array(argv)
 	return define._props[key].callv(vargv)
 
-func callmvS(key: StringName, argv: Array) -> Variant:
+func applymS(key: StringName, argv: Array) -> Variant:
 	var vargv := [sekai, self]
 	vargv.append_array(argv)
 	var handle = define._props.get(key)
 	if handle != null: return handle.callv(vargv)
 	return null
+
+func emitmR(key: StringName) -> Variant:
+	return define._props[key].call(sekai, self)
+
+func emitmRS(key: StringName) -> Variant:
+	var handle = define._props.get(key)
+	if handle != null: return handle.call(sekai, self)
+	return null
+
+func callmR(key: StringName, arg: Variant) -> Variant:
+	return define._props[key].call(sekai, self, arg)
+
+func callmRS(key: StringName, arg: Variant) -> Variant:
+	var handle = define._props.get(key)
+	if handle != null: return handle.call(sekai, self, arg)
+	return null
+
+func applymR(key: StringName, argv: Array) -> Variant:
+	var vargv := [sekai, self]
+	vargv.append_array(argv)
+	return define._props[key].callv(vargv)
+
+func applymRS(key: StringName, argv: Array) -> Variant:
+	var vargv := [sekai, self]
+	vargv.append_array(argv)
+	var handle = define._props.get(key)
+	if handle != null: return handle.callv(vargv)
+	return null
+
+# accelerator methods
 
 func is_need_collision() -> bool:
 	return getpD(&"need_collision", false)

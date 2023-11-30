@@ -80,10 +80,14 @@ func make_lisper_context() -> Lisper.Context:
 			if mono_class != null:
 				var define = get_define(ctx.exec_node(body[1]))
 				if define == null: return null
-				var mono = mono_class.new()
+				var mono := mono_class.new() as Mono
 				var args = ctx.exec_map_part(body.slice(2))
 				for k in args.keys():
-					mono.set(k, args[k])
+					match k:
+						&"props":
+							mono.cover(&"base", args[k])
+						_:
+							mono.set(k, args[k])
 				mono.set_define(define)
 				return mono
 			else:

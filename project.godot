@@ -13,12 +13,22 @@ config_version=5
 config/name="sekai-in-box"
 run/main_scene="res://test/test.tscn"
 config/features=PackedStringArray("4.1", "Forward Plus")
+run/delta_smoothing=false
 config/icon="res://icon.svg"
+
+[autoload]
+
+DebugMenu="*res://addons/debug_menu/debug_menu.tscn"
 
 [display]
 
 window/size/viewport_width=512
 window/size/viewport_height=512
+window/vsync/vsync_mode=0
+
+[editor_plugins]
+
+enabled=PackedStringArray("res://addons/debug_menu/plugin.cfg")
 
 [filesystem]
 
@@ -31,4 +41,7 @@ theme/lcd_subpixel_layout=2
 
 [rendering]
 
+environment/ssao/quality=0
+environment/ssil/quality=0
+anti_aliasing/screen_space_roughness_limiter/enabled=false
 environment/defaults/default_clear_color=Color(0, 0, 0, 1)

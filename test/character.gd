@@ -27,7 +27,7 @@ func do_merge(sets: Array[Dictionary]) -> Array[Dictionary]:
 #		&"state_data": 
 	})
 	merge_watchers(sets, {
-		&"input_keys": func (_sekai, this: Mono, _prev, keys: Dictionary):
+		&"input_keys": func (_sekai, this: Mono, keys: Dictionary):
 			var dir := Vector2(0, 0)
 			if keys.get(&"Up"): dir += Vector2(0, -1)
 			if keys.get(&"Down"): dir += Vector2(0, 1)

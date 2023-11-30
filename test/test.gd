@@ -1,4 +1,4 @@
-extends Node2D
+extends Node
 
 func _ready() -> void:
 	var tree := get_tree()

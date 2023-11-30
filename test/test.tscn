@@ -3,7 +3,13 @@
 [ext_resource type="Script" path="res://test/test.gd" id="1_fugfy"]
 [ext_resource type="Script" path="res://lib/sekai/sekai.gd" id="2_l2l10"]
 
-[node name="test" type="Node2D"]
+[node name="test" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 script = ExtResource("1_fugfy")
 
 [node name="Sekai" type="Node2D" parent="."]
