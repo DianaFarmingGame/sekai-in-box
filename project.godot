@@ -20,6 +20,11 @@ config/icon="res://icon.svg"
 window/size/viewport_width=512
 window/size/viewport_height=512
 
+[filesystem]
+
+import/blender/enabled=false
+import/fbx/enabled=false
+
 [gui]
 
 theme/lcd_subpixel_layout=2
