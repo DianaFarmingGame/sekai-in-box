@@ -211,32 +211,39 @@ func popsB(key: StringName) -> void:
 # R -> Raw:		only call on define
 
 func emitm(key: StringName) -> Variant:
-	return define._props[key].call(sekai, self)
-
-func emitmS(key: StringName) -> Variant:
+	var value = null
 	var handle = define._props.get(key)
-	if handle != null: return handle.call(sekai, self)
-	return null
+	if handle != null: value = handle.call(sekai, self)
+	var lidx = layers.size() - 1
+	while lidx >= 0:
+		handle = layers[lidx][1].get(key)
+		if handle != null: value = handle.call(sekai, self)
+		lidx -= 1
+	return value
 
 func callm(key: StringName, arg: Variant) -> Variant:
-	return define._props[key].call(sekai, self, arg)
-
-func callmS(key: StringName, arg: Variant) -> Variant:
+	var value = null
 	var handle = define._props.get(key)
-	if handle != null: return handle.call(sekai, self, arg)
-	return null
+	if handle != null: value = handle.call(sekai, self, arg)
+	var lidx = layers.size() - 1
+	while lidx >= 0:
+		handle = layers[lidx][1].get(key)
+		if handle != null: value = handle.call(sekai, self, arg)
+		lidx -= 1
+	return value
 
 func applym(key: StringName, argv: Array) -> Variant:
 	var vargv := [sekai, self]
 	vargv.append_array(argv)
-	return define._props[key].callv(vargv)
-
-func applymS(key: StringName, argv: Array) -> Variant:
-	var vargv := [sekai, self]
-	vargv.append_array(argv)
+	var value = null
 	var handle = define._props.get(key)
-	if handle != null: return handle.callv(vargv)
-	return null
+	if handle != null: value = handle.call(sekai, self, vargv)
+	var lidx = layers.size() - 1
+	while lidx >= 0:
+		handle = layers[lidx][1].get(key)
+		if handle != null: value = handle.call(sekai, self, vargv)
+		lidx -= 1
+	return value
 
 func emitmR(key: StringName) -> Variant:
 	return define._props[key].call(sekai, self)
