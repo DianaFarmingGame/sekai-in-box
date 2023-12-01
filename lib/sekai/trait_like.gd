@@ -48,15 +48,15 @@ func do_merge_uids(uids: Array[StringName]) -> void:
 	for uid in uids: do_merge_uid(uid)
 
 func merge_props(sets: Array[Dictionary], props: Dictionary) -> Array[Dictionary]:
-	sets[0].merge(props)
+	sets[0] = Prop.do_mergep(sets[0], props)
 	return sets
 
 func merge_trait(sets: Array[Dictionary], t) -> Array[Dictionary]:
 	if not t is TraitLike: t = t.new()
 	t.finalize()
-	do_merge_uid(t._get_uid())
-	sets[0].merge(t.get_props())
+	sets = merge_props(sets, t.get_props())
 	do_merge_uids(t.get_uids())
+	do_merge_uid(t._get_uid())
 	return sets
 
 func merge_traits(sets: Array[Dictionary], traits: Array) -> Array[Dictionary]:
@@ -65,14 +65,7 @@ func merge_traits(sets: Array[Dictionary], traits: Array) -> Array[Dictionary]:
 	return sets
 
 func do_override_props(props: Dictionary) -> void:
-	_props = _merge_prop_entry(_props, props)
-
-func _merge_prop_entry(tar: Variant, src: Variant) -> Variant:
-	if tar == null: return src
-	if not tar is Dictionary: return src
-	for key in src.keys():
-		tar[key] = _merge_prop_entry(tar.get(key), src[key])
-	return tar
+	_props = Prop.do_mergep(_props, props)
 
 func get_prop(key: StringName, default = null) -> Variant:
 	return _props.get(key, default)

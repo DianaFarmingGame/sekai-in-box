@@ -1,6 +1,8 @@
 class_name GCharacter extends GEntity
 
 func do_merge(sets: Array[Dictionary]) -> Array[Dictionary]:
+	super.do_merge(sets)
+	merge_traits(sets, [TInputKey, TProcess])
 	merge_props(sets, {
 		&"state": &"normal",
 		&"cur_speed": Vector2(0, 0),
@@ -17,12 +19,13 @@ func do_merge(sets: Array[Dictionary]) -> Array[Dictionary]:
 				if sekai.can_pass(Rect2(pos.x, pos.y + dpos.y, 0, 0).grow(0.25), pos_z):
 					pos.y += dpos.y
 				this.position = Vector3(pos.x, pos.y, this.position.z),
-		&"draw": func (sekai: Sekai, this: Mono, item: SekaiItem) -> void:
-			var pos := Vector2(this.position.x, this.position.y)
-			item.pen_set_transform(pos, 0, Vector2(1, 0.4))
-			item.draw_circle(Vector2(0, 0), 0.25, 0x00000055)
-			item.pen_clear_transform()
-			TDraw.draw(sekai, this, item),
+		&"draw": Prop.puts({
+			&"-1.charactor_shadow": func (_sekai, this: Mono, item: SekaiItem) -> void:
+				var pos := Vector2(this.position.x, this.position.y)
+				item.pen_set_transform(pos, 0, Vector2(1, 0.4))
+				item.draw_circle(Vector2(0, 0), 0.25, 0x00000055)
+				item.pen_clear_transform(),
+		}),
 		&"on_input_keys": func (_sekai, this: Mono, keys: Dictionary):
 			var dir := Vector2(0, 0)
 			if keys.get(&"Up"): dir += Vector2(0, -1)
@@ -39,5 +42,4 @@ func do_merge(sets: Array[Dictionary]) -> Array[Dictionary]:
 				this.callm(&"reset_to_draw", &"walk")
 			return keys,
 	})
-	merge_traits(sets, [TInputKey, TProcess])
-	return super.do_merge(sets)
+	return sets

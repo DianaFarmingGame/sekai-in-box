@@ -10,8 +10,8 @@ func _finalize() -> void:
 	ready()
 
 func _do_merge(sets: Array[Dictionary]) -> Array[Dictionary]:
-	sets = merge_props(sets, _get_own_props())
 	sets = merge_traits(sets, _get_own_traits())
+	sets = merge_props(sets, _get_own_props())
 	return sets
 
 func _get_own_traits() -> Array:

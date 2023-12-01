@@ -10,7 +10,7 @@ var props := {
 	&"draw_timer": 0.0,
 	&"flip_h": false,
 	
-	&"draw": TDraw.draw,
+	&"draw": Prop.Stack({&"0.draw": TDraw.draw}),
 	&"reset_draw": func (_sekai, this: Mono) -> void:
 		this.setp(&"draw_timer", this.item.get_time()),
 	&"to_draw": func (_sekai, this: Mono, draw_id: StringName) -> void:

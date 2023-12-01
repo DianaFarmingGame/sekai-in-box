@@ -38,14 +38,14 @@ func call_watcher(key: StringName, value: Variant) -> Variant:
 			lidx -= 1
 	return value
 
-# get property methods
-#
-# D -> Default:	get with default value
-# L -> Layer: 	only get on certain layer
-# U -> Under: 	only get under certain layer
-# B -> Base:	only get on base layer
-# R -> Raw:		only get on define
-
+## get property methods
+## [codeblock]
+## D -> Default: get with default value
+## L -> Layer:   only get on certain layer
+## U -> Under:   only get under certain layer
+## B -> Base:    only get on base layer
+## R -> Raw:     only get on define
+## [/codeblock]
 func getp(key: StringName) -> Variant:
 	for l in layers:
 		var v = l[1].get(key)
@@ -116,12 +116,12 @@ func getpR(key: StringName) -> Variant:
 func getpRD(key: StringName, default: Variant) -> Variant:
 	return define._props.get(key, default)
 
-# set property methods
-#
-# D -> Direct: 	set without trigger watchers
-# L -> Layer: 	only set on certain layer
-# B -> Base:	only set on base layer
-
+## set property methods
+## [codeblock]
+## D -> Direct: set without trigger watchers
+## L -> Layer:  only set on certain layer
+## B -> Base:   only set on base layer
+## [/codeblock]
 func setp(key: StringName, value: Variant) -> void:
 	for l in layers:
 		var v = l[1].get(key)
@@ -165,12 +165,11 @@ func setpBD(key: StringName, value: Variant) -> void:
 		return
 	cover(&"base", {key: value})
 
-# push onto stack methods
-#
-# S -> Sort: 	push key to the sorted place
-# L -> Layer: 	only push on certain layer
-# B -> Base:	only push on base layer
-
+## push onto stack methods
+## [codeblock]
+## L -> Layer: only push on certain layer
+## B -> Base:  only push on base layer
+## [/codeblock]
 func pushs(key: StringName, value: Variant) -> void:
 	for l in layers:
 		var stack = l[1].get(key)
@@ -179,40 +178,12 @@ func pushs(key: StringName, value: Variant) -> void:
 			return
 	pushsB(key, value)
 
-func pushsS(key: StringName, value: Variant) -> void:
-	for l in layers:
-		var stack = l[1].get(key)
-		if stack != null:
-			var w := int(value[0])
-			var bidx := 0
-			while bidx < stack.size():
-				if w < int(stack[bidx][0]): break
-				bidx += 1
-			stack.insert(bidx, value)
-			return
-	pushsBS(key, value)
-
 func pushsL(layer_name: StringName, key: StringName, value: Variant) -> void:
 	for l in layers:
 		if l[0] == layer_name:
 			var stack = l[1].get(key)
 			if stack != null:
 				stack.push_back(value)
-				return
-			l[1][key] = [value]
-			return
-
-func pushsLS(layer_name: StringName, key: StringName, value: Variant) -> void:
-	for l in layers:
-		if l[0] == layer_name:
-			var stack = l[1].get(key)
-			if stack != null:
-				var w := int(value[0])
-				var bidx := 0
-				while bidx < stack.size():
-					if w < int(stack[bidx][0]): break
-					bidx += 1
-				stack.insert(bidx, value)
 				return
 			l[1][key] = [value]
 			return
@@ -227,26 +198,11 @@ func pushsB(key: StringName, value: Variant) -> void:
 		return
 	cover(&"base", {key: [value]})
 
-func pushsBS(key: StringName, value: Variant) -> void:
-	if layers.size() > 0:
-		var stack = layers[-1][1].get(key)
-		if stack != null:
-			var w := int(value[0])
-			var bidx := 0
-			while bidx < stack.size():
-				if w < int(stack[bidx][0]): break
-				bidx += 1
-			stack.insert(bidx, value)
-			return
-		layers[-1][1][key] = [value]
-		return
-	cover(&"base", {key: [value]})
-
-# pop from stack methods
-#
-# L -> Layer: 	only pop on certain layer
-# B -> Base:	only pop on base layer
-
+## pop from stack methods
+## [codeblock]
+## L -> Layer: only pop on certain layer
+## B -> Base:  only pop on base layer
+## [/codeblock]
 func pops(key: StringName) -> Variant:
 	for l in layers:
 		var stack = l[1].get(key)
@@ -267,11 +223,59 @@ func popsB(key: StringName) -> Variant:
 		if stack != null: return stack.pop_back()
 	return null
 
-# delete from stack methods
-#
-# L -> Layer: 	only delete on certain layer
-# B -> Base:	only delete on base layer
+## put key in the sorted place
+## [codeblock]
+## L -> Layer: only push on certain layer
+## B -> Base:  only push on base layer
+## [/codeblock]
+func puts(key: StringName, value: Variant) -> void:
+	for l in layers:
+		var stack = l[1].get(key)
+		if stack != null:
+			var w := int(value[0])
+			var bidx := 0
+			while bidx < stack.size():
+				if w < int(stack[bidx][0]): break
+				bidx += 1
+			stack.insert(bidx, value)
+			return
+	putsB(key, value)
 
+func putsL(layer_name: StringName, key: StringName, value: Variant) -> void:
+	for l in layers:
+		if l[0] == layer_name:
+			var stack = l[1].get(key)
+			if stack != null:
+				var w := int(value[0])
+				var bidx := 0
+				while bidx < stack.size():
+					if w < int(stack[bidx][0]): break
+					bidx += 1
+				stack.insert(bidx, value)
+				return
+			l[1][key] = [value]
+			return
+
+func putsB(key: StringName, value: Variant) -> void:
+	if layers.size() > 0:
+		var stack = layers[-1][1].get(key)
+		if stack != null:
+			var w := int(value[0])
+			var bidx := 0
+			while bidx < stack.size():
+				if w < int(stack[bidx][0]): break
+				bidx += 1
+			stack.insert(bidx, value)
+			return
+		layers[-1][1][key] = [value]
+		return
+	cover(&"base", {key: [value]})
+
+## delete from stack methods
+## [codeblock]
+## L -> Layer: only delete on certain layer
+## B -> Base:  only delete on base layer
+## [/codeblock]
 func dels(key: StringName, head: Variant) -> Variant:
 	for l in layers:
 		var stack = l[1].get(key)
@@ -307,13 +311,32 @@ func delsB(key: StringName, head: Variant) -> Variant:
 			return stack.pop_at(idx)
 	return null
 
-# call function methods
-#
-# T -> Try: 	never fail
-# B -> Batch: 	batch call stacks
-# R -> Raw:		only call on define
-
+## call function methods
+## [codeblock]
+## R -> Raw:    only call on define
+## S -> Single: not batch call stacks
+## U -> Usafe:  fail when handle not found
+## [/codeblock]
 func emitm(key: StringName) -> Variant:
+	var value = null
+	var data = define._props.get(key)
+	if data is Callable:
+		value = data.call(sekai, self)
+	elif data is Array:
+		for entry in data:
+			value = entry[1].call(sekai, self)
+	var lidx = layers.size() - 1
+	while lidx >= 0:
+		data = layers[lidx][1].get(key)
+		if data is Array:
+			for entry in data:
+				value = entry[1].call(sekai, self)
+		elif data is Callable:
+			value = data.call(sekai, self)
+		lidx -= 1
+	return value
+
+func emitmS(key: StringName) -> Variant:
 	var value = null
 	var handle = define._props.get(key)
 	if handle != null: value = handle.call(sekai, self)
@@ -324,20 +347,26 @@ func emitm(key: StringName) -> Variant:
 		lidx -= 1
 	return value
 
-func emitmB(key: StringName) -> Variant:
+func callm(key: StringName, arg: Variant) -> Variant:
 	var value = null
-	var stack = define._props.get(key)
-	for entry in stack:
-		value = entry[1].call(sekai, self)
+	var data = define._props.get(key)
+	if data is Callable:
+		value = data.call(sekai, self, arg)
+	elif data is Array:
+		for entry in data:
+			value = entry[1].call(sekai, self, arg)
 	var lidx = layers.size() - 1
 	while lidx >= 0:
-		stack = layers[lidx][1].get(key)
-		for entry in stack:
-			value = entry[1].call(sekai, self)
+		data = layers[lidx][1].get(key)
+		if data is Array:
+			for entry in data:
+				value = entry[1].call(sekai, self, arg)
+		elif data is Callable:
+			value = data.call(sekai, self, arg)
 		lidx -= 1
 	return value
 
-func callm(key: StringName, arg: Variant) -> Variant:
+func callmS(key: StringName, arg: Variant) -> Variant:
 	var value = null
 	var handle = define._props.get(key)
 	if handle != null: value = handle.call(sekai, self, arg)
@@ -348,20 +377,28 @@ func callm(key: StringName, arg: Variant) -> Variant:
 		lidx -= 1
 	return value
 
-func callmB(key: StringName, arg: Variant) -> Variant:
+func applym(key: StringName, argv: Array) -> Variant:
+	var vargv := [sekai, self]
+	vargv.append_array(argv)
 	var value = null
-	var stack = define._props.get(key)
-	for entry in stack:
-		value = entry[1].call(sekai, self, arg)
+	var data = define._props.get(key)
+	if data is Callable:
+		value = data.callv(vargv)
+	elif data is Array:
+		for entry in data:
+			value = entry[1].callv(vargv)
 	var lidx = layers.size() - 1
 	while lidx >= 0:
-		stack = layers[lidx][1].get(key)
-		for entry in stack:
-			value = entry[1].call(sekai, self, arg)
+		data = layers[lidx][1].get(key)
+		if data is Array:
+			for entry in data:
+				value = entry[1].callv(vargv)
+		elif data is Callable:
+			value = data.callv(vargv)
 		lidx -= 1
 	return value
 
-func applym(key: StringName, argv: Array) -> Variant:
+func applymS(key: StringName, argv: Array) -> Variant:
 	var vargv := [sekai, self]
 	vargv.append_array(argv)
 	var value = null
@@ -374,68 +411,65 @@ func applym(key: StringName, argv: Array) -> Variant:
 		lidx -= 1
 	return value
 
-func applymB(key: StringName, argv: Array) -> Variant:
-	var vargv := [sekai, self]
-	vargv.append_array(argv)
+func emitmR(key: StringName) -> Variant:
 	var value = null
-	var stack = define._props.get(key)
-	for entry in stack:
-		value = entry[1].callv(vargv)
-	var lidx = layers.size() - 1
-	while lidx >= 0:
-		stack = layers[lidx][1].get(key)
-		for entry in stack:
-			value = entry[1].callv(vargv)
-		lidx -= 1
+	var data = define._props.get(key)
+	if data is Callable:
+		value = data.call(sekai, self)
+	elif data is Array:
+		for entry in data:
+			value = entry[1].call(sekai, self)
 	return value
 
-func emitmR(key: StringName) -> Variant:
-	return define._props[key].call(sekai, self)
-
-func emitmRT(key: StringName) -> Variant:
+func emitmRS(key: StringName) -> Variant:
 	var handle = define._props.get(key)
 	if handle != null: return handle.call(sekai, self)
 	return null
 
-func emitmRB(key: StringName) -> Variant:
-	var value = null
-	for entry in define._props[key]:
-		value = entry[1].call(sekai, self)
-	return value
+func emitmRSU(key: StringName) -> Variant:
+	return define._props[key].call(sekai, self)
 
 func callmR(key: StringName, arg: Variant) -> Variant:
-	return define._props[key].call(sekai, self, arg)
+	var value = null
+	var data = define._props.get(key)
+	if data is Callable:
+		value = data.call(sekai, self, arg)
+	elif data is Array:
+		for entry in data:
+			value = entry[1].call(sekai, self, arg)
+	return value
 
-func callmRT(key: StringName, arg: Variant) -> Variant:
+func callmRS(key: StringName, arg: Variant) -> Variant:
 	var handle = define._props.get(key)
 	if handle != null: return handle.call(sekai, self, arg)
 	return null
 
-func callmRB(key: StringName, arg: Variant) -> Variant:
-	var value = null
-	for entry in define._props[key]:
-		value = entry[1].call(sekai, self, arg)
-	return value
+func callmRSU(key: StringName, arg: Variant) -> Variant:
+	return define._props[key].call(sekai, self, arg)
 
 func applymR(key: StringName, argv: Array) -> Variant:
 	var vargv := [sekai, self]
 	vargv.append_array(argv)
-	return define._props[key].callv(vargv)
+	var value = null
+	var data = define._props.get(key)
+	if data is Callable:
+		value = data.callv(vargv)
+	elif data is Array:
+		for entry in data:
+			value = entry[1].callv(vargv)
+	return value
 
-func applymRT(key: StringName, argv: Array) -> Variant:
+func applymRS(key: StringName, argv: Array) -> Variant:
 	var vargv := [sekai, self]
 	vargv.append_array(argv)
 	var handle = define._props.get(key)
 	if handle != null: return handle.callv(vargv)
 	return null
 
-func applymRB(key: StringName, argv: Array) -> Variant:
+func applymRSU(key: StringName, argv: Array) -> Variant:
 	var vargv := [sekai, self]
 	vargv.append_array(argv)
-	var value = null
-	for entry in define._props[key]:
-		value = entry[1].callv(vargv)
-	return value
+	return define._props[key].callv(vargv)
 
 # accelerator methods
 
