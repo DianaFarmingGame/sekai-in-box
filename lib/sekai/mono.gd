@@ -501,20 +501,18 @@ func is_need_collision() -> bool:
 func is_need_route() -> bool:
 	return getpD(&"need_route", false)
 
-func will_route(point: Vector2, z_pos: int) -> Mono:
+func will_route(point: Vector2, z_pos: int, result: Array) -> void:
 	if floori(position.z) == z_pos:
 		if getp(&"routable"):
 			var box := getp(&"route_box") as Rect2
 			box.position += Vector2(position.x, position.y)
 			if box.has_point(point):
-				return self
-	return null
+				result.append(self)
 
-func will_collide(region: Rect2, z_pos: int) -> Mono:
+func will_collide(region: Rect2, z_pos: int, result: Array) -> void:
 	if floori(position.z) == z_pos:
 		if getp(&"collisible"):
 			var box := getp(&"collision_box") as Rect2
 			box.position += Vector2(position.x, position.y)
 			if box.intersects(region):
-				return self
-	return null
+				result.append(self)

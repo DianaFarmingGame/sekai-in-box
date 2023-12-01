@@ -238,17 +238,17 @@ func make_item() -> SekaiItem:
 	item.unit_size = unit_size
 	return item
 
-func will_route(point: Vector2, z_pos: int) -> Mono:
+func will_route(point: Vector2, z_pos: int) -> Array:
+	var result := []
 	for mono in monos_need_route:
-		var res = mono.will_route(point, z_pos)
-		if res: return res
-	return null
+		mono.will_route(point, z_pos, result)
+	return result
 
-func will_collide(region: Rect2, z_pos: int) -> Mono:
+func will_collide(region: Rect2, z_pos: int) -> Array:
+	var result := []
 	for mono in monos_need_collision:
-		var res = mono.will_collide(region, z_pos)
-		if res: return res
-	return null
+		mono.will_collide(region, z_pos, result)
+	return result
 
 func can_pass(region: Rect2, z_pos: int) -> bool:
-	return not will_collide(region, z_pos) and will_route(region.get_center(), z_pos - 1)
+	return will_collide(region, z_pos).size() == 0 and will_route(region.get_center(), z_pos - 1).size() > 0

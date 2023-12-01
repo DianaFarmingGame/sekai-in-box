@@ -152,40 +152,36 @@ func is_need_route() -> bool:
 		if mono != null and mono.is_need_route(): need_route = true
 	return need_route
 
-func will_route(point: Vector2, z_pos: int) -> Mono:
+func will_route(point: Vector2, z_pos: int, result: Array) -> void:
 	if floori(offset.z) == z_pos:
 		var cen := Vector2i((point - offset_xy).round())
 		if size_rti.grow(1).has_point(cen):
 			# center
 			var mono = get_mono(cen)
-			if mono and mono.will_route(point, z_pos): return mono
-			return null
-	return null
+			if mono != null: mono.will_route(point, z_pos, result)
 
-func will_collide(region: Rect2, z_pos: int) -> Mono:
+func will_collide(region: Rect2, z_pos: int, result: Array) -> void:
 	if floori(offset.z) == z_pos:
 		var cen := Vector2i((region.get_center() - offset_xy).round())
 		if size_rti.grow(1).has_point(cen):
 			# center
 			var mono = get_mono(cen)
-			if mono and mono.will_collide(region, z_pos): return mono
+			if mono != null: mono.will_collide(region, z_pos, result)
 			# sides
 			mono = get_mono(cen + Vector2i(1, 0))
-			if mono and mono.will_collide(region, z_pos): return mono
+			if mono != null: mono.will_collide(region, z_pos, result)
 			mono = get_mono(cen + Vector2i(0, 1))
-			if mono and mono.will_collide(region, z_pos): return mono
+			if mono != null: mono.will_collide(region, z_pos, result)
 			mono = get_mono(cen + Vector2i(-1, 0))
-			if mono and mono.will_collide(region, z_pos): return mono
+			if mono != null: mono.will_collide(region, z_pos, result)
 			mono = get_mono(cen + Vector2i(0, -1))
-			if mono and mono.will_collide(region, z_pos): return mono
+			if mono != null: mono.will_collide(region, z_pos, result)
 			# corners
 			mono = get_mono(cen + Vector2i(1, 1))
-			if mono and mono.will_collide(region, z_pos): return mono
+			if mono != null: mono.will_collide(region, z_pos, result)
 			mono = get_mono(cen + Vector2i(1, -1))
-			if mono and mono.will_collide(region, z_pos): return mono
+			if mono != null: mono.will_collide(region, z_pos, result)
 			mono = get_mono(cen + Vector2i(-1, 1))
-			if mono and mono.will_collide(region, z_pos): return mono
+			if mono != null: mono.will_collide(region, z_pos, result)
 			mono = get_mono(cen + Vector2i(-1, -1))
-			if mono and mono.will_collide(region, z_pos): return mono
-			return null
-	return null
+			if mono != null: mono.will_collide(region, z_pos, result)
