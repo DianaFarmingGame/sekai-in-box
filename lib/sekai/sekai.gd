@@ -1,5 +1,6 @@
 class_name Sekai extends Node2D
 
+@export_file var define_gss: String
 @export_file var entry_gss: String
 @export_dir var root_dir: String
 
@@ -45,8 +46,13 @@ func _on_input(event: InputEvent) -> void:
 			control_target.callm(&"on_input_key", event)
 
 func _init_sekai() -> void:
+	defines.clear()
+	defines_by_id.clear()
 	gss_ctx = make_lisper_context()
-	load_gss(entry_gss)
+	_clear_monos()
+	control_target = null
+	if define_gss: load_gss(define_gss)
+	if entry_gss: load_gss(entry_gss)
 	print()
 
 func make_lisper_context() -> Lisper.Context:
@@ -82,7 +88,8 @@ func make_lisper_context() -> Lisper.Context:
 			if mono_class != null:
 				var define = get_define(ctx.exec_node(body[1]))
 				if define == null: return null
-				var mono := mono_class.new(define) as Mono
+				var mono := mono_class.new() as Mono
+				mono.define = define
 				var args = ctx.exec_map_part(body.slice(2))
 				for k in args.keys():
 					match k:
@@ -252,3 +259,40 @@ func will_collide(region: Rect2, z_pos: int) -> Array:
 
 func can_pass(region: Rect2, z_pos: int) -> bool:
 	return will_collide(region, z_pos).size() == 0 and will_route(region.get_center(), z_pos - 1).size() > 0
+
+func save_to_path(path: String) -> void:
+	var file := FileAccess.open(path, FileAccess.WRITE)
+	for mono in monos: mono._on_store()
+	var vmono := monos.map(func (mono):
+		var script = mono.get_script().resource_path
+		var data = mono.to_data()
+		return [script, data])
+	@warning_ignore("incompatible_ternary")
+	var save_data := {
+		&"define_gss": define_gss,
+		&"root_dir": root_dir,
+		&"monos": vmono,
+		&"control_target": monos.find(control_target) if control_target != null else null,
+		&"unit_size": unit_size,
+	}
+	file.store_var(save_data, false)
+	for mono in monos: mono._on_restore()
+
+func load_from_path(path: String) -> void:
+	var file := FileAccess.open(path, FileAccess.READ)
+	var load_data := file.get_var(false) as Dictionary
+	define_gss = load_data[&"define_gss"]
+	entry_gss = ""
+	root_dir = load_data[&"root_dir"]
+	unit_size = load_data[&"unit_size"]
+	_init_sekai()
+	var vmonos := load_data[&"monos"] as Array
+	for entry in vmonos:
+		var script = load(entry[0])
+		var data = entry[1]
+		var mono = script.new()
+		mono.from_data(self, data)
+		add_mono(mono)
+	var target = load_data[&"control_target"]
+	control_target = monos[target] if target != null else null
+	for mono in monos: mono._on_restore()

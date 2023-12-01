@@ -23,6 +23,10 @@ func _outof_sekai() -> void:
 	setp(&"position", position)
 	super._outof_sekai()
 
+func to_data() -> Dictionary:
+	setp(&"position", position)
+	return super.to_data()
+
 func _clear_item() -> void:
 	if item:
 		sekai.remove_child(item)

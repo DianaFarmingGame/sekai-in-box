@@ -64,6 +64,12 @@ func _on_init() -> void:
 	for mono in map:
 		if mono != null: mono._on_init()
 
+func _on_store() -> void:
+	pass
+
+func _on_restore() -> void:
+	pass
+
 func _clear_layers() -> void:
 	for layer in layers:
 		sekai.remove_child(layer)
@@ -72,6 +78,18 @@ func _clear_layers() -> void:
 
 func _clear_map() -> void:
 	map.clear()
+
+func to_data() -> Dictionary:
+	return {
+		&"size": size,
+		&"offset": offset,
+		&"data": data,
+	}
+
+func from_data(_sekai, pdata: Dictionary):
+	size = pdata[&"size"]
+	offset = pdata[&"offset"]
+	data = pdata[&"data"]
 
 func get_mono(pos: Vector2i) -> Variant:
 	if size_rti.has_point(pos):
@@ -94,7 +112,7 @@ class VarTileMono extends Mono:
 	var item: SekaiItem
 	
 	func _init(pdefine: MonoDefine, pmap: MonoMap, pos: Vector3, pitem: SekaiItem) -> void:
-		super._init(pdefine)
+		define = pdefine
 		map = pmap
 		position = pos
 		item = pitem
@@ -104,7 +122,7 @@ class ConstTileMono extends Mono:
 	var item: SekaiItem
 	
 	func _init(pdefine: MonoDefine, pmap: MonoMap, pos: Vector3, pitem: SekaiItem) -> void:
-		super._init(pdefine)
+		define = pdefine
 		map = pmap
 		position = pos
 		item = pitem

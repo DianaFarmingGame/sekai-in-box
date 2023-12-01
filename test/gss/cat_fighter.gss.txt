@@ -24,8 +24,3 @@
 			]]
 		}
 	})
-
-(set_control (mono MonoEntity &cat_fighter
-	props {
-		position (vec3 6.5 7.5 1)
-	}))

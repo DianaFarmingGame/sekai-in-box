@@ -10,7 +10,18 @@ var props := {
 			var init_state = this.getp(&"init_state")
 			this.callm(&"state_to", init_state),
 	}),
-	&"state_to": func (_sekai, this: Mono, dist: StringName) -> void:
+	&"on_store": Prop.puts({
+		&"0:state": func (_sekai, this: Mono):
+			var cur_state = this.getp(&"cur_state")
+			this.setp(&"init_state", cur_state)
+			this.callm(&"state_to", null),
+	}),
+	&"on_restore": Prop.puts({
+		&"0:state": func (_sekai, this: Mono):
+			var init_state = this.getp(&"init_state")
+			this.callm(&"state_to", init_state),
+	}),
+	&"state_to": func (_sekai, this: Mono, dist: Variant) -> void:
 		var state_data = this.getp(&"state_data")
 		var prev = this.getp(&"cur_state")
 		if prev == dist: return

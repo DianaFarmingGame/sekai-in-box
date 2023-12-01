@@ -2,13 +2,10 @@ class_name Mono
 
 var sekai: Sekai
 var define: MonoDefine
-var layers := []
 
-var position := Vector3(0, 0, 0)
 var inited := false
-
-func _init(pdefine: MonoDefine) -> void:
-	define = pdefine
+var position := Vector3(0, 0, 0)
+var layers := []
 
 func _into_sekai(psekai: Sekai) -> void:
 	sekai = psekai
@@ -22,6 +19,25 @@ func _on_init() -> void:
 	if not inited:
 		inited = true
 		emitm(&"on_init")
+
+func _on_store() -> void:
+	emitm(&"on_store")
+
+func _on_restore() -> void:
+	emitm(&"on_restore")
+
+func to_data() -> Dictionary:
+	return {
+		&"ref": define.ref,
+		&"inited": inited,
+		&"layers": layers,
+	}
+
+func from_data(psekai: Sekai, data: Dictionary):
+	var ref = data[&"ref"]
+	define = psekai.get_define_by_ref(ref)
+	inited = data[&"inited"]
+	layers = data[&"layers"]
 
 func cover(layer_name: StringName, layer: Dictionary) -> void:
 	if layers.size() == 0 and layer_name != &"base": cover(&"base", {})
