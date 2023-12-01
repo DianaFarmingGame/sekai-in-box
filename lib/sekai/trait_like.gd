@@ -36,32 +36,18 @@ func _finalize() -> void:
 func _do_merge(sets: Array[Dictionary]) -> Array[Dictionary]:
 	return sets
 
-func do_merge_uid(uid: StringName) -> void:
-	if uid != &"":
-		if _uids.has(uid):
-			if DETECT_DUPLICATE_TRAIT:
-				push_warning("duplicated trait, uid: ", uid)
-		else:
-			_uids.append(uid)
-
-func do_merge_uids(uids: Array[StringName]) -> void:
-	for uid in uids: do_merge_uid(uid)
-
 func merge_props(sets: Array[Dictionary], props: Dictionary) -> Array[Dictionary]:
 	sets[0] = Prop.do_mergep(sets[0], props)
 	return sets
 
-func merge_trait(sets: Array[Dictionary], t) -> Array[Dictionary]:
-	if not t is TraitLike: t = t.new()
-	t.finalize()
-	sets = merge_props(sets, t.get_props())
-	do_merge_uids(t.get_uids())
-	do_merge_uid(t._get_uid())
+func merge_trait(sets: Array[Dictionary], t, uids: Array[StringName]) -> Array[Dictionary]:
+	if not t is MonoTrait: t = t.new()
+	sets = t.merge(sets, uids)
 	return sets
 
 func merge_traits(sets: Array[Dictionary], traits: Array) -> Array[Dictionary]:
 	for t in traits:
-		sets = merge_trait(sets, t)
+		sets = merge_trait(sets, t, _uids)
 	return sets
 
 func do_override_props(props: Dictionary) -> void:

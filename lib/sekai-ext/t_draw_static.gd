@@ -13,7 +13,7 @@ static func draw(_sekai, this: Mono, _item) -> void:
 	var draw = this.getp(&"draw_data")[this.getp(&"cur_draw")]
 	match draw[0]:
 		&"static":
-			var texture = this.callm(&"get_assert", draw[1])
+			var texture = this.callm(&"assert_get", draw[1])
 			if this.getp(&"flip_h"):
 				this.define._props[&"draw"] = func (_sekai, this: Mono, item: SekaiItem) -> void:
 					var pos := Vector2(this.position.x, this.position.y)
@@ -25,7 +25,7 @@ static func draw(_sekai, this: Mono, _item) -> void:
 					var pos := Vector2(this.position.x, this.position.y)
 					item.pen_draw_texture_region(texture, Rect2(pos + draw[2].position, draw[2].size), draw[3])
 		&"fixed":
-			var texture = this.callm(&"get_assert", draw[1])
+			var texture = this.callm(&"assert_get", draw[1])
 			var timeout := draw[2] as float
 			var frames := draw[3] as Array
 			var timer := this.getp(&"draw_timer") as float

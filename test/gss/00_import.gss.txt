@@ -1,3 +1,0 @@
-(import_define 	Block			"block.gd")
-(import_define 	BlockStatic 	"block_static.gd")
-(import_define 	Character 		"character.gd")

@@ -224,11 +224,20 @@ class Context:
 		log_error(node, str("unknown node: ", node))
 		return null
 	
+	func exec_as_keyword(node: Array) -> Variant:
+		match node[0]:
+			TType.TOKEN, TType.KEYWORD:
+				return node[1]
+			TType.STRING:
+				return StringName(node[1])
+		log_error(node, str("unable to convert node to keyword: ", node))
+		return null
+	
 	@warning_ignore("integer_division")
 	func exec_map_part(pairs: Array) -> Dictionary:
 		var res := {}
 		for i in pairs.size() / 2:
-			var k = exec_node(pairs[2 * i])
+			var k = exec_as_keyword(pairs[2 * i])
 			var v = exec_node(pairs[2 * i + 1])
 			res[k] = v
 		return res

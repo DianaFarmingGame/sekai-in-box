@@ -1,3 +1,3 @@
-(load_gss "gss/00_import.gss.txt")
-(load_gss "gss/01_blocks.gss.txt")
-(load_gss "gss/02_cat_fighter.gss.txt")
+(load_gss "gss/import.gss.txt")
+(load_gss "gss/blocks.gss.txt")
+(load_gss "gss/cat_fighter.gss.txt")

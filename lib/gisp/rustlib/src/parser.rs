@@ -269,7 +269,7 @@ impl GispParser {
         if self.rpick() == Some('{') {
             let mut np = self.rfork();
             np.offset += 1;
-            while np.r_blank() && (np.r_keyword() || np.r_string()) && np.r_blank() && np.r_item() {}
+            while np.r_blank() && np.r_item() && np.r_blank() && np.r_item() {}
             np.r_blank();
             if np.rpick() == Some('}') && np.result.len() % 2 == 0 {
                 self.offset = np.offset + 1;

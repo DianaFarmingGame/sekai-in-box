@@ -13,7 +13,6 @@ config_version=5
 config/name="sekai-in-box"
 run/main_scene="res://test/test.tscn"
 config/features=PackedStringArray("4.1", "Forward Plus")
-run/delta_smoothing=false
 config/icon="res://icon.svg"
 
 [autoload]
@@ -38,6 +37,10 @@ import/fbx/enabled=false
 [gui]
 
 theme/lcd_subpixel_layout=2
+
+[input_devices]
+
+buffering/agile_event_flushing=true
 
 [rendering]
 

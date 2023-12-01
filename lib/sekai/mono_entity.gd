@@ -12,7 +12,7 @@ func _into_sekai(psekai: Sekai) -> void:
 	if getp(&"need_process"):
 		item.on_process.connect(func ():
 			if getp(&"processing"):
-				emitm(&"process"))
+				emitm(&"on_process"))
 	item.on_draw.connect(func ():
 		item.set_y(position.y + floorf(position.z) * 64)
 		callm(&"draw", item))
@@ -20,6 +20,7 @@ func _into_sekai(psekai: Sekai) -> void:
 
 func _outof_sekai() -> void:
 	_clear_item()
+	setp(&"position", position)
 	super._outof_sekai()
 
 func _clear_item() -> void:

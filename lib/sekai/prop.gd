@@ -47,10 +47,10 @@ static func do_puts(tar: Array, src: Variant) -> Array:
 	if src is Dictionary:
 		src = src.keys().map(func (k): return [k, src[k]])
 	for entry in src:
-		var w := int(entry[0])
+		var w := float(entry[0])
 		var bidx := 0
 		while bidx < tar.size():
-			if w < int(tar[bidx][0]): break
+			if w < float(tar[bidx][0]): break
 			bidx += 1
 		tar.insert(bidx, entry)
 	return tar

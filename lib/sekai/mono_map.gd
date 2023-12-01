@@ -29,11 +29,11 @@ func _into_sekai(psekai: Sekai) -> void:
 		var ref := data[i % data.size()]
 		if ref >= 0:
 			var mono := ConstTileMono.new(
+				sekai.get_define(ref),
 				self,
 				Vector3(i % int(size.x) + offset.x, int(i / size.x) + offset.y, offset.z),
 				layers[int(i / size.x)],
 			)
-			mono.set_define(sekai.get_define(ref))
 			mono._into_sekai(sekai)
 			map[i] = mono
 	
@@ -48,7 +48,7 @@ func _into_sekai(psekai: Sekai) -> void:
 			layer.on_process.connect(func ():
 				for i in ids:
 					if map[i].getp(&"processing"):
-						map[i].emitm(&"process"))
+						map[i].emitm(&"on_process"))
 		layer.on_draw.connect(func () -> void:
 			for i in ids:
 				var mono = map[i]
@@ -59,6 +59,10 @@ func _outof_sekai() -> void:
 	_clear_layers()
 	_clear_map()
 	sekai = null
+
+func _on_init() -> void:
+	for mono in map:
+		if mono != null: mono._on_init()
 
 func _clear_layers() -> void:
 	for layer in layers:
@@ -89,7 +93,8 @@ class VarTileMono extends Mono:
 	var map: MonoMap
 	var item: SekaiItem
 	
-	func _init(pmap: MonoMap, pos: Vector3, pitem: SekaiItem) -> void:
+	func _init(pdefine: MonoDefine, pmap: MonoMap, pos: Vector3, pitem: SekaiItem) -> void:
+		super._init(pdefine)
 		map = pmap
 		position = pos
 		item = pitem
@@ -98,22 +103,42 @@ class ConstTileMono extends Mono:
 	var map: MonoMap
 	var item: SekaiItem
 	
-	func _init(pmap: MonoMap, pos: Vector3, pitem: SekaiItem) -> void:
+	func _init(pdefine: MonoDefine, pmap: MonoMap, pos: Vector3, pitem: SekaiItem) -> void:
+		super._init(pdefine)
 		map = pmap
 		position = pos
 		item = pitem
-
-	func getp(key: StringName, default = null) -> Variant:
-		return define._props.get(key, default)
-
-	func setp(key: StringName, value) -> void:
-		var rawv = define._props.get(key)
-		if rawv != value:
-			var nmono := VarTileMono.new(map, position, item)
-			nmono.set_define(define)
-			nmono._into_sekai(sekai)
-			map.set_pos(Vector2(position.x, position.y), nmono)
-			nmono.setp(key, value)
+	
+	func upgrade() -> VarTileMono:
+		var nmono := VarTileMono.new(define, map, position, item)
+		nmono._on_init()
+		nmono._into_sekai(sekai)
+		map.set_pos(Vector2(position.x, position.y), nmono)
+		return nmono
+	
+	func getp(key: StringName) -> Variant:
+		return super.getpR(key)
+	
+	func getpD(key: StringName, default: Variant) -> Variant:
+		return super.getpRD(key, default)
+	
+	func emitm(key: StringName) -> Variant:
+		return super.emitmR(key)
+	
+	func emitmS(key: StringName) -> Variant:
+		return super.emitmRS(key)
+	
+	func callm(key: StringName, arg: Variant) -> Variant:
+		return super.callmR(key, arg)
+	
+	func callmS(key: StringName, arg: Variant) -> Variant:
+		return super.callmRS(key, arg)
+	
+	func applym(key: StringName, argv: Array) -> Variant:
+		return super.applymR(key, argv)
+	
+	func applymS(key: StringName, argv: Array) -> Variant:
+		return super.applymRS(key, argv)
 
 func is_need_collision() -> bool:
 	var need_collision := false

@@ -26,6 +26,8 @@ func _init() -> void:
 
 func _ready() -> void:
 	_init_sekai()
+	Input.use_accumulated_input = false
+	get_tree().root.window_input.connect(_on_input)
 
 func _exit_tree() -> void:
 #	print("Sekai exit")
@@ -37,10 +39,10 @@ func _clear_monos() -> void:
 	monos_need_collision.clear()
 	monos_need_route.clear()
 
-func _input(event: InputEvent) -> void:
+func _on_input(event: InputEvent) -> void:
 	if control_target != null:
 		if event is InputEventKey:
-			control_target.callm(&"input_key", event)
+			control_target.callm(&"on_input_key", event)
 
 func _init_sekai() -> void:
 	gss_ctx = make_lisper_context()
@@ -80,7 +82,7 @@ func make_lisper_context() -> Lisper.Context:
 			if mono_class != null:
 				var define = get_define(ctx.exec_node(body[1]))
 				if define == null: return null
-				var mono := mono_class.new() as Mono
+				var mono := mono_class.new(define) as Mono
 				var args = ctx.exec_map_part(body.slice(2))
 				for k in args.keys():
 					match k:
@@ -88,7 +90,6 @@ func make_lisper_context() -> Lisper.Context:
 							mono.cover(&"base", args[k])
 						_:
 							mono.set(k, args[k])
-				mono.set_define(define)
 				return mono
 			else:
 				ctx.log_error(body[0], str("make_mono: ", body[0], " is not a valid token"))
@@ -188,6 +189,7 @@ func sign_define(define: MonoDefine) -> void:
 func add_mono(mono) -> void:
 	monos.append(mono)
 	mono._into_sekai(self)
+	mono._on_init()
 	if mono.is_need_collision(): monos_need_collision.append(mono)
 	if mono.is_need_route(): monos_need_route.append(mono)
 

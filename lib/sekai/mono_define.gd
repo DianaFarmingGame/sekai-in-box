@@ -19,4 +19,7 @@ func _do_merge(sets: Array[Dictionary]) -> Array[Dictionary]:
 	return sets
 
 func do_merge(sets: Array[Dictionary]) -> Array[Dictionary]:
+	merge_props(sets, {
+		&"on_init": [],
+	})
 	return sets

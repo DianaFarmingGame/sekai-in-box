@@ -5,6 +5,10 @@ var define: MonoDefine
 var layers := []
 
 var position := Vector3(0, 0, 0)
+var inited := false
+
+func _init(pdefine: MonoDefine) -> void:
+	define = pdefine
 
 func _into_sekai(psekai: Sekai) -> void:
 	sekai = psekai
@@ -14,11 +18,29 @@ func _outof_sekai() -> void:
 	define = null
 	sekai = null
 
-func set_define(pdefine: MonoDefine) -> void:
-	define = pdefine
+func _on_init() -> void:
+	if not inited:
+		inited = true
+		emitm(&"on_init")
 
 func cover(layer_name: StringName, layer: Dictionary) -> void:
+	if layers.size() == 0 and layer_name != &"base": cover(&"base", {})
 	layers.push_front([layer_name, layer])
+
+func cover_at(pos: int, layer_name: StringName, layer: Dictionary) -> void:
+	layers.insert(pos, [layer_name, layer])
+
+func cover_before(tar_name: StringName, layer_name: StringName, layer: Dictionary) -> void:
+	for lidx in layers.size():
+		if layers[lidx][0] == tar_name:
+			layers.insert(lidx, [layer_name, layer])
+			return
+
+func cover_after(tar_name: StringName, layer_name: StringName, layer: Dictionary) -> void:
+	for lidx in layers.size():
+		if layers[lidx][0] == tar_name:
+			layers.insert(lidx + 1, [layer_name, layer])
+			return
 
 func uncover(layer_name: StringName) -> void:
 	for lidx in layers.size():
@@ -232,10 +254,10 @@ func puts(key: StringName, value: Variant) -> void:
 	for l in layers:
 		var stack = l[1].get(key)
 		if stack != null:
-			var w := int(value[0])
+			var w := float(value[0])
 			var bidx := 0
 			while bidx < stack.size():
-				if w < int(stack[bidx][0]): break
+				if w < float(stack[bidx][0]): break
 				bidx += 1
 			stack.insert(bidx, value)
 			return
@@ -246,10 +268,10 @@ func putsL(layer_name: StringName, key: StringName, value: Variant) -> void:
 		if l[0] == layer_name:
 			var stack = l[1].get(key)
 			if stack != null:
-				var w := int(value[0])
+				var w := float(value[0])
 				var bidx := 0
 				while bidx < stack.size():
-					if w < int(stack[bidx][0]): break
+					if w < float(stack[bidx][0]): break
 					bidx += 1
 				stack.insert(bidx, value)
 				return
@@ -260,10 +282,10 @@ func putsB(key: StringName, value: Variant) -> void:
 	if layers.size() > 0:
 		var stack = layers[-1][1].get(key)
 		if stack != null:
-			var w := int(value[0])
+			var w := float(value[0])
 			var bidx := 0
 			while bidx < stack.size():
-				if w < int(stack[bidx][0]): break
+				if w < float(stack[bidx][0]): break
 				bidx += 1
 			stack.insert(bidx, value)
 			return
