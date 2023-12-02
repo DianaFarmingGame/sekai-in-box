@@ -260,6 +260,9 @@ func will_collide(region: Rect2, z_pos: int) -> Array:
 func can_pass(region: Rect2, z_pos: int) -> bool:
 	return will_collide(region, z_pos).size() == 0 and will_route(region.get_center(), z_pos - 1).size() > 0
 
+func timeout(time: float):
+	return get_tree().create_timer(time).timeout
+
 func save_to_path(path: String) -> void:
 	var file := FileAccess.open(path, FileAccess.WRITE)
 	for mono in monos: mono._on_store()

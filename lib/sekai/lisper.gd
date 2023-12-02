@@ -60,6 +60,15 @@ static func _make_common_context() -> Context:
 				ctx.def_var([], name, data) # TODO
 			else:
 				ctx.log_error(body[0], str("defvar: ", body[0], " is not a valid token")),
+		&"func": func (ctx: Context, body: Array) -> Array:
+			var args := []
+			var args_src = body[0][1]
+			var idx := 0
+			while idx < args_src.size():
+				var node = args_src[idx]
+				args.append(ctx.exec_as_keyword(node))
+				idx += 1
+			return [FnType.LP_CALL, args, body.slice(1)]
 	})
 	ctx.def_fns([Lisper.VarFlag.CONST, Lisper.VarFlag.FIX], FnType.GD_CALL_PURE, {
 		&"vec2": func (x: float, y: float) -> Vector2:
@@ -74,6 +83,14 @@ static func _make_common_context() -> Context:
 			if b == null: return Color(r_c, g_a)
 			if a == null: return Color(r_c, g_a, b)
 			return Color(r_c, g_a, b, a),
+		&"+": func (x, y) -> Variant:
+			return x + y,
+		&"-": func (x, y) -> Variant:
+			return x - y,
+		&"*": func (x, y) -> Variant:
+			return x * y,
+		&"/": func (x, y) -> Variant:
+			return x / y,
 	})
 	ctx.def_fns([Lisper.VarFlag.CONST, Lisper.VarFlag.FIX], FnType.GD_CALL, {
 		&"debug": func (value: Variant) -> Variant:
@@ -210,6 +227,16 @@ class Context:
 							return exec_node(handle[1].call(body))
 						FnType.GD_CALL, FnType.GD_CALL_PURE:
 							return handle[1].callv(body.map(exec_node))
+						FnType.LP_CALL:
+							var fctx := fork()
+							var args := handle[1] as Array
+							if args.size() != body.size():
+								log_error(node, str("lisper call: argument list not match expect ", args.size(), " found ", body.size()))
+								return null
+							var vargs := body.map(exec_node)
+							for iarg in args.size():
+								fctx.def_var([], args[iarg], vargs[iarg])
+							return fctx.exec(handle[2])[-1]
 						_:
 							log_error(node, str("unknown call handle type: ", handle))
 							return null
@@ -254,7 +281,7 @@ enum TType {
 	MAP,
 }
 
-## 变量类型
+## 函数类型
 enum FnType {
 	## 一般Callable
 	GD_CALL,
@@ -266,6 +293,8 @@ enum FnType {
 	GD_RAW_PURE,
 	## Macro型Callable
 	GD_MACRO,
+	
+	LP_CALL,
 }
 
 ## 变量标记

@@ -19,6 +19,8 @@ var props := {
 		if draw_id != this.getp(&"cur_draw"):
 			this.setp(&"cur_draw", draw_id)
 			this.setp(&"draw_timer", this.item.get_time()),
+	
+	&"on_draw_loop": [],
 }
 
 static func draw(_sekai, this: Mono, item: SekaiItem) -> void:
@@ -28,17 +30,19 @@ static func draw(_sekai, this: Mono, item: SekaiItem) -> void:
 	match draw[0]:
 		&"static":
 			var texture = this.callm(&"assert_get", draw[1])
+			var clip = draw[2]
 			if this.getp(&"flip_h"):
-				item.pen_set_transform(pos + draw[2].position + draw[2].size / 2, 0.0, Vector2(-1, 1))
-				item.pen_draw_texture_region(texture, Rect2(-draw[2].size / 2, draw[2].size), draw[3])
+				item.pen_set_transform(pos + clip[0].position + clip[0].size / 2, 0.0, Vector2(-1, 1))
+				item.pen_draw_texture_region(texture, Rect2(-clip[0].size / 2, clip[0].size), clip[1])
 				item.pen_clear_transform()
 			else:
-				item.pen_draw_texture_region(texture, Rect2(pos + draw[2].position, draw[2].size), draw[3])
+				item.pen_draw_texture_region(texture, Rect2(pos + clip[0].position, clip[0].size), clip[1])
 		&"fixed":
 			var texture = this.callm(&"assert_get", draw[1])
 			var timeout := draw[2] as float
-			var frames := draw[3] as Array
 			var t := (item.get_time() - this.getp(&"draw_timer")) as float
+			if t > timeout and this.emitm(&"on_draw_loop"): return draw(_sekai, this, item)
+			var frames := draw[3] as Array
 			var frame_idx := lerpf(0.0, (frames.size() as float), fmod(t, timeout) / timeout) as int
 			var frame = frames[frame_idx]
 			if this.getp(&"flip_h"):

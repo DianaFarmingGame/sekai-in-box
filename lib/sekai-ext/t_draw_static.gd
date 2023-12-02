@@ -14,16 +14,17 @@ static func draw(_sekai, this: Mono, _item) -> void:
 	match draw[0]:
 		&"static":
 			var texture = this.callm(&"assert_get", draw[1])
+			var clip = draw[2]
 			if this.getp(&"flip_h"):
 				this.define._props[&"draw"] = func (_sekai, this: Mono, item: SekaiItem) -> void:
 					var pos := Vector2(this.position.x, this.position.y)
-					item.pen_set_transform(pos + draw[2].position + draw[2].size / 2, 0.0, Vector2(-1, 1))
-					item.pen_draw_texture_region(texture, Rect2(-draw[2].size / 2, draw[2].size), draw[3])
+					item.pen_set_transform(pos + clip[0].position + clip[0].size / 2, 0.0, Vector2(-1, 1))
+					item.pen_draw_texture_region(texture, Rect2(-clip[0].size / 2, clip[0].size), clip[1])
 					item.pen_clear_transform()
 			else:
 				this.define._props[&"draw"] = func (_sekai, this: Mono, item: SekaiItem) -> void:
 					var pos := Vector2(this.position.x, this.position.y)
-					item.pen_draw_texture_region(texture, Rect2(pos + draw[2].position, draw[2].size), draw[3])
+					item.pen_draw_texture_region(texture, Rect2(pos + clip[0].position, clip[0].size), clip[1])
 		&"fixed":
 			var texture = this.callm(&"assert_get", draw[1])
 			var timeout := draw[2] as float

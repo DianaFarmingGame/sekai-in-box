@@ -6,7 +6,7 @@
 			main "assert/scifitiles-sheet.png"
 		}
 		draw_data {
-			normal [&static &main (rect2 -0.5 -0.5 1 1) (rect2 192 32 32 32)]
+			normal [&static &main [(rect2 -0.5 -0.5 1 1) (rect2 192 32 32 32)]]
 		}
 	})
 
@@ -18,6 +18,6 @@
 			main "assert/scifitiles-sheet.png"
 		}
 		draw_data {
-			normal [&static &main (rect2 -0.5 -1 1 1.5) (rect2 0 80 32 48)]
+			normal [&static &main [(rect2 -0.5 -1 1 1.5) (rect2 0 80 32 48)]]
 		}
 	})
