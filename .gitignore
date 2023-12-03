@@ -2,3 +2,4 @@
 .godot/
 .directory
 export
+.DS_Store
