@@ -2,8 +2,6 @@ class_name TCollisible extends MonoTrait
 
 var id := &"collisible"
 
-var traits := [TPosition]
-
 var props := {
 	&"need_collision": true,
 	&"collisible": true,

@@ -52,7 +52,7 @@ func _into_sekai(psekai: Sekai) -> void:
 		layer.on_draw.connect(func () -> void:
 			for i in ids:
 				var mono = map[i]
-				mono.callm(&"draw", layer))
+				mono.callm(&"on_draw", layer))
 		sekai.add_child.call_deferred(layer)
 
 func _outof_sekai() -> void:
@@ -116,6 +116,9 @@ class VarTileMono extends Mono:
 		map = pmap
 		position = pos
 		item = pitem
+		
+	func upgrade() -> VarTileMono:
+		return self
 
 class ConstTileMono extends Mono:
 	var map: MonoMap
@@ -129,7 +132,6 @@ class ConstTileMono extends Mono:
 	
 	func upgrade() -> VarTileMono:
 		var nmono := VarTileMono.new(define, map, position, item)
-		nmono._on_init()
 		nmono._into_sekai(sekai)
 		map.set_pos(Vector2(position.x, position.y), nmono)
 		return nmono

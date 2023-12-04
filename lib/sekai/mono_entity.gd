@@ -5,8 +5,6 @@ var item: SekaiItem
 func _into_sekai(psekai: Sekai) -> void:
 	super._into_sekai(psekai)
 	
-	position = getp(&"position")
-	
 	_clear_item()
 	item = sekai.make_item()
 	if getp(&"need_process"):
@@ -15,16 +13,14 @@ func _into_sekai(psekai: Sekai) -> void:
 				emitm(&"on_process"))
 	item.on_draw.connect(func ():
 		item.set_y(position.y + floorf(position.z) * 64)
-		callm(&"draw", item))
+		callm(&"on_draw", item))
 	sekai.add_child.call_deferred(item)
 
 func _outof_sekai() -> void:
 	_clear_item()
-	setp(&"position", position)
 	super._outof_sekai()
 
 func to_data() -> Dictionary:
-	setp(&"position", position)
 	return super.to_data()
 
 func _clear_item() -> void:

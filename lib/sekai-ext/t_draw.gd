@@ -2,15 +2,13 @@ class_name TDraw extends MonoTrait
 
 var id := &"draw"
 
-var traits := [TAssert]
-
 var props := {
 	&"draw_data": {},
 	&"cur_draw": &"normal",
 	&"draw_timer": 0.0,
 	&"flip_h": false,
 	
-	&"draw": Prop.Stack({&"0:draw": TDraw.draw}),
+	&"on_draw": Prop.Stack({&"0:draw": TDraw.draw}),
 	&"draw_reset": func (_sekai, this: Mono) -> void:
 		this.setp(&"draw_timer", this.item.get_time()),
 	&"draw_to": func (_sekai, this: Mono, draw_id: StringName) -> void:

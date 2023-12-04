@@ -10,7 +10,7 @@ func do_merge(sets: Array[Dictionary]) -> Array[Dictionary]:
 		&"acc_damage": 0,
 		&"down_threshold": 40,
 		
-		&"draw": Prop.puts({
+		&"on_draw": Prop.puts({
 			&"-1:charactor_shadow": func (_sekai, this: Mono, item: SekaiItem) -> void:
 				var pos := Vector2(this.position.x, this.position.y)
 				item.pen_set_transform(pos, 0, Vector2(1, 0.4))
