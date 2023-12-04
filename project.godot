@@ -21,8 +21,8 @@ DebugMenu="*res://addons/debug_menu/debug_menu.tscn"
 
 [display]
 
-window/size/viewport_width=512
-window/size/viewport_height=512
+window/size/viewport_width=640
+window/size/viewport_height=640
 window/vsync/vsync_mode=2
 
 [editor_plugins]

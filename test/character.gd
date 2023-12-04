@@ -12,8 +12,8 @@ func do_merge(sets: Array[Dictionary]) -> Array[Dictionary]:
 		
 		&"on_draw": Prop.puts({
 			&"-1:charactor_shadow": func (_sekai, this: Mono, item: SekaiItem) -> void:
-				var pos := Vector2(this.position.x, this.position.y)
-				item.pen_set_transform(pos, 0, Vector2(1, 0.4))
+				var pos := Vector2(this.position.x, this.position.y - this.position.z * item.ratio_yz)
+				item.pen_set_transform(Transform2D(0, Vector2(1, 0.4), 0, pos))
 				item.draw_circle(Vector2(0, 0), 0.25, 0x00000055)
 				item.pen_clear_transform(),
 		}),

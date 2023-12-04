@@ -128,20 +128,14 @@ impl GispParser {
 
     fn r_keyword(&mut self) -> bool {
         if self.rpick() == Some('&') {
-            let poffset = self.offset;
             let mut chars = Vec::<char>::new();
             self.offset += 1;
             while let Some(c) = self.rpick() && !_CS_N_TOKEN_BODY.contains(c) {
                 chars.push(c);
                 self.offset += 1;
             }
-            if chars.len() > 0 {
-                self.push(TType::KEYWORD, StringName::from(chars.into_iter().collect::<String>()).to_variant());
-                true
-            } else {
-                self.offset = poffset;
-                false
-            }
+            self.push(TType::KEYWORD, StringName::from(chars.into_iter().collect::<String>()).to_variant());
+            true
         } else {
             false
         }

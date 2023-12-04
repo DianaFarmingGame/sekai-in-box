@@ -270,10 +270,10 @@ func puts(key: StringName, value: Variant) -> void:
 	for l in layers:
 		var stack = l[1].get(key)
 		if stack != null:
-			var w := float(value[0])
+			var w := float(String(value[0]))
 			var bidx := 0
 			while bidx < stack.size():
-				if w < float(stack[bidx][0]): break
+				if w < float(String(stack[bidx][0])): break
 				bidx += 1
 			stack.insert(bidx, value)
 			return
@@ -284,10 +284,10 @@ func putsL(layer_name: StringName, key: StringName, value: Variant) -> void:
 		if l[0] == layer_name:
 			var stack = l[1].get(key)
 			if stack != null:
-				var w := float(value[0])
+				var w := float(String(value[0]))
 				var bidx := 0
 				while bidx < stack.size():
-					if w < float(stack[bidx][0]): break
+					if w < float(String(stack[bidx][0])): break
 					bidx += 1
 				stack.insert(bidx, value)
 				return
@@ -298,10 +298,10 @@ func putsB(key: StringName, value: Variant) -> void:
 	if layers.size() > 0:
 		var stack = layers[-1][1].get(key)
 		if stack != null:
-			var w := float(value[0])
+			var w := float(String(value[0]))
 			var bidx := 0
 			while bidx < stack.size():
-				if w < float(stack[bidx][0]): break
+				if w < float(String(stack[bidx][0])): break
 				bidx += 1
 			stack.insert(bidx, value)
 			return

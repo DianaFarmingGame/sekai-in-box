@@ -28,7 +28,7 @@ func _into_sekai(psekai: Sekai) -> void:
 	for i in length:
 		var ref := data[i % data.size()]
 		if ref >= 0:
-			var mono := ConstTileMono.new(
+			var mono := VarTileMono.new(
 				sekai.get_define(ref),
 				self,
 				Vector3(i % int(size.x) + offset.x, int(i / size.x) + offset.y, offset.z),
@@ -65,10 +65,12 @@ func _on_init() -> void:
 		if mono != null: mono._on_init()
 
 func _on_store() -> void:
-	pass
+	for mono in map:
+		if mono != null: mono._on_store()
 
 func _on_restore() -> void:
-	pass
+	for mono in map:
+		if mono != null: mono._on_restore()
 
 func _clear_layers() -> void:
 	for layer in layers:
@@ -106,6 +108,13 @@ func set_pos(point: Vector2, mono: Variant) -> void:
 	var pos := Vector2i((point - offset_xy).round())
 	if size_rti.has_point(pos):
 		map[size.x * pos.y + pos.x] = mono
+
+func get_monos_by_pos(pos: Vector3) -> Array:
+	if is_equal_approx(offset.z, pos.z):
+		var mono = get_pos(Vector2(pos.x, pos.y))
+		if mono != null:
+			return [mono]
+	return []
 
 class VarTileMono extends Mono:
 	var map: MonoMap

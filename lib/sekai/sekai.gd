@@ -12,7 +12,7 @@ var monos_need_route := []
 var monos_need_collision := []
 var control_target = null
 
-@export var unit_size := Vector2(16, 16)
+@export var unit_size := Vector3(16, 16, 12)
 
 static var root_vars := {
 	&"MonoDefine": MonoDefine.new(),
@@ -53,6 +53,10 @@ func _init_sekai() -> void:
 	control_target = null
 	if define_gss: load_gss(define_gss)
 	if entry_gss: load_gss(entry_gss)
+	var stime := Time.get_ticks_usec()
+	for mono in monos:
+		mono._on_init()
+	print_rich("[sekai] inited in ", (Time.get_ticks_usec() - stime) / 1000.0, " ms")
 	print()
 
 func make_lisper_context() -> Lisper.Context:
@@ -196,7 +200,6 @@ func sign_define(define: MonoDefine) -> void:
 func add_mono(mono) -> void:
 	monos.append(mono)
 	mono._into_sekai(self)
-	mono._on_init()
 	if mono.is_need_collision(): monos_need_collision.append(mono)
 	if mono.is_need_route(): monos_need_route.append(mono)
 
@@ -228,6 +231,16 @@ func get_define(ref_id: Variant) -> Variant:
 	else:
 		push_error("unable to parse define pointer: ", ref_id); return null
 	return define
+
+func get_monos_by_pos(pos: Vector3) -> Array:
+	var res := []
+	for mono in monos:
+		if mono is Mono:
+			if pos.is_equal_approx(mono.position):
+				res.append(mono)
+		else:
+			res.append_array(mono.get_monos_by_pos(pos))
+	return res
 
 var assert_cache := {}
 
@@ -285,10 +298,13 @@ func load_from_path(path: String) -> void:
 	var file := FileAccess.open(path, FileAccess.READ)
 	var load_data := file.get_var(false) as Dictionary
 	define_gss = load_data[&"define_gss"]
-	entry_gss = ""
 	root_dir = load_data[&"root_dir"]
 	unit_size = load_data[&"unit_size"]
-	_init_sekai()
+	defines.clear()
+	defines_by_id.clear()
+	gss_ctx = make_lisper_context()
+	_clear_monos()
+	if define_gss: load_gss(define_gss)
 	var vmonos := load_data[&"monos"] as Array
 	for entry in vmonos:
 		var script = load(entry[0])
@@ -299,3 +315,4 @@ func load_from_path(path: String) -> void:
 	var target = load_data[&"control_target"]
 	control_target = monos[target] if target != null else null
 	for mono in monos: mono._on_restore()
+	print()

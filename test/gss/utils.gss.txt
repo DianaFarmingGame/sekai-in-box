@@ -1,0 +1,8 @@
+(defvar clip_ground (func [x y]
+	[(rect2 -0.5 -1.5 1 1) (rect2 (* x 32) (* y 32) 32 32)]))
+(defvar clip_box (func [x y]
+	[(rect2 -0.5 -1.5 1 2) (rect2 (* x 32) (* y 32) 32 64)]))
+(defvar clip_wall (func [x y]
+	[(rect2 -0.5 -0.5 1 1) (rect2 (* x 32) (* y 32) 32 32)]))
+(defvar clip_cover (func [x y]
+	[(rect2 -0.5 -0.5 1 1) (rect2 (* x 32) (* y 32) 32 32)]))

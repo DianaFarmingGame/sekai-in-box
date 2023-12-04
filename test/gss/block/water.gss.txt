@@ -1,0 +1,180 @@
+(define BlockStaticATile
+	ref 101
+	props {
+		routable #f
+		asserts {
+			main "assert/地形.png"
+		}
+		cur_draw &center
+		draw_data {
+			corner_nw [&static &main (clip_ground 6 0)]
+			corner_ne [&static &main (clip_ground 8 0)]
+			corner_se [&static &main (clip_ground 8 2)]
+			corner_sw [&static &main (clip_ground 6 2)]
+			side_n [&static &main (clip_ground 7 0)]
+			side_e [&static &main (clip_ground 8 1)]
+			side_s [&static &main (clip_ground 7 2)]
+			side_w [&static &main (clip_ground 6 1)]
+			center [&static &main (clip_ground 7 1)]
+			concave_nw [&static &main (clip_ground 7 4)]
+			concave_ne [&static &main (clip_ground 8 4)]
+			concave_se [&static &main (clip_ground 8 5)]
+			concave_sw [&static &main (clip_ground 7 5)]
+			concaves_nw_se [&static &main (clip_ground 10 4)]
+			concaves_ne_sw [&static &main (clip_ground 10 3)]
+		}
+		atile_size (vec3 3 3 1)
+		atile_group 101
+		atile_allow [101]
+		atile_data [[
+			[
+				0	-	0
+				-	0	1
+				0	1	1
+			] {
+				cover {
+					cur_draw &corner_nw
+				}
+			}
+		][
+			[
+				0	-	0
+				1	0	-
+				1	1	0
+			] {
+				cover {
+					cur_draw &corner_ne
+				}
+			}
+		][
+			[
+				1	1	0
+				1	0	-
+				0	-	0
+			] {
+				cover {
+					cur_draw &corner_se
+				}
+			}
+		][
+			[
+				0	1	1
+				-	0	1
+				0	-	0
+			] {
+				cover {
+					cur_draw &corner_sw
+				}
+			}
+		][
+			[
+				0	-	0
+				1	0	1
+				1	1	1
+			] {
+				cover {
+					cur_draw &side_n
+				}
+			}
+		][
+			[
+				1	1	0
+				1	0	-
+				1	1	0
+			] {
+				cover {
+					cur_draw &side_e
+				}
+			}
+		][
+			[
+				1	1	1
+				1	0	1
+				0	-	0
+			] {
+				cover {
+					cur_draw &side_s
+				}
+			}
+		][
+			[
+				0	1	1
+				-	0	1
+				0	1	1
+			] {
+				cover {
+					cur_draw &side_w
+				}
+			}
+		][
+			[
+				1	1	1
+				1	0	1
+				1	1	1
+			] {
+				cover {
+					cur_draw &center
+				}
+			}
+		][
+			[
+				-	1	1
+				1	0	1
+				1	1	1
+			] {
+				cover {
+					cur_draw &concave_nw
+				}
+			}
+		][
+			[
+				1	1	-
+				1	0	1
+				1	1	1
+			] {
+				cover {
+					cur_draw &concave_ne
+				}
+			}
+		][
+			[
+				1	1	1
+				1	0	1
+				1	1	-
+			] {
+				cover {
+					cur_draw &concave_se
+				}
+			}
+		][
+			[
+				1	1	1
+				1	0	1
+				-	1	1
+			] {
+				cover {
+					cur_draw &concave_sw
+				}
+			}
+		][
+			[
+				-	1	1
+				1	0	1
+				1	1	-
+			] {
+				cover {
+					cur_draw &concaves_nw_se
+				}
+			}
+		][
+			[
+				1	1	-
+				1	0	1
+				-	1	1
+			] {
+				cover {
+					cur_draw &concaves_ne_sw
+				}
+			}
+		]]
+	})
