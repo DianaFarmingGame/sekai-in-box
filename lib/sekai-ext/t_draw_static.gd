@@ -5,7 +5,7 @@ var id := &"draw_static"
 var props := {
 	&"on_draw": [],
 	&"on_init": Prop.puts({
-		&"99:draw_static": TDrawStatic.update_draw_static,
+		&"99:draw_static": TDrawStatic.update,
 	}),
 	&"on_store": Prop.puts({
 		&"-99:position": func (_sekai, this: Mono) -> void:
@@ -13,11 +13,11 @@ var props := {
 			pass,
 	}),
 	&"on_restore": Prop.puts({
-		&"99:draw_static": TDrawStatic.update_draw_static,
+		&"99:draw_static": TDrawStatic.update,
 	}),
 }
 
-static func update_draw_static(_sekai, this: Mono) -> void:
+static func update(_sekai, this: Mono) -> void:
 	this = this.upgrade()
 	var cur_draw = this.getp(&"cur_draw")
 	if cur_draw == &"": return

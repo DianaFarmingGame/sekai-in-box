@@ -1,6 +1,8 @@
 class_name MonoMap
 
 var size := Vector2(0, 0)
+var cell_size := Vector3(1, 1, 1)
+var cell_size_xy: Vector2
 var offset := Vector3(0, 0, 0)
 var offset_xy: Vector2
 var size_rti: Rect2i
@@ -13,6 +15,7 @@ var layers := []
 
 func _into_sekai(psekai: Sekai) -> void:
 	sekai = psekai
+	cell_size_xy = Vector2(cell_size.x, cell_size.y)
 	offset_xy = Vector2(offset.x, offset.y)
 	size_rti = Rect2i(Vector2i(), size)
 	var length := (size.x * size.y) as int
@@ -31,7 +34,7 @@ func _into_sekai(psekai: Sekai) -> void:
 			var mono := VarTileMono.new(
 				sekai.get_define(ref),
 				self,
-				Vector3(i % int(size.x) + offset.x, int(i / size.x) + offset.y, offset.z),
+				Vector3(i % int(size.x), int(i / size.x), 0) * cell_size + offset,
 				layers[int(i / size.x)],
 			)
 			mono._into_sekai(sekai)
@@ -39,7 +42,7 @@ func _into_sekai(psekai: Sekai) -> void:
 	
 	for iy in size.y:
 		var layer := layers[iy] as SekaiItem
-		layer.set_y(iy + offset.y + floorf(offset.z) * 64)
+		layer.set_y(iy * cell_size.y + offset.y + floorf(offset.z) * 64)
 		var ids := range(iy * size.x, (iy + 1) * size.x).filter(func (i): return map[i] != null)
 		var need_process := false
 		for i in ids:
@@ -84,12 +87,14 @@ func _clear_map() -> void:
 func to_data() -> Dictionary:
 	return {
 		&"size": size,
+		&"cell_size": cell_size,
 		&"offset": offset,
 		&"data": data,
 	}
 
 func from_data(_sekai, pdata: Dictionary):
 	size = pdata[&"size"]
+	cell_size = pdata[&"cell_size"]
 	offset = pdata[&"offset"]
 	data = pdata[&"data"]
 
@@ -99,18 +104,18 @@ func get_mono(pos: Vector2i) -> Variant:
 	return null
 
 func get_pos(point: Vector2) -> Variant:
-	var pos := Vector2i((point - offset_xy).round())
+	var pos := Vector2i(((point - offset_xy) / cell_size_xy).round())
 	if size_rti.has_point(pos):
 		return map[size.x * pos.y + pos.x]
 	return null
 
 func set_pos(point: Vector2, mono: Variant) -> void:
-	var pos := Vector2i((point - offset_xy).round())
+	var pos := Vector2i(((point - offset_xy) / cell_size_xy).round())
 	if size_rti.has_point(pos):
 		map[size.x * pos.y + pos.x] = mono
 
 func get_monos_by_pos(pos: Vector3) -> Array:
-	if is_equal_approx(offset.z, pos.z):
+	if abs(offset.z - pos.z) < cell_size.z / 2:
 		var mono = get_pos(Vector2(pos.x, pos.y))
 		if mono != null:
 			return [mono]
@@ -183,7 +188,7 @@ func is_need_route() -> bool:
 
 func will_route(point: Vector2, z_pos: int, result: Array) -> void:
 	if floori(offset.z) == z_pos:
-		var cen := Vector2i((point - offset_xy).round())
+		var cen := Vector2i(((point - offset_xy) / cell_size_xy).round())
 		if size_rti.grow(1).has_point(cen):
 			# center
 			var mono = get_mono(cen)
@@ -191,7 +196,7 @@ func will_route(point: Vector2, z_pos: int, result: Array) -> void:
 
 func will_collide(region: Rect2, z_pos: int, result: Array) -> void:
 	if floori(offset.z) == z_pos:
-		var cen := Vector2i((region.get_center() - offset_xy).round())
+		var cen := Vector2i(((region.get_center() - offset_xy) / cell_size_xy).round())
 		if size_rti.grow(1).has_point(cen):
 			# center
 			var mono = get_mono(cen)

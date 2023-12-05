@@ -1,4 +1,4 @@
 (import_define 	Block			"block.gd")
 (import_define 	BlockStatic 	"block_static.gd")
-(import_define 	BlockStaticATile "block_static_atile.gd")
+(import_define 	BlockStaticExt	"block_static_ext.gd")
 (import_define 	Character 		"character.gd")

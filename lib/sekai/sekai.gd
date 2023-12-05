@@ -158,12 +158,10 @@ func make_lisper_context() -> Lisper.Context:
 			return get_assert(path).new(),
 		&"load_gss": func (path: String) -> void:
 			load_gss(root_dir.path_join(path)),
-		&"make_mono_map": func (offset, size: Vector2, data := []) -> MonoMap:
+		&"make_mono_map": func (offset: Vector3, cell_size: Vector3, size: Vector2, data := []) -> MonoMap:
 			var map := MonoMap.new()
-			if offset is Vector2:
-				map.offset = Vector3(offset.x, offset.y, 0)
-			else:
-				map.offset = offset
+			map.offset = offset
+			map.cell_size = cell_size
 			map.size = size
 			map.data = PackedInt32Array(data)
 			return map,
@@ -236,7 +234,7 @@ func get_monos_by_pos(pos: Vector3) -> Array:
 	var res := []
 	for mono in monos:
 		if mono is Mono:
-			if pos.is_equal_approx(mono.position):
+			if (pos - mono.position).abs() < mono.getp(&"size") / 2:
 				res.append(mono)
 		else:
 			res.append_array(mono.get_monos_by_pos(pos))

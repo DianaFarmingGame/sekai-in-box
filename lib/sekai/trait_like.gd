@@ -1,6 +1,6 @@
 class_name TraitLike extends Resource
 
-const DETECT_DUPLICATE_TRAIT := false
+const DETECT_DUPLICATE_TRAIT := true
 
 var _props: Dictionary
 var _finalized := false

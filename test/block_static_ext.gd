@@ -1,6 +1,6 @@
-class_name GBlockStaticATile extends GBlockStatic
+class_name GBlockStaticExt extends GBlockStatic
 
 func do_merge(sets: Array[Dictionary]) -> Array[Dictionary]:
 	super.do_merge(sets)
-	merge_traits(sets, [TATile])
+	merge_traits(sets, [TGroup, TRTile, TATile])
 	return sets

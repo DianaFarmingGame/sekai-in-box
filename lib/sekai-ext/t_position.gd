@@ -4,6 +4,7 @@ var id := &"position"
 
 var props := {
 	&"position": Vector3(0, 0, 0),
+	&"size": Vector3(1, 1, 1),
 	&"on_init": Prop.puts({
 		&"-99:position": func (_sekai, this: Mono) -> void:
 			this.position = this.getp(&"position")

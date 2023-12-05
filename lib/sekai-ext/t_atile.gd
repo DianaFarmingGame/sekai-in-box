@@ -4,23 +4,23 @@ var id := &"atile"
 
 var props := {
 	&"atile_size": Vector3(1, 1, 1),
-	&"atile_group": null,
-	&"atile_allow": [],
-	&"atile_data": [],
+	&"atile_matches": [],
+	&"atile_rules": [],
 	&"on_init": Prop.puts({
-		&"-9:atile": TATile.update_atile,
+		&"-9:atile": TATile.update,
 	}),
 	&"on_restore": Prop.puts({
-		&"-9:atile": TATile.update_atile,
+		&"-9:atile": TATile.update,
 	}),
 }
 
-static func update_atile(sekai: Sekai, this: Mono) -> void:
+static func update(sekai: Sekai, this: Mono) -> void:
 	this = this.upgrade()
 	var pos := this.position
+	var size := this.getp(&"size") as Vector3
 	var atile_size := this.getp(&"atile_size") as Vector3
-	var atile_allow := this.getp(&"atile_allow") as Array
-	var atile_data := this.getp(&"atile_data") as Array
+	var atile_matches := this.getp(&"atile_matches") as Array
+	var atile_data := this.getp(&"atile_rules") as Array
 	var rx := int((atile_size.x - 1) / 2)
 	var ry := int((atile_size.y - 1) / 2)
 	var rz := int((atile_size.z - 1) / 2)
@@ -29,16 +29,15 @@ static func update_atile(sekai: Sekai, this: Mono) -> void:
 	var sz := 1 + rz * 2
 	var base := []
 	base.resize(sx * sy * sz)
-	base.fill(false)
+	for idx in base.size(): base[idx] = []
 	for dz in sz:
 		for dy in sy:
 			for dx in sx:
-				var monos := sekai.get_monos_by_pos(pos + Vector3(dx - rx, dy - ry, dz - rz))
-				for mono in monos:
-					if mono != this:
-						var group = mono.getp(&"atile_group")
-						if atile_allow.has(group):
-							base[(sz - 1 - dz) * sy * sx + dy * sx + dx] = true
+				var monos := sekai.get_monos_by_pos(pos + Vector3(dx - rx, dy - ry, dz - rz) * size)
+				for idx in atile_matches.size():
+					for mono in monos:
+						if mono != this and mono.callm(&"group_intersects", atile_matches[idx]):
+							base[(sz - 1 - dz) * sy * sx + dy * sx + dx].append(idx + 1)
 							break
 	for rule in atile_data:
 		var mask := rule[0] as Array
@@ -46,21 +45,11 @@ static func update_atile(sekai: Sekai, this: Mono) -> void:
 		var idx := 0
 		var matched := true
 		while idx < mask.size():
-			match mask[idx]:
-				-1.0:
-					if base[idx] != false:
-						matched = false
-						break
-				0.0:
-					pass
-				1.0:
-					if base[idx] != true:
-						matched = false
-						break
-				_:
-					push_error("unknown atile match enum: ", mask[idx])
-					matched = false
-					break
+			var bit = int(mask[idx])
+			if (bit > 0 and not base[idx].has(bit)) \
+			or (bit < 0 and base[idx].has(-bit)):
+				matched = false
+				break
 			idx += 1
 		if matched:
 			var cover = cfg.get(&"cover")

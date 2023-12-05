@@ -1,4 +1,4 @@
-(define BlockStaticATile
+(define BlockStaticExt
 	ref 100
 	props {
 		asserts {
@@ -34,9 +34,9 @@
 			top_concave_sw [&static &main (clip_ground 3 7)]
 		}
 		atile_size (vec3 3 3 3)
-		atile_group 100
-		atile_allow [100 101]
-		atile_data [[
+		groups [100]
+		atile_matches [[100 101]]
+		atile_rules [[
 			[
 				0	0	0
 				0	-	0

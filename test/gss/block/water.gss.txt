@@ -1,4 +1,4 @@
-(define BlockStaticATile
+(define BlockStaticExt
 	ref 101
 	props {
 		routable #f
@@ -24,9 +24,9 @@
 			concaves_ne_sw [&static &main (clip_ground 10 3)]
 		}
 		atile_size (vec3 3 3 1)
-		atile_group 101
-		atile_allow [101]
-		atile_data [[
+		groups [101]
+		atile_matches [[101]]
+		atile_rules [[
 			[
 				0	-	0
 				-	0	1
