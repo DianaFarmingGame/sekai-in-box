@@ -19,6 +19,7 @@ func _on_init() -> void:
 	if not inited:
 		inited = true
 		emitm(&"on_init")
+		emitm(&"on_inited")
 
 func _on_store() -> void:
 	emitm(&"on_store")

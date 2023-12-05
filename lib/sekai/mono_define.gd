@@ -21,6 +21,7 @@ func _do_merge(sets: Array[Dictionary]) -> Array[Dictionary]:
 func do_merge(sets: Array[Dictionary]) -> Array[Dictionary]:
 	merge_props(sets, {
 		&"on_init": [],
+		&"on_inited": [],
 		&"on_store": [],
 		&"on_restore": [],
 	})

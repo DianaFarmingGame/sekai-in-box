@@ -22,6 +22,8 @@ static func update(_sekai, this: Mono) -> void:
 	var cur_draw = this.getp(&"cur_draw")
 	if cur_draw == &"": return
 	var draw = this.getp(&"draw_data")[cur_draw]
+	if draw[0] == &"diverse":
+		draw = draw[1][this.getp(&"cur_draw_variant")]
 	match draw[0]:
 		&"static":
 			var texture = this.callm(&"assert_get", draw[1])

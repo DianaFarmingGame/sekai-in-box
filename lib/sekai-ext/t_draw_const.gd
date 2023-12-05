@@ -13,6 +13,8 @@ static func on_draw(_sekai, this: Mono, _item) -> void:
 		this.define._props[&"on_draw"] = null
 		return
 	var draw = this.getp(&"draw_data")[cur_draw]
+	if draw[0] == &"diverse":
+		draw = draw[1][this.getp(&"cur_draw_variant")]
 	match draw[0]:
 		&"static":
 			var texture = this.callm(&"assert_get", draw[1])

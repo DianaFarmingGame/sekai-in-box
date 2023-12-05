@@ -312,5 +312,7 @@ func load_from_path(path: String) -> void:
 		add_mono(mono)
 	var target = load_data[&"control_target"]
 	control_target = monos[target] if target != null else null
+	var stime := Time.get_ticks_usec()
 	for mono in monos: mono._on_restore()
+	print_rich("[sekai] restore in ", (Time.get_ticks_usec() - stime) / 1000.0, " ms")
 	print()

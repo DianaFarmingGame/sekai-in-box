@@ -5,6 +5,7 @@ var id := &"draw"
 var props := {
 	&"draw_data": {},
 	&"cur_draw": &"",
+	&"cur_draw_variant": 0,
 	&"draw_timer": 0.0,
 	&"flip_h": false,
 	
@@ -27,6 +28,8 @@ static func on_draw(_sekai, this: Mono, item: SekaiItem) -> void:
 	if cur_draw == &"": return
 	@warning_ignore("shadowed_variable")
 	var draw = this.getp(&"draw_data")[cur_draw]
+	if draw[0] == &"diverse":
+		draw = draw[1][this.getp(&"cur_draw_variant")]
 	match draw[0]:
 		&"static":
 			var texture = this.callm(&"assert_get", draw[1])

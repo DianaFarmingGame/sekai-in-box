@@ -9,3 +9,157 @@
 
 (defvar clip16_cover (func [x y]
 	[(rect2 -0.25 -0.25 0.5 0.5) (rect2 (* x 16) (* y 16) 16 16)]))
+
+(defvar *atile_rules_3x3x1* [[
+	[
+		0	-	0
+		-	0	1
+		0	1	1
+	] {
+		cover {
+			cur_draw &corner_nw
+		}
+	}
+][
+	[
+		0	-	0
+		1	0	-
+		1	1	0
+	] {
+		cover {
+			cur_draw &corner_ne
+		}
+	}
+][
+	[
+		1	1	0
+		1	0	-
+		0	-	0
+	] {
+		cover {
+			cur_draw &corner_se
+		}
+	}
+][
+	[
+		0	1	1
+		-	0	1
+		0	-	0
+	] {
+		cover {
+			cur_draw &corner_sw
+		}
+	}
+][
+	[
+		0	-	0
+		1	0	1
+		1	1	1
+	] {
+		cover {
+			cur_draw &side_n
+		}
+	}
+][
+	[
+		1	1	0
+		1	0	-
+		1	1	0
+	] {
+		cover {
+			cur_draw &side_e
+		}
+	}
+][
+	[
+		1	1	1
+		1	0	1
+		0	-	0
+	] {
+		cover {
+			cur_draw &side_s
+		}
+	}
+][
+	[
+		0	1	1
+		-	0	1
+		0	1	1
+	] {
+		cover {
+			cur_draw &side_w
+		}
+	}
+][
+	[
+		1	1	1
+		1	0	1
+		1	1	1
+	] {
+		cover {
+			cur_draw &center
+		}
+	}
+][
+	[
+		-	1	1
+		1	0	1
+		1	1	1
+	] {
+		cover {
+			cur_draw &concave_nw
+		}
+	}
+][
+	[
+		1	1	-
+		1	0	1
+		1	1	1
+	] {
+		cover {
+			cur_draw &concave_ne
+		}
+	}
+][
+	[
+		1	1	1
+		1	0	1
+		1	1	-
+	] {
+		cover {
+			cur_draw &concave_se
+		}
+	}
+][
+	[
+		1	1	1
+		1	0	1
+		-	1	1
+	] {
+		cover {
+			cur_draw &concave_sw
+		}
+	}
+]])
+
+(defvar *atile_rules_3x3x1_crossed* (array_concat *atile_rules_3x3x1* [[
+	[
+		-	1	1
+		1	0	1
+		1	1	-
+	] {
+		cover {
+			cur_draw &concaves_nw_se
+		}
+	}
+][
+	[
+		1	1	-
+		1	0	1
+		-	1	1
+	] {
+		cover {
+			cur_draw &concaves_ne_sw
+		}
+	}
+]]))

@@ -39,6 +39,28 @@ static func _make_common_context() -> Context:
 	ctx.def_fns([Lisper.VarFlag.CONST, Lisper.VarFlag.FIX], FnType.GD_RAW_PURE, {
 		&"raw": func (_ctx: Context, body: Array) -> Array:
 			return body,
+		&"if": func (ctx: Context, body: Array) -> Variant:
+			if ctx.exec_node(body[0]):
+				return ctx.exec_node(body[1])
+			elif body.size() > 2:
+				return ctx.exec_node(body[2])
+			return null,
+		&"func": func (ctx: Context, body: Array) -> Array:
+			var args := []
+			var args_src = body[0][1]
+			var idx := 0
+			while idx < args_src.size():
+				var node = args_src[idx]
+				args.append(ctx.exec_as_keyword(node))
+				idx += 1
+			return [FnType.LP_CALL, args, body.slice(1)],
+		&"array_concat": func (ctx: Context, body: Array) -> Array:
+			var res := []
+			body = body.map(ctx.exec_node)
+			for v in body:
+				assert(v is Array)
+				res.append_array(v)
+			return res,
 	})
 	ctx.def_fns([Lisper.VarFlag.CONST, Lisper.VarFlag.FIX], FnType.GD_RAW, {
 		&"echo": func (ctx: Context, body: Array) -> void:
@@ -60,15 +82,6 @@ static func _make_common_context() -> Context:
 				ctx.def_var([], name, data) # TODO
 			else:
 				ctx.log_error(body[0], str("defvar: ", body[0], " is not a valid token")),
-		&"func": func (ctx: Context, body: Array) -> Array:
-			var args := []
-			var args_src = body[0][1]
-			var idx := 0
-			while idx < args_src.size():
-				var node = args_src[idx]
-				args.append(ctx.exec_as_keyword(node))
-				idx += 1
-			return [FnType.LP_CALL, args, body.slice(1)]
 	})
 	ctx.def_fns([Lisper.VarFlag.CONST, Lisper.VarFlag.FIX], FnType.GD_CALL_PURE, {
 		&"vec2": func (x: float, y: float) -> Vector2:

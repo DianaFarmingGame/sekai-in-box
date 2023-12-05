@@ -81,11 +81,29 @@
 			[1 { cover { cur_draw &rock7 }}]
 			[1 { cover { cur_draw &rock8 }}]
 			[1 { cover { cur_draw &rock9 }}]
-			[10 {}]
+			[30 {}]
 		]
 		atile_size (vec3 3 3 3)
-		atile_matches [[102] [100]]
+		atile_matches [[102] [100] [105 106 108]]
 		atile_rules [[
+			[
+				0	0	0
+				0	0	0
+				0	0	0
+				
+				0	0	0
+				0	0	0
+				0	0	0
+				
+				3	3	3
+				3	3	3
+				3	3	3
+			] {
+				cover {
+					cur_draw &
+				}
+			}
+		][
 			[
 				0	0	0
 				0	0	0
