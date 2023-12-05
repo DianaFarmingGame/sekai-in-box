@@ -58,12 +58,12 @@
 (mono_map (vec3 0.75 1.75 1) (vec3 0.5 0.5 0.5) (vec2 16 16) [103])
 (mono_map (vec3 0.75 1.75 1) (vec3 0.5 0.5 0.5) (vec2 16 16) [104])
 
-(mono MonoEntity &ran
+(mono MonoEntity &嘉然
 	props {
 		position (vec3 5 9 1)
 	})
 
-(set_control (mono MonoEntity &tang
+(set_control (mono MonoEntity &嘉心糖
 	props {
 		position (vec3 7 9 1)
 	}))

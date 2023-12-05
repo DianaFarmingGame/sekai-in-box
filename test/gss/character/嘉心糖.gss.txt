@@ -1,6 +1,6 @@
 (define Character
 	ref 200
-	id &tang
+	id &嘉心糖
 	props {
 		collision_box (rect2 -0.4 -0.1 0.8 0.2)
 		asserts {
