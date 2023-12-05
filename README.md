@@ -8,6 +8,12 @@ NOTE: 请使用以下命令克隆仓库，以防止历史的动态链接库占�
 git clone --depth 1 https://github.com/DianaFarmingGame/sekai-in-box.git
 ```
 
+如要使用 SSH，请使用以下命令：
+
+```shell
+git clone --depth 1 git@github.com:DianaFarmingGame/sekai-in-box.git
+```
+
 ## TODOs
 
 - [ ] 为Lisper提供异步支持
