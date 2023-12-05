@@ -6,4 +6,5 @@
 (load_gss "gss/block/plant.gss.txt")
 (load_gss "gss/block/water_plant.gss.txt")
 (load_gss "gss/block/road.gss.txt")
-(load_gss "gss/cat_fighter.gss.txt")
+(load_gss "gss/ran.gss.txt")
+(load_gss "gss/tang.gss.txt")

@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://cnwnq14me0m7s"
-path="res://.godot/imported/scifitiles-sheet.png-262e8aab92ef9920f8b22e6013107518.ctex"
+uid="uid://dehw0wpachb6m"
+path="res://.godot/imported/挖地.png-e2c8c3d984a2129253551a7cb896e875.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://test/assert/scifitiles-sheet.png"
-dest_files=["res://.godot/imported/scifitiles-sheet.png-262e8aab92ef9920f8b22e6013107518.ctex"]
+source_file="res://test/assert/人物/糖/挖地.png"
+dest_files=["res://.godot/imported/挖地.png-e2c8c3d984a2129253551a7cb896e875.ctex"]
 
 [params]
 

@@ -26,6 +26,8 @@ static func Number(value: float) -> Array: return [TType.NUMBER, value]
 
 static func Array(nodes: Array) -> Array: return [TType.ARRAY, nodes]
 
+static func Raw(value: Variant) -> Array: return [TType.RAW, value]
+
 static func Call(name: StringName, tails = null) -> Array:
 	var body := [Token(name)]
 	if tails != null: for tail in tails:
@@ -45,6 +47,10 @@ static func _make_common_context() -> Context:
 			elif body.size() > 2:
 				return ctx.exec_node(body[2])
 			return null,
+		&"unfold": func (ctx: Context, body: Array) -> Variant:
+			var size := int(ctx.exec_node(body[0]))
+			var handle = ctx.exec_node(body[1])
+			return range(size).map(func (i): return ctx.call_fn(handle, [i])),
 		&"func": func (ctx: Context, body: Array) -> Array:
 			var args := []
 			var args_src = body[0][1]
@@ -226,7 +232,7 @@ class Context:
 		match node[0]:
 			TType.TOKEN:
 				return get_var(node[1])
-			TType.NUMBER, TType.BOOL, TType.KEYWORD, TType.STRING:
+			TType.RAW, TType.NUMBER, TType.BOOL, TType.KEYWORD, TType.STRING:
 				return node[1]
 			TType.LIST:
 				var head = node[1][0]
@@ -281,6 +287,49 @@ class Context:
 			var v = exec_node(pairs[2 * i + 1])
 			res[k] = v
 		return res
+	
+	func call_rawfn(handle: Array, body: Array) -> Variant:
+		match handle[0]:
+			FnType.GD_RAW, FnType.GD_RAW_PURE:
+				return handle[1].call(self, body)
+			FnType.GD_MACRO:
+				return exec_node(handle[1].call(body))
+			FnType.GD_CALL, FnType.GD_CALL_PURE:
+				return handle[1].callv(body.map(exec_node))
+			FnType.LP_CALL:
+				var fctx := fork()
+				var args := handle[1] as Array
+				if args.size() != body.size():
+					push_error("argument list not match expect ", args.size(), " found ", body.size())
+					return null
+				var vargs := body.map(exec_node)
+				for iarg in args.size():
+					fctx.def_var([], args[iarg], vargs[iarg])
+				return fctx.exec(handle[2])[-1]
+			_:
+				push_error("unknown call handle type: ", handle)
+				return null
+	
+	func call_fn(handle: Array, vargs: Array) -> Variant:
+		match handle[0]:
+			FnType.GD_RAW, FnType.GD_RAW_PURE:
+				return handle[1].call(self, vargs.map(Lisper.Raw))
+			FnType.GD_MACRO:
+				return exec_node(handle[1].call(vargs.map(Lisper.Raw)))
+			FnType.GD_CALL, FnType.GD_CALL_PURE:
+				return handle[1].callv(vargs)
+			FnType.LP_CALL:
+				var fctx := fork()
+				var args := handle[1] as Array
+				if args.size() != vargs.size():
+					push_error("argument list not match expect ", args.size(), " found ", vargs.size())
+					return null
+				for iarg in args.size():
+					fctx.def_var([], args[iarg], vargs[iarg])
+				return fctx.exec(handle[2])[-1]
+			_:
+				push_error("unknown call handle type: ", handle)
+				return null
 
 ## Token类型
 enum TType {
@@ -292,6 +341,8 @@ enum TType {
 	LIST,
 	ARRAY,
 	MAP,
+	
+	RAW,
 }
 
 ## 函数类型

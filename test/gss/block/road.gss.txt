@@ -31,7 +31,7 @@
 				concaves_nw_se [&static &main (clip_ground (+ x_offset 2) 4)]
 				concaves_ne_sw [&static &main (clip_ground (+ x_offset 2) 3)]
 			}
-			rtile_rules (if diverse
+			random_rules (if diverse
 				[
 					[1 { cover { cur_draw_variant 1 }}]
 					[1 { cover { cur_draw_variant 2 }}]

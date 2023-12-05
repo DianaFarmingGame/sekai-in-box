@@ -10,6 +10,12 @@
 (defvar clip16_cover (func [x y]
 	[(rect2 -0.25 -0.25 0.5 0.5) (rect2 (* x 16) (* y 16) 16 16)]))
 
+(defvar clip_char (func [x]
+	[(rect2 -1.5 -2 3 3) (rect2 (* x 96) 0 96 96)]))
+
+(defvar anim_char (func [frame]
+	(unfold frame clip_char)))
+
 (defvar *atile_rules_3x3x1* [[
 	[
 		0	-	0
