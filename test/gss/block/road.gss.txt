@@ -2,7 +2,9 @@
 	(make_define BlockStaticExt
 		ref ref
 		props {
+			need_route #f
 			routable #f
+			need_collision #f
 			collisible #f
 			asserts {
 				main "assert/路.png"

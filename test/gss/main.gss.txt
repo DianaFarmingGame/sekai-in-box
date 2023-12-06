@@ -67,3 +67,8 @@
 	props {
 		position (vec3 7 9 1)
 	}))
+
+(proc_call (proc []
+	(test)
+	(wait 2)
+	(test)))

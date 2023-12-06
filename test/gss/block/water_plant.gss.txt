@@ -1,7 +1,9 @@
 (define BlockStaticExt
 	ref 104
 	props {
+		need_route #f
 		routable #f
+		need_collision #f
 		collisible #f
 		size (vec3 .5 .5 1)
 		asserts {

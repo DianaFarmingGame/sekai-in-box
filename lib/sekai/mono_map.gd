@@ -187,15 +187,11 @@ func is_need_route() -> bool:
 	return need_route
 
 func will_route(point: Vector2, z_pos: int, result: Array) -> void:
-	if floori(offset.z) == z_pos:
-		var cen := Vector2i(((point - offset_xy) / cell_size_xy).round())
-		if size_rti.grow(1).has_point(cen):
-			# center
-			var mono = get_mono(cen)
-			if mono != null: mono.will_route(point, z_pos, result)
+	var monos = get_monos_by_pos(Vector3(point.x, point.y, z_pos))
+	if monos.size() > 0: monos[0].will_route(point, z_pos, result)
 
 func will_collide(region: Rect2, z_pos: int, result: Array) -> void:
-	if floori(offset.z) == z_pos:
+	if abs(offset.z - z_pos) < cell_size.z / 2:
 		var cen := Vector2i(((region.get_center() - offset_xy) / cell_size_xy).round())
 		if size_rti.grow(1).has_point(cen):
 			# center

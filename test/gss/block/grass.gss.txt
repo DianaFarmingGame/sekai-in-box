@@ -1,7 +1,9 @@
 (define BlockStaticExt
 	ref 102
 	props {
+		need_route #f
 		routable #f
+		need_collision #f
 		collisible #f
 		asserts {
 			main "assert/地形.png"

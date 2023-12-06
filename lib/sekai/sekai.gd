@@ -6,7 +6,7 @@ class_name Sekai extends Node2D
 
 var defines: Array[MonoDefine]
 var defines_by_id := {}
-var gss_ctx: Lisper.Context
+var gss_ctx: LisperContext
 var monos := []
 var monos_need_route := []
 var monos_need_collision := []
@@ -59,13 +59,13 @@ func _init_sekai() -> void:
 	print_rich("[sekai] inited in ", (Time.get_ticks_usec() - stime) / 1000.0, " ms")
 	print()
 
-func make_lisper_context() -> Lisper.Context:
-	var ctx := Lisper.Context.common()
+func make_lisper_context() -> LisperContext:
+	var ctx := LisperCommons.fork()
 	
 	ctx.def_vars([Lisper.VarFlag.CONST, Lisper.VarFlag.FIX], root_vars)
 	
 	ctx.def_fns([Lisper.VarFlag.CONST, Lisper.VarFlag.FIX], Lisper.FnType.GD_RAW_PURE, {
-		&"make_define": func (ctx: Lisper.Context, body: Array) -> Variant:
+		&"make_define": func (ctx: LisperContext, body: Array) -> Variant:
 			var def = ctx.exec_node(body[0])
 			if def != null:
 				def = def.fork()
@@ -83,11 +83,11 @@ func make_lisper_context() -> Lisper.Context:
 	})
 	
 	ctx.def_fns([Lisper.VarFlag.CONST, Lisper.VarFlag.FIX], Lisper.FnType.GD_RAW, {
-		&"sign_define": func (ctx: Lisper.Context, body: Array) -> Variant:
+		&"sign_define": func (ctx: LisperContext, body: Array) -> Variant:
 			var def = ctx.exec_node(body[0])
 			sign_define(def)
 			return def,
-		&"make_mono": func (ctx: Lisper.Context, body: Array) -> Mono:
+		&"make_mono": func (ctx: LisperContext, body: Array) -> Mono:
 			var mono_class = ctx.exec_node(body[0])
 			if mono_class != null:
 				var define = get_define(ctx.exec_node(body[1]))
@@ -105,11 +105,11 @@ func make_lisper_context() -> Lisper.Context:
 			else:
 				ctx.log_error(body[0], str("make_mono: ", body[0], " is not a valid token"))
 				return null,
-		&"mono": func (ctx: Lisper.Context, body: Array) -> Mono:
+		&"mono": func (ctx: LisperContext, body: Array) -> Mono:
 			var mono = ctx.exec_node(Lisper.Call(&"make_mono", [body]))
 			add_mono(mono)
 			return mono,
-		&"mono_map": func (ctx: Lisper.Context, body: Array) -> MonoMap:
+		&"mono_map": func (ctx: LisperContext, body: Array) -> MonoMap:
 			var map = ctx.exec_node(Lisper.Call(&"make_mono_map", [body]))
 			add_mono(map)
 			return map,
