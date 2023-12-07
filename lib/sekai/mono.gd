@@ -355,6 +355,7 @@ func delsB(key: StringName, head: Variant) -> Variant:
 ## R -> Raw:    only call on define
 ## S -> Single: not batch call stacks
 ## U -> Usafe:  fail when handle not found
+## A -> Async:  call func with await
 ## [/codeblock]
 func emitm(key: StringName) -> Variant:
 	var value = null
@@ -509,6 +510,160 @@ func applymRSU(key: StringName, argv: Array) -> Variant:
 	var vargv := [sekai, self]
 	vargv.append_array(argv)
 	return define._props[key].callv(vargv)
+
+func emitmA(key: StringName) -> Variant:
+	var value = null
+	var data = define._props.get(key)
+	if data is Callable:
+		value = await data.call(sekai, self)
+	elif data is Array:
+		for entry in data:
+			value = await entry[1].call(sekai, self)
+	var lidx = layers.size() - 1
+	while lidx >= 0:
+		data = layers[lidx][1].get(key)
+		if data is Array:
+			for entry in data:
+				value = await entry[1].call(sekai, self)
+		elif data is Callable:
+			value = await data.call(sekai, self)
+		lidx -= 1
+	return value
+
+func emitmAS(key: StringName) -> Variant:
+	var value = null
+	var handle = define._props.get(key)
+	if handle != null: value = await handle.call(sekai, self)
+	var lidx = layers.size() - 1
+	while lidx >= 0:
+		handle = layers[lidx][1].get(key)
+		if handle != null: value = await handle.call(sekai, self)
+		lidx -= 1
+	return value
+
+func callmA(key: StringName, arg: Variant) -> Variant:
+	var value = null
+	var data = define._props.get(key)
+	if data is Callable:
+		value = await data.call(sekai, self, arg)
+	elif data is Array:
+		for entry in data:
+			value = await entry[1].call(sekai, self, arg)
+	var lidx = layers.size() - 1
+	while lidx >= 0:
+		data = layers[lidx][1].get(key)
+		if data is Array:
+			for entry in data:
+				value = await entry[1].call(sekai, self, arg)
+		elif data is Callable:
+			value = await data.call(sekai, self, arg)
+		lidx -= 1
+	return value
+
+func callmAS(key: StringName, arg: Variant) -> Variant:
+	var value = null
+	var handle = define._props.get(key)
+	if handle != null: value = await handle.call(sekai, self, arg)
+	var lidx = layers.size() - 1
+	while lidx >= 0:
+		handle = layers[lidx][1].get(key)
+		if handle != null: value = await handle.call(sekai, self, arg)
+		lidx -= 1
+	return value
+
+func applymA(key: StringName, argv: Array) -> Variant:
+	var vargv := [sekai, self]
+	vargv.append_array(argv)
+	var value = null
+	var data = define._props.get(key)
+	if data is Callable:
+		value = await data.callv(vargv)
+	elif data is Array:
+		for entry in data:
+			value = await entry[1].callv(vargv)
+	var lidx = layers.size() - 1
+	while lidx >= 0:
+		data = layers[lidx][1].get(key)
+		if data is Array:
+			for entry in data:
+				value = await entry[1].callv(vargv)
+		elif data is Callable:
+			value = await data.callv(vargv)
+		lidx -= 1
+	return value
+
+func applymAS(key: StringName, argv: Array) -> Variant:
+	var vargv := [sekai, self]
+	vargv.append_array(argv)
+	var value = null
+	var handle = define._props.get(key)
+	if handle != null: value = await handle.callv(vargv)
+	var lidx = layers.size() - 1
+	while lidx >= 0:
+		handle = layers[lidx][1].get(key)
+		if handle != null: value = await handle.callv(vargv)
+		lidx -= 1
+	return value
+
+func emitmAR(key: StringName) -> Variant:
+	var value = null
+	var data = define._props.get(key)
+	if data is Callable:
+		value = await data.call(sekai, self)
+	elif data is Array:
+		for entry in data:
+			value = await entry[1].call(sekai, self)
+	return value
+
+func emitmARS(key: StringName) -> Variant:
+	var handle = define._props.get(key)
+	if handle != null: return await handle.call(sekai, self)
+	return null
+
+func emitmARSU(key: StringName) -> Variant:
+	return await define._props[key].call(sekai, self)
+
+func callmAR(key: StringName, arg: Variant) -> Variant:
+	var value = null
+	var data = define._props.get(key)
+	if data is Callable:
+		value = await data.call(sekai, self, arg)
+	elif data is Array:
+		for entry in data:
+			value = await entry[1].call(sekai, self, arg)
+	return value
+
+func callmARS(key: StringName, arg: Variant) -> Variant:
+	var handle = define._props.get(key)
+	if handle != null: return await handle.call(sekai, self, arg)
+	return null
+
+func callmARSU(key: StringName, arg: Variant) -> Variant:
+	return await define._props[key].call(sekai, self, arg)
+
+func applymAR(key: StringName, argv: Array) -> Variant:
+	var vargv := [sekai, self]
+	vargv.append_array(argv)
+	var value = null
+	var data = define._props.get(key)
+	if data is Callable:
+		value = await data.callv(vargv)
+	elif data is Array:
+		for entry in data:
+			value = await entry[1].callv(vargv)
+	return value
+
+func applymARS(key: StringName, argv: Array) -> Variant:
+	var vargv := [sekai, self]
+	vargv.append_array(argv)
+	var handle = define._props.get(key)
+	if handle != null: return await handle.callv(vargv)
+	return null
+
+func applymARSU(key: StringName, argv: Array) -> Variant:
+	var vargv := [sekai, self]
+	vargv.append_array(argv)
+	return await define._props[key].callv(vargv)
 
 # accelerator methods
 

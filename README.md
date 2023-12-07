@@ -21,3 +21,5 @@ git clone --depth 1 git@github.com:DianaFarmingGame/sekai-in-box.git
 - [ ] 为Lisper类型的函数提供预编译支持
 
 - [ ] 重构TCollisible/TRoutable/TPosition为使用AABB盒
+
+- [ ] 消除碰撞和导航检测的接近缝隙问题

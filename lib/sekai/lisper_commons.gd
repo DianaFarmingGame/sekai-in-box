@@ -27,6 +27,11 @@ func def_commons(ctx: LisperContext) -> void:
 			elif body.size() > 2:
 				return ctx.exec_node(body[2])
 			return null,
+		&"loop": func (ctx: LisperContext, body: Array) -> Variant:
+			while true:
+				for node in body:
+					ctx.exec_node(node)
+			return null,
 		&"unfold": func (ctx: LisperContext, body: Array) -> Variant:
 			var size := int(ctx.exec_node(body[0]))
 			var handle = ctx.exec_node(body[1])
@@ -49,12 +54,13 @@ func def_commons(ctx: LisperContext) -> void:
 				args.append(ctx.exec_as_keyword(node))
 				idx += 1
 			return [Lisper.FnType.LP_CALL, args, body.slice(1)],
-		&"proc_call": func (ctx: LisperContext, body: Array) -> void:
+		&"proc_call": func (ctx: LisperContext, body: Array) -> ProcedureContext:
 			var vctx := ProcedureCommons.fork()
 			body = body.map(ctx.exec_node)
 			var handle = body[0]
 			var args = body.slice(1)
-			vctx.call_fn_async(handle, args),
+			vctx.call_fn_async(handle, args)
+			return vctx,
 		&"array_concat": func (ctx: LisperContext, body: Array) -> Array:
 			var res := []
 			body = body.map(ctx.exec_node)
@@ -83,6 +89,11 @@ func def_commons(ctx: LisperContext) -> void:
 				ctx.def_var([], vname, data) # TODO
 			else:
 				ctx.log_error(body[0], str("defvar: ", body[0], " is not a valid token")),
+		&"do": func (ctx: LisperContext, body: Array) -> Variant:
+			var this := ctx.exec_node(body[0]) as Mono
+			var method := ctx.exec_as_keyword(body[1]) as StringName
+			var them := ctx.exec_node(body.slice(2)) as Array
+			return this.applym(method, them),
 	})
 	ctx.def_fns([Lisper.VarFlag.CONST, Lisper.VarFlag.FIX], Lisper.FnType.GD_CALL_PURE, {
 		&"vec2": func (x: float, y: float) -> Vector2:

@@ -25,10 +25,14 @@ static var root_vars := {
 func _init() -> void:
 	y_sort_enabled = true
 
+signal before_process
+
 func _ready() -> void:
 	_init_sekai()
 	Input.use_accumulated_input = false
-	get_tree().root.window_input.connect(_on_input)
+	var tree := get_tree()
+	tree.root.window_input.connect(_on_input)
+	tree.process_frame.connect(func (): before_process.emit())
 
 func _exit_tree() -> void:
 #	print("Sekai exit")
