@@ -16,7 +16,7 @@ git clone --depth 1 git@github.com:DianaFarmingGame/sekai-in-box.git
 
 ## TODOs
 
-- [ ] 为Lisper提供异步支持
+- [x] 为Lisper提供异步支持
 
 - [ ] 为Lisper类型的函数提供预编译支持
 
