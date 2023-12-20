@@ -1,7 +1,17 @@
-[gd_scene load_steps=3 format=3 uid="uid://cy0i20t42382p"]
+[gd_scene load_steps=6 format=3 uid="uid://cy0i20t42382p"]
 
 [ext_resource type="Script" path="res://test/test.gd" id="1_fugfy"]
+[ext_resource type="FontFile" uid="uid://clrrm68hjw5tu" path="res://test/assert/Cubic_11_1.000_R.ttf" id="1_jnnce"]
 [ext_resource type="Script" path="res://lib/sekai/sekai.gd" id="2_l2l10"]
+
+[sub_resource type="FontVariation" id="FontVariation_y4onr"]
+base_font = ExtResource("1_jnnce")
+spacing_top = 4
+spacing_bottom = 4
+
+[sub_resource type="Theme" id="Theme_bvu3n"]
+default_font = SubResource("FontVariation_y4onr")
+default_font_size = 18
 
 [node name="test" type="Control"]
 layout_mode = 3
@@ -10,6 +20,8 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+focus_mode = 2
+theme = SubResource("Theme_bvu3n")
 script = ExtResource("1_fugfy")
 
 [node name="Sekai" type="Node2D" parent="."]
@@ -30,9 +42,35 @@ offset_bottom = 70.0
 [node name="SaveBtn" type="Button" parent="VBoxContainer"]
 unique_name_in_owner = true
 layout_mode = 2
+focus_mode = 0
 text = "Save"
 
 [node name="LoadBtn" type="Button" parent="VBoxContainer"]
 unique_name_in_owner = true
 layout_mode = 2
+focus_mode = 0
 text = "Load"
+
+[node name="DialogBox" type="PanelContainer" parent="."]
+unique_name_in_owner = true
+visible = false
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 0
+
+[node name="MarginContainer" type="MarginContainer" parent="DialogBox"]
+layout_mode = 2
+theme_override_constants/margin_left = 16
+theme_override_constants/margin_top = 16
+theme_override_constants/margin_right = 16
+theme_override_constants/margin_bottom = 16
+
+[node name="DialogInner" type="RichTextLabel" parent="DialogBox/MarginContainer"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 120)
+layout_mode = 2
+bbcode_enabled = true

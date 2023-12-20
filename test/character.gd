@@ -4,6 +4,7 @@ func do_merge(sets: Array[Dictionary]) -> Array[Dictionary]:
 	super.do_merge(sets)
 	merge_traits(sets, [TCollisible, TInputKey, TProcess, TState])
 	merge_props(sets, {
+		&"name": "unnamed",
 		&"max_speed": 3,
 		&"touch_radius": 1,
 		
@@ -41,6 +42,14 @@ func do_merge(sets: Array[Dictionary]) -> Array[Dictionary]:
 			if dir > 0:
 				this.setp(&"flip_h", true)
 			return dir,
+		
+		&"face_to": func (_sekai, this: Mono, target: Variant) -> void:
+			var pos: Vector2 = target if target is Vector2 else Vector2(target.position.x, target.position.y)
+			var dx := pos.x - this.position.x
+			if dx < 0:
+				this.setp(&"cur_dir", -1)
+			if dx > 0:
+				this.setp(&"cur_dir", 1),
 		
 		&"move_by": func (_sekai, this: Mono, delta: Vector2) -> bool:
 			return await this.applymA(&"move_by_at_speed", [delta, this.getp(&"max_speed")]),
@@ -118,6 +127,9 @@ func do_merge(sets: Array[Dictionary]) -> Array[Dictionary]:
 			this.setp(&"cur_speed", Vector2(0, 0))
 			this.callm(&"state_to", &"idle")
 			return not blocked,
+		
+		&"say_to": func (sekai: Sekai, this: Mono, _target: Mono, text: String) -> void:
+			await sekai.external_fns[&"show_dialog"].call(sekai, this, text),
 		
 		&"init_state": &"idle",
 		&"state_data": {

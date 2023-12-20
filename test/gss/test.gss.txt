@@ -1,0 +1,69 @@
+; 测试：相对移动
+#;(proc_call
+	(proc [我 你]
+		(delay 2)
+		(do 我 move_by (vec2 -1 0))
+		(loop
+			(do 我 move_by_at_speed (vec2 0 -2) 50)
+			(do 我 move_by_at_speed (vec2 2 0) 50)
+			(do 我 move_by_at_speed (vec2 0 2) 50)
+			(do 我 move_by_at_speed (vec2 -2 0) 50)
+		)
+	)
+	嘉心糖 嘉然)
+
+; 测试：目标移动
+#;(proc_call
+	(proc [我 你]
+		(delay 2)
+		(do 我 move_to (vec2 8 9.5))
+		(do 你 move_to (vec2 6.5 8))
+		(go
+			(do 你 move_to_at_speed 我 1))
+		(loop
+			(do 我 move_by_at_speed (vec2 -3 0) 5)
+			(do 我 move_by_at_speed (vec2 0 -3) 5)
+			(do 我 move_by_at_speed (vec2 3 0) 5)
+			(do 我 move_by_at_speed (vec2 0 3) 5)
+		)
+	)
+	嘉心糖 嘉然)
+
+; 测试：跟随
+#;(proc_call
+	(proc [我 你]
+		(loop
+			(if (do 你 move_to_at_speed 我 3)
+				(delay 0.1)
+				(delay 0))
+		)
+	)
+	嘉心糖 嘉然)
+
+; 测试：对话
+(proc_call
+	(proc [我 你]
+		(delay 2)
+		(do 我 move_to 你)
+		(do 你 face_to 我)
+		(delay 0.5)
+		(do 我 say_to 你 "和我一起SAY：\n1～2～1～\n1～2～1～")
+		(delay 0.5)
+		(do 你 say_to 我 "1～2～1～\n1～2～1～")
+		(delay 0.5)
+		(loop
+			(do 我 say_to 你 "说得不错，再来一次！\n1～2～1～\n1～2～1～")
+			(delay 0.5)
+			(do 你 say_to 我 "1～2～1～\n1～2～1～")
+			(delay 0.5)
+			(do_select 你 choose
+				"好的！" (block
+					(do 你 say_to 我 "1～2～1～\n1～2～1～")
+					(delay 0.5))
+				"不要！" (block
+					(break)
+					(delay 0.5))
+			)
+		)
+	)
+	嘉心糖 嘉然)

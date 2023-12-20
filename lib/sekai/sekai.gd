@@ -14,6 +14,8 @@ var control_target = null
 
 @export var unit_size := Vector3(16, 16, 12)
 
+var external_fns := {}
+
 static var root_vars := {
 	&"MonoDefine": MonoDefine.new(),
 	&"Entity": GEntity.new(),
@@ -31,7 +33,7 @@ func _ready() -> void:
 	_init_sekai()
 	Input.use_accumulated_input = false
 	var tree := get_tree()
-	tree.root.window_input.connect(_on_input)
+#	tree.root.window_input.connect(_on_input)
 	tree.process_frame.connect(func (): before_process.emit())
 
 func _exit_tree() -> void:
@@ -48,6 +50,9 @@ func _on_input(event: InputEvent) -> void:
 	if control_target != null:
 		if event is InputEventKey:
 			control_target.callm(&"on_input_key", event)
+
+func _unhandled_input(event: InputEvent) -> void:
+	_on_input(event)
 
 func _init_sekai() -> void:
 	defines.clear()

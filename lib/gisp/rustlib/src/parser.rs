@@ -1,5 +1,6 @@
 use std::rc::Rc;
 use godot::prelude::*;
+use unescape::unescape;
 
 #[derive(Default)]
 struct GispStream {
@@ -155,7 +156,7 @@ impl GispParser {
                     }
                     '\\' => {
                         if let Some(nc) = self.rpick() {
-                            if let Ok(s) = unescape(&([nc, c].into_iter().collect::<String>())) {
+                            if let Some(s) = unescape(&([c, nc].into_iter().collect::<String>())) {
                                 chars.push(s.chars().nth(0).unwrap());
                             } else {
                                 chars.push(c); chars.push(nc);
@@ -296,8 +297,6 @@ impl GispParser {
         }
     }
 }
-
-use snailquote::unescape;
 
 const _CS_BLANK: &str = "\u{0020}\u{0009}\u{000A}\u{000B}\u{000C}\u{00A0}\u{000D}\u{2028}\u{2029}";
 const _CS_NUMBER: &str = "-0123456789.";

@@ -68,44 +68,4 @@
 		position (vec3 7 9 1)
 	})))
 
-; Test move_by
-#;(proc_call
-	(proc [我 你]
-		(delay 2)
-		(do 我 move_by (vec2 -1 0))
-		(loop
-			(do 我 move_by_at_speed (vec2 0 -2) 50)
-			(do 我 move_by_at_speed (vec2 2 0) 50)
-			(do 我 move_by_at_speed (vec2 0 2) 50)
-			(do 我 move_by_at_speed (vec2 -2 0) 50)
-		)
-	)
-	嘉心糖 嘉然)
-
-; Test move_to
-#;(proc_call
-	(proc [我 你]
-		(delay 2)
-		(do 我 move_to (vec2 8 9.5))
-		(do 你 move_to (vec2 6.5 8))
-		(go
-			(do 你 move_to_at_speed 我 1))
-		(loop
-			(do 我 move_by_at_speed (vec2 -3 0) 5)
-			(do 我 move_by_at_speed (vec2 0 -3) 5)
-			(do 我 move_by_at_speed (vec2 3 0) 5)
-			(do 我 move_by_at_speed (vec2 0 3) 5)
-		)
-	)
-	嘉心糖 嘉然)
-
-; Test follow
-#;(proc_call
-	(proc [我 你]
-		(loop
-			(if (do 你 move_to_at_speed 我 3)
-				(delay 0.1)
-				(delay 0))
-		)
-	)
-	嘉心糖 嘉然)
+(load_gss "gss/test.gss.txt")

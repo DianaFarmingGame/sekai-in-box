@@ -70,12 +70,14 @@ func def_commons(ctx: LisperContext) -> void:
 			return res,
 	})
 	ctx.def_fns([Lisper.VarFlag.CONST, Lisper.VarFlag.FIX], Lisper.FnType.GD_RAW, {
-		&"echo": func (ctx: LisperContext, body: Array) -> void:
+		&"echo": func (ctx: LisperContext, body: Array) -> Variant:
 			var msg := []
+			var res
 			for node in body:
-				var res = ctx.exec_node(node)
+				res = ctx.exec_node(node)
 				msg.append(str(res))
-			print(' '.join(msg)),
+			print(' '.join(msg))
+			return res,
 		&"eval": func (ctx: LisperContext, body: Array) -> Variant:
 			var result = null
 			for node in body:
