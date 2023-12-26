@@ -1,0 +1,22 @@
+on: push
+
+jobs:
+  send_notify:
+    name: Send notify to feishu webhook
+    runs-on: ubuntu-latest
+    steps:
+    - uses: foxundermoon/feishu-action@v2
+      with:
+        url: https://open.feishu.cn/open-apis/bot/v2/hook/5552d16d-a73d-4f26-93fa-3d402e821c6c
+        msg_type: post
+        content: |
+          post:
+            zh_cn:
+              title: New push from ${{ github.event.pusher.name }} in ${{ github.event.repository.name }}
+              content:
+              - - tag: text
+                  un_escape: true
+                  text: 'Commits:&#xA;&#xA;'
+                - tag: text
+                  un_escape: true
+                  text: '${{ join(github.event.commits.*.message, '&#xA;') }}'
