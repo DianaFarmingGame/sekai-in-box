@@ -12,7 +12,7 @@ jobs:
         content: |
           post:
             zh_cn:
-              title: New push from ${{ github.event.pusher.name }} in ${{ github.event.repository.name }}/${{ github.event.base_ref }}
+              title: New push from ${{ github.event.pusher.name }} in ${{ github.event.repository.name }}/${{ github.ref_name }}
               content:
               - - tag: text
                   un_escape: true
