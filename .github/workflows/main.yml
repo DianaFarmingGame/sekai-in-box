@@ -1,4 +1,4 @@
-on: [push, pull_request]
+on: push
 
 jobs:
   send_notify:
@@ -12,17 +12,9 @@ jobs:
         content: |
           post:
             zh_cn:
-              title: Github连接测试
+              title: New push from ${{ github.event.pusher.name }} in ${{ toJson(github.event.repository) }}
               content:
               - - tag: text
-                  un_escape: true
-                  text: '第一行&nbsp;:'
-                - tag: a
-                  text: 超链接
-                  href: http://www.feishu.cn
-                - tag: at
-                  user_id: ou_18eac85d35a26f989317ad4f02e8bbbb
-              - - tag: text
-                  text: '第二行 :'
+                  text: Commits:
                 - tag: text
-                  text: 文本测试
+                  text: ${{ join(github.event.commits.*.message, "\n") }}
