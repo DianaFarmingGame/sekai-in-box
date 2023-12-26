@@ -18,6 +18,10 @@ func _init() -> void:
 	def_commons(CommonContext)
 
 func def_commons(ctx: LisperContext) -> void:
+	ctx.def_fns([Lisper.VarFlag.CONST, Lisper.VarFlag.FIX], Lisper.FnType.GD_MACRO, {
+		&"do": func (body: Array) -> Variant:
+			return Lisper.Call(&"callm", [body]),
+	})
 	ctx.def_fns([Lisper.VarFlag.CONST, Lisper.VarFlag.FIX], Lisper.FnType.GD_RAW_PURE, {
 		&"raw": func (_ctx: LisperContext, body: Array) -> Array:
 			return body,
@@ -91,11 +95,26 @@ func def_commons(ctx: LisperContext) -> void:
 				ctx.def_var([], vname, data) # TODO
 			else:
 				ctx.log_error(body[0], str("defvar: ", body[0], " is not a valid token")),
-		&"do": func (ctx: LisperContext, body: Array) -> Variant:
+		&"callm": func (ctx: LisperContext, body: Array) -> Variant:
 			var this := ctx.exec_node(body[0]) as Mono
 			var method := ctx.exec_as_keyword(body[1]) as StringName
-			var them := ctx.exec_node(body.slice(2)) as Array
-			return this.applym(method, them),
+			var argv := ctx.exec_node(body.slice(2)) as Array
+			return this.applym(method, argv),
+		&"getp": func (ctx: LisperContext, body: Array) -> Variant:
+			var this := ctx.exec_node(body[0]) as Mono
+			var key := ctx.exec_as_keyword(body[1]) as StringName
+			return this.getp(key),
+		&"setp": func (ctx: LisperContext, body: Array) -> void:
+			var this := ctx.exec_node(body[0]) as Mono
+			var key := ctx.exec_as_keyword(body[1]) as StringName
+			var value = ctx.exec_node(body[1])
+			this.setp(key, value),
+		&"destroy": func (ctx: LisperContext, body: Array) -> void:
+			var this := ctx.exec_node(body[0]) as Mono
+			this.destroy(),
+		&"queue_destroy": func (ctx: LisperContext, body: Array) -> void:
+			var this := ctx.exec_node(body[0]) as Mono
+			this.destroy.call_deferred(),
 	})
 	ctx.def_fns([Lisper.VarFlag.CONST, Lisper.VarFlag.FIX], Lisper.FnType.GD_CALL_PURE, {
 		&"vec2": func (x: float, y: float) -> Vector2:

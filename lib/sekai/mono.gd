@@ -34,11 +34,14 @@ func to_data() -> Dictionary:
 		&"layers": layers,
 	}
 
-func from_data(psekai: Sekai, data: Dictionary):
+func from_data(psekai: Sekai, data: Dictionary) -> void:
 	var ref = data[&"ref"]
 	define = psekai.get_define_by_ref(ref)
 	inited = data[&"inited"]
 	layers = data[&"layers"]
+
+func destroy() -> void:
+	sekai.remove_mono(self)
 
 func cover(layer_name: StringName, layer: Dictionary) -> void:
 	if layers.size() == 0 and layer_name != &"base": cover(&"base", {})

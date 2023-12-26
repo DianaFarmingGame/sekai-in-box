@@ -156,6 +156,14 @@ func call_fn(handle: Array, vargs: Array) -> Variant:
 			push_error("unknown call handle type: ", handle)
 			return null
 
+func call_anyway(handle: Variant, vargs: Array) -> Variant:
+	if handle is Callable:
+		return handle.callv(vargs)
+	if handle is Array:
+		return call_fn(handle, vargs)
+	push_error("unknown call handle type: ", handle)
+	return null
+
 func eval_async(expr: String) -> Variant:
 	var tokens = Lisper.tokenize(expr)
 	source = expr
