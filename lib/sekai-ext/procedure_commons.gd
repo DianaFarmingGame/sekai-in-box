@@ -33,7 +33,7 @@ func def_commons(ctx: ProcedureContext) -> void:
 			return null,
 	})
 	ctx.def_fns([Lisper.VarFlag.CONST, Lisper.VarFlag.FIX], Lisper.FnType.GD_RAW, {
-		&"do": func (ctx: ProcedureContext, body: Array) -> Variant:
+		&"callm": func (ctx: ProcedureContext, body: Array) -> Variant:
 			var this := await ctx.exec_node_async(body[0]) as Mono
 			var method := ctx.exec_as_keyword(body[1]) as StringName
 			var them := await ctx.exec_async(body.slice(2)) as Array

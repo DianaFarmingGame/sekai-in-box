@@ -215,6 +215,12 @@ func add_mono(mono) -> void:
 	if mono.is_need_collision(): monos_need_collision.append(mono)
 	if mono.is_need_route(): monos_need_route.append(mono)
 
+func remove_mono(mono) -> void:
+	monos_need_collision.erase(mono)
+	monos_need_route.erase(mono)
+	mono._outof_sekai()
+	monos.erase(mono)
+
 func call_ref_method(ref: int, method: StringName, argv := []) -> Variant:
 	var handle := defines[ref].get_method(method) as Callable
 	var rargv := [self]
