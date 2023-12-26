@@ -269,3 +269,11 @@ func call_fn_async(handle: Array, vargs: Array) -> Variant:
 		_:
 			push_error("unknown call handle type: ", handle)
 			return null
+
+func call_anyway_async(handle: Variant, vargs: Array) -> Variant:
+	if handle is Callable:
+		return await handle.callv(vargs)
+	if handle is Array:
+		return await call_fn(handle, vargs)
+	push_error("unknown call handle type: ", handle)
+	return null

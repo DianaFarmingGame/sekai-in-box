@@ -31,7 +31,7 @@ static func update(sekai: Sekai, this: Mono) -> void:
 				var cover = rule[1].get(&"cover")
 				if cover != null: this.cover(&"random", cover)
 				var vupdate = rule[1].get(&"update")
-				if vupdate != null: sekai.gss_ctx.call_anyway(vupdate, [sekai, this])
+				if vupdate != null: sekai.gss_ctx.call_anyway_async(vupdate, [sekai, this])
 				break
 	pass
 
@@ -41,5 +41,5 @@ static func updated(sekai: Sekai, this: Mono) -> void:
 		var cur = this.getp(&"random_cur")
 		var rule = random_rules[cur]
 		var vupdated = rule[1].get(&"updated")
-		if vupdated != null: sekai.gss_ctx.call_anyway(vupdated, [sekai, this])
+		if vupdated != null: sekai.gss_ctx.call_anyway_async(vupdated, [sekai, this])
 	pass
