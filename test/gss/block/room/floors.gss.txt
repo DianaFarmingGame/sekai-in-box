@@ -1,0 +1,32 @@
+; 垂直地板
+(define BlockStaticExt
+	ref 302
+	props {
+		need_collision  #f
+		collisible      #f
+		asserts {
+			main "assert/房间.png"
+		}
+		cur_draw &floor
+		draw_data {
+			floor       [&static &main (clip_ground 4 3)]
+		}
+	}
+)
+
+; 水平地板
+(define BlockStaticExt
+	ref 303
+	props {
+		need_collision  #f
+		collisible      #f
+		asserts {
+			main "assert/房间.png"
+		}
+		cur_draw &floor
+		draw_data {
+			floor       [&static &main (clip_ground 3 3)]
+		}
+	}
+)
+

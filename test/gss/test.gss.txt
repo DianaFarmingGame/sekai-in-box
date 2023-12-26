@@ -41,7 +41,7 @@
 	嘉心糖 嘉然)
 
 ; 测试：对话
-(proc_call
+#;(proc_call
 	(proc [我 你]
 		(delay 2)
 		(do 我 move_to 你)

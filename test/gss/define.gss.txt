@@ -8,3 +8,8 @@
 (load_gss "gss/block/road.gss.txt")
 (load_gss "gss/character/嘉心糖.gss.txt")
 (load_gss "gss/character/嘉然.gss.txt")
+
+(load_gss "gss/block/room/stair.gss.txt")
+(load_gss "gss/block/room/floors.gss.txt")
+(load_gss "gss/block/room/walls.gss.txt")
+(load_gss "gss/block/room/tops.gss.txt")
