@@ -20,5 +20,5 @@ func update(event: InputEvent) -> void:
 				triggered_actions[action] = obj
 			else:
 				triggered_actions.erase(action)
-	print(triggered_actions)
+#	print(triggered_actions)
 	updated.emit(triggered_actions, pressings, releasings)
