@@ -29,12 +29,15 @@ func _init() -> void:
 
 signal before_process
 
+@onready var input_mapper := InputMapper.new()
+
 func _ready() -> void:
 	_init_sekai()
 	Input.use_accumulated_input = false
 	var tree := get_tree()
 #	tree.root.window_input.connect(_on_input)
 	tree.process_frame.connect(func (): before_process.emit())
+	input_mapper.updated.connect(_on_input)
 
 func _exit_tree() -> void:
 #	print("Sekai exit")
@@ -46,13 +49,15 @@ func _clear_monos() -> void:
 	monos_need_collision.clear()
 	monos_need_route.clear()
 
-func _on_input(event: InputEvent) -> void:
-	if control_target != null:
-		if event is InputEventKey:
-			control_target.callm(&"on_input_key", event)
+signal input_updated(triggered: Dictionary, pressings: Dictionary, releasings: Dictionary)
+
+func _on_input(triggered: Dictionary, pressings: Dictionary, releasings: Dictionary) -> void:
+	if control_target is Mono:
+		control_target.applym(&"on_input_action", [triggered, pressings, releasings])
+	input_updated.emit(triggered, pressings, releasings)
 
 func _unhandled_input(event: InputEvent) -> void:
-	_on_input(event)
+	input_mapper.update(event)
 
 func _init_sekai() -> void:
 	defines.clear()

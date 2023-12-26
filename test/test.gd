@@ -35,10 +35,10 @@ func _ready() -> void:
 			accept_event()
 			dialog_box.visible = false
 	})
+	sekai.input_updated.connect(_on_input)
 
 signal confirmed
 
-func _input(event: InputEvent) -> void:
-	if event is InputEventKey and event.pressed and event.keycode == KEY_SPACE:
-		skip_dialog = true
+func _on_input(_all, press: Dictionary, _release) -> void:
+	if press.has(&"dialog_confirm"):
 		confirmed.emit()
