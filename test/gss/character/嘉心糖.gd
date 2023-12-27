@@ -2,6 +2,7 @@ extends GCharacter
 
 func do_merge(sets: Array[Dictionary]) -> Array[Dictionary]:
 	super.do_merge(sets)
+	name = "嘉心糖"
 	merge_props(sets, {
 		&"power": 20,
 		

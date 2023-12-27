@@ -1,6 +1,7 @@
 class_name TATile extends MonoTrait
 
 var id := &"atile"
+var requires := [&"group", &"position"]
 
 var props := {
 	&"atile_size": Vector3(1, 1, 1),

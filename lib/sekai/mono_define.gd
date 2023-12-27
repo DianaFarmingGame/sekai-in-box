@@ -6,6 +6,9 @@ class_name MonoDefine extends TraitLike
 @export var traits: Array[TraitLike]
 @export var props: Dictionary
 
+func _get_name() -> StringName:
+	return str(ref, ":", id, "(", name, ")")
+
 func _get_own_traits() -> Array[TraitLike]:
 	return traits
 
@@ -19,6 +22,7 @@ func _do_merge(sets: Array[Dictionary]) -> Array[Dictionary]:
 	return sets
 
 func do_merge(sets: Array[Dictionary]) -> Array[Dictionary]:
+	name = "MonoDefine"
 	merge_props(sets, {
 		&"on_init": [],
 		&"on_inited": [],
