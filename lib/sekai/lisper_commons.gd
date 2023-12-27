@@ -72,6 +72,10 @@ func def_commons(ctx: LisperContext) -> void:
 				assert(v is Array)
 				res.append_array(v)
 			return res,
+		&"array_map": func (ctx: LisperContext, body: Array) -> Variant:
+			var ary := ctx.exec_node(body[0]) as Array
+			var handle = ctx.exec_node(body[1])
+			return ary.map(func (e): return ctx.call_fn(handle, [e])),
 	})
 	ctx.def_fns([Lisper.VarFlag.CONST, Lisper.VarFlag.FIX], Lisper.FnType.GD_RAW, {
 		&"echo": func (ctx: LisperContext, body: Array) -> Variant:
@@ -137,6 +141,8 @@ func def_commons(ctx: LisperContext) -> void:
 			return x * y,
 		&"/": func (x, y) -> Variant:
 			return x / y,
+		&"@": func (src, ref) -> Variant:
+			return src[ref],
 	})
 	ctx.def_fns([Lisper.VarFlag.CONST, Lisper.VarFlag.FIX], Lisper.FnType.GD_CALL, {
 		&"debug": func (value: Variant) -> Variant:
