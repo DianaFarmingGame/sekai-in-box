@@ -19,4 +19,4 @@ jobs:
                   text: 'Commits:&#xA;&#xA;'
                 - tag: text
                   un_escape: true
-                  text: '${{ toJSON(join(github.event.commits.*.message, '&#xA;')) }}'
+                  text: '${{ join(github.event.commits.*.message, '&#xA;') }}'
