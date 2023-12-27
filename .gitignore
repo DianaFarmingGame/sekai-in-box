@@ -3,3 +3,5 @@
 .directory
 export
 .DS_Store
+
+.vscode
