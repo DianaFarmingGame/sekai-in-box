@@ -1,7 +1,7 @@
 class_name TSolid extends MonoTrait
 
 var id := &"solid"
-var requires := [&"group", &"position"]
+var requires := [&"position"]
 
 var props := {
 	&"solid_will_route": true,
