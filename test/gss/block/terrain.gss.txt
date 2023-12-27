@@ -34,7 +34,7 @@
 			top_concave_sw [&static &main (clip_ground 3 7)]
 		}
 		atile_size (vec3 3 3 3)
-		groups [100]
+		groups (prop/pushs [100])
 		atile_matches [[100 101]]
 		atile_rules [[
 			[

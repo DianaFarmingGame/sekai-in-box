@@ -41,7 +41,7 @@
 				]
 				[])
 			atile_size (vec3 3 3 1)
-			groups [ref]
+			groups (prop/pushs [ref])
 			atile_matches [[ref]]
 			atile_rules *atile_rules_3x3x1_crossed*
 		})))
