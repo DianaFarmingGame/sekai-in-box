@@ -3,10 +3,17 @@ extends Control
 @onready var sekai := $Sekai as Sekai
 @onready var dialog_inner := %DialogInner as RichTextLabel
 @onready var dialog_box := %DialogBox as Control
+@onready var dialog = $dialog
+
+var picture_dict = {
+	"嘉心糖": load("res://test/asset/ui/小然立绘/祈求.png"),
+	"嘉然": load("res://test/asset/ui/小然立绘/生气.png"),
+}
 
 var skip_dialog := false
 
 func _ready() -> void:
+	dialog.hide()
 	var tree := get_tree()
 	tree.auto_accept_quit = false
 	tree.root.close_requested.connect(func ():
@@ -21,19 +28,20 @@ func _ready() -> void:
 		sekai.load_from_path("user://save.sekai"))
 	sekai.external_fns.merge({
 		&"show_dialog": func (_sekai, this: Mono, text: String):
-			var head: String = "[color=green]" + this.getp(&"name") + "：[/color]\n"
-			dialog_inner.text = head + text
-			dialog_inner.visible_characters = 0
-			dialog_box.visible = true
 			skip_dialog = false
-			while dialog_inner.visible_characters < dialog_inner.get_total_character_count():
+			dialog.show()
+			dialog.set_content(text)
+			dialog.set_character_texture(picture_dict.get(this.getp(&"name")))
+			dialog.set_character_name(this.getp(&"name"))
+			dialog.set_visiable_content(0)
+			while dialog.get_visiable_character_count() < dialog.get_total_character_count():
 				await tree.create_timer(0.02).timeout
 				if skip_dialog:
-					dialog_inner.visible_characters = dialog_inner.get_total_character_count()
-				dialog_inner.visible_characters += 1
+					dialog.set_visiable_content(dialog.get_total_character_count())
+				dialog.set_visiable_content(dialog.get_visiable_character_count() + 1)
 			await confirmed
 			accept_event()
-			dialog_box.visible = false
+			dialog.hide()
 	})
 
 signal confirmed
