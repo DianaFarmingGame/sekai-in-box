@@ -148,7 +148,7 @@
 	}
 ]])
 
-(defvar *atile_rules_3x3x1_crossed* (array_concat *atile_rules_3x3x1* [[
+(defvar *atile_rules_3x3x1_crossed* (array/concat *atile_rules_3x3x1* [[
 	[
 		-	1	1
 		1	0	1

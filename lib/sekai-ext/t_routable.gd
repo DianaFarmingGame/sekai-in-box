@@ -1,6 +1,7 @@
 class_name TRoutable extends MonoTrait
 
 var id := &"routable"
+var requires := [&"position", &"group"]
 
 var props := {
 	&"need_route": true,

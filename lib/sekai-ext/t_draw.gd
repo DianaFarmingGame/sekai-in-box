@@ -1,6 +1,7 @@
 class_name TDraw extends MonoTrait
 
 var id := &"draw"
+var requires := [&"assert", &"position"]
 
 var props := {
 	&"draw_data": {},

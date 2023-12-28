@@ -7,7 +7,7 @@ jobs:
     steps:
     - uses: foxundermoon/feishu-action@v2
       with:
-        url: https://open.feishu.cn/open-apis/bot/v2/hook/5552d16d-a73d-4f26-93fa-3d402e821c6c
+        url: ${{ secrets.BOT_WEBHOOK }}
         msg_type: post
         content: |
           post:

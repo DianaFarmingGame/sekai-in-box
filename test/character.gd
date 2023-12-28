@@ -2,11 +2,13 @@ class_name GCharacter extends GEntity
 
 func do_merge(sets: Array[Dictionary]) -> Array[Dictionary]:
 	super.do_merge(sets)
-	merge_traits(sets, [TCollisible, TInputAction, TProcess, TState])
+	name = "GCharacter"
+	merge_traits(sets, [TSolid, TInputAction, TProcess, TState])
 	merge_props(sets, {
 		&"name": "unnamed",
 		&"max_speed": 3,
 		&"touch_radius": 1,
+		&"solid_route_zoffset": -1,
 		
 		&"cur_speed": Vector2(0, 0),
 		&"cur_dir": -1,
@@ -143,25 +145,13 @@ func do_merge(sets: Array[Dictionary]) -> Array[Dictionary]:
 			&"walk": {
 				&"cover": {
 					&"cur_draw": &"walk",
-					&"on_process": func (sekai: Sekai, this: Mono) -> void:
+					&"on_process": func (_sekai, this: Mono) -> void:
 						var cur_speed := this.getp(&"cur_speed") as Vector2
 						if cur_speed != Vector2(0, 0):
 							var delta := this.item.get_delta_time() as float
-							var pos_z := floori(this.position.z)
-							var pos := Vector2(this.position.x, this.position.y)
 							var dpos := cur_speed * delta as Vector2
-							var box := this.getp(&"collision_box") as Rect2
-							box.position += pos + Vector2(dpos.x, 0)
-							if sekai.will_collide(box, pos_z).filter(func (m): return m != this).size() == 0 \
-							and sekai.will_route(box.get_center(), pos_z - 1).size() > 0:
-								pos.x += dpos.x
-							else:
-								box.position -= Vector2(dpos.x, 0)
-							box.position += Vector2(0, dpos.y)
-							if sekai.will_collide(box, pos_z).filter(func (m): return m != this).size() == 0 \
-							and sekai.will_route(box.get_center(), pos_z - 1).size() > 0:
-								pos.y += dpos.y
-							this.position = Vector3(pos.x, pos.y, this.position.z),
+							this.callm(&"solid_move", Vector3(dpos.x, 0, 0))
+							this.callm(&"solid_move", Vector3(0, dpos.y, 0)),
 				},
 				&"on_enter": func (_sekai, this: Mono, _pres) -> void:
 					this.emitm(&"draw_reset"),

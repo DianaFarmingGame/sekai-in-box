@@ -23,7 +23,7 @@
 			corner_sw 	[&static &main (clip_ground 0 2)]
 		}
 		atile_size (vec3 3 3 1)
-		groups [309]
+		groups (prop/pushs [309])
 		atile_matches [[399 309]]
 		atile_rules *atile_rules_3x3x1*
 	}
@@ -39,6 +39,6 @@
 		need_route		#f
 		routable		#f
 		cur_draw &
-		groups [399]
+		groups (prop/pushs [399])
 	}
 )

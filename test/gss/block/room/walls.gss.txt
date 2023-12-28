@@ -19,7 +19,7 @@
 			bottom_right	[&static &main (clip_wall 5 2)]
 		}
 		atile_size (vec3 3 3 1)
-		groups [304 300]
+		groups (prop/pushs [304 300])
 		atile_matches [[304]]
 		atile_rules *atile_wall_rules_3x3x1*
 	}
@@ -39,7 +39,7 @@
 		draw_data {
 			left			[&static &main (clip_wall 3 1)]
 		}
-		groups [304]
+		groups (prop/pushs [304])
 	}
 )
 
@@ -56,7 +56,7 @@
 		draw_data {
 			top_left		[&static &main (clip_wall 3 0)]
 		}
-		groups [304]
+		groups (prop/pushs [304])
 	}
 )
 
@@ -73,7 +73,7 @@
 		draw_data {
 			right			[&static &main (clip_wall 5 1)]
 		}
-		groups [304 300]
+		groups (prop/pushs [304 300])
 	}
 )
 
@@ -92,7 +92,7 @@
 			center			[&static &main (clip_wall 6 1)]
 			bottom_centre	[&static &main (clip_wall 6 2)]
 		}
-		groups [304 300]
+		groups (prop/pushs [304 300])
 		atile_size (vec3 3 3 1)
 		atile_matches [[304]]
 		atile_rules *atile_wall_rules_3x3x1*

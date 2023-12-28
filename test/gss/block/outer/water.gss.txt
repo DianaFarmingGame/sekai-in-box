@@ -27,7 +27,7 @@
 			concaves_ne_sw [&static &main (clip_ground 10 3)]
 		}
 		atile_size (vec3 3 3 1)
-		groups [101]
+		groups (prop/pushs [101])
 		atile_matches [[101]]
 		atile_rules *atile_rules_3x3x1_crossed*
 	})

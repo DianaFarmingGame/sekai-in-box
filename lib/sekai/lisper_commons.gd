@@ -58,20 +58,24 @@ func def_commons(ctx: LisperContext) -> void:
 				args.append(ctx.exec_as_keyword(node))
 				idx += 1
 			return [Lisper.FnType.LP_CALL, args, body.slice(1)],
-		&"proc_call": func (ctx: LisperContext, body: Array) -> ProcedureContext:
+		&"proc/call": func (ctx: LisperContext, body: Array) -> ProcedureContext:
 			var vctx := ProcedureCommons.fork()
 			body = body.map(ctx.exec_node)
 			var handle = body[0]
 			var args = body.slice(1)
 			vctx.call_fn_async(handle, args)
 			return vctx,
-		&"array_concat": func (ctx: LisperContext, body: Array) -> Array:
+		&"array/concat": func (ctx: LisperContext, body: Array) -> Array:
 			var res := []
 			body = body.map(ctx.exec_node)
 			for v in body:
 				assert(v is Array)
 				res.append_array(v)
 			return res,
+		&"array/map": func (ctx: LisperContext, body: Array) -> Variant:
+			var ary := ctx.exec_node(body[0]) as Array
+			var handle = ctx.exec_node(body[1])
+			return ary.map(func (e): return ctx.call_fn(handle, [e])),
 	})
 	ctx.def_fns([Lisper.VarFlag.CONST, Lisper.VarFlag.FIX], Lisper.FnType.GD_RAW, {
 		&"echo": func (ctx: LisperContext, body: Array) -> Variant:
@@ -137,6 +141,12 @@ func def_commons(ctx: LisperContext) -> void:
 			return x * y,
 		&"/": func (x, y) -> Variant:
 			return x / y,
+		&"@": func (src, ref) -> Variant:
+			return src[ref],
+		&"prop/setp": Prop.setp,
+		&"prop/pushs": Prop.pushs,
+		&"prop/puts": Prop.puts,
+		&"prop/mergep": Prop.mergep,
 	})
 	ctx.def_fns([Lisper.VarFlag.CONST, Lisper.VarFlag.FIX], Lisper.FnType.GD_CALL, {
 		&"debug": func (value: Variant) -> Variant:

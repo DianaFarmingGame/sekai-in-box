@@ -1,6 +1,7 @@
 class_name TDrawStatic extends MonoTrait
 
 var id := &"draw_static"
+var requires := [&"draw"]
 
 var props := {
 	&"on_draw": [],

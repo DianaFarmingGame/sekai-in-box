@@ -1,6 +1,7 @@
 class_name TATile extends MonoTrait
 
 var id := &"atile"
+var requires := [&"position"]
 
 var props := {
 	&"atile_size": Vector3(1, 1, 1),
@@ -55,6 +56,6 @@ static func update(sekai: Sekai, this: Mono) -> void:
 			var cover = cfg.get(&"cover")
 			if cover != null: this.cover(&"atile", cover)
 			var vupdate = cfg.get(&"update")
-			if vupdate != null: sekai.gss_ctx.call_anyway(vupdate, [sekai, this])
+			if vupdate != null: sekai.gss_ctx.call_anyway_async(vupdate, [sekai, this])
 			break
 	pass
