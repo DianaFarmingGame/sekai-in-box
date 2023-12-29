@@ -29,7 +29,7 @@ func _ready() -> void:
 	sekai.input_updated.connect(_on_input)
 	
 	sekai.external_fns.merge({
-		&"dialog_say_to": func (_sekai, this: Mono, text: String):
+		&"dialog_say_to": func (_sekai, this: Mono, _meta: Dictionary, text: String):
 			skip_dialog = false
 			dialog.show()
 			dialog.set_content(text)
@@ -44,7 +44,7 @@ func _ready() -> void:
 			await confirmed
 			sekai.block_input()
 			dialog.hide(),
-		&"dialog_choose_single": func (psekai: Sekai, _this, title: String, choices: Array) -> int:
+		&"dialog_choose_single": func (psekai: Sekai, _this, _meta: Dictionary, title: String, choices: Array) -> int:
 			var choose := [0]
 			var update_inner_text := func ():
 				var text := title
