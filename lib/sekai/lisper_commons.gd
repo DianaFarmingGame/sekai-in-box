@@ -19,8 +19,10 @@ func _init() -> void:
 
 func def_commons(ctx: LisperContext) -> void:
 	ctx.def_vars([Lisper.VarFlag.CONST, Lisper.VarFlag.FIX], {
-		&"raw": Lisper.FuncGDRawPure( func (_ctx: LisperContext, body: Array) -> Array:
+		&"raw": Lisper.FuncGDRawPure( func (_ctx, body: Array) -> Array:
 			return body),
+		&"block": Lisper.FuncGDRawPure( func (ctx: LisperContext, body: Array) -> Variant:
+			return ctx.exec(body)[-1]),
 		&"if": Lisper.FuncGDRawPure( func (ctx: LisperContext, body: Array) -> Variant:
 			if ctx.exec_node(body[0]):
 				return ctx.exec_node(body[1])

@@ -20,13 +20,15 @@ func _init() -> void:
 
 func def_commons(ctx: ProcedureContext) -> void:
 	ctx.def_vars([Lisper.VarFlag.CONST, Lisper.VarFlag.FIX], {
-		&"if": Lisper.FuncGDRawPure( func (ctx: LisperContext, body: Array) -> Variant:
+		&"block": Lisper.FuncGDRawPure( func (ctx: ProcedureContext, body: Array) -> Variant:
+			return (await ctx.exec_async(body))[-1]),
+		&"if": Lisper.FuncGDRawPure( func (ctx: ProcedureContext, body: Array) -> Variant:
 			if await ctx.exec_node_async(body[0]):
 				return await ctx.exec_node_async(body[1])
 			elif body.size() > 2:
 				return await ctx.exec_node_async(body[2])
 			return null),
-		&"loop": Lisper.FuncGDRawPure( func (ctx: LisperContext, body: Array) -> Variant:
+		&"loop": Lisper.FuncGDRawPure( func (ctx: ProcedureContext, body: Array) -> Variant:
 			while true:
 				for node in body:
 					await ctx.exec_node_async(node)
@@ -49,4 +51,12 @@ func def_commons(ctx: ProcedureContext) -> void:
 			pass),
 		&"delay": Lisper.FuncGDCall( func (timeout: float) -> void:
 			await get_tree().create_timer(timeout).timeout),
+		&"echo": Lisper.FuncGDRaw( func (ctx: ProcedureContext, body: Array) -> Variant:
+			var msg := []
+			var res
+			for node in body:
+				res = await ctx.exec_node_async(node)
+				msg.append(str(res))
+			print(' '.join(msg))
+			return res),
 	})

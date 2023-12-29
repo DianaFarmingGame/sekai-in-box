@@ -131,7 +131,10 @@ func do_merge(sets: Array[Dictionary]) -> Array[Dictionary]:
 			return not blocked,
 		
 		&"say_to": func (sekai: Sekai, this: Mono, _target: Mono, text: String) -> void:
-			await sekai.external_fns[&"show_dialog"].call(sekai, this, text),
+			await sekai.external_fns[&"dialog_say_to"].call(sekai, this, text),
+		
+		&"choose_single": func (sekai: Sekai, this: Mono, title: String, choices: Array) -> int:
+			return await sekai.external_fns[&"dialog_choose_single"].call(sekai, this, title, choices),
 		
 		&"init_state": &"idle",
 		&"state_data": {
@@ -167,6 +170,23 @@ func do_merge(sets: Array[Dictionary]) -> Array[Dictionary]:
 			&"move_to": Lisper.FuncGDCall(vprops[&"move_to"]),
 			&"move_to_at_speed": Lisper.FuncGDCall(vprops[&"move_to_at_speed"]),
 			&"say_to": Lisper.FuncGDCall(vprops[&"say_to"]),
+			&"choose_single": Lisper.FuncGDRaw( func (ctx: ProcedureContext, body: Array) -> Variant:
+				var handle := vprops[&"choose_single"] as Callable
+				var sekai := await ctx.exec_node_async(body[0]) as Sekai
+				var this := await ctx.exec_node_async(body[1]) as Mono
+				var title := await ctx.exec_node_async(body[2]) as String
+				var patterns := body.slice(3)
+				@warning_ignore("integer_division")
+				var count := patterns.size() / 2
+				var choices := Array()
+				choices.resize(count)
+				var branches := Array()
+				branches.resize(count)
+				for i in count:
+					choices[i] = ctx.exec_as_string(patterns[2 * i]) as String
+					branches[i] = patterns[2 * i + 1] as Array
+				var choose := await handle.call(sekai, this, title, choices) as int
+				return await ctx.exec_node_async(branches[choose])),
 		}),
 	})
 	return sets

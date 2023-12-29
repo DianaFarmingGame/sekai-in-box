@@ -49,12 +49,26 @@ func _clear_monos() -> void:
 	monos_need_collision.clear()
 	monos_need_route.clear()
 
+signal input_updating(triggered: Dictionary, pressings: Dictionary, releasings: Dictionary)
+
 signal input_updated(triggered: Dictionary, pressings: Dictionary, releasings: Dictionary)
 
-func _on_input(triggered: Dictionary, pressings: Dictionary, releasings: Dictionary) -> void:
+var _block_input := false
+
+func block_input() -> void:
+	_block_input = true
+
+func pass_input(triggered: Dictionary, pressings: Dictionary, releasings: Dictionary) -> void:
 	if control_target is Mono:
 		control_target.applym(&"on_input_action", [triggered, pressings, releasings])
 	input_updated.emit(triggered, pressings, releasings)
+
+func _on_input(triggered: Dictionary, pressings: Dictionary, releasings: Dictionary) -> void:
+	input_updating.emit(triggered, pressings, releasings)
+	if _block_input:
+		_block_input = false
+		return
+	pass_input(triggered, pressings, releasings)
 
 func _unhandled_input(event: InputEvent) -> void:
 	input_mapper.update(event)
