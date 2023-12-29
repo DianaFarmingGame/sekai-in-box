@@ -42,7 +42,7 @@ func _ready() -> void:
 					dialog.set_visiable_content(dialog.get_total_character_count())
 				dialog.set_visiable_content(dialog.get_visiable_character_count() + 1)
 			await confirmed
-      accept_event()
+			sekai.block_input()
 			dialog.hide(),
 		&"dialog_choose_single": func (psekai: Sekai, _this, title: String, choices: Array) -> int:
 			var choose := [0]
