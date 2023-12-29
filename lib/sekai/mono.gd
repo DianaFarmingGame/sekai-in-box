@@ -29,6 +29,7 @@ func _on_restore() -> void:
 
 func clone() -> Mono:
 	var mono := get_script().new() as Mono
+	mono.sekai = sekai
 	mono.define = define
 	mono.inited = inited
 	mono.position = position
