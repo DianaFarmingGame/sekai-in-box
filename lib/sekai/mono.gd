@@ -27,6 +27,14 @@ func _on_store() -> void:
 func _on_restore() -> void:
 	emitm(&"on_restore")
 
+func clone() -> Mono:
+	var mono := get_script().new() as Mono
+	mono.define = define
+	mono.inited = inited
+	mono.position = position
+	mono.layers = layers.duplicate(true)
+	return mono
+
 func to_data() -> Dictionary:
 	return {
 		&"ref": define.ref,
