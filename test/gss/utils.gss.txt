@@ -148,7 +148,7 @@
 	}
 ]])
 
-(defvar *atile_rules_3x3x1_crossed* (array_concat *atile_rules_3x3x1* [[
+(defvar *atile_rules_3x3x1_crossed* (array/concat *atile_rules_3x3x1* [[
 	[
 		-	1	1
 		1	0	1
@@ -169,3 +169,217 @@
 		}
 	}
 ]]))
+
+(defvar *atile_wall_rules_3x3x1* [[
+	[
+		0	0	0
+		-	0	0
+		0	-	0
+	] {
+		cover {
+			cur_draw &bottom_left
+		}
+	}
+] [
+	[
+		0	0	0
+		0	0	-
+		0	-	0
+	] {
+		cover {
+			cur_draw &bottom_right
+		}
+	}
+] [
+	[
+		0	0	0
+		0	0	0
+		0	-	0
+	] {
+		cover {
+			cur_draw &bottom_centre
+		}
+	}
+] [
+	[
+		0	-	0
+		-	0	0
+		0	0	0
+	] {
+		cover {
+			cur_draw &top_left
+		}
+	}
+] [
+	[
+		0	-	0
+		0	0	-
+		0	0	0
+	] {
+		cover {
+			cur_draw &top_right
+		}
+	}
+] [
+	[
+		0	-	0
+		0	0	0
+		0	0	0
+	] {
+		cover {
+			cur_draw &top_center
+		}
+	}
+] [
+	[
+		0	0	0
+		-	0	0
+		0	1	0
+	] {
+		cover {
+			cur_draw &left
+		}
+	}
+] [
+	[
+		0	0	0
+		0	0	-
+		0	1	0
+	] {
+		cover {
+			cur_draw &right
+		}
+	}
+] [
+	[
+		0	0	0
+		0	0	0
+		0	1	0
+	] {
+		cover {
+			cur_draw &center
+		}
+	}
+]])
+
+(defvar *atile_top_rules_3x3x1* [[
+	[
+		0	-	0
+		-	0	1
+		0	1	1
+	] {
+		cover {
+			cur_draw &corner_nw
+		}
+	}
+][
+	[
+		0	-	0
+		1	0	-
+		1	1	0
+	] {
+		cover {
+			cur_draw &corner_ne
+		}
+	}
+][
+	[
+		1	1	0
+		1	0	-
+		0	-	0
+	] {
+		cover {
+			cur_draw &corner_se
+		}
+	}
+][
+	[
+		0	1	1
+		-	0	1
+		0	-	0
+	] {
+		cover {
+			cur_draw &corner_sw
+		}
+	}
+][
+	[
+		0	-	0
+		1	0	1
+		0 	-	0
+	] {
+		cover {
+			cur_draw &side_n
+		}
+	}
+][
+	[
+		0	1	0
+		-	0	-
+		0	1	0
+	] {
+		cover {
+			cur_draw &side_e
+		}
+	}
+][
+	[
+		0	-	0
+		1	0	1
+		0	-	0
+	] {
+		cover {
+			cur_draw &side_s
+		}
+	}
+][
+	[
+		0	1	0
+		-	0	-
+		0	1	0
+	] {
+		cover {
+			cur_draw &side_w
+		}
+	}
+][
+	[
+		-	1	1
+		1	0	1
+		1	1	1
+	] {
+		cover {
+			cur_draw &concave_nw
+		}
+	}
+][
+	[
+		1	1	-
+		1	0	1
+		1	1	1
+	] {
+		cover {
+			cur_draw &concave_ne
+		}
+	}
+][
+	[
+		1	1	1
+		1	0	1
+		1	1	-
+	] {
+		cover {
+			cur_draw &concave_se
+		}
+	}
+][
+	[
+		1	1	1
+		1	0	1
+		-	1	1
+	] {
+		cover {
+			cur_draw &concave_sw
+		}
+	}
+]])

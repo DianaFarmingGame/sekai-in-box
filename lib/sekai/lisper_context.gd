@@ -104,6 +104,15 @@ func exec_as_keyword(node: Array) -> Variant:
 	log_error(node, str("unable to convert node to keyword: ", node))
 	return null
 
+func exec_as_string(node: Array) -> Variant:
+	match node[0]:
+		Lisper.TType.TOKEN, Lisper.TType.KEYWORD:
+			return String(node[1])
+		Lisper.TType.STRING:
+			return node[1]
+	log_error(node, str("unable to convert node to string: ", node))
+	return null
+
 @warning_ignore("integer_division")
 func exec_map_part(pairs: Array) -> Dictionary:
 	var res := {}
@@ -155,6 +164,14 @@ func call_fn(handle: Array, vargs: Array) -> Variant:
 		_:
 			push_error("unknown call handle type: ", handle)
 			return null
+
+func call_anyway(handle: Variant, vargs: Array) -> Variant:
+	if handle is Callable:
+		return handle.callv(vargs)
+	if handle is Array:
+		return call_fn(handle, vargs)
+	push_error("unknown call handle type: ", handle)
+	return null
 
 func eval_async(expr: String) -> Variant:
 	var tokens = Lisper.tokenize(expr)
@@ -261,3 +278,11 @@ func call_fn_async(handle: Array, vargs: Array) -> Variant:
 		_:
 			push_error("unknown call handle type: ", handle)
 			return null
+
+func call_anyway_async(handle: Variant, vargs: Array) -> Variant:
+	if handle is Callable:
+		return await handle.callv(vargs)
+	if handle is Array:
+		return await call_fn(handle, vargs)
+	push_error("unknown call handle type: ", handle)
+	return null

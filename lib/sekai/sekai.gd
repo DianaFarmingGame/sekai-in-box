@@ -29,12 +29,15 @@ func _init() -> void:
 
 signal before_process
 
+@onready var input_mapper := InputMapper.new()
+
 func _ready() -> void:
 	_init_sekai()
 	Input.use_accumulated_input = false
 	var tree := get_tree()
 #	tree.root.window_input.connect(_on_input)
 	tree.process_frame.connect(func (): before_process.emit())
+	input_mapper.updated.connect(_on_input)
 
 func _exit_tree() -> void:
 #	print("Sekai exit")
@@ -46,13 +49,29 @@ func _clear_monos() -> void:
 	monos_need_collision.clear()
 	monos_need_route.clear()
 
-func _on_input(event: InputEvent) -> void:
-	if control_target != null:
-		if event is InputEventKey:
-			control_target.callm(&"on_input_key", event)
+signal input_updating(triggered: Dictionary, pressings: Dictionary, releasings: Dictionary)
+
+signal input_updated(triggered: Dictionary, pressings: Dictionary, releasings: Dictionary)
+
+var _block_input := false
+
+func block_input() -> void:
+	_block_input = true
+
+func pass_input(triggered: Dictionary, pressings: Dictionary, releasings: Dictionary) -> void:
+	if control_target is Mono:
+		control_target.applym(&"on_input_action", [triggered, pressings, releasings])
+	input_updated.emit(triggered, pressings, releasings)
+
+func _on_input(triggered: Dictionary, pressings: Dictionary, releasings: Dictionary) -> void:
+	input_updating.emit(triggered, pressings, releasings)
+	if _block_input:
+		_block_input = false
+		return
+	pass_input(triggered, pressings, releasings)
 
 func _unhandled_input(event: InputEvent) -> void:
-	_on_input(event)
+	input_mapper.update(event)
 
 func _init_sekai() -> void:
 	defines.clear()
@@ -73,8 +92,8 @@ func make_lisper_context() -> LisperContext:
 	
 	ctx.def_vars([Lisper.VarFlag.CONST, Lisper.VarFlag.FIX], root_vars)
 	
-	ctx.def_fns([Lisper.VarFlag.CONST, Lisper.VarFlag.FIX], Lisper.FnType.GD_RAW_PURE, {
-		&"make_define": func (ctx: LisperContext, body: Array) -> Variant:
+	ctx.def_vars([Lisper.VarFlag.CONST, Lisper.VarFlag.FIX], {
+		&"make_define": Lisper.FuncGDRawPure( func (ctx: LisperContext, body: Array) -> Variant:
 			var def = ctx.exec_node(body[0])
 			if def != null:
 				def = def.fork()
@@ -88,15 +107,12 @@ func make_lisper_context() -> LisperContext:
 				return def
 			else:
 				ctx.log_error(body[0], str("make_define: ", body[0], " is not a valid token"))
-				return null,
-	})
-	
-	ctx.def_fns([Lisper.VarFlag.CONST, Lisper.VarFlag.FIX], Lisper.FnType.GD_RAW, {
-		&"sign_define": func (ctx: LisperContext, body: Array) -> Variant:
+				return null),
+		&"sign_define": Lisper.FuncGDRaw( func (ctx: LisperContext, body: Array) -> Variant:
 			var def = ctx.exec_node(body[0])
 			sign_define(def)
-			return def,
-		&"make_mono": func (ctx: LisperContext, body: Array) -> Mono:
+			return def),
+		&"make_mono": Lisper.FuncGDRaw( func (ctx: LisperContext, body: Array) -> Mono:
 			var mono_class = ctx.exec_node(body[0])
 			if mono_class != null:
 				var define = get_define(ctx.exec_node(body[1]))
@@ -113,67 +129,58 @@ func make_lisper_context() -> LisperContext:
 				return mono
 			else:
 				ctx.log_error(body[0], str("make_mono: ", body[0], " is not a valid token"))
-				return null,
-		&"mono": func (ctx: LisperContext, body: Array) -> Mono:
+				return null),
+		&"mono": Lisper.FuncGDRaw( func (ctx: LisperContext, body: Array) -> Mono:
 			var mono = ctx.exec_node(Lisper.Call(&"make_mono", [body]))
 			add_mono(mono)
-			return mono,
-		&"mono_map": func (ctx: LisperContext, body: Array) -> MonoMap:
+			return mono),
+		&"mono_map": Lisper.FuncGDRaw( func (ctx: LisperContext, body: Array) -> MonoMap:
 			var map = ctx.exec_node(Lisper.Call(&"make_mono_map", [body]))
 			add_mono(map)
-			return map,
-	})
-	
-	ctx.def_fns([Lisper.VarFlag.CONST, Lisper.VarFlag.FIX], Lisper.FnType.GD_MACRO, {
-		&"Define": func (body: Array) -> Array:
+			return map),
+		&"Define": Lisper.FuncGDMacro( func (body: Array) -> Array:
 			return Lisper.Call(&"defvar", [
 				[body[0]],
 				[Lisper.Call(&"make_define", [
 					body.slice(1),
 				])],
-			]),
-		&"define": func (body: Array) -> Array:
+			])),
+		&"define": Lisper.FuncGDMacro( func (body: Array) -> Array:
 			return Lisper.Call(&"sign_define", [
 				[Lisper.Call(&"make_define", [body])],
-			]),
-		&"import": func (body: Array) -> Array:
+			])),
+		&"import": Lisper.FuncGDMacro( func (body: Array) -> Array:
 			return Lisper.Call(&"defvar", [
 				[body[0]],
 				[Lisper.Call(&"load", [
 					body.slice(1),
 				])],
-			]),
-		&"import_define": func (body: Array) -> Array:
+			])),
+		&"import_define": Lisper.FuncGDMacro( func (body: Array) -> Array:
 			return Lisper.Call(&"defvar", [
 				[body[0]],
 				[Lisper.Call(&"load_define", [
 					body.slice(1),
 				])],
-			]),
-	})
-	
-	ctx.def_fns([Lisper.VarFlag.CONST, Lisper.VarFlag.FIX], Lisper.FnType.GD_CALL, {
-		&"set_control": func (mono: Mono) -> Mono:
+			])),
+		&"set_control": Lisper.FuncGDCall( func (mono: Mono) -> Mono:
 			control_target = mono
-			return mono,
-		&"clear_control": func () -> void:
-			control_target = null,
-	})
-	
-	ctx.def_fns([Lisper.VarFlag.CONST, Lisper.VarFlag.FIX], Lisper.FnType.GD_CALL_PURE, {
-		&"load": func (path: String) -> Resource:
-			return get_assert(path),
-		&"load_define": func (path: String) -> Resource:
-			return get_assert(path).new(),
-		&"load_gss": func (path: String) -> void:
-			load_gss(root_dir.path_join(path)),
-		&"make_mono_map": func (offset: Vector3, cell_size: Vector3, size: Vector2, data := []) -> MonoMap:
+			return mono),
+		&"clear_control": Lisper.FuncGDCall( func () -> void:
+			control_target = null),
+		&"load": Lisper.FuncGDCallPure( func (path: String) -> Resource:
+			return get_assert(path)),
+		&"load_define": Lisper.FuncGDCallPure( func (path: String) -> Resource:
+			return get_assert(path).new()),
+		&"load_gss": Lisper.FuncGDCallPure( func (path: String) -> void:
+			load_gss(root_dir.path_join(path))),
+		&"make_mono_map": Lisper.FuncGDCallPure( func (offset: Vector3, cell_size: Vector3, size: Vector2, data := []) -> MonoMap:
 			var map := MonoMap.new()
 			map.offset = offset
 			map.cell_size = cell_size
 			map.size = size
 			map.data = PackedInt32Array(data)
-			return map,
+			return map),
 	})
 	return ctx
 
@@ -209,6 +216,12 @@ func add_mono(mono) -> void:
 	mono._into_sekai(self)
 	if mono.is_need_collision(): monos_need_collision.append(mono)
 	if mono.is_need_route(): monos_need_route.append(mono)
+
+func remove_mono(mono) -> void:
+	monos_need_collision.erase(mono)
+	monos_need_route.erase(mono)
+	mono._outof_sekai()
+	monos.erase(mono)
 
 func call_ref_method(ref: int, method: StringName, argv := []) -> Variant:
 	var handle := defines[ref].get_method(method) as Callable

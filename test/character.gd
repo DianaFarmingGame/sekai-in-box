@@ -2,32 +2,34 @@ class_name GCharacter extends GEntity
 
 func do_merge(sets: Array[Dictionary]) -> Array[Dictionary]:
 	super.do_merge(sets)
-	merge_traits(sets, [TCollisible, TInputKey, TProcess, TState])
-	merge_props(sets, {
+	name = "GCharacter"
+	merge_traits(sets, [TSolid, TInputAction, TProcess, TState])
+	var vprops := {
 		&"name": "unnamed",
 		&"max_speed": 3,
 		&"touch_radius": 1,
+		&"solid_route_zoffset": -1,
 		
 		&"cur_speed": Vector2(0, 0),
 		&"cur_dir": -1,
 		
-		&"on_input_keys": func (_sekai, this: Mono, keys: Dictionary) -> Dictionary:
+		&"on_input_action": func (_sekai, this: Mono, all: Dictionary, press: Dictionary, _release) -> void:
 			if this.getp(&"cur_state") != &"combo":
-				if keys.get(&"Z"):
+				if press.has(&"combo"):
 					this.callm(&"state_to", &"combo")
 				else:
 					var dir := Vector2(0, 0)
-					if keys.get(&"Up"): dir += Vector2(0, -1)
-					if keys.get(&"Down"): dir += Vector2(0, 1)
-					if keys.get(&"Left"): dir += Vector2(-1, 0)
-					if keys.get(&"Right"): dir += Vector2(1, 0)
+					if all.has(&"ui_up"): dir += Vector2(0, -1)
+					if all.has(&"ui_down"): dir += Vector2(0, 1)
+					if all.has(&"ui_left"): dir += Vector2(-1, 0)
+					if all.has(&"ui_right"): dir += Vector2(1, 0)
 					var speed := dir.normalized() * 3
 					this.setp(&"cur_speed", speed)
 					if speed == Vector2(0, 0):
 						this.callm(&"state_to", &"idle")
 					else:
 						this.callm(&"state_to", &"walk")
-			return keys,
+			pass,
 		
 		&"on_cur_speed": func (_sekai, this: Mono, speed: Vector2) -> Vector2:
 			if speed.x < 0:
@@ -129,7 +131,10 @@ func do_merge(sets: Array[Dictionary]) -> Array[Dictionary]:
 			return not blocked,
 		
 		&"say_to": func (sekai: Sekai, this: Mono, _target: Mono, text: String) -> void:
-			await sekai.external_fns[&"show_dialog"].call(sekai, this, text),
+			await sekai.external_fns[&"dialog_say_to"].call(sekai, this, text),
+		
+		&"choose_single": func (sekai: Sekai, this: Mono, title: String, choices: Array) -> int:
+			return await sekai.external_fns[&"dialog_choose_single"].call(sekai, this, title, choices),
 		
 		&"init_state": &"idle",
 		&"state_data": {
@@ -143,29 +148,45 @@ func do_merge(sets: Array[Dictionary]) -> Array[Dictionary]:
 			&"walk": {
 				&"cover": {
 					&"cur_draw": &"walk",
-					&"on_process": func (sekai: Sekai, this: Mono) -> void:
+					&"on_process": func (_sekai, this: Mono) -> void:
 						var cur_speed := this.getp(&"cur_speed") as Vector2
 						if cur_speed != Vector2(0, 0):
 							var delta := this.item.get_delta_time() as float
-							var pos_z := floori(this.position.z)
-							var pos := Vector2(this.position.x, this.position.y)
 							var dpos := cur_speed * delta as Vector2
-							var box := this.getp(&"collision_box") as Rect2
-							box.position += pos + Vector2(dpos.x, 0)
-							if sekai.will_collide(box, pos_z).filter(func (m): return m != this).size() == 0 \
-							and sekai.will_route(box.get_center(), pos_z - 1).size() > 0:
-								pos.x += dpos.x
-							else:
-								box.position -= Vector2(dpos.x, 0)
-							box.position += Vector2(0, dpos.y)
-							if sekai.will_collide(box, pos_z).filter(func (m): return m != this).size() == 0 \
-							and sekai.will_route(box.get_center(), pos_z - 1).size() > 0:
-								pos.y += dpos.y
-							this.position = Vector3(pos.x, pos.y, this.position.z),
+							this.callm(&"solid_move", Vector3(dpos.x, 0, 0))
+							this.callm(&"solid_move", Vector3(0, dpos.y, 0)),
 				},
 				&"on_enter": func (_sekai, this: Mono, _pres) -> void:
 					this.emitm(&"draw_reset"),
 			},
 		}
+	}
+	merge_props(sets, vprops)
+	merge_props(sets, {
+		&"actions": Prop.mergep({
+			&"face_to": Lisper.FuncGDCall(vprops[&"face_to"]),
+			&"move_by": Lisper.FuncGDCall(vprops[&"move_by"]),
+			&"move_by_at_speed": Lisper.FuncGDCall(vprops[&"move_by_at_speed"]),
+			&"move_to": Lisper.FuncGDCall(vprops[&"move_to"]),
+			&"move_to_at_speed": Lisper.FuncGDCall(vprops[&"move_to_at_speed"]),
+			&"say_to": Lisper.FuncGDCall(vprops[&"say_to"]),
+			&"choose_single": Lisper.FuncGDRaw( func (ctx: ProcedureContext, body: Array) -> Variant:
+				var handle := vprops[&"choose_single"] as Callable
+				var sekai := await ctx.exec_node_async(body[0]) as Sekai
+				var this := await ctx.exec_node_async(body[1]) as Mono
+				var title := await ctx.exec_node_async(body[2]) as String
+				var patterns := body.slice(3)
+				@warning_ignore("integer_division")
+				var count := patterns.size() / 2
+				var choices := Array()
+				choices.resize(count)
+				var branches := Array()
+				branches.resize(count)
+				for i in count:
+					choices[i] = ctx.exec_as_string(patterns[2 * i]) as String
+					branches[i] = patterns[2 * i + 1] as Array
+				var choose := await handle.call(sekai, this, title, choices) as int
+				return await ctx.exec_node_async(branches[choose])),
+		}),
 	})
 	return sets

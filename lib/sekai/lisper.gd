@@ -29,6 +29,16 @@ static func Call(name: StringName, tails = null) -> Array:
 		body.append_array(tail)
 	return List(body)
 
+static func FuncGDRaw(handle: Callable) -> Array: return [FnType.GD_RAW, handle]
+
+static func FuncGDRawPure(handle: Callable) -> Array: return [FnType.GD_RAW_PURE, handle]
+
+static func FuncGDCall(handle: Callable) -> Array: return [FnType.GD_CALL, handle]
+
+static func FuncGDCallPure(handle: Callable) -> Array: return [FnType.GD_CALL_PURE, handle]
+
+static func FuncGDMacro(handle: Callable) -> Array: return [FnType.GD_MACRO, handle]
+
 static func test_parser() -> void:
 	print(Lisper.tokenize("1 0 .5 10 204.2 3.30"))
 	print(Lisper.tokenize("#t #f#t"))

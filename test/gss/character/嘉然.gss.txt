@@ -3,7 +3,7 @@
 	id &嘉然
 	props {
 		name "嘉然"
-		collision_box (rect2 -0.3 -0.1 0.6 0.2)
+		solid_box (rect2 -0.3 -0.1 0.6 0.2)
 		asserts {
 			idle "assert/人物/嘉然/魔女帽站立.png"
 			walk "assert/人物/嘉然/魔女帽行走.png"

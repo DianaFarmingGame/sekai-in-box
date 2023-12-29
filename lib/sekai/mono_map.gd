@@ -43,19 +43,19 @@ func _into_sekai(psekai: Sekai) -> void:
 	for iy in size.y:
 		var layer := layers[iy] as SekaiItem
 		layer.set_y(iy * cell_size.y + offset.y + floorf(offset.z) * 64)
-		var ids := range(iy * size.x, (iy + 1) * size.x).filter(func (i): return map[i] != null)
+		var ids := range(iy * size.x, (iy + 1) * size.x)
 		var need_process := false
 		for i in ids:
-			if map[i].getp(&"need_process"): need_process = true; break
+			if map[i] and map[i].getp(&"need_process"): need_process = true; break
 		if need_process:
 			layer.on_process.connect(func ():
 				for i in ids:
-					if map[i].getp(&"processing"):
+					if map[i] and map[i].getp(&"processing"):
 						map[i].emitm(&"on_process"))
 		layer.on_draw.connect(func () -> void:
 			for i in ids:
-				var mono = map[i]
-				mono.callm(&"on_draw", layer))
+				if map[i]:
+					map[i].callm(&"on_draw", layer))
 		sekai.add_child.call_deferred(layer)
 
 func _outof_sekai() -> void:
@@ -130,6 +130,10 @@ class VarTileMono extends Mono:
 		map = pmap
 		position = pos
 		item = pitem
+	
+	func destroy() -> void:
+		_outof_sekai()
+		map.set_pos(Vector2(position.x, position.y), null)
 		
 	func upgrade() -> VarTileMono:
 		return self
@@ -143,6 +147,10 @@ class ConstTileMono extends Mono:
 		map = pmap
 		position = pos
 		item = pitem
+	
+	func destroy() -> void:
+		_outof_sekai()
+		map.set_pos(Vector2(position.x, position.y), null)
 	
 	func upgrade() -> VarTileMono:
 		var nmono := VarTileMono.new(define, map, position, item)
