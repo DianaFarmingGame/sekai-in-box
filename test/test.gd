@@ -6,6 +6,7 @@ extends Control
 @onready var dialog = $dialog
 
 var picture_dict = {
+	# ^Lane Sun: 使用 preload 可以用相对路径访问文件
 	"嘉心糖": load("res://test/asset/ui/小然立绘/祈求.png"),
 	"嘉然": load("res://test/asset/ui/小然立绘/生气.png"),
 }
