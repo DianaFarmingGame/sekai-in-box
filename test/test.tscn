@@ -1,8 +1,9 @@
-[gd_scene load_steps=6 format=3 uid="uid://cy0i20t42382p"]
+[gd_scene load_steps=7 format=3 uid="uid://cy0i20t42382p"]
 
 [ext_resource type="Script" path="res://test/test.gd" id="1_fugfy"]
 [ext_resource type="FontFile" uid="uid://clrrm68hjw5tu" path="res://test/assert/Cubic_11_1.000_R.ttf" id="1_jnnce"]
 [ext_resource type="Script" path="res://lib/sekai/sekai.gd" id="2_l2l10"]
+[ext_resource type="PackedScene" uid="uid://b4y7w86wfvetv" path="res://test/ui/dialog.tscn" id="4_8aq0t"]
 
 [sub_resource type="FontVariation" id="FontVariation_y4onr"]
 base_font = ExtResource("1_jnnce")
@@ -74,3 +75,5 @@ unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 120)
 layout_mode = 2
 bbcode_enabled = true
+
+[node name="dialog" parent="." instance=ExtResource("4_8aq0t")]

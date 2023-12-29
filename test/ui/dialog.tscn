@@ -1,0 +1,116 @@
+[gd_scene load_steps=11 format=3 uid="uid://b4y7w86wfvetv"]
+
+[ext_resource type="Script" path="res://test/ui/dialog.gd" id="1_dri0j"]
+[ext_resource type="Texture2D" uid="uid://qeh8gglwbcgp" path="res://test/asset/ui/对话框.png" id="1_x824b"]
+[ext_resource type="SystemFont" uid="uid://bvw54ryufwdfi" path="res://test/asset/new_system_font.tres" id="2_u1fhh"]
+[ext_resource type="Texture2D" uid="uid://bec86e4ti8h0b" path="res://test/asset/ui/小然立绘/生气.png" id="3_rv6im"]
+[ext_resource type="Texture2D" uid="uid://hh32m8r64m1y" path="res://test/asset/ui/下一页标.png" id="4_y4ypv"]
+
+[sub_resource type="LabelSettings" id="LabelSettings_qby6o"]
+font = ExtResource("2_u1fhh")
+font_size = 27
+font_color = Color(0.458824, 0.239216, 0, 1)
+
+[sub_resource type="LabelSettings" id="LabelSettings_w5icp"]
+font = ExtResource("2_u1fhh")
+font_size = 27
+font_color = Color(0.941176, 0.423529, 0.627451, 1)
+
+[sub_resource type="Animation" id="Animation_qns6n"]
+length = 0.4
+loop_mode = 1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath(".:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.2),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Vector2(832, 119), Vector2(832, 133)]
+}
+
+[sub_resource type="Animation" id="Animation_mdn2x"]
+resource_name = "new_animation"
+length = 0.6
+loop_mode = 1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath(".:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.3),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Vector2(907, 551), Vector2(907, 545)]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_upscb"]
+_data = {
+"RESET": SubResource("Animation_qns6n"),
+"new_animation": SubResource("Animation_mdn2x")
+}
+
+[node name="dialog" type="CanvasLayer"]
+script = ExtResource("1_dri0j")
+
+[node name="TextureRect" type="TextureRect" parent="."]
+offset_left = 2.0
+offset_top = 426.0
+offset_right = 878.0
+offset_bottom = 598.0
+texture = ExtResource("1_x824b")
+metadata/_edit_use_anchors_ = true
+
+[node name="content" type="Label" parent="."]
+anchors_preset = -1
+anchor_left = 0.258
+anchor_top = 0.689
+anchor_right = 0.928
+anchor_bottom = 0.944
+offset_left = 89.392
+offset_top = 47.04
+offset_right = 22.472
+offset_bottom = -45.2
+grow_horizontal = 2
+grow_vertical = 0
+text = "天王盖地虎，嘉然一米五"
+label_settings = SubResource("LabelSettings_qby6o")
+visible_characters = 0
+visible_ratio = 0.0
+metadata/_edit_use_anchors_ = true
+
+[node name="name" type="Label" parent="."]
+offset_left = 219.0
+offset_top = 448.0
+offset_right = 277.0
+offset_bottom = 490.0
+text = "嘉然"
+label_settings = SubResource("LabelSettings_w5icp")
+metadata/_edit_use_anchors_ = true
+
+[node name="character" type="TextureRect" parent="."]
+offset_left = 19.0
+offset_top = 411.0
+offset_right = 170.0
+offset_bottom = 585.0
+texture = ExtResource("3_rv6im")
+metadata/_edit_use_anchors_ = true
+
+[node name="TextureRect2" type="TextureRect" parent="."]
+offset_left = 832.0
+offset_top = 119.0
+offset_right = 851.0
+offset_bottom = 138.0
+texture = ExtResource("4_y4ypv")
+metadata/_edit_use_anchors_ = true
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="TextureRect2"]
+autoplay = "new_animation"
+libraries = {
+"": SubResource("AnimationLibrary_upscb")
+}
