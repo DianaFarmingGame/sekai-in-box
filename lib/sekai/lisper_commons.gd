@@ -34,6 +34,20 @@ func def_commons(ctx: LisperContext) -> void:
 				for node in body:
 					ctx.exec_node(node)
 			return null),
+		&"loop*": Lisper.FuncGDRaw( func (ctx: ProcedureContext, body: Array) -> Variant:
+			var state := [false, false]
+			var res = [null]
+			var skip_ref := ctx.exec_as_keyword(body[0]) as StringName
+			var escape_ref := ctx.exec_as_keyword(body[1]) as StringName
+			ctx.def_var([], skip_ref, Lisper.FuncGDCall( func (): state[0] = true ))
+			ctx.def_var([], escape_ref, Lisper.FuncGDCall( func (pres = null): res[0] = pres; state[1] = true ))
+			while not state[1]:
+				for node in body:
+					if state[1] or state[0]:
+						state[0] = false
+						break
+					ctx.exec_node(node)
+			return res[0]),
 		&"unfold": Lisper.FuncGDRawPure( func (ctx: LisperContext, body: Array) -> Variant:
 			var size := int(ctx.exec_node(body[0]))
 			var handle = ctx.exec_node(body[1])

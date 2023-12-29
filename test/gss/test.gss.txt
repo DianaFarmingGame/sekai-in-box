@@ -51,17 +51,15 @@
 		(delay 0.5)
 		(do 你 say_to 我 "1～2～1～\n1～2～1～")
 		(delay 0.5)
-		(loop
+		(echo (loop* skip escape
 			(do 我 say_to 你 "说得不错，再来一次！\n1～2～1～\n1～2～1～")
 			(delay 0.5)
 			(do 你 choose_single "做出你的选择："
 				"好的！" (block
 					(do 你 say_to 我 "1～2～1～\n1～2～1～")
 					(delay 0.5))
-				"不要！" (block
-					(break)
-					(delay 0.5))
+				"不要！" (escape "是拒绝的返回值！")
 			)
-		)
+		))
 	)
 	嘉心糖 嘉心糖)
