@@ -12,7 +12,6 @@ func _into_sekai(psekai: Sekai) -> void:
 	define.finalize()
 
 func _outof_sekai() -> void:
-	define = null
 	sekai = null
 
 func _on_init() -> void:

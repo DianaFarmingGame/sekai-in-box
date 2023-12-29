@@ -1,5 +1,7 @@
 class_name TContainer extends MonoTrait
 
+# 注意: 对于实体 (GEntity), 移入容器前需要先令其退出 Sekai
+
 var id := &"container"
 
 var props := {
