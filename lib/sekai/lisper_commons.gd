@@ -19,8 +19,6 @@ func _init() -> void:
 
 func def_commons(ctx: LisperContext) -> void:
 	ctx.def_vars([Lisper.VarFlag.CONST, Lisper.VarFlag.FIX], {
-		&"do": Lisper.FuncGDMacro( func (body: Array) -> Variant:
-			return Lisper.Call(&"callm", [body])),
 		&"raw": Lisper.FuncGDRawPure( func (_ctx: LisperContext, body: Array) -> Array:
 			return body),
 		&"if": Lisper.FuncGDRawPure( func (ctx: LisperContext, body: Array) -> Variant:
@@ -95,6 +93,13 @@ func def_commons(ctx: LisperContext) -> void:
 				ctx.def_var([], vname, data) # TODO
 			else:
 				ctx.log_error(body[0], str("defvar: ", body[0], " is not a valid token"))),
+		&"do": Lisper.FuncGDRaw( func (ctx: LisperContext, body: Array) -> Variant:
+			var this := ctx.exec_node(body[0]) as Mono
+			var act_name := ctx.exec_as_keyword(body[1]) as StringName
+			var action = this.getp(&"actions").get(act_name)
+			var argv := [Lisper.Raw(this.sekai), Lisper.Raw(this)]
+			argv.append_array(body.slice(2))
+			return ctx.call_rawfn(action, argv)),
 		&"callm": Lisper.FuncGDRaw( func (ctx: LisperContext, body: Array) -> Variant:
 			var this := ctx.exec_node(body[0]) as Mono
 			var method := ctx.exec_as_keyword(body[1]) as StringName

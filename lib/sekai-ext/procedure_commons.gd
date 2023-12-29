@@ -31,6 +31,13 @@ func def_commons(ctx: ProcedureContext) -> void:
 				for node in body:
 					await ctx.exec_node_async(node)
 			return null),
+		&"do": Lisper.FuncGDRaw( func (ctx: ProcedureContext, body: Array) -> Variant:
+			var this := await ctx.exec_node_async(body[0]) as Mono
+			var act_name := ctx.exec_as_keyword(body[1]) as StringName
+			var action = this.getp(&"actions").get(act_name)
+			var argv := [Lisper.Raw(this.sekai), Lisper.Raw(this)]
+			argv.append_array(body.slice(2))
+			return await ctx.call_rawfn_async(action, argv)),
 		&"callm": Lisper.FuncGDRaw( func (ctx: ProcedureContext, body: Array) -> Variant:
 			var this := await ctx.exec_node_async(body[0]) as Mono
 			var method := ctx.exec_as_keyword(body[1]) as StringName

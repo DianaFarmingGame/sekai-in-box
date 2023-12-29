@@ -4,7 +4,7 @@ func do_merge(sets: Array[Dictionary]) -> Array[Dictionary]:
 	super.do_merge(sets)
 	name = "GCharacter"
 	merge_traits(sets, [TSolid, TInputAction, TProcess, TState])
-	merge_props(sets, {
+	var vprops := {
 		&"name": "unnamed",
 		&"max_speed": 3,
 		&"touch_radius": 1,
@@ -157,5 +157,16 @@ func do_merge(sets: Array[Dictionary]) -> Array[Dictionary]:
 					this.emitm(&"draw_reset"),
 			},
 		}
+	}
+	merge_props(sets, vprops)
+	merge_props(sets, {
+		&"actions": Prop.mergep({
+			&"face_to": Lisper.FuncGDCall(vprops[&"face_to"]),
+			&"move_by": Lisper.FuncGDCall(vprops[&"move_by"]),
+			&"move_by_at_speed": Lisper.FuncGDCall(vprops[&"move_by_at_speed"]),
+			&"move_to": Lisper.FuncGDCall(vprops[&"move_to"]),
+			&"move_to_at_speed": Lisper.FuncGDCall(vprops[&"move_to_at_speed"]),
+			&"say_to": Lisper.FuncGDCall(vprops[&"say_to"]),
+		}),
 	})
 	return sets

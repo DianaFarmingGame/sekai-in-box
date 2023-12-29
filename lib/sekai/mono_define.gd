@@ -28,5 +28,7 @@ func do_merge(sets: Array[Dictionary]) -> Array[Dictionary]:
 		&"on_inited": [],
 		&"on_store": [],
 		&"on_restore": [],
+		
+		&"actions": {},
 	})
 	return sets
