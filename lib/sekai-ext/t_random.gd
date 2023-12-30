@@ -3,7 +3,7 @@ class_name TRandom extends MonoTrait
 var id := &"random"
 
 var props := {
-	&"random_rules": [],
+	&"random_rules": Prop.Stack([]),
 	&"random_cur": 0,
 	&"on_init": Prop.puts({
 		&"-99:random": TRandom.update,

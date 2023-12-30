@@ -21,7 +21,7 @@ func _init() -> void:
 func def_commons(ctx: ProcedureContext) -> void:
 	ctx.def_vars([Lisper.VarFlag.CONST, Lisper.VarFlag.FIX], {
 		&"block": Lisper.FuncGDRawPure( func (ctx: ProcedureContext, body: Array) -> Variant:
-			return (await ctx.exec_async(body))[-1]),
+			return (await ctx.exec_async(body))[-1] if body.size() > 0 else null),
 		&"if": Lisper.FuncGDRawPure( func (ctx: ProcedureContext, body: Array) -> Variant:
 			if await ctx.exec_node_async(body[0]):
 				return await ctx.exec_node_async(body[1])

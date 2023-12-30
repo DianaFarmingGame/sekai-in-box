@@ -29,7 +29,7 @@ script = ExtResource("1_fugfy")
 texture_filter = 3
 script = ExtResource("2_l2l10")
 define_gss = "res://test/gss/define.gss.txt"
-entry_gss = "res://test/gss/main.gss.txt"
+entry_gss = "res://test/gss/test/test.gss.txt"
 root_dir = "res://test"
 unit_size = Vector3(64, 64, 64)
 

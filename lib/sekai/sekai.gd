@@ -21,6 +21,7 @@ static var root_vars := {
 	&"Entity": GEntity.new(),
 	&"Tile": GTile.new(),
 	
+	&"Mono": Mono,
 	&"MonoEntity": MonoEntity,
 }
 
@@ -202,6 +203,7 @@ func load_gss(path: String) -> void:
 	_indent -= 1
 
 func sign_define(define: MonoDefine) -> void:
+	define.finalize()
 	if define.ref >= defines.size(): defines.resize(define.ref + 1)
 	defines[define.ref] = define
 	if define.id != null and define.id != &"":

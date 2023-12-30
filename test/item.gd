@@ -3,7 +3,7 @@ class_name GItem extends GElement
 func do_merge(sets: Array[Dictionary]) -> Array[Dictionary]:
 	super.do_merge(sets)
 	name = "GItem"
-	merge_traits(sets, [TGroup, TStackable])
+	merge_traits(sets, [TGroup, TStackable, TIcon])
 	merge_props(sets, {
 		&"pickable": true, # 能否取得
 		

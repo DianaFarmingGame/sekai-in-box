@@ -24,7 +24,7 @@ ProcedureCommons="*res://lib/sekai-ext/procedure_commons.gd"
 [display]
 
 window/size/viewport_width=576
-window/size/viewport_height=1024
+window/size/viewport_height=640
 window/vsync/vsync_mode=2
 window/defaults/default_clear_color=Color(1, 1, 1, 1)
 

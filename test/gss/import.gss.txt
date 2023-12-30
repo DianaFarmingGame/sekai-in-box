@@ -3,3 +3,5 @@
 (import_define 	BlockStaticExt	"block_static_ext.gd")
 (import_define 	Character 		"character.gd")
 (import_define 	Item 			"item.gd")
+(import_define 	Drop 			"drop.gd")
+(sign_define 	Drop)

@@ -22,7 +22,7 @@ func def_commons(ctx: LisperContext) -> void:
 		&"raw": Lisper.FuncGDRawPure( func (_ctx, body: Array) -> Array:
 			return body),
 		&"block": Lisper.FuncGDRawPure( func (ctx: LisperContext, body: Array) -> Variant:
-			return ctx.exec(body)[-1]),
+			return ctx.exec(body)[-1] if body.size() > 0 else null),
 		&"if": Lisper.FuncGDRawPure( func (ctx: LisperContext, body: Array) -> Variant:
 			if ctx.exec_node(body[0]):
 				return ctx.exec_node(body[1])
