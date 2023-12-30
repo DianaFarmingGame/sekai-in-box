@@ -9,7 +9,7 @@ var props := {
 	&"container_capacity": 256,
 	
 	&"container_put": func (_sekai, this: Mono, item: Mono) -> bool:
-		var contains := this.getp(&"contains") as Array
+		var contains := this.getpBD(&"contains", []) as Array
 		if item.getp(&"stackable"):
 			var putted := false
 			for mono in contains:
@@ -19,15 +19,16 @@ var props := {
 			if putted: return true
 		if contains.size() < this.getp(&"container_capacity"):
 			contains.append(item)
+			this.setp(&"contains", contains)
 			return true
 		return false,
 	&"container_pick": func (_sekai, this: Mono, item: Mono) -> Mono:
-		var contains := this.getp(&"contains") as Array
+		var contains := this.getpBD(&"contains", []) as Array
 		contains.erase(item)
 		this.setp(&"contains", contains)
 		return item,
 	&"container_pick_by_ref": func (_sekai, this: Mono, ref: int, count := 1) -> Variant:
-		var contains := this.getp(&"contains") as Array
+		var contains := this.getpBD(&"contains", []) as Array
 		var try_count := count
 		for mono in contains:
 			if try_count <= 0: break

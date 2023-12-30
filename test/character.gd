@@ -31,6 +31,17 @@ func do_merge(sets: Array[Dictionary]) -> Array[Dictionary]:
 						this.callm(&"state_to", &"walk")
 			pass,
 		
+		&"on_move": func (_sekai, this: Mono) -> void:
+			var collides := this.emitm(&"solid_collide_all_by") as Array
+			var drops := collides.filter(func (m): return m.callm(&"group_in", &"drop"))
+			for drop in drops:
+				for item in drop.getp("contains"):
+					if this.callm(&"container_put", item):
+						drop.callm(&"container_pick", item)
+				if drop.getp("contains").size() == 0:
+					drop.destroy()
+			pass,
+		
 		&"on_cur_speed": func (_sekai, this: Mono, speed: Vector2) -> Vector2:
 			if speed.x < 0:
 				this.setp(&"cur_dir", -1)

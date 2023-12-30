@@ -5,10 +5,13 @@ func do_merge(sets: Array[Dictionary]) -> Array[Dictionary]:
 	name = "GDrop"
 	ref = 0
 	id = "drop"
-	merge_traits(sets, [TSolid, TProcess, TContainer, TSmallShadow])
+	merge_traits(sets, [TGroup, TCollisible, TSolid, TProcess, TContainer, TSmallShadow])
 	merge_props(sets, {
 		&"float_radius": 0.03,
-		&"float_cycle_time": 0.6,
+		&"float_cycle_time": 1.2,
+		
+		&"groups": [&"drop"],
+		
 		&"on_draw": Prop.puts({
 			&"0:drop_item": func (_sekai, this: Mono, sitem: SekaiItem) -> void:
 				var pos := Vector2(this.position.x, this.position.y - this.position.z * sitem.ratio_yz)
