@@ -4,7 +4,7 @@ var id := &"draw_static"
 var requires := [&"draw"]
 
 var props := {
-	&"on_draw": [],
+	&"on_draw": Prop.Stack([]),
 	&"on_init": Prop.puts({
 		&"99:draw_static": TDrawStatic.update,
 	}),

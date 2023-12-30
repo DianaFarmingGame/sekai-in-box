@@ -3,9 +3,11 @@ extends Control
 @onready var sekai := $Sekai as Sekai
 @onready var dialog_inner := %DialogInner as RichTextLabel
 @onready var dialog_box := %DialogBox as Control
+@onready var item_box := %ItemBox as ItemList
 @onready var dialog = $dialog
 
 var picture_dict = {
+	# ^Lane Sun: 使用 preload 可以用相对路径访问文件
 	"嘉心糖": load("res://test/asset/ui/小然立绘/祈求.png"),
 	"嘉然": load("res://test/asset/ui/小然立绘/生气.png"),
 }
@@ -29,7 +31,7 @@ func _ready() -> void:
 	sekai.input_updated.connect(_on_input)
 	
 	sekai.external_fns.merge({
-		&"dialog_say_to": func (_sekai, this: Mono, text: String):
+		&"dialog_say_to": func (_sekai, this: Mono, _meta: Dictionary, text: String):
 			skip_dialog = false
 			dialog.show()
 			dialog.set_content(text)
@@ -42,9 +44,9 @@ func _ready() -> void:
 					dialog.set_visiable_content(dialog.get_total_character_count())
 				dialog.set_visiable_content(dialog.get_visiable_character_count() + 1)
 			await confirmed
-      accept_event()
+			sekai.block_input()
 			dialog.hide(),
-		&"dialog_choose_single": func (psekai: Sekai, _this, title: String, choices: Array) -> int:
+		&"dialog_choose_single": func (psekai: Sekai, _this, _meta: Dictionary, title: String, choices: Array) -> int:
 			var choose := [0]
 			var update_inner_text := func ():
 				var text := title
@@ -78,6 +80,15 @@ func _ready() -> void:
 					continue
 			dialog_box.visible = false
 			return choose[0],
+		&"itembox_update": func (_sekai, _this, contains: Array) -> void:
+			item_box.clear()
+			for item in contains:
+				var vname := item.getp(&"name") as String
+				var icon := item.emitm(&"icon_get_texture") as Texture2D
+				var text := vname
+				if item.getp(&"stackable"):
+					text += " x" + str(item.getp(&"stack_count"))
+				item_box.add_item(text, icon),
 	})
 
 signal confirmed

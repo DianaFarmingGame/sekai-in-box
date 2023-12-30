@@ -21,7 +21,7 @@ func _init() -> void:
 func def_commons(ctx: ProcedureContext) -> void:
 	ctx.def_vars([Lisper.VarFlag.CONST, Lisper.VarFlag.FIX], {
 		&"block": Lisper.FuncGDRawPure( func (ctx: ProcedureContext, body: Array) -> Variant:
-			return (await ctx.exec_async(body))[-1]),
+			return (await ctx.exec_async(body))[-1] if body.size() > 0 else null),
 		&"if": Lisper.FuncGDRawPure( func (ctx: ProcedureContext, body: Array) -> Variant:
 			if await ctx.exec_node_async(body[0]):
 				return await ctx.exec_node_async(body[1])
@@ -33,6 +33,20 @@ func def_commons(ctx: ProcedureContext) -> void:
 				for node in body:
 					await ctx.exec_node_async(node)
 			return null),
+		&"loop*": Lisper.FuncGDRaw( func (ctx: ProcedureContext, body: Array) -> Variant:
+			var state := [false, false]
+			var res = [null]
+			var skip_ref := ctx.exec_as_keyword(body[0]) as StringName
+			var escape_ref := ctx.exec_as_keyword(body[1]) as StringName
+			ctx.def_var([], skip_ref, Lisper.FuncGDCall( func (): state[0] = true ))
+			ctx.def_var([], escape_ref, Lisper.FuncGDCall( func (pres = null): res[0] = pres; state[1] = true ))
+			while not state[1]:
+				for node in body:
+					if state[1] or state[0]:
+						state[0] = false
+						break
+					await ctx.exec_node_async(node)
+			return res[0]),
 		&"do": Lisper.FuncGDRaw( func (ctx: ProcedureContext, body: Array) -> Variant:
 			var this := await ctx.exec_node_async(body[0]) as Mono
 			var act_name := ctx.exec_as_keyword(body[1]) as StringName

@@ -3,7 +3,7 @@ class_name GCharacter extends GEntity
 func do_merge(sets: Array[Dictionary]) -> Array[Dictionary]:
 	super.do_merge(sets)
 	name = "GCharacter"
-	merge_traits(sets, [TSolid, TInputAction, TProcess, TState])
+	merge_traits(sets, [TSolid, TInputAction, TProcess, TState, TContainer])
 	var vprops := {
 		&"name": "unnamed",
 		&"max_speed": 3,
@@ -30,6 +30,21 @@ func do_merge(sets: Array[Dictionary]) -> Array[Dictionary]:
 					else:
 						this.callm(&"state_to", &"walk")
 			pass,
+		
+		&"on_move": func (_sekai, this: Mono) -> void:
+			var collides := this.emitm(&"solid_collide_all_by") as Array
+			var drops := collides.filter(func (m): return m.callm(&"group_in", &"drop"))
+			for drop in drops:
+				for item in drop.getp("contains"):
+					if this.callm(&"container_put", item):
+						drop.callm(&"container_pick", item)
+				if drop.getp("contains").size() == 0:
+					drop.destroy()
+			pass,
+		
+		&"on_contains": func (sekai: Sekai, this: Mono, contains: Array) -> Array:
+			sekai.external_fns[&"itembox_update"].call(sekai, this, contains)
+			return contains,
 		
 		&"on_cur_speed": func (_sekai, this: Mono, speed: Vector2) -> Vector2:
 			if speed.x < 0:
@@ -130,11 +145,17 @@ func do_merge(sets: Array[Dictionary]) -> Array[Dictionary]:
 			this.callm(&"state_to", &"idle")
 			return not blocked,
 		
-		&"say_to": func (sekai: Sekai, this: Mono, _target: Mono, text: String) -> void:
-			await sekai.external_fns[&"dialog_say_to"].call(sekai, this, text),
+		&"say_to": func (sekai: Sekai, this: Mono, _target: Mono, meta_text, text = null) -> void:
+			if text != null:
+				await sekai.external_fns[&"dialog_say_to"].call(sekai, this, meta_text, text)
+			else:
+				await sekai.external_fns[&"dialog_say_to"].call(sekai, this, {}, meta_text),
 		
-		&"choose_single": func (sekai: Sekai, this: Mono, title: String, choices: Array) -> int:
-			return await sekai.external_fns[&"dialog_choose_single"].call(sekai, this, title, choices),
+		&"choose_single": func (sekai: Sekai, this: Mono, meta_arg1, arg1, arg2 = null) -> int:
+			if arg2 != null:
+				return await sekai.external_fns[&"dialog_choose_single"].call(sekai, this, meta_arg1, arg1, arg2)
+			else:
+				return await sekai.external_fns[&"dialog_choose_single"].call(sekai, this, {}, meta_arg1, arg1),
 		
 		&"init_state": &"idle",
 		&"state_data": {
@@ -171,13 +192,21 @@ func do_merge(sets: Array[Dictionary]) -> Array[Dictionary]:
 			&"move_to_at_speed": Lisper.FuncGDCall(vprops[&"move_to_at_speed"]),
 			&"say_to": Lisper.FuncGDCall(vprops[&"say_to"]),
 			&"choose_single": Lisper.FuncGDRaw( func (ctx: ProcedureContext, body: Array) -> Variant:
-				var handle := vprops[&"choose_single"] as Callable
 				var sekai := await ctx.exec_node_async(body[0]) as Sekai
 				var this := await ctx.exec_node_async(body[1]) as Mono
-				var title := await ctx.exec_node_async(body[2]) as String
-				var patterns := body.slice(3)
+				var meta = {}
+				var title = null
+				var patterns = null
+				var meta_title = await ctx.exec_node_async(body[2])
+				if meta_title is Dictionary:
+					meta = meta_title
+					title = await ctx.exec_node_async(body[3])
+					patterns = body.slice(4)
+				else:
+					title = meta_title
+					patterns = body.slice(3)
 				@warning_ignore("integer_division")
-				var count := patterns.size() / 2
+				var count := patterns.size() / 2 as int
 				var choices := Array()
 				choices.resize(count)
 				var branches := Array()
@@ -185,7 +214,7 @@ func do_merge(sets: Array[Dictionary]) -> Array[Dictionary]:
 				for i in count:
 					choices[i] = ctx.exec_as_string(patterns[2 * i]) as String
 					branches[i] = patterns[2 * i + 1] as Array
-				var choose := await handle.call(sekai, this, title, choices) as int
+				var choose := await vprops[&"choose_single"].call(sekai, this, meta, title, choices) as int
 				return await ctx.exec_node_async(branches[choose])),
 		}),
 	})

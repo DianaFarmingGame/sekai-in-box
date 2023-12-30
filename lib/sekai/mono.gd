@@ -7,13 +7,11 @@ var inited := false
 var position := Vector3(0, 0, 0)
 var layers := []
 
-func _into_sekai(psekai: Sekai) -> void:
-	sekai = psekai
+func _into_sekai() -> void:
 	define.finalize()
 
 func _outof_sekai() -> void:
-	define = null
-	sekai = null
+	pass
 
 func _on_init() -> void:
 	if not inited:
@@ -26,6 +24,15 @@ func _on_store() -> void:
 
 func _on_restore() -> void:
 	emitm(&"on_restore")
+
+func clone() -> Mono:
+	var mono := get_script().new() as Mono
+	mono.sekai = sekai
+	mono.define = define
+	mono.inited = inited
+	mono.position = position
+	mono.layers = layers.duplicate(true)
+	return mono
 
 func to_data() -> Dictionary:
 	return {
@@ -68,8 +75,8 @@ func uncover(layer_name: StringName) -> void:
 			layers.remove_at(lidx)
 			return
 
-func call_watcher(key: StringName, value: Variant) -> Variant:
-	if getp(key) != value:
+func call_watcher(key: StringName, value: Variant, force := false) -> Variant:
+	if force or getp(key) != value:
 		var hkey = StringName("on_" + key)
 		var handle = define._props.get(hkey)
 		if handle != null: value = handle.call(sekai, self, value)

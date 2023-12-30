@@ -71,5 +71,3 @@
 	props {
 		position (vec3 3 5 1)
 	})))
-
-(load_gss "gss/test.gss.txt")

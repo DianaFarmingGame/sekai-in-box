@@ -2,8 +2,8 @@ class_name MonoEntity extends Mono
 
 var item: SekaiItem
 
-func _into_sekai(psekai: Sekai) -> void:
-	super._into_sekai(psekai)
+func _into_sekai() -> void:
+	super._into_sekai()
 	
 	_clear_item()
 	item = sekai.make_item()
