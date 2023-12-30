@@ -7,12 +7,11 @@ var inited := false
 var position := Vector3(0, 0, 0)
 var layers := []
 
-func _into_sekai(psekai: Sekai) -> void:
-	sekai = psekai
+func _into_sekai() -> void:
 	define.finalize()
 
 func _outof_sekai() -> void:
-	sekai = null
+	pass
 
 func _on_init() -> void:
 	if not inited:
@@ -76,8 +75,8 @@ func uncover(layer_name: StringName) -> void:
 			layers.remove_at(lidx)
 			return
 
-func call_watcher(key: StringName, value: Variant) -> Variant:
-	if getp(key) != value:
+func call_watcher(key: StringName, value: Variant, force := false) -> Variant:
+	if force or getp(key) != value:
 		var hkey = StringName("on_" + key)
 		var handle = define._props.get(hkey)
 		if handle != null: value = handle.call(sekai, self, value)

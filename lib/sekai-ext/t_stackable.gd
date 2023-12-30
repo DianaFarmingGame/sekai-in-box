@@ -13,7 +13,7 @@ var props := {
 		and item.getp(&"stackable"):
 			var icount := item.getp(&"stack_count") as int
 			var res = this.callm(&"stack_put_count", icount)
-			if res == true:
+			if is_same(res, true):
 				return true
 			else:
 				item.setp(&"stack_count", icount - res)

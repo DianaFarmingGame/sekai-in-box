@@ -42,6 +42,10 @@ func do_merge(sets: Array[Dictionary]) -> Array[Dictionary]:
 					drop.destroy()
 			pass,
 		
+		&"on_contains": func (sekai: Sekai, this: Mono, contains: Array) -> Array:
+			sekai.external_fns[&"itembox_update"].call(sekai, this, contains)
+			return contains,
+		
 		&"on_cur_speed": func (_sekai, this: Mono, speed: Vector2) -> Vector2:
 			if speed.x < 0:
 				this.setp(&"cur_dir", -1)

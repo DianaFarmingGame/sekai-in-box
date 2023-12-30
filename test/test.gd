@@ -3,6 +3,7 @@ extends Control
 @onready var sekai := $Sekai as Sekai
 @onready var dialog_inner := %DialogInner as RichTextLabel
 @onready var dialog_box := %DialogBox as Control
+@onready var item_box := %ItemBox as ItemList
 @onready var dialog = $dialog
 
 var picture_dict = {
@@ -79,6 +80,15 @@ func _ready() -> void:
 					continue
 			dialog_box.visible = false
 			return choose[0],
+		&"itembox_update": func (_sekai, _this, contains: Array) -> void:
+			item_box.clear()
+			for item in contains:
+				var vname := item.getp(&"name") as String
+				var icon := item.emitm(&"icon_get_texture") as Texture2D
+				var text := vname
+				if item.getp(&"stackable"):
+					text += " x" + str(item.getp(&"stack_count"))
+				item_box.add_item(text, icon),
 	})
 
 signal confirmed

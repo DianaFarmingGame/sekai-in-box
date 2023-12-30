@@ -119,6 +119,7 @@ func make_lisper_context() -> LisperContext:
 				var define = get_define(ctx.exec_node(body[1]))
 				if define == null: return null
 				var mono := mono_class.new() as Mono
+				mono.sekai = self
 				mono.define = define
 				var args = ctx.exec_map_part(body.slice(2))
 				for k in args.keys():
@@ -177,6 +178,7 @@ func make_lisper_context() -> LisperContext:
 			load_gss(root_dir.path_join(path))),
 		&"make_mono_map": Lisper.FuncGDCallPure( func (offset: Vector3, cell_size: Vector3, size: Vector2, data := []) -> MonoMap:
 			var map := MonoMap.new()
+			map.sekai = self
 			map.offset = offset
 			map.cell_size = cell_size
 			map.size = size
@@ -215,7 +217,7 @@ func sign_define(define: MonoDefine) -> void:
 
 func add_mono(mono) -> void:
 	monos.append(mono)
-	mono._into_sekai(self)
+	mono._into_sekai()
 	if mono.is_need_collision(): monos_need_collision.append(mono)
 	if mono.is_need_route(): monos_need_route.append(mono)
 

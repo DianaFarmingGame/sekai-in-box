@@ -77,3 +77,17 @@ layout_mode = 2
 bbcode_enabled = true
 
 [node name="dialog" parent="." instance=ExtResource("4_8aq0t")]
+
+[node name="ItemBox" type="ItemList" parent="."]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(160, 80)
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -20.0
+offset_top = 60.0
+offset_right = -20.0
+offset_bottom = 60.0
+grow_horizontal = 0
+auto_height = true

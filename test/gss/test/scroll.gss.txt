@@ -2,9 +2,11 @@
 	ref 500
 	id &卷轴
 	props {
+		name "卷轴"
+		
 		pickable #t
 		stackable #t
-		stack_capacity 99
+		stack_capacity 16
 	
 		chargeable #f
 		charge_point 1

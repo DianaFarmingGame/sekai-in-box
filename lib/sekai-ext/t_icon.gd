@@ -10,5 +10,13 @@ var props := {
 		var icon := this.getp(&"icon") as Array
 		var texture = this.callm(&"assert_get", icon[0])
 		var clip = icon[1]
-		item.pen_draw_texture_region(texture, rect, clip, pmodulate)
+		item.pen_draw_texture_region(texture, rect, clip, pmodulate),
+	&"icon_get_texture": func (_sekai, this: Mono) -> Texture2D:
+		var icon := this.getp(&"icon") as Array
+		var texture = this.callm(&"assert_get", icon[0])
+		var clip = icon[1]
+		var res := AtlasTexture.new()
+		res.atlas = texture
+		res.region = clip
+		return res,
 }
