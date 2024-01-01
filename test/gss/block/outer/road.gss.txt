@@ -1,5 +1,5 @@
-(defvar make_road (func [ref x_offset diverse]
-	(make_define BlockStaticExt
+(defvar road/make (func [ref x_offset diverse]
+	(define/make BlockStaticExt
 		ref ref
 		props {
 			need_route #f
@@ -46,7 +46,7 @@
 			atile_rules *atile_rules_3x3x1_crossed*
 		})))
 
-(sign_define (make_road 105 0 #f))
-(sign_define (make_road 106 3 #t))
-(sign_define (make_road 107 6 #f))
-(sign_define (make_road 108 9 #t))
+(define/sign (road/make 105 0 #f))
+(define/sign (road/make 106 3 #t))
+(define/sign (road/make 107 6 #f))
+(define/sign (road/make 108 9 #t))
