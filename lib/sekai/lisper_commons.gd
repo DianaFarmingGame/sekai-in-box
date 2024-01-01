@@ -88,6 +88,17 @@ func def_commons(ctx: LisperContext) -> void:
 			var ary := ctx.exec_node(body[0]) as Array
 			var handle = ctx.exec_node(body[1])
 			return ary.map(func (e): return ctx.call_fn(handle, [e]))),
+		&"array/slice": Lisper.FuncGDRawPure( func (ctx: LisperContext, body: Array) -> Variant:
+			var ary := ctx.exec_node(body[0]) as Array
+			var begin := 0
+			var end := ary.size()
+			var step := 1
+			var deep := false
+			if body.size() >= 2: begin = ctx.exec_node(body[1]);\
+			if body.size() >= 3: end = ctx.exec_node(body[2]);\
+			if body.size() >= 4: step = ctx.exec_node(body[3]);\
+			if body.size() >= 5: deep = ctx.exec_node(body[4])
+			return ary.slice(begin, end, step, deep)),
 		&"echo": Lisper.FuncGDRaw( func (ctx: LisperContext, body: Array) -> Variant:
 			var msg := []
 			var res
@@ -158,6 +169,8 @@ func def_commons(ctx: LisperContext) -> void:
 			return x / y),
 		&"@": Lisper.FuncGDCallPure( func (src, ref) -> Variant:
 			return src[ref]),
+		&"@=": Lisper.FuncGDCallPure( func (src, ref, value) -> void:
+			src[ref] = value),
 		&"prop/setp": Lisper.FuncGDCallPure(Prop.setp),
 		&"prop/pushs": Lisper.FuncGDCallPure(Prop.pushs),
 		&"prop/puts": Lisper.FuncGDCallPure(Prop.puts),

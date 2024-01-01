@@ -19,10 +19,7 @@
 			[1 { cover { cur_draw &water_lily1 }}]
 			[1 { cover { cur_draw &water_lily2 }}]
 			[1 { cover { cur_draw &water_lily3 }}]
-			[10 {
-				update (func [sekai this]
-					(queue_destroy this))
-			}]
+			[10 { cover { need_destroy #t }}]
 		]
 		atile_size (vec3 3 3 3)
 		atile_matches [[101]]
@@ -53,9 +50,6 @@
 				0	0	0
 				0	0	0
 				0	0	0
-			] {
-				update (func [sekai this]
-					(queue_destroy this))
-			}
+			] { cover { need_destroy #t }}
 		]]
 	})

@@ -80,8 +80,8 @@ func _init_sekai() -> void:
 	gss_ctx = make_lisper_context()
 	_clear_monos()
 	control_target = null
-	if define_gss: load_gss(define_gss)
-	if entry_gss: load_gss(entry_gss)
+	if define_gss: exec_gss(define_gss)
+	if entry_gss: exec_gss(entry_gss)
 	var stime := Time.get_ticks_usec()
 	for mono in monos:
 		mono._on_init()
@@ -94,7 +94,7 @@ func make_lisper_context() -> LisperContext:
 	ctx.def_vars([Lisper.VarFlag.CONST, Lisper.VarFlag.FIX], root_vars)
 	
 	ctx.def_vars([Lisper.VarFlag.CONST, Lisper.VarFlag.FIX], {
-		&"make_define": Lisper.FuncGDRawPure( func (ctx: LisperContext, body: Array) -> Variant:
+		&"define/make": Lisper.FuncGDRawPure( func (ctx: LisperContext, body: Array) -> Variant:
 			var def = ctx.exec_node(body[0])
 			if def != null:
 				def = def.fork()
@@ -107,13 +107,13 @@ func make_lisper_context() -> LisperContext:
 							def.set(k, args[k])
 				return def
 			else:
-				ctx.log_error(body[0], str("make_define: ", body[0], " is not a valid token"))
+				ctx.log_error(body[0], str("define/make: ", body[0], " is not a valid token"))
 				return null),
-		&"sign_define": Lisper.FuncGDRaw( func (ctx: LisperContext, body: Array) -> Variant:
+		&"define/sign": Lisper.FuncGDRaw( func (ctx: LisperContext, body: Array) -> Variant:
 			var def = ctx.exec_node(body[0])
 			sign_define(def)
 			return def),
-		&"make_mono": Lisper.FuncGDRaw( func (ctx: LisperContext, body: Array) -> Mono:
+		&"mono/make": Lisper.FuncGDRaw( func (ctx: LisperContext, body: Array) -> Mono:
 			var mono_class = ctx.exec_node(body[0])
 			if mono_class != null:
 				var define = get_define(ctx.exec_node(body[1]))
@@ -130,26 +130,26 @@ func make_lisper_context() -> LisperContext:
 							mono.set(k, args[k])
 				return mono
 			else:
-				ctx.log_error(body[0], str("make_mono: ", body[0], " is not a valid token"))
+				ctx.log_error(body[0], str("mono/make: ", body[0], " is not a valid token"))
 				return null),
 		&"mono": Lisper.FuncGDRaw( func (ctx: LisperContext, body: Array) -> Mono:
-			var mono = ctx.exec_node(Lisper.Call(&"make_mono", [body]))
+			var mono = ctx.exec_node(Lisper.Call(&"mono/make", [body]))
 			add_mono(mono)
 			return mono),
 		&"mono_map": Lisper.FuncGDRaw( func (ctx: LisperContext, body: Array) -> MonoMap:
-			var map = ctx.exec_node(Lisper.Call(&"make_mono_map", [body]))
+			var map = ctx.exec_node(Lisper.Call(&"mono_map/make", [body]))
 			add_mono(map)
 			return map),
 		&"Define": Lisper.FuncGDMacro( func (body: Array) -> Array:
 			return Lisper.Call(&"defvar", [
 				[body[0]],
-				[Lisper.Call(&"make_define", [
+				[Lisper.Call(&"define/make", [
 					body.slice(1),
 				])],
 			])),
 		&"define": Lisper.FuncGDMacro( func (body: Array) -> Array:
-			return Lisper.Call(&"sign_define", [
-				[Lisper.Call(&"make_define", [body])],
+			return Lisper.Call(&"define/sign", [
+				[Lisper.Call(&"define/make", [body])],
 			])),
 		&"import": Lisper.FuncGDMacro( func (body: Array) -> Array:
 			return Lisper.Call(&"defvar", [
@@ -158,25 +158,25 @@ func make_lisper_context() -> LisperContext:
 					body.slice(1),
 				])],
 			])),
-		&"import_define": Lisper.FuncGDMacro( func (body: Array) -> Array:
+		&"define/import": Lisper.FuncGDMacro( func (body: Array) -> Array:
 			return Lisper.Call(&"defvar", [
 				[body[0]],
-				[Lisper.Call(&"load_define", [
+				[Lisper.Call(&"define/load", [
 					body.slice(1),
 				])],
 			])),
-		&"set_control": Lisper.FuncGDCall( func (mono: Mono) -> Mono:
+		&"control/set": Lisper.FuncGDCall( func (mono: Mono) -> Mono:
 			control_target = mono
 			return mono),
-		&"clear_control": Lisper.FuncGDCall( func () -> void:
+		&"control/clear": Lisper.FuncGDCall( func () -> void:
 			control_target = null),
 		&"load": Lisper.FuncGDCallPure( func (path: String) -> Resource:
 			return get_assert(path)),
-		&"load_define": Lisper.FuncGDCallPure( func (path: String) -> Resource:
+		&"define/load": Lisper.FuncGDCallPure( func (path: String) -> Resource:
 			return get_assert(path).new()),
-		&"load_gss": Lisper.FuncGDCallPure( func (path: String) -> void:
-			load_gss(root_dir.path_join(path))),
-		&"make_mono_map": Lisper.FuncGDCallPure( func (offset: Vector3, cell_size: Vector3, size: Vector2, data := []) -> MonoMap:
+		&"gss/exec": Lisper.FuncGDCallPure( func (path: String) -> void:
+			exec_gss(root_dir.path_join(path))),
+		&"mono_map/make": Lisper.FuncGDCallPure( func (offset: Vector3, cell_size: Vector3, size: Vector2, data := []) -> MonoMap:
 			var map := MonoMap.new()
 			map.sekai = self
 			map.offset = offset
@@ -195,7 +195,7 @@ func _line_head_body() -> String:
 func _line_head_end() -> String:
 	return '' if _indent == 0 else "[color=gray]" + ''.rpad(_indent - 1, "│ ") + "└╴" + "[/color]"
 
-func load_gss(path: String) -> void:
+func exec_gss(path: String) -> void:
 	var expr := FileAccess.get_file_as_string(path)
 	print_rich("[sekai] ", _line_head_body(), "[color=green][b]gss: ", path, "[/b][/color]")
 	_indent += 1
@@ -328,7 +328,7 @@ func load_from_path(path: String) -> void:
 	defines_by_id.clear()
 	gss_ctx = make_lisper_context()
 	_clear_monos()
-	if define_gss: load_gss(define_gss)
+	if define_gss: exec_gss(define_gss)
 	var vmonos := load_data[&"monos"] as Array
 	for entry in vmonos:
 		var script = load(entry[0])

@@ -1,4 +1,4 @@
-(load_gss "gss/test/scene.gss.txt")
+(gss/exec "gss/test/scene.gss.txt")
 
 ; 测试：相对移动
 #;(proc/call
@@ -58,39 +58,39 @@
 			)
 		))
 	)
-	嘉心糖 嘉心糖)
+	嘉心糖 嘉然)
 
 ; 测试掉落物/背包
 (block
-	(load_gss "gss/test/scroll.gss.txt")
+	(gss/exec "gss/test/scroll.gss.txt")
 	(mono MonoEntity &drop
 		props {
 			position (vec3 2 2 1)
-			contains [(make_mono Mono &卷轴)]
+			contains [(mono/make Mono &卷轴)]
 		})
 	(mono MonoEntity &drop
 		props {
 			position (vec3 2 4 1)
-			contains [(make_mono Mono &卷轴 props {stack_count 9})]
+			contains [(mono/make Mono &卷轴 props {stack_count 9})]
 		})
 	(mono MonoEntity &drop
 		props {
 			position (vec3 1 5 1)
-			contains [(make_mono Mono &卷轴 props {stack_count 11})]
+			contains [(mono/make Mono &卷轴 props {stack_count 11})]
 		})
 	(mono MonoEntity &drop
 		props {
 			position (vec3 2 5 1)
-			contains [(make_mono Mono &卷轴 props {stack_count 11})]
+			contains [(mono/make Mono &卷轴 props {stack_count 11})]
 		})
 	(mono MonoEntity &drop
 		props {
 			position (vec3 1 6 1)
-			contains [(make_mono Mono &卷轴 props {stack_count 11})]
+			contains [(mono/make Mono &卷轴 props {stack_count 11})]
 		})
 	(mono MonoEntity &drop
 		props {
 			position (vec3 2 6 1)
-			contains [(make_mono Mono &卷轴 props {stack_count 11})]
+			contains [(mono/make Mono &卷轴 props {stack_count 11})]
 		})
 	)
