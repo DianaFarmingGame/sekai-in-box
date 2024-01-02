@@ -3,7 +3,7 @@ class_name GCharacter extends GEntity
 func do_merge(sets: Array[Dictionary]) -> Array[Dictionary]:
 	super.do_merge(sets)
 	name = "GCharacter"
-	merge_traits(sets, [TSolid, TInputAction, TProcess, TState, TContainer])
+	merge_traits(sets, [TSolid, TInputAction, TProcess, TState, TContainer, TJump])
 	var vprops := {
 		&"name": "unnamed",
 		&"max_speed": 3,
@@ -13,23 +13,25 @@ func do_merge(sets: Array[Dictionary]) -> Array[Dictionary]:
 		&"cur_speed": Vector2(0, 0),
 		&"cur_dir": -1,
 		
-		&"on_input_action": func (_sekai, this: Mono, all: Dictionary, press: Dictionary, _release) -> void:
-			if this.getp(&"cur_state") != &"combo":
-				if press.has(&"combo"):
-					this.callm(&"state_to", &"combo")
-				else:
-					var dir := Vector2(0, 0)
-					if all.has(&"ui_up"): dir += Vector2(0, -1)
-					if all.has(&"ui_down"): dir += Vector2(0, 1)
-					if all.has(&"ui_left"): dir += Vector2(-1, 0)
-					if all.has(&"ui_right"): dir += Vector2(1, 0)
-					var speed := dir.normalized() * 3
-					this.setp(&"cur_speed", speed)
-					if speed == Vector2(0, 0):
-						this.callm(&"state_to", &"idle")
+		&"on_input_action": Prop.puts({
+			&"0:character": func (_sekai, this: Mono, all: Dictionary, press: Dictionary, _release) -> void:
+				if this.getp(&"cur_state") != &"combo":
+					if press.has(&"combo"):
+						this.callm(&"state_to", &"combo")
 					else:
-						this.callm(&"state_to", &"walk")
-			pass,
+						var dir := Vector2(0, 0)
+						if all.has(&"ui_up"): dir += Vector2(0, -1)
+						if all.has(&"ui_down"): dir += Vector2(0, 1)
+						if all.has(&"ui_left"): dir += Vector2(-1, 0)
+						if all.has(&"ui_right"): dir += Vector2(1, 0)
+						var speed := dir.normalized() * 3
+						this.setp(&"cur_speed", speed)
+						if speed == Vector2(0, 0):
+							this.callm(&"state_to", &"idle")
+						else:
+							this.callm(&"state_to", &"walk")
+				pass,
+		}),
 		
 		&"on_move": func (_sekai, this: Mono) -> void:
 			var collides := this.emitm(&"solid_collide_all_by") as Array

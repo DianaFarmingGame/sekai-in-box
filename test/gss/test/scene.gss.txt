@@ -53,8 +53,7 @@
 	102	102	-	-	-	-	-	-
 ])
 
-(mono_map (vec3 0.75 1.75 1) (vec3 0.5 0.5 0.5) (vec2 16 16) [103])
-(mono_map (vec3 0.75 1.75 1) (vec3 0.5 0.5 0.5) (vec2 16 16) [104])
+
 
 (defvar 嘉然 (mono MonoEntity &嘉然
 	props {
