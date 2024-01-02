@@ -6,6 +6,7 @@
 (load_gss "gss/block/plant.gss.txt")
 (load_gss "gss/block/water_plant.gss.txt")
 (load_gss "gss/block/tree.gss.txt")
+(load_gss "gss/block/building.gss.txt")
 (load_gss "gss/block/road.gss.txt")
 (load_gss "gss/character/嘉心糖.gss.txt")
 (load_gss "gss/character/嘉然.gss.txt")
