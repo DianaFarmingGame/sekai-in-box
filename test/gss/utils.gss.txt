@@ -10,7 +10,9 @@
 (defvar clip16_cover (func [x y]
 	[(rect2 -0.25 -0.25 0.5 0.5) (rect2 (* x 16) (* y 16) 16 16)]))
 
-(defvar clip3x3_cover (func [x y]
+(defvar clip_build (func [x y]
+	[(rect2 -0.5 -0.5 1 1) (rect2 (* x 32) (* y 32) 32 32)]))
+(defvar clip3x3_build (func [x y]
 	[(rect2 -1.5 -2.5 3 3) (rect2 (* x 96) (* y 96) 96 96)]))
 
 (defvar clip_char (func [x]
