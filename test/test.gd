@@ -10,6 +10,8 @@ var picture_dict = {
 	# ^Lane Sun: 使用 preload 可以用相对路径访问文件
 	"嘉心糖": load("res://test/asset/ui/小然立绘/祈求.png"),
 	"嘉然": load("res://test/asset/ui/小然立绘/生气.png"),
+	"嘉心糖高兴": load("res://test/asset/ui/小然立绘/祈求.png"),
+	"嘉然高兴": load("res://test/asset/ui/小然立绘/生气.png"),
 }
 
 var skip_dialog := false
@@ -35,7 +37,10 @@ func _ready() -> void:
 			skip_dialog = false
 			dialog.show()
 			dialog.set_content(text)
-			dialog.set_character_texture(picture_dict.get(this.getp(&"name")))
+			var character_texture = picture_dict.get(this.getp(&"name"))
+			if _meta.get(&"emotion") != null:
+				character_texture = picture_dict.get(this.getp(&"name") + _meta.get(&"emotion"))
+			dialog.set_character_texture(character_texture)
 			dialog.set_character_name(this.getp(&"name"))
 			dialog.set_visiable_content(0)
 			while dialog.get_visiable_character_count() < dialog.get_total_character_count():
@@ -55,16 +60,21 @@ func _ready() -> void:
 						text += "\n  > " + choices[i]
 					else:
 						text += "\n    " + choices[i]
-				dialog_inner.text = text
+				dialog.set_content(text)
 			update_inner_text.call()
-			dialog_inner.visible_characters = 0
-			dialog_box.visible = true
+			dialog.set_visiable_content(0)
+			var character_texture = picture_dict.get(_this.getp(&"name"))
+			if _meta.get(&"emotion") != null:
+				character_texture = picture_dict.get(_this.getp(&"name") + _meta.get(&"emotion"))
+			dialog.set_character_texture(character_texture)
+			dialog.set_character_name(_this.getp(&"name"))
+			dialog.show()
 			skip_dialog = false
-			while dialog_inner.visible_characters < dialog_inner.get_total_character_count():
+			while dialog.get_visiable_character_count() < dialog.get_total_character_count():
 				await tree.create_timer(0.02).timeout
 				if skip_dialog:
-					dialog_inner.visible_characters = dialog_inner.get_total_character_count()
-				dialog_inner.visible_characters += 1
+					dialog.set_visiable_content(dialog.get_total_character_count())
+				dialog.set_visiable_content(dialog.get_visiable_character_count() + 1)
 			while true:
 				var inputs := await psekai.input_updating as Array
 				sekai.block_input()
@@ -78,7 +88,7 @@ func _ready() -> void:
 					choose[0] = wrapi(choose[0] + 1, 0, choices.size())
 					update_inner_text.call()
 					continue
-			dialog_box.visible = false
+			dialog.hide()
 			return choose[0],
 		&"itembox_update": func (_sekai, _this, contains: Array) -> void:
 			item_box.clear()

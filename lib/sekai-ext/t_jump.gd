@@ -25,7 +25,6 @@ var props := {
 				var t = this.getp(&"jump_time") + delta
 				this.setp(&"jump_time", t)
 				var z = init_z + v * t - 0.5 * g * t * t
-				print(z)
 				if z < init_z:
 					this.position.z = init_z
 					this.setp(&"on_jump", false)
