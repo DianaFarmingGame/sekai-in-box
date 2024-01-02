@@ -1,0 +1,16 @@
+; common tree
+(define BlockStaticExt
+	ref 109
+	props {
+		need_route #f
+		routable #f
+		collision_box (rect2 -0.2 -0.5 0.4 0.5)
+		asserts {
+			main "assert/树.png"
+		}
+		cur_draw &common_tree
+		draw_data {
+			common_tree [&static &main (clip3x3_cover 0 0)] 
+		}
+	})
+

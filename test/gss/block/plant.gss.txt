@@ -83,7 +83,7 @@
 			[1 { cover { cur_draw &rock7 }}]
 			[1 { cover { cur_draw &rock8 }}]
 			[1 { cover { cur_draw &rock9 }}]
-			[30 {
+			[500 {
 				update (func [sekai this]
 					(queue_destroy this))
 			}]
