@@ -1,0 +1,15 @@
+(define BlockStaticExt
+	ref 111
+	props {
+		need_route 	#f
+		routable 	#f
+		collision_box (rect2 -1.5 0 3 2)
+		asserts {
+			main "assert/房子.png"
+		}
+		cur_draw &building_1
+		draw_data {
+			building_1 [&static &main (clip3x5_build 0 0)] 
+		}
+	}
+)
