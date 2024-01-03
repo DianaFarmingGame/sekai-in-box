@@ -264,9 +264,9 @@ impl GispParser {
         if self.rpick() == Some('{') {
             let mut np = self.rfork();
             np.offset += 1;
-            while np.r_blank() && np.r_item() && np.r_blank() && np.r_item() {}
+            while np.r_blank() && np.r_item() {}
             np.r_blank();
-            if np.rpick() == Some('}') && np.result.len() % 2 == 0 {
+            if np.rpick() == Some('}') {
                 self.offset = np.offset + 1;
                 self.push(TType::MAP, np.get_result().to_variant());
                 return true

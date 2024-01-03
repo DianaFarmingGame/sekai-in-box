@@ -34,6 +34,7 @@ func def_commons(ctx: ProcedureContext) -> void:
 					await ctx.exec_node_async(node)
 			return null),
 		&"loop*": Lisper.FuncGDRaw( func (ctx: ProcedureContext, body: Array) -> Variant:
+			ctx = ctx.fork()
 			var state := [false, false]
 			var res = [null]
 			var skip_ref := ctx.exec_as_keyword(body[0]) as StringName
