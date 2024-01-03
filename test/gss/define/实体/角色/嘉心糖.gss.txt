@@ -1,6 +1,6 @@
 (define (define/load "gss/define/实体/角色/嘉心糖.gd")
 	ref 200
-	id &嘉心糖
+	id &实体/角色/嘉心糖
 	props {
 		name "嘉心糖"
 		solid_box (rect2 -0.4 -0.1 0.8 0.2)

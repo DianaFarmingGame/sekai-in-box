@@ -26,7 +26,7 @@
 	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-
 ])
 
-(defvar 嘉心糖 (control/set (mono MonoEntity &嘉心糖
+(defvar 嘉心糖 (control/set (mono MonoEntity &实体/角色/嘉心糖
 	props {
 		position (vec3 8 8 1)
 	})))

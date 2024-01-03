@@ -55,12 +55,12 @@
 
 
 
-(defvar 嘉然 (mono MonoEntity &嘉然
+(defvar 嘉然 (mono MonoEntity &实体/角色/嘉然
 	props {
 		position (vec3 5 9 1)
 	}))
 
-(defvar 嘉心糖 (control/set (mono MonoEntity &嘉心糖
+(defvar 嘉心糖 (control/set (mono MonoEntity &实体/角色/嘉心糖
 	props {
 		position (vec3 7 9 1)
 	})))
