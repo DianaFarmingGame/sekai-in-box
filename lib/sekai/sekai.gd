@@ -184,6 +184,10 @@ func make_lisper_context() -> LisperContext:
 			map.size = size
 			map.data = PackedInt32Array(data)
 			return map),
+		&"csv/load": Lisper.FuncGDRaw( func (ctx: LisperContext, body: Array) -> Array:
+			var src := ctx.exec_node(body[0]) as String
+			var content := FileAccess.get_file_as_string(root_dir.path_join(src))
+			return Array(content.split('\n')).map(func (line: String): return line.split(','))),
 	})
 	return ctx
 

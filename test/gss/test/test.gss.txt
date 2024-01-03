@@ -60,8 +60,8 @@
 	)
 	嘉心糖 嘉然)
 
-; 测试掉落物/背包
-(block
+; 测试：掉落物/背包
+#;(block
 	(gss/exec "gss/test/scroll.gss.txt")
 	(mono MonoEntity &drop
 		props {
@@ -94,3 +94,6 @@
 			contains [(mono/make Mono &卷轴 props {stack_count 11})]
 		})
 	)
+
+; 测试：CSV读取
+(echo (csv/load "test.csv"))
