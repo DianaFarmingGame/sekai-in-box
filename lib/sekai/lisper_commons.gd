@@ -100,6 +100,16 @@ func def_commons(context: LisperContext) -> void:
 			if body.size() >= 4: step = ctx.exec_node(body[3]);\
 			if body.size() >= 5: deep = ctx.exec_node(body[4])
 			return ary.slice(begin, end, step, deep)),
+		&"array/let": Lisper.FuncGDRawPure( func (ctx: LisperContext, body: Array) -> Variant:
+			ctx = ctx.fork()
+			var ary := ctx.exec_node(body[0]) as Array
+			var defs := body[1][1].map(func (node): return ctx.exec_as_keyword(node)) as Array
+			for i in defs.size():
+				ctx.def_var([], defs[i], ary[i])
+			var res = null
+			for node in body.slice(2):
+				res = ctx.exec_node(node)
+			return res),
 		&"echo": Lisper.FuncGDRaw( func (ctx: LisperContext, body: Array) -> Variant:
 			var msg := []
 			var res
