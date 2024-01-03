@@ -1,4 +1,4 @@
-(gss/exec "gss/test/scene.gss.txt")
+(gss/exec "gss/test/dev-ls/scene.gss.txt")
 
 ; 测试：相对移动
 #;(proc/call
@@ -62,7 +62,7 @@
 
 ; 测试：掉落物/背包
 #;(block
-	(gss/exec "gss/test/scroll.gss.txt")
+	(gss/exec "gss/test/dev-ls/scroll.gss.txt")
 	(mono MonoEntity &drop
 		props {
 			position (vec3 2 2 1)
@@ -96,4 +96,4 @@
 	)
 
 ; 测试：CSGV读取
-(echo (csgv/load "test.csv"))
+(echo (csgv/load "gss/test/dev-ls/test.csv"))

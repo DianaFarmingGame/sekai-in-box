@@ -36,12 +36,10 @@ func _ready() -> void:
 	_init_sekai()
 	Input.use_accumulated_input = false
 	var tree := get_tree()
-#	tree.root.window_input.connect(_on_input)
 	tree.process_frame.connect(func (): before_process.emit())
 	input_mapper.updated.connect(_on_input)
 
 func _exit_tree() -> void:
-#	print("Sekai exit")
 	_clear_monos()
 
 func _clear_monos() -> void:
@@ -186,13 +184,7 @@ func make_lisper_context() -> LisperContext:
 			return map),
 		&"csgv/load": Lisper.FuncGDRaw( func (ctx: LisperContext, body: Array) -> Array:
 			var src := ctx.exec_node(body[0]) as String
-			var content := []
-			var file := FileAccess.open(root_dir.path_join(src), FileAccess.READ)
-			var _head := file.get_csv_line()
-			while file.get_position() < file.get_length():
-				content.append(Array(file.get_csv_line()).map(func (entry: String):
-					return gss_ctx.eval(entry.replace('“', '"').replace('”', '"'))[0]))
-			return content),
+			return load_csgv(root_dir.path_join(src))),
 	})
 	return ctx
 
@@ -212,6 +204,15 @@ func exec_gss(path: String) -> void:
 	gss_ctx.eval(expr)
 	print_rich("[sekai] ", _line_head_end(), "[color=gray]", (Time.get_ticks_usec() - stime) / 1000.0, " ms[/color]")
 	_indent -= 1
+
+func load_csgv(path: String) -> Array:
+	var content := []
+	var file := FileAccess.open(path, FileAccess.READ)
+	var _head := file.get_csv_line()
+	while file.get_position() < file.get_length():
+		content.append(Array(file.get_csv_line()).map(func (entry: String):
+			return gss_ctx.eval(entry.replace('“', '"').replace('”', '"'))[0]))
+	return content
 
 func sign_define(define: MonoDefine) -> void:
 	define.finalize()

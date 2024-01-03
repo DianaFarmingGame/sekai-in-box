@@ -8,7 +8,7 @@ var position := Vector3(0, 0, 0)
 var layers := []
 
 func _into_sekai() -> void:
-	define.finalize()
+	pass
 
 func _outof_sekai() -> void:
 	pass
