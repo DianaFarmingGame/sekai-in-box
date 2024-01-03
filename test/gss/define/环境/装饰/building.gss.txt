@@ -1,5 +1,5 @@
 (define BlockStaticExt
-	ref 111
+	ref 2409
 	props {
 		need_route 	#f
 		routable 	#f
