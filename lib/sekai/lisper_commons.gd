@@ -17,8 +17,8 @@ func _init() -> void:
 	CommonContext = LisperContext.new()
 	def_commons(CommonContext)
 
-func def_commons(ctx: LisperContext) -> void:
-	ctx.def_vars([Lisper.VarFlag.CONST, Lisper.VarFlag.FIX], {
+func def_commons(context: LisperContext) -> void:
+	context.def_vars([Lisper.VarFlag.CONST, Lisper.VarFlag.FIX], {
 		&"raw": Lisper.FuncGDRawPure( func (_ctx, body: Array) -> Array:
 			return body),
 		&"block": Lisper.FuncGDRawPure( func (ctx: LisperContext, body: Array) -> Variant:

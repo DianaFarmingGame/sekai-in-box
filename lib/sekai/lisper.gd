@@ -51,25 +51,6 @@ static func test_parser() -> void:
 	print(Lisper.tokenize("; comment\n token ; another comment"))
 	print(Lisper.tokenize("#;[ skiper comment ]"))
 
-static func test_common() -> void:
-	print(Lisper.eval("""
-		; Vector2
-		(vec2)
-		(vec2 2 1)
-		
-		; Rect2
-		(rect2)
-		(rect2 (vec2 10 10) (vec2 20 20))
-		(rect2 (rect2 1 1 2 2))
-		
-		; Color
-		(color)
-		(color "#0088ff44")
-		(color "#0088ff" 0.5)
-		(color 0 0.5 1)
-		(color (color 0 0.5 1 0.5))
-	"""))
-
 ## Token类型
 enum TType {
 	TOKEN,

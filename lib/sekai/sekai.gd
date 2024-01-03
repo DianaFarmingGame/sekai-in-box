@@ -87,11 +87,11 @@ func _init_sekai() -> void:
 	print()
 
 func make_lisper_context() -> LisperContext:
-	var ctx := LisperCommons.fork()
+	var context := LisperCommons.fork()
 	
-	ctx.def_vars([Lisper.VarFlag.CONST, Lisper.VarFlag.FIX], root_vars)
+	context.def_vars([Lisper.VarFlag.CONST, Lisper.VarFlag.FIX], root_vars)
 	
-	ctx.def_vars([Lisper.VarFlag.CONST, Lisper.VarFlag.FIX], {
+	context.def_vars([Lisper.VarFlag.CONST, Lisper.VarFlag.FIX], {
 		&"define/make": Lisper.FuncGDRawPure( func (ctx: LisperContext, body: Array) -> Variant:
 			var def = ctx.exec_node(body[0])
 			if def != null:
@@ -186,7 +186,7 @@ func make_lisper_context() -> LisperContext:
 			var src := ctx.exec_node(body[0]) as String
 			return load_csgv(root_dir.path_join(src))),
 	})
-	return ctx
+	return context
 
 var _indent := 0
 
