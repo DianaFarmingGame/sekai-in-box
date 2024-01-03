@@ -184,10 +184,15 @@ func make_lisper_context() -> LisperContext:
 			map.size = size
 			map.data = PackedInt32Array(data)
 			return map),
-		&"csv/load": Lisper.FuncGDRaw( func (ctx: LisperContext, body: Array) -> Array:
+		&"csgv/load": Lisper.FuncGDRaw( func (ctx: LisperContext, body: Array) -> Array:
 			var src := ctx.exec_node(body[0]) as String
-			var content := FileAccess.get_file_as_string(root_dir.path_join(src))
-			return Array(content.split('\n')).map(func (line: String): return line.split(','))),
+			var content := []
+			var file := FileAccess.open(root_dir.path_join(src), FileAccess.READ)
+			var _head := file.get_csv_line()
+			while file.get_position() < file.get_length():
+				content.append(Array(file.get_csv_line()).map(func (entry: String):
+					return gss_ctx.eval(entry.replace('“', '"').replace('”', '"'))[0]))
+			return content),
 	})
 	return ctx
 

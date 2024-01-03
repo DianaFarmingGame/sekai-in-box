@@ -95,5 +95,5 @@
 		})
 	)
 
-; 测试：CSV读取
-(echo (csv/load "test.csv"))
+; 测试：CSGV读取
+(echo (csgv/load "test.csv"))
