@@ -1,0 +1,23 @@
+(define Item
+	ref 500
+	id &卷轴
+	props {
+		name "卷轴"
+		
+		pickable #t
+		stackable #t
+		stack_capacity 16
+	
+		chargeable #f
+		charge_point 1
+		charge_capacity 1
+		
+		tradeable #t
+		trade_price 500
+		trade_stability 0.8
+		
+		asserts {
+			icon "assert/ui/icon/卷轴.png"
+		}
+		icon [&icon (rect2 0 0 32 32)]
+	})

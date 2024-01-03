@@ -104,6 +104,15 @@ func exec_as_keyword(node: Array) -> Variant:
 	log_error(node, str("unable to convert node to keyword: ", node))
 	return null
 
+func exec_as_string(node: Array) -> Variant:
+	match node[0]:
+		Lisper.TType.TOKEN, Lisper.TType.KEYWORD:
+			return String(node[1])
+		Lisper.TType.STRING:
+			return node[1]
+	log_error(node, str("unable to convert node to string: ", node))
+	return null
+
 @warning_ignore("integer_division")
 func exec_map_part(pairs: Array) -> Dictionary:
 	var res := {}

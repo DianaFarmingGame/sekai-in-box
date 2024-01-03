@@ -13,8 +13,7 @@ var sekai: Sekai
 var map := []
 var layers := []
 
-func _into_sekai(psekai: Sekai) -> void:
-	sekai = psekai
+func _into_sekai() -> void:
 	cell_size_xy = Vector2(cell_size.x, cell_size.y)
 	offset_xy = Vector2(offset.x, offset.y)
 	size_rti = Rect2i(Vector2i(), size)
@@ -37,7 +36,8 @@ func _into_sekai(psekai: Sekai) -> void:
 				Vector3(i % int(size.x), int(i / size.x), 0) * cell_size + offset,
 				layers[int(i / size.x)],
 			)
-			mono._into_sekai(sekai)
+			mono.sekai = sekai
+			mono._into_sekai()
 			map[i] = mono
 	
 	for iy in size.y:
@@ -61,7 +61,6 @@ func _into_sekai(psekai: Sekai) -> void:
 func _outof_sekai() -> void:
 	_clear_layers()
 	_clear_map()
-	sekai = null
 
 func _on_init() -> void:
 	for mono in map:
@@ -154,7 +153,8 @@ class ConstTileMono extends Mono:
 	
 	func upgrade() -> VarTileMono:
 		var nmono := VarTileMono.new(define, map, position, item)
-		nmono._into_sekai(sekai)
+		nmono.sekai = sekai
+		nmono._into_sekai()
 		map.set_pos(Vector2(position.x, position.y), nmono)
 		return nmono
 	

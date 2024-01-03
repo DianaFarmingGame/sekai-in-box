@@ -83,10 +83,7 @@
 			[1 { cover { cur_draw &rock7 }}]
 			[1 { cover { cur_draw &rock8 }}]
 			[1 { cover { cur_draw &rock9 }}]
-			[500 {
-				update (func [sekai this]
-					(queue_destroy this))
-			}]
+			[30 { cover { need_destroy #t }}]
 		]
 		atile_size (vec3 3 3 3)
 		atile_matches [[102] [100] [105 106 108]]
@@ -103,10 +100,7 @@
 				3	3	3
 				3	3	3
 				3	3	3
-			] {
-				update (func [sekai this]
-					(queue_destroy this))
-			}
+			] { cover { need_destroy #t }}
 		][
 			[
 				0	0	0
@@ -134,9 +128,6 @@
 				0	0	0
 				0	0	0
 				0	0	0
-			] {
-				update (func [sekai this]
-					(queue_destroy this))
-			}
+			] { cover { need_destroy #t }}
 		]]
 	})

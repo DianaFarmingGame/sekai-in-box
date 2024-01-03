@@ -3,7 +3,7 @@ class_name TGroup extends MonoTrait
 var id := &"group"
 
 var props := {
-	&"groups": [&""],
+	&"groups": Prop.Stack([&""]),
 	
 	&"group_in": func (_sekai, this: Mono, group: Variant) -> bool:
 		return this.getp(&"groups").has(group),

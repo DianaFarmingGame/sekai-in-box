@@ -20,7 +20,7 @@ var props := {
 			this.setp(&"cur_draw", draw_id)
 			this.setp(&"draw_timer", this.item.get_time()),
 	
-	&"on_draw_loop": [],
+	&"on_draw_loop": Prop.Stack([]),
 }
 
 static func on_draw(_sekai, this: Mono, item: SekaiItem) -> void:
