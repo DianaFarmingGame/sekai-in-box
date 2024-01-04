@@ -1,7 +1,5 @@
 class_name TCollisible extends MonoTrait
 
-const DEBUG_DRAW := true
-
 var id := &"collisible"
 var requires := [&"position", &"group"]
 
@@ -23,7 +21,7 @@ var props := {
 	
 	&"on_draw": Prop.puts({
 		&"99:collision_boxes": TCollisible.draw_debug,
-	} if DEBUG_DRAW else {})
+	} if ProjectSettings.get_setting(&"global/debug_draw") else {})
 }
 
 static func draw_debug(sekai: Sekai, this: Mono, item: SekaiItem) -> void:

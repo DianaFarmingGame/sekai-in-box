@@ -41,6 +41,10 @@ enabled=PackedStringArray("res://addons/debug_menu/plugin.cfg")
 import/blender/enabled=false
 import/fbx/enabled=false
 
+[global]
+
+debug_draw=true
+
 [gui]
 
 theme/lcd_subpixel_layout=2
