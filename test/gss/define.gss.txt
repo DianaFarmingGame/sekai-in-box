@@ -7,6 +7,7 @@
 	(gss/exec "gss/define/环境/地形/tops.gss.txt")
 	(gss/exec "gss/define/环境/地形/walls.gss.txt")
 	(gss/exec "gss/define/环境/地形/water.gss.txt")
+	(gss/exec "gss/define/环境/装饰/building_side.gss.txt")
 	(gss/exec "gss/define/环境/装饰/building.gss.txt")
 	(gss/exec "gss/define/环境/装饰/grass.gss.txt")
 	(gss/exec "gss/define/环境/装饰/plant.gss.txt")
