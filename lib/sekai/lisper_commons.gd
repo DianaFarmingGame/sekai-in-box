@@ -110,6 +110,12 @@ func def_commons(context: LisperContext) -> void:
 			for node in body.slice(2):
 				res = ctx.exec_node(node)
 			return res),
+		&"dict/for": Lisper.FuncGDRawPure( func (ctx: LisperContext, body: Array) -> void:
+			var dict := ctx.exec_node(body[0]) as Dictionary
+			var handle = ctx.exec_node(body[1])
+			for key in dict.keys():
+				ctx.call_fn(handle, [key, dict[key]])
+			),
 		&"echo": Lisper.FuncGDRaw( func (ctx: LisperContext, body: Array) -> Variant:
 			var msg := []
 			var res

@@ -107,11 +107,13 @@ func make_lisper_context() -> LisperContext:
 			else:
 				ctx.log_error(body[0], str("define/make: ", body[0], " is not a valid token"))
 				return null),
-		&"define/sign": Lisper.FuncGDRaw( func (ctx: LisperContext, body: Array) -> Variant:
-			var def = ctx.exec_node(body[0])
-			sign_define(def)
-			return def),
-		&"mono/make": Lisper.FuncGDRaw( func (ctx: LisperContext, body: Array) -> Mono:
+		&"define/sign": Lisper.FuncGDCall( func (define: MonoDefine) -> MonoDefine:
+			sign_define(define)
+			return define),
+		&"mono/add": Lisper.FuncGDCall( func (mono: Variant) -> Variant:
+			add_mono(mono)
+			return mono),
+		&"mono/make": Lisper.FuncGDRawPure( func (ctx: LisperContext, body: Array) -> Mono:
 			var mono_class = ctx.exec_node(body[0])
 			if mono_class != null:
 				var define = get_define(ctx.exec_node(body[1]))
@@ -130,14 +132,14 @@ func make_lisper_context() -> LisperContext:
 			else:
 				ctx.log_error(body[0], str("mono/make: ", body[0], " is not a valid token"))
 				return null),
-		&"mono": Lisper.FuncGDRaw( func (ctx: LisperContext, body: Array) -> Mono:
-			var mono = ctx.exec_node(Lisper.Call(&"mono/make", [body]))
-			add_mono(mono)
-			return mono),
-		&"mono_map": Lisper.FuncGDRaw( func (ctx: LisperContext, body: Array) -> MonoMap:
-			var map = ctx.exec_node(Lisper.Call(&"mono_map/make", [body]))
-			add_mono(map)
-			return map),
+		&"mono": Lisper.FuncGDMacro( func (body: Array) -> Array:
+			return Lisper.Call(&"mono/add", [
+				[Lisper.Call(&"mono/make", [body])],
+			])),
+		&"mono_map": Lisper.FuncGDMacro( func (body: Array) -> Array:
+			return Lisper.Call(&"mono/add", [
+				[Lisper.Call(&"mono_map/make", [body])],
+			])),
 		&"Define": Lisper.FuncGDMacro( func (body: Array) -> Array:
 			return Lisper.Call(&"defvar", [
 				[body[0]],

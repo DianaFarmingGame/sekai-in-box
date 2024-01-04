@@ -1,6 +1,6 @@
 ID,名称,位置X,位置Y,位置Z,图片/站立,图片/移动,图片/头像,对话标题,行为
-0,"""村民A""",2,4,1,"""assert/npc/A.png""","""assert/npc/A-move.png""","""assert/npc/A-avatar.png""","""早生好""","[&dialog/NPC-A &trade/NPC-A]"
-1,"""村民A""",3,5,2,"""assert/npc/A.png""","""assert/npc/A-move.png""","""assert/npc/A-avatar.png""","""早生好""","[&dialog/NPC-A &trade/NPC-A]"
-2,"""村民A""",4,6,3,"""assert/npc/A.png""","""assert/npc/A-move.png""","""assert/npc/A-avatar.png""","""早生好""","[&dialog/NPC-A &trade/NPC-A]"
-3,"""村民A""",5,7,4,"""assert/npc/A.png""","""assert/npc/A-move.png""","""assert/npc/A-avatar.png""","""早生好""","[&dialog/NPC-A &trade/NPC-A]"
-4,"""村民A""",6,8,5,"""assert/npc/A.png""","""assert/npc/A-move.png""","""assert/npc/A-avatar.png""","""早生好""","[&dialog/NPC-A &trade/NPC-A]"
+"""NPC-0""","""村民1""",2,4,1,"""assert/人物/NPC/站立.png""","""assert/人物/NPC/走路.png""","""assert/人物/NPC/立绘.png""","""早生好""",[&dialog/NPC-A &trade/NPC-A]
+"""NPC-1""","""村民2""",3,4,1,"""assert/人物/NPC/站立.png""","""assert/人物/NPC/走路.png""","""assert/人物/NPC/立绘.png""","""早生好""",[&dialog/NPC-A &trade/NPC-A]
+"""NPC-2""","""村民3""",4,4,1,"""assert/人物/NPC/站立.png""","""assert/人物/NPC/走路.png""","""assert/人物/NPC/立绘.png""","""早生好""",[&dialog/NPC-A &trade/NPC-A]
+"""NPC-3""","""村民4""",5,4,1,"""assert/人物/NPC/站立.png""","""assert/人物/NPC/走路.png""","""assert/人物/NPC/立绘.png""","""早生好""",[&dialog/NPC-A &trade/NPC-A]
+"""NPC-4""","""村民5""",6,4,1,"""assert/人物/NPC/站立.png""","""assert/人物/NPC/走路.png""","""assert/人物/NPC/立绘.png""","""早生好""",[&dialog/NPC-A &trade/NPC-A]
