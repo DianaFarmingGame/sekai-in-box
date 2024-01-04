@@ -31,9 +31,9 @@ var props := {
 		var collide_group := this.getp(&"solid_collide_group") as Array
 		return TSolid.collide_pos(sekai, this, pos).filter(func (m): return m != this and m.callm(&"group_intersects", collide_group)),
 	
-	&"on_draw": Prop.puts({
+	&"on_draw_debug": Prop.puts({
 		&"99:solid_box": TSolid.draw_debug,
-	} if ProjectSettings.get_setting(&"global/debug_draw") else {})
+	})
 }
 
 static func test_pos(sekai: Sekai, this: Mono, pos: Vector3) -> bool:

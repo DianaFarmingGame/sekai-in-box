@@ -19,9 +19,9 @@ var props := {
 						return true
 		return false,
 	
-	&"on_draw": Prop.puts({
+	&"on_draw_debug": Prop.puts({
 		&"99:route_boxes": TRoutable.draw_debug,
-	} if ProjectSettings.get_setting(&"global/debug_draw") else {})
+	})
 }
 
 static func draw_debug(sekai: Sekai, this: Mono, item: SekaiItem) -> void:
@@ -32,6 +32,6 @@ static func draw_debug(sekai: Sekai, this: Mono, item: SekaiItem) -> void:
 			var rboxes = this.getp(&"route_boxes")
 			for rbox in rboxes:
 				var box := Rect2(pos + rbox.position, rbox.size)
-				item.draw_rect(box, 0x00ff0044)
-				item.draw_rect(box, 0x00ff00ff, false)
+				item.draw_rect(box, 0x00ff0088)
+				#item.draw_rect(box, 0x00ff00ff, false)
 

@@ -12,6 +12,7 @@ var sekai: Sekai
 
 var map := []
 var layers := []
+var debug_layers := []
 
 func _into_sekai() -> void:
 	cell_size_xy = Vector2(cell_size.x, cell_size.y)
@@ -24,6 +25,11 @@ func _into_sekai() -> void:
 	for iy in size.y:
 		var layer := sekai.make_item()
 		layers[iy] = layer
+	if ProjectSettings.get_setting(&"global/debug_draw"):
+		debug_layers.resize(size.y as int)
+		for iy in size.y:
+			var layer := sekai.make_item()
+			debug_layers[iy] = layer
 	
 	_clear_map()
 	map.resize(length)
@@ -56,6 +62,14 @@ func _into_sekai() -> void:
 			for i in ids:
 				if map[i]:
 					map[i].callm(&"on_draw", layer))
+		if ProjectSettings.get_setting(&"global/debug_draw"):
+			var debug_layer := debug_layers[iy] as SekaiItem
+			debug_layer.set_y(iy * cell_size.y + offset.y + floorf(offset.z) * 64 + 4096)
+			debug_layer.on_draw.connect(func ():
+				for i in ids:
+					if map[i]:
+						map[i].callm(&"on_draw_debug", debug_layer))
+			sekai.add_child.call_deferred(debug_layer)
 		sekai.add_child.call_deferred(layer)
 
 func _outof_sekai() -> void:
@@ -75,10 +89,14 @@ func _on_restore() -> void:
 		if mono != null: mono._on_restore()
 
 func _clear_layers() -> void:
-	for layer in layers:
+	for layer in layers: if layer != null:
 		sekai.remove_child(layer)
 		layer.queue_free()
 	layers.clear()
+	for layer in debug_layers: if layer != null:
+		sekai.remove_child(layer)
+		layer.queue_free()
+	debug_layers.clear()
 
 func _clear_map() -> void:
 	map.clear()

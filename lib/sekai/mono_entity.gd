@@ -1,6 +1,7 @@
 class_name MonoEntity extends Mono
 
 var item: SekaiItem
+var debug_item: SekaiItem
 
 func _into_sekai() -> void:
 	super._into_sekai()
@@ -13,7 +14,15 @@ func _into_sekai() -> void:
 				emitm(&"on_process"))
 	item.on_draw.connect(func ():
 		item.set_y(position.y + floorf(position.z) * 64)
+		item.pen_clear_transform()
 		callm(&"on_draw", item))
+	if ProjectSettings.get_setting(&"global/debug_draw"):
+		debug_item = sekai.make_item()
+		debug_item.on_draw.connect(func ():
+			debug_item.set_y(position.y + floorf(position.z) * 64 + 4096)
+			debug_item.pen_clear_transform()
+			callm(&"on_draw_debug", debug_item))
+		sekai.add_child.call_deferred(debug_item)
 	sekai.add_child.call_deferred(item)
 
 func _outof_sekai() -> void:
@@ -28,3 +37,7 @@ func _clear_item() -> void:
 		sekai.remove_child(item)
 		item.queue_free()
 		item = null
+	if debug_item:
+		sekai.remove_child(debug_item)
+		debug_item.queue_free()
+		debug_item = null

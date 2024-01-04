@@ -19,9 +19,9 @@ var props := {
 						return true
 		return false,
 	
-	&"on_draw": Prop.puts({
+	&"on_draw_debug": Prop.puts({
 		&"99:collision_boxes": TCollisible.draw_debug,
-	} if ProjectSettings.get_setting(&"global/debug_draw") else {})
+	})
 }
 
 static func draw_debug(sekai: Sekai, this: Mono, item: SekaiItem) -> void:
