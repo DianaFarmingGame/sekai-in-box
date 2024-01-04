@@ -33,6 +33,7 @@
 				] {
 					cover {
 						cur_draw &corner_nw
+						collision_boxes [(rect2 -0.2 -0.2 0.7 0.1) (rect2 -0.3 -0.2 0.1 0.7)]
 					}
 				}
 			][
@@ -43,6 +44,7 @@
 				] {
 					cover {
 						cur_draw &corner_ne
+						collision_boxes [(rect2 -0.5 -0.2 0.7 0.1) (rect2 0.2 -0.2 0.1 0.7)]
 					}
 				}
 			][
@@ -53,6 +55,7 @@
 				] {
 					cover {
 						cur_draw &corner_se
+						collision_boxes [(rect2 -0.5 0.3 0.7 0.1) (rect2 0.2 -0.5 0.1 0.8)]
 					}
 				}
 			][
@@ -63,6 +66,7 @@
 				] {
 					cover {
 						cur_draw &corner_sw
+						collision_boxes [(rect2 -0.2 0.3 0.7 0.1) (rect2 -0.3 -0.5 0.1 0.8)]
 					}
 				}
 			][
@@ -84,7 +88,7 @@
 				] {
 					cover {
 						cur_draw &side_e
-						collision_boxes [(rect2 0.3 -0.5 0.1 1)]
+						collision_boxes [(rect2 0.2 -0.5 0.1 1)]
 					}
 				}
 			][
@@ -106,7 +110,7 @@
 				] {
 					cover {
 						cur_draw &side_w
-						collision_boxes [(rect2 -0.2 -0.5 0.1 1)]
+						collision_boxes [(rect2 -0.3 -0.5 0.1 1)]
 					}
 				}
 			][
@@ -127,6 +131,7 @@
 				] {
 					cover {
 						cur_draw &concave_nw
+						collision_boxes [(rect2 -0.5 -0.2 0.3 0.1) (rect2 -0.3 -0.5 0.1 0.2)]
 					}
 				}
 			][
@@ -137,6 +142,7 @@
 				] {
 					cover {
 						cur_draw &concave_ne
+						collision_boxes [(rect2 0.2 -0.2 0.3 0.1) (rect2 0.2 -0.5 0.1 0.3)]
 					}
 				}
 			][
@@ -147,6 +153,7 @@
 				] {
 					cover {
 						cur_draw &concave_se
+						collision_boxes [(rect2 0.2 0.3 0.3 0.1) (rect2 0.2 0.3 0.1 0.3)]
 					}
 				}
 			][
@@ -157,6 +164,7 @@
 				] {
 					cover {
 						cur_draw &concave_sw
+						collision_boxes [(rect2 -0.5 0.2 0.3 0.1) (rect2 -0.2 0.2 0.1 0.3)]
 					}
 				}
 			]]
