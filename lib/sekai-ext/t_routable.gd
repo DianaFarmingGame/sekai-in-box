@@ -1,20 +1,39 @@
 class_name TRoutable extends MonoTrait
 
+const DEBUG_DRAW := true
+
 var id := &"routable"
 var requires := [&"position", &"group"]
 
 var props := {
 	&"need_route": true,
 	&"routable": true,
-	&"route_box": Rect2(-0.5, -0.5, 1, 1),
+	&"route_boxes": [Rect2(-0.5, -0.5, 1, 1)],
+	
+	&"route_test": func (_sekai, this: Mono, point: Vector2, z_pos: int) -> bool:
+		var position := this.position
+		if floori(position.z) == z_pos:
+			if this.getp(&"routable"):
+				var boxes = this.getp(&"route_boxes")
+				for box in boxes:
+					box.position += Vector2(position.x, position.y)
+					if box.has_point(point):
+						return true
+		return false,
+	
+	&"on_draw": Prop.puts({
+		&"99:route_boxes": TRoutable.draw_debug,
+	} if DEBUG_DRAW else {})
 }
 
-static func draw_debug(sekai: Sekai, this: Mono) -> void:
-	if this.getp(&"routable") and floori(this.position.z) == floori(sekai.control_target.position.z) - 1:
-		var item := this.get_item() as SekaiItem
-		var pos := Vector2(this.position.x, this.position.y)
-		var rbox := this.getp(&"route_box") as Rect2
-		var box := Rect2(pos + rbox.position, rbox.size)
-		item.draw_rect(box, 0x00ff0044)
-		item.draw_rect(box, 0x00ff00ff, false)
+static func draw_debug(sekai: Sekai, this: Mono, item: SekaiItem) -> void:
+	var tar := sekai.control_target as Mono
+	if tar != null:
+		if this.getp(&"routable") and floori(this.position.z) == floori(tar.position.z + tar.getp(&"solid_route_zoffset")):
+			var pos := Vector2(this.position.x, this.position.y - this.position.z * item.ratio_yz + tar.getp(&"solid_route_zoffset") * item.ratio_yz)
+			var rboxes = this.getp(&"route_boxes")
+			for rbox in rboxes:
+				var box := Rect2(pos + rbox.position, rbox.size)
+				item.draw_rect(box, 0x00ff0044)
+				item.draw_rect(box, 0x00ff00ff, false)
 
