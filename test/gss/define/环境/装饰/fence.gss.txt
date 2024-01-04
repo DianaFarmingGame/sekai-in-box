@@ -73,7 +73,7 @@
 				] {
 					cover {
 						cur_draw &side_n
-						collision_box (rect2 -0.5 -0.2 1 0.1)
+						collision_boxes [(rect2 -0.5 -0.2 1 0.1)]
 					}
 				}
 			][
@@ -84,7 +84,7 @@
 				] {
 					cover {
 						cur_draw &side_e
-						collision_box (rect2 0.3 -0.5 0.1 1)
+						collision_boxes [(rect2 0.3 -0.5 0.1 1)]
 					}
 				}
 			][
@@ -95,7 +95,7 @@
 				] {
 					cover {
 						cur_draw &side_s
-						collision_box (rect2 -0.5 0.3 1 0.1)
+						collision_boxes [(rect2 -0.5 0.3 1 0.1)]
 					}
 				}
 			][
@@ -106,7 +106,7 @@
 				] {
 					cover {
 						cur_draw &side_w
-						collision_box (rect2 -0.2 -0.5 0.1 1)
+						collision_boxes [(rect2 -0.2 -0.5 0.1 1)]
 					}
 				}
 			][
