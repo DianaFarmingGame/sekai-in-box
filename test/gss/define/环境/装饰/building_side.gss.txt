@@ -1,6 +1,7 @@
-(defvar building_side/make (func[ref x y]
-	(define/make BlockStaticExt
+(defvar building_side/make (func[ref x y id]
+	(define/make GEntityBlock
 		ref ref
+		id id
 		props {
 			need_route 	#f
 			routable 	#f
@@ -17,12 +18,13 @@
 	)
 ))
 
-(define/sign (building_side/make 2415 2 0))
-(define/sign (building_side/make 2416 2 1))
-(define/sign (building_side/make 2417 2 2))
+(define/sign (building_side/make 2415 2 0 &环境/装饰/房子侧红))
+(define/sign (building_side/make 2416 2 1 &环境/装饰/房子侧黑))
+(define/sign (building_side/make 2417 2 2 &环境/装饰/房子侧架))
 
-(define BlockStaticExt
+(define GEntityBlock
 	ref 2418
+	id &环境/装饰/房子侧门
 	props {
 		need_route 	#f
 		routable 	#f
