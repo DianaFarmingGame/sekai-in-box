@@ -43,7 +43,7 @@
 	嘉心糖 嘉然)
 
 ; 测试：对话
-(proc/call
+#;(proc/call
 	(proc [我 你]
 		(delay 2)
 		(do 我 move_to 你)
@@ -96,4 +96,7 @@
 	)
 
 ; 测试：CSGV读取
-(echo (csgv/load "gss/test/dev-ls/test.csv"))
+(echo (csgv/map-let "gss/test/dev-ls/test.csv"
+	[ID 名称 位置X 位置Y 位置Z 图片/站立 图片/移动 图片/头像 对话标题 行为]
+	(echo ID 名称 位置X 位置Y 位置Z 图片/站立 图片/移动 图片/头像 对话标题 行为)
+	(vec3 位置X 位置Y 位置Z)))

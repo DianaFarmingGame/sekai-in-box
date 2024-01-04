@@ -29,6 +29,13 @@ static func Call(name: StringName, tails = null) -> Array:
 		body.append_array(tail)
 	return List(body)
 
+static func Func(args: Array[StringName], body: Array) -> Array:
+	var vbody := [[
+		Lisper.Array(args.map(func (token): return Lisper.Token(token))),
+	]]
+	vbody.append_array(body)
+	return Lisper.Call(&"func", vbody)
+
 static func FuncGDRaw(handle: Callable) -> Array: return [FnType.GD_RAW, handle]
 
 static func FuncGDRawPure(handle: Callable) -> Array: return [FnType.GD_RAW_PURE, handle]

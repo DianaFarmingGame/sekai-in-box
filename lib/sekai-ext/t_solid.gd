@@ -30,6 +30,10 @@ var props := {
 	&"solid_collide_at": func (sekai: Sekai, this: Mono, pos: Vector3) -> Array:
 		var collide_group := this.getp(&"solid_collide_group") as Array
 		return TSolid.collide_pos(sekai, this, pos).filter(func (m): return m != this and m.callm(&"group_intersects", collide_group)),
+	
+	&"on_draw": Prop.puts({
+		&"99:solid_box": TSolid.draw_debug,
+	} if ProjectSettings.get_setting(&"global/debug_draw") else {})
 }
 
 static func test_pos(sekai: Sekai, this: Mono, pos: Vector3) -> bool:
@@ -47,11 +51,12 @@ static func collide_pos(sekai: Sekai, this: Mono, pos: Vector3) -> Array:
 	box.position += Vector2(pos.x, pos.y)
 	return sekai.will_collide(box, int(pos.z))
 
-static func draw_debug(_sekai, this: Mono) -> void:
-	var item := this.get_item() as SekaiItem
-	var pos := Vector2(this.position.x, this.position.y)
+static func draw_debug(_sekai, this: Mono, item: SekaiItem) -> void:
+	var pos := Vector2(this.position.x, this.position.y - this.position.z * item.ratio_yz)
 	var rbox := this.getp(&"solid_box") as Rect2
 	var box := Rect2(pos + rbox.position, rbox.size)
-	item.draw_rect(box, 0x0000ff44)
-	item.draw_rect(box, 0x0000ffff, false)
+	item.draw_rect(box, 0x0088ff88)
+	item.draw_rect(box, 0x0022ffff, false)
+	item.draw_line(Vector2(box.position.x, pos.y), Vector2(box.end.x, pos.y), 0x0022ffff)
+	item.draw_line(Vector2(pos.x, box.position.y), Vector2(pos.x, box.end.y), 0x0022ffff)
 
