@@ -12,6 +12,7 @@
 			draw_data {
 				building [&static &main (clip3x5_build x y)] 
 			}
+			groups (prop/pushs [2409])
 		}
 	)
 ))
