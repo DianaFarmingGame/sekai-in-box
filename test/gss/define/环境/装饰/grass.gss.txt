@@ -1,5 +1,5 @@
 (define BlockStaticExt
-	ref 102
+	ref 2401
 	props {
 		need_route #f
 		routable #f
@@ -25,7 +25,7 @@
 			concave_sw [&static &main (clip_ground 3 14)]
 		}
 		atile_size (vec3 3 3 1)
-		groups (prop/pushs [102])
-		atile_matches [[102]]
+		groups (prop/pushs [2401])
+		atile_matches [[2401]]
 		atile_rules *atile_rules_3x3x1*
 	})

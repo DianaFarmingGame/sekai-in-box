@@ -1,5 +1,5 @@
 (define BlockStaticExt
-	ref 104
+	ref 2408
 	props {
 		need_route #f
 		routable #f
@@ -22,7 +22,7 @@
 			[10 { cover { need_destroy #t }}]
 		]
 		atile_size (vec3 3 3 3)
-		atile_matches [[101]]
+		atile_matches [[2102]]
 		atile_rules [[
 			[
 				0	0	0

@@ -1,5 +1,5 @@
 (define BlockStaticExt
-	ref 100
+	ref 2101
 	props {
 		asserts {
 			main "assert/地形.png"
@@ -34,8 +34,8 @@
 			top_concave_sw [&static &main (clip_ground 3 7)]
 		}
 		atile_size (vec3 3 3 3)
-		groups (prop/pushs [100])
-		atile_matches [[100 101]]
+		groups (prop/pushs [2101])
+		atile_matches [[2101 2102]]
 		atile_rules [[
 			[
 				0	0	0

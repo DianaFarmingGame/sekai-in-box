@@ -46,7 +46,7 @@
 			atile_rules *atile_rules_3x3x1_crossed*
 		})))
 
-(define/sign (road/make 105 0 #f))
-(define/sign (road/make 106 3 #t))
-(define/sign (road/make 107 6 #f))
-(define/sign (road/make 108 9 #t))
+(define/sign (road/make 2402 0 #f))
+(define/sign (road/make 2403 3 #t))
+(define/sign (road/make 2404 6 #f))
+(define/sign (road/make 2405 9 #t))

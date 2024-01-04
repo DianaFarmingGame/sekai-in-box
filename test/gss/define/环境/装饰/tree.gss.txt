@@ -1,6 +1,6 @@
 ; common tree
 (define BlockStaticExt
-	ref 109
+	ref 2406
 	props {
 		need_route 	#f
 		routable 	#f
@@ -17,7 +17,7 @@
 
 ; 灌木
 (define BlockStaticExt
-	ref 110
+	ref 2407
 	props {
 		need_route 		#f
 		routable 		#f

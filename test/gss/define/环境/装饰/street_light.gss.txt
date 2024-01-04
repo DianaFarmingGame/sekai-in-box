@@ -1,0 +1,29 @@
+;; (define BlockStaticExt
+;; 	ref 2419
+;; 	props {
+;; 		need_route #f
+;; 		routable #f
+;; 		asserts {
+;; 			main "assert/?.png"
+;; 		}
+;; 		cur_draw &light
+;; 		draw_data {
+;; 			light [&static &main (clip_ground ? ?)]
+;; 		}
+;; 	}
+
+;; 	atile_size (vec3 3 3 1)
+;; 	atile_matches [[2403 2405]]
+
+;; 	atile_rules [[
+;; 		[
+;; 			0	0	0
+;; 			-	0	1
+;; 			0	0	0
+;; 		] {
+;; 			cover {
+;; 				flip_h #t
+;; 			}
+;; 		}
+;; 	]]
+;; )
