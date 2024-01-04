@@ -185,6 +185,13 @@ func make_lisper_context() -> LisperContext:
 		&"csgv/load": Lisper.FuncGDRaw( func (ctx: LisperContext, body: Array) -> Array:
 			var src := ctx.exec_node(body[0]) as String
 			return load_csgv(root_dir.path_join(src))),
+		&"csgv/map-let": Lisper.FuncGDMacro( func (body: Array) -> Array:
+			return Lisper.Call(&"array/map", [[
+				Lisper.Call(&"csgv/load", [[body[0]]]),
+				Lisper.Func([&"$record"], [[
+					Lisper.Call(&"array/let", [[Lisper.Token(&"$record"), body[1]], body.slice(2)])
+				]]),
+			]])),
 	})
 	return context
 
