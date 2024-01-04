@@ -1,8 +1,10 @@
-class_name Sekai extends Node2D
+class_name Sekai extends Control
 
 @export_file var define_gss: String
 @export_file var entry_gss: String
 @export_dir var root_dir: String
+@export var render_border_radius := 4
+@export var min_inits_per_frame := 8
 
 var defines: Array[MonoDefine]
 var defines_by_id := {}
@@ -11,6 +13,7 @@ var monos := []
 var monos_need_route := []
 var monos_need_collision := []
 var control_target = null
+@export var cam_target = Vector2()
 
 @export var unit_size := Vector3(16, 16, 12)
 
@@ -38,6 +41,49 @@ func _ready() -> void:
 	var tree := get_tree()
 	tree.process_frame.connect(func (): before_process.emit())
 	input_mapper.updated.connect(_on_input)
+
+func _process(_delta: float) -> void:
+	queue_redraw()
+
+var _item_offset := Vector2()
+var _cam_pos := Vector2()
+var _render_box := Rect2()
+var _frame_time := 0.0
+var _min_count := 0
+var _cur_nearest: float = INF
+var _next_nearest: float = INF
+
+func _draw() -> void:
+	_cur_nearest = _next_nearest
+	_next_nearest = INF
+	_min_count = min_inits_per_frame
+	var cpos := Vector3()
+	if cam_target is Vector3: cpos = cam_target
+	elif cam_target is Mono: cpos = cam_target.position
+	var pos := Vector2(cpos.x, cpos.y - (cpos.z * unit_size.y) / unit_size.z)
+	var offset := -pos + (Vector2(size) * 0.5) / Vector2(unit_size.x, unit_size.y)
+	var box := Rect2(-offset, size / Vector2(unit_size.x, unit_size.y)).grow(render_border_radius)
+	_cam_pos = pos
+	_item_offset = offset
+	_render_box = box
+	_frame_time = Time.get_ticks_usec()
+
+func is_idle(pos: Vector2) -> bool:
+	var ne := _cam_pos.distance_squared_to(pos)
+	if 1 < (_cur_nearest + 1) / ne:
+		_min_count -= 1
+		return _min_count >= 0 or Time.get_ticks_usec() - _frame_time < 10_000
+	return false
+
+func update_padding_pos(pos: Vector2) -> void:
+	var ne := _cam_pos.distance_squared_to(pos)
+	if ne < _next_nearest: _next_nearest = ne
+
+func get_item_offset() -> Vector2:
+	return _item_offset
+
+func get_render_box() -> Rect2:
+	return _render_box
 
 func _exit_tree() -> void:
 	_clear_monos()
@@ -168,18 +214,23 @@ func make_lisper_context() -> LisperContext:
 			return mono),
 		&"control/clear": Lisper.FuncGDCall( func () -> void:
 			control_target = null),
+		&"cam/set": Lisper.FuncGDCall( func (mono: Mono) -> Mono:
+			cam_target = mono
+			return mono),
+		&"cam/clear": Lisper.FuncGDCall( func () -> void:
+			cam_target = null),
 		&"load": Lisper.FuncGDCallPure( func (path: String) -> Resource:
 			return get_assert(path)),
 		&"define/load": Lisper.FuncGDCallPure( func (path: String) -> Resource:
 			return get_assert(path).new()),
 		&"gss/exec": Lisper.FuncGDCallPure( func (path: String) -> void:
 			exec_gss(root_dir.path_join(path))),
-		&"mono_map/make": Lisper.FuncGDCallPure( func (offset: Vector3, cell_size: Vector3, size: Vector2, data := []) -> MonoMap:
+		&"mono_map/make": Lisper.FuncGDCallPure( func (offset: Vector3, cell_size: Vector3, psize: Vector2, data := []) -> MonoMap:
 			var map := MonoMap.new()
 			map.sekai = self
 			map.offset = offset
 			map.cell_size = cell_size
-			map.size = size
+			map.size = psize
 			map.data = PackedInt32Array(data)
 			return map),
 		&"csgv/load": Lisper.FuncGDRaw( func (ctx: LisperContext, body: Array) -> Array:
@@ -329,7 +380,8 @@ func save_to_path(path: String) -> void:
 		&"define_gss": define_gss,
 		&"root_dir": root_dir,
 		&"monos": vmono,
-		&"control_target": monos.find(control_target) if control_target != null else null,
+		&"control_target": monos.find(control_target) if control_target is Mono else control_target,
+		&"cam_target": monos.find(cam_target) if cam_target is Mono else cam_target,
 		&"unit_size": unit_size,
 	}
 	file.store_var(save_data, false)
@@ -353,8 +405,10 @@ func load_from_path(path: String) -> void:
 		var mono = script.new()
 		mono.from_data(self, data)
 		add_mono(mono)
-	var target = load_data[&"control_target"]
-	control_target = monos[target] if target != null else null
+	var vcontrol_target = load_data[&"control_target"]
+	control_target = monos[vcontrol_target] if vcontrol_target is int else vcontrol_target
+	var vcam_target = load_data[&"cam_target"]
+	cam_target = monos[vcam_target] if vcam_target is int else vcam_target
 	var stime := Time.get_ticks_usec()
 	for mono in monos: mono._on_restore()
 	print_rich("[sekai] restore in ", (Time.get_ticks_usec() - stime) / 1000.0, " ms")

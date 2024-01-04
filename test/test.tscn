@@ -25,11 +25,17 @@ focus_mode = 2
 theme = SubResource("Theme_bvu3n")
 script = ExtResource("1_fugfy")
 
-[node name="Sekai" type="Node2D" parent="."]
+[node name="Sekai" type="Control" parent="."]
 texture_filter = 3
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 script = ExtResource("2_l2l10")
 define_gss = "res://test/gss/define_entry.gss.txt"
-entry_gss = "res://test/gss/test/dev-ls/entry.gss.txt"
+entry_gss = "res://test/gss/test/dev-jc-outer/entry.gss.txt"
 root_dir = "res://test"
 unit_size = Vector3(64, 64, 64)
 

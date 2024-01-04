@@ -43,6 +43,7 @@ func to_data() -> Dictionary:
 
 func from_data(psekai: Sekai, data: Dictionary) -> void:
 	var ref = data[&"ref"]
+	sekai = psekai
 	define = psekai.get_define_by_ref(ref)
 	inited = data[&"inited"]
 	layers = data[&"layers"]
