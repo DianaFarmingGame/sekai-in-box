@@ -94,9 +94,3 @@
 			contains [(mono/make Mono &卷轴 props {stack_count 11})]
 		})
 	)
-
-; 测试：CSGV读取
-(echo (csgv/map-let "gss/test/dev-ls/test.csv"
-	[ID 名称 位置X 位置Y 位置Z 图片/站立 图片/移动 图片/头像 对话标题 行为]
-	(echo ID 名称 位置X 位置Y 位置Z 图片/站立 图片/移动 图片/头像 对话标题 行为)
-	(vec3 位置X 位置Y 位置Z)))

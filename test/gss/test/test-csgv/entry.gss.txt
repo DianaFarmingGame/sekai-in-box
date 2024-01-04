@@ -1,0 +1,5 @@
+; 测试：CSGV读取
+(echo (csgv/map-let "gss/test/test-csgv/test.csv"
+	[ID 名称 位置X 位置Y 位置Z 图片/站立 图片/移动 图片/头像 对话标题 行为]
+	(echo ID 名称 位置X 位置Y 位置Z 图片/站立 图片/移动 图片/头像 对话标题 行为)
+	(vec3 位置X 位置Y 位置Z)))
