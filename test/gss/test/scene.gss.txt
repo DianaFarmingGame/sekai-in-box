@@ -53,8 +53,6 @@
 	102	102	-	-	-	-	-	-
 ])
 
-
-
 (defvar 嘉然 (mono MonoEntity &嘉然
 	props {
 		position (vec3 5 9 1)

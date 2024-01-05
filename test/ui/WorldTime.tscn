@@ -7,7 +7,9 @@
 [sub_resource type="LabelSettings" id="LabelSettings_xdu5i"]
 font_size = 10
 
-[node name="WorldTime" type="Node2D"]
+[node name="WorldTime" type="Control"]
+layout_mode = 3
+anchors_preset = 0
 script = ExtResource("1_hw424")
 
 [node name="date" type="TextureRect" parent="."]

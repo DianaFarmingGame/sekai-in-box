@@ -64,16 +64,16 @@ animations = [{
 }]
 
 [node name="package" type="TextureRect"]
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_right = -212.0
-offset_bottom = -529.0
-grow_horizontal = 2
-grow_vertical = 2
+anchors_preset = -1
+anchor_left = 0.189236
+anchor_top = 0.376563
+anchor_right = 0.821181
+anchor_bottom = 0.55
+offset_right = -1.52588e-05
 texture = ExtResource("1_as14i")
 stretch_mode = 2
 script = ExtResource("2_dr40a")
+metadata/_edit_use_anchors_ = true
 
 [node name="ItemSpace" type="GridContainer" parent="."]
 layout_mode = 0

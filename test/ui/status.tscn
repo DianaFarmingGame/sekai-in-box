@@ -24,13 +24,13 @@ grow_vertical = 2
 script = ExtResource("1_qog5n")
 
 [node name="diana" type="Control" parent="."]
-layout_mode = 3
-anchors_preset = 0
-offset_left = 17.0
-offset_top = 21.0
-offset_right = 118.0
-offset_bottom = 56.0
+layout_mode = 1
+anchor_left = 0.0295139
+anchor_top = 0.0328125
+anchor_right = 0.204861
+anchor_bottom = 0.0875
 metadata/_edit_group_ = true
+metadata/_edit_use_anchors_ = true
 
 [node name="hp_progress" type="TextureProgressBar" parent="diana"]
 layout_mode = 0
@@ -92,11 +92,12 @@ label_settings = SubResource("LabelSettings_o2wtf")
 
 [node name="traveler" type="Control" parent="."]
 anchors_preset = 0
-offset_left = 17.0
-offset_top = 21.0
-offset_right = 118.0
-offset_bottom = 56.0
+anchor_left = 0.0295139
+anchor_top = 0.0328125
+anchor_right = 0.204861
+anchor_bottom = 0.0875
 metadata/_edit_group_ = true
+metadata/_edit_use_anchors_ = true
 
 [node name="hp_progress" type="TextureProgressBar" parent="traveler"]
 layout_mode = 0
@@ -158,16 +159,17 @@ label_settings = SubResource("LabelSettings_o2wtf")
 
 [node name="money" type="TextureRect" parent="."]
 layout_mode = 1
-anchors_preset = 1
-anchor_left = 1.0
-anchor_right = 1.0
-offset_left = -104.0
-offset_top = 79.0
-offset_right = -22.0
-offset_bottom = 101.0
+anchors_preset = -1
+anchor_left = 0.819444
+anchor_top = 0.123438
+anchor_right = 0.961806
+anchor_bottom = 0.157813
+offset_left = 1.52588e-05
+offset_right = -1.52588e-05
 grow_horizontal = 0
 texture = ExtResource("6_mpmw7")
 expand_mode = 3
+metadata/_edit_use_anchors_ = true
 
 [node name="num" type="Label" parent="money"]
 layout_mode = 0
@@ -180,4 +182,12 @@ label_settings = SubResource("LabelSettings_42c66")
 horizontal_alignment = 1
 
 [node name="WorldTime" parent="." instance=ExtResource("7_o2iu0")]
-position = Vector2(472, 16)
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.819444
+anchor_top = 0.0265625
+anchor_right = 0.819444
+anchor_bottom = 0.0265625
+offset_left = 1.52588e-05
+offset_right = 1.52588e-05
+metadata/_edit_use_anchors_ = true
