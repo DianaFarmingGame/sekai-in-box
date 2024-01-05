@@ -1,0 +1,15 @@
+(define Character
+	ref 1200
+	id &实体/NPC
+	props {
+		name "NPC"
+		solid_box (rect2 -0.3 -0.1 0.6 0.2)
+		asserts {
+			idle "assert/人物/糖/站立.png"
+			walk "assert/人物/糖/走路.png"
+		}
+		draw_data {
+			idle [&fixed &idle 0.6 (anim_char 4)]
+			walk [&fixed &walk 0.4 (anim_char 8)]
+		}
+	})
