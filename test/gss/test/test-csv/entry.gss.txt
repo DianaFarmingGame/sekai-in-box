@@ -1,0 +1,45 @@
+(gss/exec "gss/test/test-csv/scene.gss.txt")
+
+; 测试：CSV映射到对话
+(block
+	(defvar Actions {})
+	(defvar data (csv/map-let "gss/test/test-csv/dialog.csv"
+		[ID 类型 发起者 文本 跳转表] {
+			ID ID
+			类型 (keyword 类型)
+			发起者 (keyword 发起者)
+			文本 文本
+			跳转表 (=> 跳转表
+					(string/split "\n")
+					(array/filter (func [l] (!= l "")))
+					(array/map (func [l] (=> l
+						(string/split ":")
+						(array/map string/trim)
+						((func [pair] (@= pair 1 (keyword (@ pair 1))) pair))))))
+		}))
+	
+	#;(array/for data (func [i record]
+		(if (and (!= & (@ record &类型)) (!= "" (@ record &ID)))
+			(echo record))
+		))
+	
+	(defvar NPCs {})
+	(csgv/map-let "gss/test/test-csv/npc.csv"
+		[ID 名称 位置X 位置Y 位置Z 图片/站立 图片/移动 图片/头像 对话标题 行为]
+		(defvar NPC (mono/make MonoEntity &实体/NPC
+			props {
+				name 名称
+				position (vec3 位置X 位置Y 位置Z)
+				asserts {
+					idle 图片/站立
+					walk 图片/移动
+				}
+				actions {
+					interact {}
+				}
+			}))
+		(@= NPCs ID NPC)
+		)
+	(dict/for NPCs (func [k v]
+		(mono/add v)))
+	)

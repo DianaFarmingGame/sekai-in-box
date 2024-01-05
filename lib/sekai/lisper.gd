@@ -46,6 +46,51 @@ static func FuncGDCallPure(handle: Callable) -> Array: return [FnType.GD_CALL_PU
 
 static func FuncGDMacro(handle: Callable) -> Array: return [FnType.GD_MACRO, handle]
 
+static func stringify(node: Array, indent := 0) -> String:
+	match node[0]:
+		TType.TOKEN:
+			return str(node[1])
+		TType.NUMBER:
+			return str(node[1])
+		TType.BOOL:
+			match node[1]:
+				true: return "#t"
+				false: return "#f"
+		TType.KEYWORD:
+			return str('&', node[1])
+		TType.STRING:
+			return str('"', (node[1] as String).c_escape(), '"')
+		TType.LIST:
+			var body = node[1]
+			if body.size() <= 2:
+				return '(' + ' '.join(node[1].map(func (n): return Lisper.stringify(n, indent))) + ')'
+			return '(' + \
+			Lisper.stringify(body[0], indent) + ' ' + \
+			Lisper.stringify(body[1], indent) + \
+			''.join(body.slice(2).map(func (n): return '\n' + ''.lpad(indent+1, '\t') + Lisper.stringify(n, indent + 1))) + ')'
+		TType.ARRAY:
+			return '[' + ' '.join(node[1].map(func (n): return Lisper.stringify(n, indent))) + ']'
+		TType.MAP:
+			var res := ['{']
+			var key := true
+			for n in node[1]:
+				if key:
+					res.append('\n' + ''.lpad(indent+1, '\t'))
+					res.append(Lisper.stringify(n, indent + 1))
+				else:
+					res.append(' ')
+					res.append(Lisper.stringify(n, indent + 2))
+				key = not key
+			res.append('\n' + ''.lpad(indent, '\t') + '}')
+			return ''.join(res)
+		TType.RAW:
+			return str(node[1])
+	push_error("unknown typed node: ", node)
+	return "<UNKNOWN>"
+
+static func stringifys(body: Array) -> String:
+	return ' '.join(body.map(Lisper.stringify))
+
 static func test_parser() -> void:
 	print(Lisper.tokenize("1 0 .5 10 204.2 3.30"))
 	print(Lisper.tokenize("#t #f#t"))

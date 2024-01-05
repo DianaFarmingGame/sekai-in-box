@@ -239,12 +239,16 @@ func make_lisper_context() -> LisperContext:
 			var src := ctx.exec_node(body[0]) as String
 			return load_csgv(root_dir.path_join(src))),
 		&"csgv/map-let": Lisper.FuncGDMacro( func (body: Array) -> Array:
-			return Lisper.Call(&"array/map", [[
+			return Lisper.Call(&"array/map-let", [[
 				Lisper.Call(&"csgv/load", [[body[0]]]),
-				Lisper.Func([&"$record"], [[
-					Lisper.Call(&"array/let", [[Lisper.Token(&"$record"), body[1]], body.slice(2)])
-				]]),
-			]])),
+			], body.slice(1)])),
+		&"csv/load": Lisper.FuncGDRaw( func (ctx: LisperContext, body: Array) -> Array:
+			var src := ctx.exec_node(body[0]) as String
+			return load_csv(root_dir.path_join(src))),
+		&"csv/map-let": Lisper.FuncGDMacro( func (body: Array) -> Array:
+			return Lisper.Call(&"array/map-let", [[
+				Lisper.Call(&"csv/load", [[body[0]]]),
+			], body.slice(1)])),
 	})
 	return context
 
@@ -272,6 +276,14 @@ func load_csgv(path: String) -> Array:
 	while file.get_position() < file.get_length():
 		content.append(Array(file.get_csv_line()).map(func (entry: String):
 			return gss_ctx.eval(entry.replace('“', '"').replace('”', '"'))[0]))
+	return content
+
+func load_csv(path: String) -> Array:
+	var content := []
+	var file := FileAccess.open(path, FileAccess.READ)
+	var _head := file.get_csv_line()
+	while file.get_position() < file.get_length():
+		content.append(Array(file.get_csv_line()))
 	return content
 
 func sign_define(define: MonoDefine) -> void:
