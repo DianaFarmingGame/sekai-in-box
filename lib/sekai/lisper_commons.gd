@@ -78,6 +78,13 @@ func def_commons(context: LisperContext) -> void:
 			var args = body.slice(1)
 			vctx.call_fn_async(handle, args)
 			return vctx),
+		&"str/concat": Lisper.FuncGDRawPure( func (ctx: LisperContext, body: Array) -> String:
+			var res := ''
+			body = body.map(ctx.exec_node)
+			for v in body[0]:
+				assert(v is String)
+				res += v
+			return res),
 		&"array/concat": Lisper.FuncGDRawPure( func (ctx: LisperContext, body: Array) -> Array:
 			var res := []
 			body = body.map(ctx.exec_node)
