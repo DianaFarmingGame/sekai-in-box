@@ -4,7 +4,7 @@ extends Control
 @onready var dialog_inner := %DialogInner as RichTextLabel
 @onready var dialog_box := %DialogBox as Control
 @onready var item_box := %ItemBox as ItemList
-@onready var dialog = $dialog
+@onready var dialog = $CanvasLayer/dialog
 
 var picture_dict = {
 	# ^Lane Sun: 使用 preload 可以用相对路径访问文件

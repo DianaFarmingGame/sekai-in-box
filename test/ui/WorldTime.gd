@@ -1,4 +1,4 @@
-extends Node2D
+extends Control
 
 const START_TIME = "2022-03-07 00:00:00"
 
