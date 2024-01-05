@@ -7,10 +7,12 @@ class_name Sekai extends Node2D
 var defines: Array[MonoDefine]
 var defines_by_id := {}
 var gss_ctx: LisperContext
+var proc_ctx: ProcedureContext
 var monos := []
 var monos_need_route := []
 var monos_need_collision := []
 var control_target = null
+var control_stack := []
 
 @export var unit_size := Vector3(16, 16, 12)
 
@@ -52,6 +54,13 @@ signal input_updating(triggered: Dictionary, pressings: Dictionary, releasings: 
 
 signal input_updated(triggered: Dictionary, pressings: Dictionary, releasings: Dictionary)
 
+func cover_control(control = null) -> void:
+	control_stack.append(control_target)
+	control_target = control
+
+func uncover_control() -> void:
+	control_target = control_stack.pop_back()
+
 var _block_input := false
 
 func block_input() -> void:
@@ -76,6 +85,8 @@ func _init_sekai() -> void:
 	defines.clear()
 	defines_by_id.clear()
 	gss_ctx = make_lisper_context()
+	proc_ctx = ProcedureContext.extend(gss_ctx)
+	ProcedureCommons.def_commons(proc_ctx)
 	_clear_monos()
 	control_target = null
 	if define_gss: exec_gss(define_gss)

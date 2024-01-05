@@ -14,9 +14,22 @@ func do_merge(sets: Array[Dictionary]) -> Array[Dictionary]:
 		&"cur_dir": -1,
 		
 		&"on_input_action": Prop.puts({
-			&"0:character": func (_sekai, this: Mono, all: Dictionary, press: Dictionary, _release) -> void:
+			&"0:character": func (sekai: Sekai, this: Mono, all: Dictionary, press: Dictionary, _release) -> void:
 				if this.getp(&"cur_state") != &"combo":
-					if press.has(&"combo"):
+					if press.has(&"dialog_confirm"):
+						var mono = null
+						var min_dis = INF
+						for m in sekai.monos:
+							if m is Mono and m != this:
+								var dis := this.position.distance_squared_to(m.position)
+								if dis < min_dis:
+									min_dis = dis
+									mono = m
+						if mono != null and sqrt(min_dis) <= this.getp(&"touch_radius"):
+							var action = mono.getp(&"actions").get(&"interact")
+							if action != null:
+								sekai.proc_ctx.call_fn_async(action, [sekai, mono, this])
+					elif press.has(&"combo"):
 						this.callm(&"state_to", &"combo")
 					else:
 						var dir := Vector2(0, 0)
@@ -153,6 +166,12 @@ func do_merge(sets: Array[Dictionary]) -> Array[Dictionary]:
 			else:
 				await sekai.external_fns[&"dialog_say_to"].call(sekai, this, {}, meta_text),
 		
+		&"show_aside": func (sekai: Sekai, this: Mono, meta_text, text = null) -> void:
+			if text != null:
+				await sekai.external_fns[&"dialog_show_aside"].call(sekai, this, meta_text, text)
+			else:
+				await sekai.external_fns[&"dialog_show_aside"].call(sekai, this, {}, meta_text),
+		
 		&"choose_single": func (sekai: Sekai, this: Mono, meta_arg1, arg1, arg2 = null) -> int:
 			if arg2 != null:
 				return await sekai.external_fns[&"dialog_choose_single"].call(sekai, this, meta_arg1, arg1, arg2)
@@ -193,6 +212,7 @@ func do_merge(sets: Array[Dictionary]) -> Array[Dictionary]:
 			&"move_to": Lisper.FuncGDCall(vprops[&"move_to"]),
 			&"move_to_at_speed": Lisper.FuncGDCall(vprops[&"move_to_at_speed"]),
 			&"say_to": Lisper.FuncGDCall(vprops[&"say_to"]),
+			&"show_aside": Lisper.FuncGDCall(vprops[&"show_aside"]),
 			&"choose_single": Lisper.FuncGDRaw( func (ctx: ProcedureContext, body: Array) -> Variant:
 				var sekai := await ctx.exec_node_async(body[0]) as Sekai
 				var this := await ctx.exec_node_async(body[1]) as Mono
@@ -218,6 +238,10 @@ func do_merge(sets: Array[Dictionary]) -> Array[Dictionary]:
 					branches[i] = patterns[2 * i + 1] as Array
 				var choose := await vprops[&"choose_single"].call(sekai, this, meta, title, choices) as int
 				return await ctx.exec_node_async(branches[choose])),
+			&"dialog_to": Lisper.FuncGDRaw( func (ctx: ProcedureContext, body: Array) -> Variant:
+				var vid = await ctx.exec_node_async(body[3])
+				var dialog = ctx.get_var(&"Dialogs")[vid]
+				return await ctx.call_rawfn_async(dialog, body.slice(0, 3))),
 		}),
 	})
 	return sets

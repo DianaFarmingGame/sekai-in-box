@@ -2,7 +2,7 @@
 
 ; 测试：CSV映射到对话
 (block
-	(defvar Actions {})
+	(defvar Dialogs {})
 	(defvar data (csv/map-let "gss/test/test-csv/dialog.csv"
 		[ID 类型 发起者 文本 跳转表] {
 			ID ID
@@ -18,27 +18,57 @@
 						((func [pair] (@= pair 1 (keyword (@ pair 1))) pair))))))
 		}))
 	
-	#;(array/for data (func [i record]
-		(if (and (!= & (@ record &类型)) (!= "" (@ record &ID)))
-			(echo record))
+	(array/for data (func [i record]
+		(if (and (!= (@ record &类型) &)
+				 (!= (@ record &ID) ""))
+			(block
+				(defvar cur-i i)
+				(loop* skip escape
+					(if (not (and (< cur-i (array/size data))
+								  (=> data (@ cur-i) (@ &类型) (!= &))))
+						(escape))
+					(+1 cur-i))
+				(defvar ary (array/slice data i cur-i))
+				(defvar expr (template
+					(proc [sekai this src]
+						:expand :raw
+						(array/map ary (func [opt]
+							(switch (@ opt &类型)
+								&对话 (switch (@ opt &发起者)
+									&主 (template (do src say_to this :eval (@ opt &文本)))
+									&宾 (template (do this say_to src :eval (@ opt &文本))))
+								&旁白
+									(template (do src show_aside :eval (@ opt &文本)))
+								&选择
+									(template
+										(do src choose_single :eval (@ opt &文本)
+											:expand :raw
+											(array/flat (array/map (@ opt &跳转表) (func [item]
+												[(raw<- (@ item 0)) (template (do this dialog_to src :eval (@ item 1)))])))))
+								#t
+									(template (echo "unsupport dialog type:" :eval (@ opt &类型)))
+								))))))
+				#;(raw/echo expr)
+				(@= Dialogs (@ record &ID) (eval expr))
+				))
 		))
 	
 	(defvar NPCs {})
-	(csgv/map-let "gss/test/test-csv/npc.csv"
-		[ID 名称 位置X 位置Y 位置Z 图片/站立 图片/移动 图片/头像 对话标题 行为]
-		(defvar NPC (mono/make MonoEntity &实体/NPC
+	(csv/map-let "gss/test/test-csv/npc.csv"
+		[ID 名称 位置X 位置Y 位置Z 图片/站立 图片/移动 图片/头像 行为]
+		(defvar npc (mono/make MonoEntity &实体/NPC
 			props {
 				name 名称
-				position (vec3 位置X 位置Y 位置Z)
+				position (vec3 (num 位置X) (num 位置Y) (num 位置Z))
 				asserts {
 					idle 图片/站立
 					walk 图片/移动
 				}
 				actions {
-					interact {}
+					interact (@ Dialogs 行为)
 				}
 			}))
-		(@= NPCs ID NPC)
+		(@= NPCs ID npc)
 		)
 	(dict/for NPCs (func [k v]
 		(mono/add v)))
