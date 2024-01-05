@@ -17,17 +17,90 @@ func _init() -> void:
 	CommonContext = LisperContext.new()
 	def_commons(CommonContext)
 
+# Template 语法
+#   :eval   执行随后的元素并转换为Raw格式
+#   :expand 执行随后的元素并将结果数组的各元素转换为Raw格式后依次插入
+#   :raw    为随后的操作保留原格式
+
+func template(ctx: LisperContext, node: Array) -> Array:
+	match node[0]:
+		Lisper.TType.LIST, Lisper.TType.ARRAY, Lisper.TType.MAP:
+			var body := (node[1] as Array).duplicate()
+			var act_type := &""
+			var is_raw := false
+			var i := 0
+			while i < body.size():
+				var n := body[i] as Array
+				if n[0] == Lisper.TType.TOKEN:
+					match n[1]:
+						&":eval":
+							body.remove_at(i)
+							act_type = &":eval"
+							continue
+						&":expand":
+							body.remove_at(i)
+							act_type = &":expand"
+							continue
+						&":raw":
+							body.remove_at(i)
+							is_raw = true
+							continue
+				match act_type:
+					&"": i += 1; continue
+					&":eval":
+						var res = ctx.exec_node(body[i])
+						body[i] = res if is_raw else Lisper.Raw(res)
+						act_type = &""; is_raw = false
+						i += 1; continue
+					&":expand":
+						var res := ctx.exec_node(body.pop_at(i)) as Array
+						var nbody = body.slice(0, i)
+						nbody.append_array(res if is_raw else res.map(Lisper.Raw))
+						nbody.append_array(body.slice(i))
+						body = nbody
+						act_type = &""; is_raw = false
+						i += res.size(); continue
+			return [node[0], body]
+	return node
+
 func def_commons(context: LisperContext) -> void:
 	context.def_vars([Lisper.VarFlag.CONST, Lisper.VarFlag.FIX], {
 		&"raw": Lisper.FuncGDRawPure( func (_ctx, body: Array) -> Array:
-			return body),
+			return body[0]),
+		&"raw->string": Lisper.FuncGDCallPure(Lisper.stringify),
+		&"raw/echo": Lisper.FuncGDMacro( func (body: Array) -> Array:
+			return Lisper.Call(&"echo", [[
+				Lisper.Call(&"raw->string", [body]),
+			]])),
+		&"display": Lisper.FuncGDMacro( func (body: Array) -> Array:
+			return Lisper.Call(&"echo", [[
+				Lisper.Call(&"raw->string", [[
+					Lisper.Call(&"raw", [body]),
+				]]),
+			]])),
+		&"template": Lisper.FuncGDRawPure( func (ctx: LisperContext, body: Array) -> Array:
+			return template(ctx, body[0])),
 		&"block": Lisper.FuncGDRawPure( func (ctx: LisperContext, body: Array) -> Variant:
 			return ctx.exec(body)[-1] if body.size() > 0 else null),
+		&"=>": Lisper.FuncGDMacro( func (body: Array) -> Array:
+			var inner = body[0]
+			for step in body.slice(1):
+				step = step.duplicate()
+				step[1] = step[1].duplicate()
+				step[1].insert(1, inner)
+				inner = step
+			return inner),
 		&"if": Lisper.FuncGDRawPure( func (ctx: LisperContext, body: Array) -> Variant:
 			if ctx.exec_node(body[0]):
 				return ctx.exec_node(body[1])
 			elif body.size() > 2:
 				return ctx.exec_node(body[2])
+			return null),
+		&"switch": Lisper.FuncGDRawPure( func (ctx: LisperContext, body: Array) -> Variant:
+			var value = ctx.exec_node(body[0])
+			for i in (body.size() - 1) / 2:
+				if value == ctx.exec_node(body[2 * i + 1]):
+					return ctx.exec_node(body[2 * i + 2])
 			return null),
 		&"loop": Lisper.FuncGDRawPure( func (ctx: LisperContext, body: Array) -> Variant:
 			while true:
@@ -78,6 +151,8 @@ func def_commons(context: LisperContext) -> void:
 			var args = body.slice(1)
 			vctx.call_fn_async(handle, args)
 			return vctx),
+		&"keyword": Lisper.FuncGDCallPure( func (value: Variant) -> StringName:
+			return StringName(value)),
 		&"array/concat": Lisper.FuncGDRawPure( func (ctx: LisperContext, body: Array) -> Array:
 			var res := []
 			body = body.map(ctx.exec_node)
@@ -89,6 +164,10 @@ func def_commons(context: LisperContext) -> void:
 			var ary := ctx.exec_node(body[0]) as Array
 			var handle = ctx.exec_node(body[1])
 			return ary.map(func (e): return ctx.call_fn(handle, [e]))),
+		&"array/filter": Lisper.FuncGDRawPure( func (ctx: LisperContext, body: Array) -> Variant:
+			var ary := ctx.exec_node(body[0]) as Array
+			var handle = ctx.exec_node(body[1])
+			return ary.filter(func (e): return ctx.call_fn(handle, [e]))),
 		&"array/slice": Lisper.FuncGDRawPure( func (ctx: LisperContext, body: Array) -> Variant:
 			var ary := ctx.exec_node(body[0]) as Array
 			var begin := 0
@@ -110,12 +189,29 @@ func def_commons(context: LisperContext) -> void:
 			for node in body.slice(2):
 				res = ctx.exec_node(node)
 			return res),
+		&"array/map-let": Lisper.FuncGDMacro( func (body: Array) -> Array:
+			return Lisper.Call(&"array/map", [[
+				body[0],
+				Lisper.Func([&"$item"], [[
+					Lisper.Call(&"array/let", [[Lisper.Token(&"$item"), body[1]], body.slice(2)])
+				]]),
+			]])),
+		&"array/for": Lisper.FuncGDRawPure( func (ctx: LisperContext, body: Array) -> void:
+			var ary := ctx.exec_node(body[0]) as Array
+			var handle = ctx.exec_node(body[1])
+			for i in ary.size():
+				ctx.call_fn(handle, [i, ary[i]])
+			),
 		&"dict/for": Lisper.FuncGDRawPure( func (ctx: LisperContext, body: Array) -> void:
 			var dict := ctx.exec_node(body[0]) as Dictionary
 			var handle = ctx.exec_node(body[1])
 			for key in dict.keys():
 				ctx.call_fn(handle, [key, dict[key]])
 			),
+		&"string/split": Lisper.FuncGDCallPure( func (pstr: String, split: String) -> Array:
+			return Array(pstr.split(split))),
+		&"string/trim": Lisper.FuncGDCallPure( func (pstr: String) -> String:
+			return pstr.strip_edges()),
 		&"echo": Lisper.FuncGDRaw( func (ctx: LisperContext, body: Array) -> Variant:
 			var msg := []
 			var res
@@ -184,10 +280,26 @@ func def_commons(context: LisperContext) -> void:
 			return x * y),
 		&"/": Lisper.FuncGDCallPure( func (x, y) -> Variant:
 			return x / y),
+		&"==": Lisper.FuncGDCallPure( func (x, y) -> Variant:
+			return x == y),
+		&"!=": Lisper.FuncGDCallPure( func (x, y) -> Variant:
+			return x != y),
 		&"@": Lisper.FuncGDCallPure( func (src, ref) -> Variant:
 			return src[ref]),
 		&"@=": Lisper.FuncGDCallPure( func (src, ref, value) -> void:
 			src[ref] = value),
+		&"and": Lisper.FuncGDRawPure( func (ctx: LisperContext, body: Array) -> bool:
+			var res := true
+			for expr in body:
+				res = ctx.exec_node(expr)
+				if not res: return res
+			return res),
+		&"or": Lisper.FuncGDRawPure( func (ctx: LisperContext, body: Array) -> bool:
+			var res := false
+			for expr in body:
+				res = ctx.exec_node(expr)
+				if res: return res
+			return res),
 		&"prop/setp": Lisper.FuncGDCallPure(Prop.setp),
 		&"prop/pushs": Lisper.FuncGDCallPure(Prop.pushs),
 		&"prop/puts": Lisper.FuncGDCallPure(Prop.puts),

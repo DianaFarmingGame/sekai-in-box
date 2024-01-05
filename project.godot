@@ -23,6 +23,7 @@ ProcedureCommons="*res://lib/sekai-ext/procedure_commons.gd"
 
 [debug]
 
+gdscript/warnings/integer_division=0
 gdscript/warnings/confusable_local_declaration=0
 
 [display]

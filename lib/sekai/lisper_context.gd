@@ -49,6 +49,8 @@ func eval(expr: String) -> Variant:
 		return res
 	else:
 		push_error("failed to tokenize expression")
+		printerr("failed to tokenize expression:")
+		printerr(source)
 		return null
 
 func exec(nodes: Array) -> Variant:
@@ -68,7 +70,8 @@ func log_error(node: Array, msg) -> void:
 			lines[i] = String.num_uint64(i + slnum + 1).lpad(4) + "|\t" + lines[i]
 		printerr(msg, "\n", '\n'.join(lines))
 	else:
-		printerr(msg)
+		printerr(msg, " @:")
+		printerr(Lisper.stringify(node))
 	print('')
 
 func exec_node(node: Array) -> Variant:
@@ -135,6 +138,9 @@ func call_rawfn(handle: Array, body: Array) -> Variant:
 			var args := handle[1] as Array
 			if args.size() != body.size():
 				push_error("argument list not match expect ", args.size(), " found ", body.size())
+				printerr("argument list not match expect ", args.size(), " found ", body.size())
+				printerr("need: ", args)
+				printerr("provide: ", Lisper.stringifys(body))
 				return null
 			var vargs := body.map(exec_node)
 			for iarg in args.size():
@@ -142,6 +148,8 @@ func call_rawfn(handle: Array, body: Array) -> Variant:
 			return fctx.exec(handle[2])[-1]
 		_:
 			push_error("unknown call handle type: ", handle)
+			printerr("unknown call handle type: ", handle)
+			printerr("arguments: ", Lisper.stringifys(body))
 			return null
 
 func call_fn(handle: Array, vargs: Array) -> Variant:
@@ -157,12 +165,17 @@ func call_fn(handle: Array, vargs: Array) -> Variant:
 			var args := handle[1] as Array
 			if args.size() != vargs.size():
 				push_error("argument list not match expect ", args.size(), " found ", vargs.size())
+				printerr("argument list not match expect ", args.size(), " found ", vargs.size())
+				printerr("need: ", args)
+				printerr("provide: ", vargs)
 				return null
 			for iarg in args.size():
 				fctx.def_var([], args[iarg], vargs[iarg])
 			return fctx.exec(handle[2])[-1]
 		_:
 			push_error("unknown call handle type: ", handle)
+			printerr("unknown call handle type: ", handle)
+			printerr("arguments: ", vargs)
 			return null
 
 func call_anyway(handle: Variant, vargs: Array) -> Variant:
@@ -171,6 +184,8 @@ func call_anyway(handle: Variant, vargs: Array) -> Variant:
 	if handle is Array:
 		return call_fn(handle, vargs)
 	push_error("unknown call handle type: ", handle)
+	printerr("unknown call handle type: ", handle)
+	printerr("arguments: ", vargs)
 	return null
 
 func eval_async(expr: String) -> Variant:
@@ -182,6 +197,8 @@ func eval_async(expr: String) -> Variant:
 		return res
 	else:
 		push_error("failed to tokenize expression")
+		printerr("failed to tokenize expression:")
+		printerr(source)
 		return null
 
 func exec_async(nodes: Array) -> Variant:
@@ -246,6 +263,9 @@ func call_rawfn_async(handle: Array, body: Array) -> Variant:
 			var args := handle[1] as Array
 			if args.size() != body.size():
 				push_error("argument list not match expect ", args.size(), " found ", body.size())
+				printerr("argument list not match expect ", args.size(), " found ", body.size())
+				printerr("need: ", args)
+				printerr("provide: ", Lisper.stringifys(body))
 				return null
 			var vargs := []
 			vargs.resize(body.size())
@@ -256,6 +276,8 @@ func call_rawfn_async(handle: Array, body: Array) -> Variant:
 			return (await fctx.exec_async(handle[2]))[-1]
 		_:
 			push_error("unknown call handle type: ", handle)
+			printerr("unknown call handle type: ", handle)
+			printerr("arguments: ", Lisper.stringifys(body))
 			return null
 
 func call_fn_async(handle: Array, vargs: Array) -> Variant:
@@ -271,12 +293,17 @@ func call_fn_async(handle: Array, vargs: Array) -> Variant:
 			var args := handle[1] as Array
 			if args.size() != vargs.size():
 				push_error("argument list not match expect ", args.size(), " found ", vargs.size())
+				printerr("argument list not match expect ", args.size(), " found ", vargs.size())
+				printerr("need: ", args)
+				printerr("provide: ", vargs)
 				return null
 			for iarg in args.size():
 				fctx.def_var([], args[iarg], vargs[iarg])
 			return (await fctx.exec_async(handle[2]))[-1]
 		_:
 			push_error("unknown call handle type: ", handle)
+			printerr("unknown call handle type: ", handle)
+			printerr("arguments: ", vargs)
 			return null
 
 func call_anyway_async(handle: Variant, vargs: Array) -> Variant:
@@ -285,4 +312,6 @@ func call_anyway_async(handle: Variant, vargs: Array) -> Variant:
 	if handle is Array:
 		return await call_fn(handle, vargs)
 	push_error("unknown call handle type: ", handle)
+	printerr("unknown call handle type: ", handle)
+	printerr("arguments: ", vargs)
 	return null
