@@ -1,5 +1,5 @@
 (defvar building_side/make (func[ref x y id]
-	(define/make GEntityBlock
+	(define/make EntityBlock
 		ref ref
 		id id
 		props {
@@ -22,7 +22,7 @@
 (define/sign (building_side/make 2416 2 1 &环境/装饰/房子侧黑))
 (define/sign (building_side/make 2417 2 2 &环境/装饰/房子侧架))
 
-(define GEntityBlock
+(define EntityBlock
 	ref 2418
 	id &环境/装饰/房子侧门
 	props {

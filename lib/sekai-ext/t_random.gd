@@ -16,7 +16,6 @@ var props := {
 }
 
 static func update(sekai: Sekai, this: Mono) -> void:
-	this = this.upgrade()
 	var random_rules := this.getp(&"random_rules") as Array
 	if random_rules.size() > 0:
 		var wtotal := 0.0

@@ -1,6 +1,7 @@
 class_name SekaiItem extends Node2D
 
 var base_transform: Transform2D
+var offset_transform: Transform2D
 var unit_size: Vector3:
 	set(v):
 		unit_size = v
@@ -9,6 +10,7 @@ var ratio_yz := 1.0
 
 func _ready() -> void:
 	base_transform = Transform2D(0, Vector2(unit_size.x, unit_size.y), 0, Vector2(0, -position.y))
+	offset_transform = Transform2D(0, Vector2(1, 1), 0, Vector2())
 
 var _time := 0.0
 var _t_delta := 0.0
@@ -24,6 +26,7 @@ func _process(delta: float) -> void:
 signal on_draw
 
 func _draw() -> void:
+	set_offset(get_parent().get_item_offset())
 	pen_clear_transform()
 	on_draw.emit()
 
@@ -37,6 +40,9 @@ func set_y(y: float) -> void:
 	if y != position.y:
 		position.y = y
 		base_transform = Transform2D(0, Vector2(unit_size.x, unit_size.y), 0, Vector2(0, -position.y))
+
+func set_offset(pos: Vector2) -> void:
+	offset_transform = Transform2D(0, Vector2(1, 1), 0, pos)
 
 func rect3_to_rect2(rect: AABB) -> Rect2:
 	return Rect2(
@@ -53,7 +59,7 @@ func pen_draw_texture_region(texture: Texture2D, rect: Rect2, region: Rect2, pmo
 	draw_texture_rect_region(texture, rect, region, pmodulate)
 
 func pen_set_transform(ptransform: Transform2D) -> void:
-	draw_set_transform_matrix(base_transform * ptransform)
+	draw_set_transform_matrix(base_transform * offset_transform * ptransform)
 
 func pen_clear_transform() -> void:
-	draw_set_transform_matrix(base_transform)
+	draw_set_transform_matrix(base_transform * offset_transform)

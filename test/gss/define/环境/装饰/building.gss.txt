@@ -1,5 +1,5 @@
 (defvar building/make (func [ref x y id]
-	(define/make GEntityBlock
+	(define/make EntityBlock
 		ref ref
 		id id
 		props {
