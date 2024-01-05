@@ -53,9 +53,7 @@ static func stringify(node: Array, indent := 0) -> String:
 		TType.NUMBER:
 			return str(node[1])
 		TType.BOOL:
-			match node[1]:
-				true: return "#t"
-				false: return "#f"
+			return "#t" if node[1] else "#f"
 		TType.KEYWORD:
 			return str('&', node[1])
 		TType.STRING:
@@ -84,9 +82,16 @@ static func stringify(node: Array, indent := 0) -> String:
 			res.append('\n' + ''.lpad(indent, '\t') + '}')
 			return ''.join(res)
 		TType.RAW:
-			return str(node[1])
+			var value = node[1]
+			if value is String:
+				return str('"', node[1].c_escape(), '"')
+			if value is bool:
+				return "#t" if value else "#f"
+			if value is StringName:
+				return str('&', value)
+			return var_to_str(node[1])
 	push_error("unknown typed node: ", node)
-	return "<UNKNOWN>"
+	return "<Unknown>"
 
 static func stringifys(body: Array) -> String:
 	return ' '.join(body.map(Lisper.stringify))

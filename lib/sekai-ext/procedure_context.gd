@@ -2,6 +2,11 @@ class_name ProcedureContext extends LisperContext
 
 var stopped := false
 
+static func extend(ctx: LisperContext) -> LisperContext:
+	var nctx := ProcedureContext.new()
+	nctx.parent = ctx
+	return nctx
+
 func clone() -> LisperContext:
 	var ctx := ProcedureContext.new()
 	ctx.parent = parent

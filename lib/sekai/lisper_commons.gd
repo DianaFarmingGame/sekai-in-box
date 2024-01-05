@@ -67,6 +67,8 @@ func def_commons(context: LisperContext) -> void:
 	context.def_vars([Lisper.VarFlag.CONST, Lisper.VarFlag.FIX], {
 		&"raw": Lisper.FuncGDRawPure( func (_ctx, body: Array) -> Array:
 			return body[0]),
+		&"raw<-": Lisper.FuncGDCallPure( func (value: Variant) -> Array:
+			return Lisper.Raw(value)),
 		&"raw->string": Lisper.FuncGDCallPure(Lisper.stringify),
 		&"raw/echo": Lisper.FuncGDMacro( func (body: Array) -> Array:
 			return Lisper.Call(&"echo", [[
@@ -99,7 +101,8 @@ func def_commons(context: LisperContext) -> void:
 		&"switch": Lisper.FuncGDRawPure( func (ctx: LisperContext, body: Array) -> Variant:
 			var value = ctx.exec_node(body[0])
 			for i in (body.size() - 1) / 2:
-				if value == ctx.exec_node(body[2 * i + 1]):
+				var caser = ctx.exec_node(body[2 * i + 1])
+				if is_same(caser, true) or is_same(caser, value):
 					return ctx.exec_node(body[2 * i + 2])
 			return null),
 		&"loop": Lisper.FuncGDRawPure( func (ctx: LisperContext, body: Array) -> Variant:
@@ -107,7 +110,7 @@ func def_commons(context: LisperContext) -> void:
 				for node in body:
 					ctx.exec_node(node)
 			return null),
-		&"loop*": Lisper.FuncGDRaw( func (ctx: ProcedureContext, body: Array) -> Variant:
+		&"loop*": Lisper.FuncGDRaw( func (ctx: LisperContext, body: Array) -> Variant:
 			ctx = ctx.fork()
 			var state := [false, false]
 			var res = [null]
@@ -145,7 +148,7 @@ func def_commons(context: LisperContext) -> void:
 				idx += 1
 			return [Lisper.FnType.LP_CALL, args, body.slice(1)]),
 		&"proc/call": Lisper.FuncGDRawPure( func (ctx: LisperContext, body: Array) -> ProcedureContext:
-			var vctx := ProcedureCommons.fork()
+			var vctx := ProcedureContext.extend(ctx)
 			body = body.map(ctx.exec_node)
 			var handle = body[0]
 			var args = body.slice(1)
@@ -160,6 +163,10 @@ func def_commons(context: LisperContext) -> void:
 			return res),
 		&"keyword": Lisper.FuncGDCallPure( func (value: Variant) -> StringName:
 			return StringName(value)),
+		&"num": Lisper.FuncGDCallPure( func (value: Variant) -> float:
+			return float(value)),
+		&"array/size": Lisper.FuncGDCallPure( func (ary: Array) -> int:
+			return ary.size()),
 		&"array/concat": Lisper.FuncGDRawPure( func (ctx: LisperContext, body: Array) -> Array:
 			var res := []
 			body = body.map(ctx.exec_node)
@@ -167,24 +174,22 @@ func def_commons(context: LisperContext) -> void:
 				assert(v is Array)
 				res.append_array(v)
 			return res),
-		&"array/map": Lisper.FuncGDRawPure( func (ctx: LisperContext, body: Array) -> Variant:
+		&"array/flat": Lisper.FuncGDRawPure( func (ctx: LisperContext, body: Array) -> Array:
+			var ary := ctx.exec_node(body[0]) as Array
+			var res := []
+			for item in ary:
+				assert(item is Array)
+				res.append_array(item)
+			return res),
+		&"array/map": Lisper.FuncGDRawPure( func (ctx: LisperContext, body: Array) -> Array:
 			var ary := ctx.exec_node(body[0]) as Array
 			var handle = ctx.exec_node(body[1])
 			return ary.map(func (e): return ctx.call_fn(handle, [e]))),
-		&"array/filter": Lisper.FuncGDRawPure( func (ctx: LisperContext, body: Array) -> Variant:
+		&"array/filter": Lisper.FuncGDRawPure( func (ctx: LisperContext, body: Array) -> Array:
 			var ary := ctx.exec_node(body[0]) as Array
 			var handle = ctx.exec_node(body[1])
 			return ary.filter(func (e): return ctx.call_fn(handle, [e]))),
-		&"array/slice": Lisper.FuncGDRawPure( func (ctx: LisperContext, body: Array) -> Variant:
-			var ary := ctx.exec_node(body[0]) as Array
-			var begin := 0
-			var end := ary.size()
-			var step := 1
-			var deep := false
-			if body.size() >= 2: begin = ctx.exec_node(body[1]);\
-			if body.size() >= 3: end = ctx.exec_node(body[2]);\
-			if body.size() >= 4: step = ctx.exec_node(body[3]);\
-			if body.size() >= 5: deep = ctx.exec_node(body[4])
+		&"array/slice": Lisper.FuncGDCallPure( func (ary: Array, begin := 0, end := ary.size(), step := 1, deep := false) -> Array:
 			return ary.slice(begin, end, step, deep)),
 		&"array/let": Lisper.FuncGDRawPure( func (ctx: LisperContext, body: Array) -> Variant:
 			ctx = ctx.fork()
@@ -234,16 +239,14 @@ func def_commons(context: LisperContext) -> void:
 				result = ctx.exec_node(res)
 			return result),
 		&"defvar": Lisper.FuncGDRaw( func (ctx: LisperContext, body: Array) -> void:
-			var vname = body[0][1]
-			if vname is String or vname is StringName:
-				var data = ctx.exec_node(body[1])
-				ctx.def_var([], vname, data) # TODO
-			else:
-				ctx.log_error(body[0], str("defvar: ", body[0], " is not a valid token"))),
+			var vname := ctx.exec_as_keyword(body[0]) as StringName
+			var data = ctx.exec_node(body[1])
+			ctx.def_var([], vname, data)), # TODO
 		&"do": Lisper.FuncGDRaw( func (ctx: LisperContext, body: Array) -> Variant:
 			var this := ctx.exec_node(body[0]) as Mono
 			var act_name := ctx.exec_as_keyword(body[1]) as StringName
 			var action = this.getp(&"actions").get(act_name)
+			if action == null: action = this.getpR(&"actions").get(act_name)
 			var argv := [Lisper.Raw(this.sekai), Lisper.Raw(this)]
 			argv.append_array(body.slice(2))
 			return ctx.call_rawfn(action, argv)),
@@ -261,11 +264,9 @@ func def_commons(context: LisperContext) -> void:
 			var key := ctx.exec_as_keyword(body[1]) as StringName
 			var value = ctx.exec_node(body[1])
 			this.setp(key, value)),
-		&"destroy": Lisper.FuncGDRaw( func (ctx: LisperContext, body: Array) -> void:
-			var this := ctx.exec_node(body[0]) as Mono
+		&"destroy": Lisper.FuncGDRaw( func (this: Mono) -> void:
 			this.destroy()),
-		&"queue_destroy": Lisper.FuncGDRaw( func (ctx: LisperContext, body: Array) -> void:
-			var this := ctx.exec_node(body[0]) as Mono
+		&"queue_destroy": Lisper.FuncGDCall( func (this: Mono) -> void:
 			this.destroy.call_deferred()),
 		&"vec2": Lisper.FuncGDCallPure( func (x: float, y: float) -> Vector2:
 			return Vector2(x, y)),
@@ -279,14 +280,32 @@ func def_commons(context: LisperContext) -> void:
 			if b == null: return Color(r_c, g_a)
 			if a == null: return Color(r_c, g_a, b)
 			return Color(r_c, g_a, b, a)),
+		&"set": Lisper.FuncGDRaw( func (ctx: LisperContext, body: Array) -> void:
+			var vname := ctx.exec_as_keyword(body[0]) as StringName
+			var data = ctx.exec_node(body[1])
+			ctx.set_var(vname, data)),
+		&"+1": Lisper.FuncGDRaw( func (ctx: LisperContext, body: Array) -> void:
+			var vname := ctx.exec_as_keyword(body[0]) as StringName
+			ctx.set_var(vname, ctx.get_var(vname) + 1)),
+		&":-1": Lisper.FuncGDRaw( func (ctx: LisperContext, body: Array) -> void:
+			var vname := ctx.exec_as_keyword(body[0]) as StringName
+			ctx.set_var(vname, ctx.get_var(vname) - 1)),
 		&"+": Lisper.FuncGDCallPure( func (x, y) -> Variant:
 			return x + y),
-		&"-": Lisper.FuncGDCallPure( func (x, y) -> Variant:
+		&":-": Lisper.FuncGDCallPure( func (x, y) -> Variant:
 			return x - y),
 		&"*": Lisper.FuncGDCallPure( func (x, y) -> Variant:
 			return x * y),
 		&"/": Lisper.FuncGDCallPure( func (x, y) -> Variant:
 			return x / y),
+		&"<": Lisper.FuncGDCallPure( func (x, y) -> Variant:
+			return x < y),
+		&"<=": Lisper.FuncGDCallPure( func (x, y) -> Variant:
+			return x <= y),
+		&">": Lisper.FuncGDCallPure( func (x, y) -> Variant:
+			return x > y),
+		&">=": Lisper.FuncGDCallPure( func (x, y) -> Variant:
+			return x >= y),
 		&"==": Lisper.FuncGDCallPure( func (x, y) -> Variant:
 			return x == y),
 		&"!=": Lisper.FuncGDCallPure( func (x, y) -> Variant:
@@ -295,18 +314,20 @@ func def_commons(context: LisperContext) -> void:
 			return src[ref]),
 		&"@=": Lisper.FuncGDCallPure( func (src, ref, value) -> void:
 			src[ref] = value),
-		&"and": Lisper.FuncGDRawPure( func (ctx: LisperContext, body: Array) -> bool:
-			var res := true
+		&"and": Lisper.FuncGDRawPure( func (ctx: LisperContext, body: Array) -> Variant:
+			var res = true
 			for expr in body:
 				res = ctx.exec_node(expr)
 				if not res: return res
 			return res),
-		&"or": Lisper.FuncGDRawPure( func (ctx: LisperContext, body: Array) -> bool:
-			var res := false
+		&"or": Lisper.FuncGDRawPure( func (ctx: LisperContext, body: Array) -> Variant:
+			var res = false
 			for expr in body:
 				res = ctx.exec_node(expr)
 				if res: return res
 			return res),
+		&"not": Lisper.FuncGDCallPure( func (v) -> bool:
+			return not v),
 		&"prop/setp": Lisper.FuncGDCallPure(Prop.setp),
 		&"prop/pushs": Lisper.FuncGDCallPure(Prop.pushs),
 		&"prop/puts": Lisper.FuncGDCallPure(Prop.puts),
