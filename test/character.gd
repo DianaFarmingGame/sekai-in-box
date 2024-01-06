@@ -213,16 +213,16 @@ func do_merge(sets: Array[Dictionary]) -> Array[Dictionary]:
 			&"move_to_at_speed": Lisper.FuncGDCall(vprops[&"move_to_at_speed"]),
 			&"say_to": Lisper.FuncGDCall(vprops[&"say_to"]),
 			&"show_aside": Lisper.FuncGDCall(vprops[&"show_aside"]),
-			&"choose_single": Lisper.FuncGDRaw( func (ctx: ProcedureContext, body: Array) -> Variant:
-				var sekai := await ctx.exec_node_async(body[0]) as Sekai
-				var this := await ctx.exec_node_async(body[1]) as Mono
+			&"choose_single": Lisper.FuncGDRaw( func (ctx: LisperContext, body: Array) -> Variant:
+				var sekai := await ctx.exec_node(body[0]) as Sekai
+				var this := await ctx.exec_node(body[1]) as Mono
 				var meta = {}
 				var title = null
 				var patterns = null
-				var meta_title = await ctx.exec_node_async(body[2])
+				var meta_title = await ctx.exec_node(body[2])
 				if meta_title is Dictionary:
 					meta = meta_title
-					title = await ctx.exec_node_async(body[3])
+					title = await ctx.exec_node(body[3])
 					patterns = body.slice(4)
 				else:
 					title = meta_title
@@ -237,11 +237,11 @@ func do_merge(sets: Array[Dictionary]) -> Array[Dictionary]:
 					choices[i] = ctx.exec_as_string(patterns[2 * i]) as String
 					branches[i] = patterns[2 * i + 1] as Array
 				var choose := await vprops[&"choose_single"].call(sekai, this, meta, title, choices) as int
-				return await ctx.exec_node_async(branches[choose])),
-			&"dialog_to": Lisper.FuncGDRaw( func (ctx: ProcedureContext, body: Array) -> Variant:
-				var vid = await ctx.exec_node_async(body[3])
+				return await ctx.exec_node(branches[choose])),
+			&"dialog_to": Lisper.FuncGDRaw( func (ctx: LisperContext, body: Array) -> Variant:
+				var vid = await ctx.exec_node(body[3])
 				var dialog = ctx.get_var(&"Dialogs")[vid]
-				return await ctx.call_rawfn_async(dialog, body.slice(0, 3))),
+				return await ctx.call_rawfn(dialog, body.slice(0, 3))),
 		}),
 	})
 	return sets

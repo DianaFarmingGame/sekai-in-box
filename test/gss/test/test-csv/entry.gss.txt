@@ -30,7 +30,7 @@
 					(+1 cur-i))
 				(defvar ary (array/slice data i cur-i))
 				(defvar expr (template
-					(proc [sekai this src]
+					(func [sekai this src]
 						:expand :raw
 						(array/map ary (func [opt]
 							(switch (@ opt &类型)

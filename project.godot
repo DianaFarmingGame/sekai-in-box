@@ -19,7 +19,6 @@ config/icon="res://icon.svg"
 
 DebugMenu="*res://addons/debug_menu/debug_menu.tscn"
 LisperCommons="*res://lib/sekai/lisper_commons.gd"
-ProcedureCommons="*res://lib/sekai-ext/procedure_commons.gd"
 
 [debug]
 
