@@ -19,10 +19,10 @@ config/icon="res://icon.svg"
 
 DebugMenu="*res://addons/debug_menu/debug_menu.tscn"
 LisperCommons="*res://lib/sekai/lisper_commons.gd"
-ProcedureCommons="*res://lib/sekai-ext/procedure_commons.gd"
 
 [debug]
 
+gdscript/warnings/integer_division=0
 gdscript/warnings/confusable_local_declaration=0
 
 [display]

@@ -16,7 +16,6 @@ var props := {
 }
 
 static func update(sekai: Sekai, this: Mono) -> void:
-	this = this.upgrade()
 	var pos := this.position
 	var size := this.getp(&"size") as Vector3
 	var atile_size := this.getp(&"atile_size") as Vector3
@@ -37,7 +36,7 @@ static func update(sekai: Sekai, this: Mono) -> void:
 				var monos := sekai.get_monos_by_pos(pos + Vector3(dx - rx, dy - ry, dz - rz) * size)
 				for idx in atile_matches.size():
 					for mono in monos:
-						if mono != this and mono.callm(&"group_intersects", atile_matches[idx]):
+						if mono != this and await mono.callm(&"group_intersects", atile_matches[idx]):
 							base[(sz - 1 - dz) * sy * sx + dy * sx + dx].append(idx + 1)
 							break
 	for rule in atile_data:
@@ -56,6 +55,6 @@ static func update(sekai: Sekai, this: Mono) -> void:
 			var cover = cfg.get(&"cover")
 			if cover != null: this.cover(&"atile", cover)
 			var vupdate = cfg.get(&"update")
-			if vupdate != null: sekai.gss_ctx.call_anyway_async(vupdate, [sekai, this])
+			if vupdate != null: await sekai.gss_ctx.call_anyway(vupdate, [sekai, this])
 			break
 	pass

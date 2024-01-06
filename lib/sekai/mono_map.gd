@@ -48,6 +48,7 @@ func _into_sekai() -> void:
 	
 	for iy in size.y:
 		var layer := layers[iy] as SekaiItem
+		var lbox := Rect2(Vector2(offset.x, offset.y + iy * cell_size.x - offset.z * layer.ratio_yz), Vector2((size.x - 1) * cell_size.x, 0)).grow(max(cell_size.x, cell_size.y))
 		layer.set_y(iy * cell_size.y + offset.y + floorf(offset.z) * 64)
 		var ids := range(iy * size.x, (iy + 1) * size.x)
 		var need_process := false
@@ -59,16 +60,27 @@ func _into_sekai() -> void:
 					if map[i] and map[i].getp(&"processing"):
 						map[i].emitm(&"on_process"))
 		layer.on_draw.connect(func () -> void:
-			for i in ids:
-				if map[i]:
-					map[i].callm(&"on_draw", layer))
+			if sekai.get_render_box().intersects(lbox):
+				for i in ids:
+					var mono = map[i]
+					if mono:
+						if mono.inited:
+							mono.callm(&"on_draw", layer)
+						else:
+							var mpos := mono.position as Vector3
+							var pos := Vector2(mpos.x, mpos.y - mpos.z * layer.ratio_yz)
+							if sekai.is_idle(pos):
+								mono._on_init()
+							else:
+								sekai.update_padding_pos(pos))
 		if ProjectSettings.get_setting(&"global/debug_draw"):
 			var debug_layer := debug_layers[iy] as SekaiItem
 			debug_layer.set_y(iy * cell_size.y + offset.y + floorf(offset.z) * 64 + 4096)
 			debug_layer.on_draw.connect(func ():
-				for i in ids:
-					if map[i]:
-						map[i].callm(&"on_draw_debug", debug_layer))
+				if sekai.get_render_box().intersects(lbox):
+					for i in ids:
+						if map[i]:
+							map[i].callm(&"on_draw_debug", debug_layer))
 			sekai.add_child.call_deferred(debug_layer)
 		sekai.add_child.call_deferred(layer)
 
@@ -77,16 +89,13 @@ func _outof_sekai() -> void:
 	_clear_map()
 
 func _on_init() -> void:
-	for mono in map:
-		if mono != null: mono._on_init()
+	pass
 
 func _on_store() -> void:
-	for mono in map:
-		if mono != null: mono._on_store()
+	pass
 
 func _on_restore() -> void:
-	for mono in map:
-		if mono != null: mono._on_restore()
+	pass
 
 func _clear_layers() -> void:
 	for layer in layers: if layer != null:
@@ -109,7 +118,8 @@ func to_data() -> Dictionary:
 		&"data": data,
 	}
 
-func from_data(_sekai, pdata: Dictionary):
+func from_data(psekai, pdata: Dictionary):
+	sekai = psekai
 	size = pdata[&"size"]
 	cell_size = pdata[&"cell_size"]
 	offset = pdata[&"offset"]
@@ -151,54 +161,6 @@ class VarTileMono extends Mono:
 	func destroy() -> void:
 		_outof_sekai()
 		map.set_pos(Vector2(position.x, position.y), null)
-		
-	func upgrade() -> VarTileMono:
-		return self
-
-class ConstTileMono extends Mono:
-	var map: MonoMap
-	var item: SekaiItem
-	
-	func _init(pdefine: MonoDefine, pmap: MonoMap, pos: Vector3, pitem: SekaiItem) -> void:
-		define = pdefine
-		map = pmap
-		position = pos
-		item = pitem
-	
-	func destroy() -> void:
-		_outof_sekai()
-		map.set_pos(Vector2(position.x, position.y), null)
-	
-	func upgrade() -> VarTileMono:
-		var nmono := VarTileMono.new(define, map, position, item)
-		nmono.sekai = sekai
-		nmono._into_sekai()
-		map.set_pos(Vector2(position.x, position.y), nmono)
-		return nmono
-	
-	func getp(key: StringName) -> Variant:
-		return super.getpR(key)
-	
-	func getpD(key: StringName, default: Variant) -> Variant:
-		return super.getpRD(key, default)
-	
-	func emitm(key: StringName) -> Variant:
-		return super.emitmR(key)
-	
-	func emitmS(key: StringName) -> Variant:
-		return super.emitmRS(key)
-	
-	func callm(key: StringName, arg: Variant) -> Variant:
-		return super.callmR(key, arg)
-	
-	func callmS(key: StringName, arg: Variant) -> Variant:
-		return super.callmRS(key, arg)
-	
-	func applym(key: StringName, argv: Array) -> Variant:
-		return super.applymR(key, argv)
-	
-	func applymS(key: StringName, argv: Array) -> Variant:
-		return super.applymRS(key, argv)
 
 func is_need_collision() -> bool:
 	var need_collision := false
@@ -214,7 +176,7 @@ func is_need_route() -> bool:
 
 func will_route(point: Vector2, z_pos: int, result: Array) -> void:
 	var monos = get_monos_by_pos(Vector3(point.x, point.y, z_pos))
-	if monos.size() > 0: monos[0].will_route(point, z_pos, result)
+	if monos.size() > 0: await monos[0].will_route(point, z_pos, result)
 
 func will_collide(region: Rect2, z_pos: int, result: Array) -> void:
 	if abs(offset.z - z_pos) < cell_size.z / 2:
@@ -222,22 +184,22 @@ func will_collide(region: Rect2, z_pos: int, result: Array) -> void:
 		if size_rti.grow(1).has_point(cen):
 			# center
 			var mono = get_mono(cen)
-			if mono != null: mono.will_collide(region, z_pos, result)
+			if mono != null: await mono.will_collide(region, z_pos, result)
 			# sides
 			mono = get_mono(cen + Vector2i(1, 0))
-			if mono != null: mono.will_collide(region, z_pos, result)
+			if mono != null: await mono.will_collide(region, z_pos, result)
 			mono = get_mono(cen + Vector2i(0, 1))
-			if mono != null: mono.will_collide(region, z_pos, result)
+			if mono != null: await mono.will_collide(region, z_pos, result)
 			mono = get_mono(cen + Vector2i(-1, 0))
-			if mono != null: mono.will_collide(region, z_pos, result)
+			if mono != null: await mono.will_collide(region, z_pos, result)
 			mono = get_mono(cen + Vector2i(0, -1))
-			if mono != null: mono.will_collide(region, z_pos, result)
+			if mono != null: await mono.will_collide(region, z_pos, result)
 			# corners
 			mono = get_mono(cen + Vector2i(1, 1))
-			if mono != null: mono.will_collide(region, z_pos, result)
+			if mono != null: await mono.will_collide(region, z_pos, result)
 			mono = get_mono(cen + Vector2i(1, -1))
-			if mono != null: mono.will_collide(region, z_pos, result)
+			if mono != null: await mono.will_collide(region, z_pos, result)
 			mono = get_mono(cen + Vector2i(-1, 1))
-			if mono != null: mono.will_collide(region, z_pos, result)
+			if mono != null: await mono.will_collide(region, z_pos, result)
 			mono = get_mono(cen + Vector2i(-1, -1))
-			if mono != null: mono.will_collide(region, z_pos, result)
+			if mono != null: await mono.will_collide(region, z_pos, result)

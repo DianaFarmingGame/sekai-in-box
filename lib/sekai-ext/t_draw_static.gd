@@ -19,7 +19,6 @@ var props := {
 }
 
 static func update(_sekai, this: Mono) -> void:
-	this = this.upgrade()
 	var cur_draw = this.getp(&"cur_draw")
 	if cur_draw == &"": return
 	var draw = this.getp(&"draw_data")[cur_draw]
@@ -27,7 +26,7 @@ static func update(_sekai, this: Mono) -> void:
 		draw = draw[1][this.getp(&"cur_draw_variant")]
 	match draw[0]:
 		&"static":
-			var texture = this.callm(&"assert_get", draw[1])
+			var texture = await this.callm(&"assert_get", draw[1])
 			var clip = draw[2]
 			if this.getp(&"flip_h"):
 				this.puts(&"on_draw", [
@@ -46,7 +45,7 @@ static func update(_sekai, this: Mono) -> void:
 						pass,
 				])
 		&"fixed":
-			var texture = this.callm(&"assert_get", draw[1])
+			var texture = await this.callm(&"assert_get", draw[1])
 			var timeout := draw[2] as float
 			var frames := draw[3] as Array
 			var timer := this.getp(&"draw_timer") as float

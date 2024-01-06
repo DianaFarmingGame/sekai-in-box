@@ -14,9 +14,22 @@ func do_merge(sets: Array[Dictionary]) -> Array[Dictionary]:
 		&"cur_dir": -1,
 		
 		&"on_input_action": Prop.puts({
-			&"0:character": func (_sekai, this: Mono, all: Dictionary, press: Dictionary, _release) -> void:
+			&"0:character": func (sekai: Sekai, this: Mono, all: Dictionary, press: Dictionary, _release) -> void:
 				if this.getp(&"cur_state") != &"combo":
-					if press.has(&"combo"):
+					if press.has(&"dialog_confirm"):
+						var mono = null
+						var min_dis = INF
+						for m in sekai.monos:
+							if m is Mono and m != this:
+								var dis := this.position.distance_squared_to(m.position)
+								if dis < min_dis:
+									min_dis = dis
+									mono = m
+						if mono != null and sqrt(min_dis) <= this.getp(&"touch_radius"):
+							var action = mono.getp(&"actions").get(&"interact")
+							if action != null:
+								sekai.gss_ctx.call_fn(action, [sekai, mono, this])
+					elif press.has(&"combo"):
 						this.callm(&"state_to", &"combo")
 					else:
 						var dir := Vector2(0, 0)
@@ -34,12 +47,12 @@ func do_merge(sets: Array[Dictionary]) -> Array[Dictionary]:
 		}),
 		
 		&"on_move": func (_sekai, this: Mono) -> void:
-			var collides := this.emitm(&"solid_collide_all_by") as Array
-			var drops := collides.filter(func (m): return m.callm(&"group_in", &"drop"))
+			var collides := await this.emitm(&"solid_collide_all_by") as Array
+			var drops := await Async.array_filter(collides, func (m): return await m.callm(&"group_in", &"drop"))
 			for drop in drops:
 				for item in drop.getp("contains"):
-					if this.callm(&"container_put", item):
-						drop.callm(&"container_pick", item)
+					if await this.callm(&"container_put", item):
+						await drop.callm(&"container_pick", item)
 				if drop.getp("contains").size() == 0:
 					drop.destroy()
 			pass,
@@ -71,10 +84,10 @@ func do_merge(sets: Array[Dictionary]) -> Array[Dictionary]:
 				this.setp(&"cur_dir", 1),
 		
 		&"move_by": func (_sekai, this: Mono, delta: Vector2) -> bool:
-			return await this.applymA(&"move_by_at_speed", [delta, this.getp(&"max_speed")]),
+			return await this.applym(&"move_by_at_speed", [delta, this.getp(&"max_speed")]),
 		
 		&"move_by_at_speed": func (sekai: Sekai, this: Mono, delta: Vector2, max_speed: float) -> bool:
-			this.callm(&"state_to", &"walk")
+			await this.callm(&"state_to", &"walk")
 			var target := Vector2(this.position.x, this.position.y) + delta
 			var blocked := false
 			var block_cnt := 0
@@ -95,17 +108,17 @@ func do_merge(sets: Array[Dictionary]) -> Array[Dictionary]:
 				else:
 					block_cnt = 0
 			this.setp(&"cur_speed", Vector2(0, 0))
-			this.callm(&"state_to", &"idle")
+			await this.callm(&"state_to", &"idle")
 			return not blocked,
 		
 		&"move_to": func (_sekai, this: Mono, target: Variant) -> bool:
-			return await this.applymA(&"move_to_at_speed", [target, this.getp(&"max_speed")]),
+			return await this.applym(&"move_to_at_speed", [target, this.getp(&"max_speed")]),
 		
 		&"move_to_at_speed": func (sekai: Sekai, this: Mono, target: Variant, max_speed: float) -> bool:
 			var delta: Vector2
 			var blocked := false
 			var block_cnt := 0
-			this.callm(&"state_to", &"walk")
+			await this.callm(&"state_to", &"walk")
 			if target is Vector2:
 				delta = target - Vector2(this.position.x, this.position.y)
 				while delta.length() > 0.1:
@@ -144,7 +157,7 @@ func do_merge(sets: Array[Dictionary]) -> Array[Dictionary]:
 					else:
 						block_cnt = 0
 			this.setp(&"cur_speed", Vector2(0, 0))
-			this.callm(&"state_to", &"idle")
+			await this.callm(&"state_to", &"idle")
 			return not blocked,
 		
 		&"say_to": func (sekai: Sekai, this: Mono, _target: Mono, meta_text, text = null) -> void:
@@ -152,6 +165,12 @@ func do_merge(sets: Array[Dictionary]) -> Array[Dictionary]:
 				await sekai.external_fns[&"dialog_say_to"].call(sekai, this, meta_text, text)
 			else:
 				await sekai.external_fns[&"dialog_say_to"].call(sekai, this, {}, meta_text),
+		
+		&"show_aside": func (sekai: Sekai, this: Mono, meta_text, text = null) -> void:
+			if text != null:
+				await sekai.external_fns[&"dialog_show_aside"].call(sekai, this, meta_text, text)
+			else:
+				await sekai.external_fns[&"dialog_show_aside"].call(sekai, this, {}, meta_text),
 		
 		&"choose_single": func (sekai: Sekai, this: Mono, meta_arg1, arg1, arg2 = null) -> int:
 			if arg2 != null:
@@ -166,7 +185,7 @@ func do_merge(sets: Array[Dictionary]) -> Array[Dictionary]:
 					&"cur_draw": &"idle",
 				},
 				&"on_enter": func (_sekai, this: Mono, _pres) -> void:
-					this.emitm(&"draw_reset"),
+					await this.emitm(&"draw_reset"),
 			},
 			&"walk": {
 				&"cover": {
@@ -176,11 +195,11 @@ func do_merge(sets: Array[Dictionary]) -> Array[Dictionary]:
 						if cur_speed != Vector2(0, 0):
 							var delta := this.item.get_delta_time() as float
 							var dpos := cur_speed * delta as Vector2
-							this.callm(&"solid_move", Vector3(dpos.x, 0, 0))
-							this.callm(&"solid_move", Vector3(0, dpos.y, 0)),
+							await this.callm(&"solid_move", Vector3(dpos.x, 0, 0))
+							await this.callm(&"solid_move", Vector3(0, dpos.y, 0)),
 				},
 				&"on_enter": func (_sekai, this: Mono, _pres) -> void:
-					this.emitm(&"draw_reset"),
+					await this.emitm(&"draw_reset"),
 			},
 		}
 	}
@@ -193,16 +212,17 @@ func do_merge(sets: Array[Dictionary]) -> Array[Dictionary]:
 			&"move_to": Lisper.FuncGDCall(vprops[&"move_to"]),
 			&"move_to_at_speed": Lisper.FuncGDCall(vprops[&"move_to_at_speed"]),
 			&"say_to": Lisper.FuncGDCall(vprops[&"say_to"]),
-			&"choose_single": Lisper.FuncGDRaw( func (ctx: ProcedureContext, body: Array) -> Variant:
-				var sekai := await ctx.exec_node_async(body[0]) as Sekai
-				var this := await ctx.exec_node_async(body[1]) as Mono
+			&"show_aside": Lisper.FuncGDCall(vprops[&"show_aside"]),
+			&"choose_single": Lisper.FuncGDRaw( func (ctx: LisperContext, body: Array) -> Variant:
+				var sekai := await ctx.exec_node(body[0]) as Sekai
+				var this := await ctx.exec_node(body[1]) as Mono
 				var meta = {}
 				var title = null
 				var patterns = null
-				var meta_title = await ctx.exec_node_async(body[2])
+				var meta_title = await ctx.exec_node(body[2])
 				if meta_title is Dictionary:
 					meta = meta_title
-					title = await ctx.exec_node_async(body[3])
+					title = await ctx.exec_node(body[3])
 					patterns = body.slice(4)
 				else:
 					title = meta_title
@@ -217,7 +237,11 @@ func do_merge(sets: Array[Dictionary]) -> Array[Dictionary]:
 					choices[i] = ctx.exec_as_string(patterns[2 * i]) as String
 					branches[i] = patterns[2 * i + 1] as Array
 				var choose := await vprops[&"choose_single"].call(sekai, this, meta, title, choices) as int
-				return await ctx.exec_node_async(branches[choose])),
+				return await ctx.exec_node(branches[choose])),
+			&"dialog_to": Lisper.FuncGDRaw( func (ctx: LisperContext, body: Array) -> Variant:
+				var vid = await ctx.exec_node(body[3])
+				var dialog = ctx.get_var(&"Dialogs")[vid]
+				return await ctx.call_rawfn(dialog, body.slice(0, 3))),
 		}),
 	})
 	return sets

@@ -1,12 +1,12 @@
 (define Character
-	ref 1101
-	id &实体/角色/嘉然
+	ref 1200
+	id &实体/NPC
 	props {
-		name "嘉然"
+		name "NPC"
 		solid_box (rect2 -0.3 -0.1 0.6 0.2)
 		asserts {
-			idle "assert/人物/嘉然/魔女帽站立.png"
-			walk "assert/人物/嘉然/魔女帽行走.png"
+			idle "assert/人物/糖/站立.png"
+			walk "assert/人物/糖/走路.png"
 		}
 		draw_data {
 			idle [&fixed &idle 0.6 (anim_char 4)]

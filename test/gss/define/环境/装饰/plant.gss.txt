@@ -83,11 +83,25 @@
 			[1 { cover { cur_draw &rock7 }}]
 			[1 { cover { cur_draw &rock8 }}]
 			[1 { cover { cur_draw &rock9 }}]
-			[500 { cover { need_destroy #t }}]
+			[400 { cover { need_destroy #t }}]
 		]
 		atile_size (vec3 3 3 3)
-		atile_matches [[2401] [2101] [2403 2404 2405]]
+		atile_matches [[2401] [2101] [2403 2402 2405] [2409 2415 2406 2420]]
 		atile_rules [[
+			[
+				0	0	0
+				0	4	0
+				0	0	0
+				
+				0	0	0
+				0	0	0
+				0	0	0
+				
+				0	0	0
+				0	0	0
+				0	0	0
+			] { cover { need_destroy #t }}
+		] [
 			[
 				0	0	0
 				0	0	0

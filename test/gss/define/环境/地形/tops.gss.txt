@@ -3,7 +3,7 @@
 	props {
 		need_route		#f
 		routable      	#f
-		collision_box	(rect2 -0.5 -1.5 1 1)
+		collision_boxes	[(rect2 -0.5 -1.5 1 1)]
 		asserts {
 			main "assert/房间.png"
 		}

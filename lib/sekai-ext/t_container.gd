@@ -13,21 +13,21 @@ var props := {
 		if item.getp(&"stackable"):
 			var putted := false
 			for mono in contains:
-				if mono.define.ref == item.define.ref and mono.getp(&"stackable") and mono.callm(&"stack_put", item):
+				if mono.define.ref == item.define.ref and mono.getp(&"stackable") and await mono.callm(&"stack_put", item):
 					putted = true
 					break
-			this.setp(&"contains", this.call_watcher(&"contains", contains, true))
+			this.setp(&"contains", await this.call_watcher(&"contains", contains, true))
 			if putted: return true
 		if contains.size() < this.getp(&"container_capacity"):
 			contains.append(item)
-			this.setp(&"contains", this.call_watcher(&"contains", contains, true))
+			this.setp(&"contains", await this.call_watcher(&"contains", contains, true))
 			return true
-		this.setp(&"contains", this.call_watcher(&"contains", contains, true))
+		this.setp(&"contains", await this.call_watcher(&"contains", contains, true))
 		return false,
 	&"container_pick": func (_sekai, this: Mono, item: Mono) -> Mono:
 		var contains := this.getpBD(&"contains", []) as Array
 		contains.erase(item)
-		this.setp(&"contains", this.call_watcher(&"contains", contains, true))
+		this.setp(&"contains", await this.call_watcher(&"contains", contains, true))
 		return item,
 	&"container_pick_by_ref": func (_sekai, this: Mono, ref: int, count := 1) -> Variant:
 		var contains := this.getpBD(&"contains", []) as Array
@@ -45,7 +45,7 @@ var props := {
 				var item = null
 				if mono.define.ref == ref:
 					if mono.getp(&"stackable"):
-						item = mono.callm(&"stack_try_pick", count)
+						item = await mono.callm(&"stack_try_pick", count)
 						if item != null: count -= item.getp(&"stack_count")
 					else:
 						item = mono
@@ -54,13 +54,13 @@ var props := {
 				if item.getp(&"stackable"):
 					var putted := false
 					for m in picks:
-						if m.define.ref == item.define.ref and m.getp(&"stackable") and m.callm(&"stack_put", item):
+						if m.define.ref == item.define.ref and m.getp(&"stackable") and await m.callm(&"stack_put", item):
 							putted = true
 							break
 					if putted: continue
 				picks.append(item)
 			for mono in removes: contains.erase(mono)
-			this.setp(&"contains", this.call_watcher(&"contains", contains, true))
+			this.setp(&"contains", await this.call_watcher(&"contains", contains, true))
 			return picks
 		return null,
 }
