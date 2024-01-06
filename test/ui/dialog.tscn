@@ -209,6 +209,6 @@ grow_vertical = 0
 text = "天王盖地虎，嘉然一米五
 天王盖地虎，嘉然一米五"
 label_settings = SubResource("LabelSettings_qby6o")
-visible_characters = -2
-visible_ratio = -0.0909091
+visible_characters = 0
+visible_ratio = 0.0
 metadata/_edit_use_anchors_ = true
