@@ -28,7 +28,6 @@ static func on_draw(_sekai, this: Mono, item: SekaiItem) -> void:
 	var pos := Vector2(this.position.x, this.position.y - this.position.z * item.ratio_yz)
 	var cur_draw = this.getp(&"cur_draw")
 	if cur_draw == &"": return
-	@warning_ignore("shadowed_variable")
 	var draw = this.getp(&"draw_data")[cur_draw]
 	if draw[0] == &"diverse":
 		draw = draw[1][this.getp(&"cur_draw_variant")]

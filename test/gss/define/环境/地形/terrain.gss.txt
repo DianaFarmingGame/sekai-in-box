@@ -4,7 +4,7 @@
 		asserts {
 			main "assert/地形.png"
 		}
-		cur_draw &top_center
+		cur_draw &
 		draw_data {
 			top_corner_nw [&static &main (clip_ground 0 0)]
 			top_corner_ne [&static &main (clip_ground 2 0)]
@@ -42,70 +42,16 @@
 				0	-	0
 				0	0	0
 				
-				0	-	-
-				-	0	1
-				-	1	1
+				1	1	1
+				1	0	1
+				1	1	1
 				
 				0	0	0
 				0	0	0
 				0	0	0
 			] {
 				cover {
-					cur_draw &top_corner_nw
-				}
-			}
-		][
-			[
-				0	0	0
-				0	-	0
-				0	0	0
-				
-				-	-	0
-				1	0	-
-				1	1	-
-				
-				0	0	0
-				0	0	0
-				0	0	0
-			] {
-				cover {
-					cur_draw &top_corner_ne
-				}
-			}
-		][
-			[
-				0	0	0
-				0	-	0
-				0	0	0
-				
-				1	1	-
-				1	0	-
-				-	-	0
-				
-				0	0	0
-				0	1	0
-				0	-	0
-			] {
-				cover {
-					cur_draw &top_corner_se
-				}
-			}
-		][
-			[
-				0	0	0
-				0	-	0
-				0	0	0
-				
-				-	1	1
-				-	0	1
-				0	-	-
-				
-				0	0	0
-				0	1	0
-				0	-	0
-			] {
-				cover {
-					cur_draw &top_corner_sw
+					cur_draw &top_center
 				}
 			}
 		][
@@ -186,16 +132,88 @@
 				0	-	0
 				0	0	0
 				
-				1	1	1
-				1	0	1
-				1	1	1
+				0	-	-
+				-	0	1
+				-	1	1
 				
 				0	0	0
 				0	0	0
 				0	0	0
 			] {
 				cover {
-					cur_draw &top_center
+					cur_draw &top_corner_nw
+				}
+			}
+		][
+			[
+				0	0	0
+				0	-	0
+				0	0	0
+				
+				-	-	0
+				1	0	-
+				1	1	-
+				
+				0	0	0
+				0	0	0
+				0	0	0
+			] {
+				cover {
+					cur_draw &top_corner_ne
+				}
+			}
+		][
+			[
+				0	0	0
+				0	-	0
+				0	0	0
+				
+				1	1	-
+				1	0	-
+				-	-	0
+				
+				0	0	0
+				0	1	0
+				0	-	0
+			] {
+				cover {
+					cur_draw &top_corner_se
+				}
+			}
+		][
+			[
+				0	0	0
+				0	-	0
+				0	0	0
+				
+				-	1	1
+				-	0	1
+				0	-	-
+				
+				0	0	0
+				0	1	0
+				0	-	0
+			] {
+				cover {
+					cur_draw &top_corner_sw
+				}
+			}
+		][
+			[
+				0	0	0
+				0	1	0
+				0	0	0
+				
+				1	1	1
+				1	0	1
+				0	-	0
+				
+				0	0	0
+				0	1	0
+				0	-	0
+			] {
+				cover {
+					cur_draw &middle_side_s
 				}
 			}
 		][
@@ -245,11 +263,11 @@
 				0	-	0
 				
 				0	0	0
-				0	1	0
-				0	-	0
+				0	0	0
+				0	0	0
 			] {
 				cover {
-					cur_draw &middle_side_s
+					cur_draw &bottom_side_s
 				}
 			}
 		][
@@ -291,7 +309,7 @@
 		][
 			[
 				0	0	0
-				0	1	0
+				0	-	0
 				0	0	0
 				
 				1	1	1
@@ -303,7 +321,7 @@
 				0	0	0
 			] {
 				cover {
-					cur_draw &bottom_side_s
+					cur_draw &thin_side_s
 				}
 			}
 		][
@@ -340,24 +358,6 @@
 			] {
 				cover {
 					cur_draw &thin_corner_sw
-				}
-			}
-		][
-			[
-				0	0	0
-				0	-	0
-				0	0	0
-				
-				1	1	1
-				1	0	1
-				0	-	0
-				
-				0	0	0
-				0	0	0
-				0	0	0
-			] {
-				cover {
-					cur_draw &thin_side_s
 				}
 			}
 		][

@@ -27,42 +27,12 @@
 
 (defvar *atile_rules_3x3x1* [[
 	[
-		0	-	0
-		-	0	1
-		0	1	1
+		1	1	1
+		1	0	1
+		1	1	1
 	] {
 		cover {
-			cur_draw &corner_nw
-		}
-	}
-][
-	[
-		0	-	0
-		1	0	-
-		1	1	0
-	] {
-		cover {
-			cur_draw &corner_ne
-		}
-	}
-][
-	[
-		1	1	0
-		1	0	-
-		0	-	0
-	] {
-		cover {
-			cur_draw &corner_se
-		}
-	}
-][
-	[
-		0	1	1
-		-	0	1
-		0	-	0
-	] {
-		cover {
-			cur_draw &corner_sw
+			cur_draw &center
 		}
 	}
 ][
@@ -107,12 +77,42 @@
 	}
 ][
 	[
-		1	1	1
-		1	0	1
-		1	1	1
+		0	-	0
+		-	0	1
+		0	1	1
 	] {
 		cover {
-			cur_draw &center
+			cur_draw &corner_nw
+		}
+	}
+][
+	[
+		0	-	0
+		1	0	-
+		1	1	0
+	] {
+		cover {
+			cur_draw &corner_ne
+		}
+	}
+][
+	[
+		1	1	0
+		1	0	-
+		0	-	0
+	] {
+		cover {
+			cur_draw &corner_se
+		}
+	}
+][
+	[
+		0	1	1
+		-	0	1
+		0	-	0
+	] {
+		cover {
+			cur_draw &corner_sw
 		}
 	}
 ][
@@ -182,61 +182,11 @@
 (defvar *atile_wall_rules_3x3x1* [[
 	[
 		0	0	0
-		-	0	0
-		0	-	0
+		0	0	0
+		0	1	0
 	] {
 		cover {
-			cur_draw &bottom_left
-		}
-	}
-] [
-	[
-		0	0	0
-		0	0	-
-		0	-	0
-	] {
-		cover {
-			cur_draw &bottom_right
-		}
-	}
-] [
-	[
-		0	0	0
-		0	0	0
-		0	-	0
-	] {
-		cover {
-			cur_draw &bottom_centre
-		}
-	}
-] [
-	[
-		0	-	0
-		-	0	0
-		0	0	0
-	] {
-		cover {
-			cur_draw &top_left
-		}
-	}
-] [
-	[
-		0	-	0
-		0	0	-
-		0	0	0
-	] {
-		cover {
-			cur_draw &top_right
-		}
-	}
-] [
-	[
-		0	-	0
-		0	0	0
-		0	0	0
-	] {
-		cover {
-			cur_draw &top_center
+			cur_draw &center
 		}
 	}
 ] [
@@ -263,55 +213,65 @@
 	[
 		0	0	0
 		0	0	0
-		0	1	0
+		0	-	0
 	] {
 		cover {
-			cur_draw &center
+			cur_draw &bottom_centre
+		}
+	}
+] [
+	[
+		0	0	0
+		-	0	0
+		0	-	0
+	] {
+		cover {
+			cur_draw &bottom_left
+		}
+	}
+] [
+	[
+		0	0	0
+		0	0	-
+		0	-	0
+	] {
+		cover {
+			cur_draw &bottom_right
+		}
+	}
+] [
+	[
+		0	-	0
+		0	0	0
+		0	0	0
+	] {
+		cover {
+			cur_draw &top_center
+		}
+	}
+] [
+	[
+		0	-	0
+		-	0	0
+		0	0	0
+	] {
+		cover {
+			cur_draw &top_left
+		}
+	}
+] [
+	[
+		0	-	0
+		0	0	-
+		0	0	0
+	] {
+		cover {
+			cur_draw &top_right
 		}
 	}
 ]])
 
 (defvar *atile_top_rules_3x3x1* [[
-	[
-		0	-	0
-		-	0	1
-		0	1	1
-	] {
-		cover {
-			cur_draw &corner_nw
-		}
-	}
-][
-	[
-		0	-	0
-		1	0	-
-		1	1	0
-	] {
-		cover {
-			cur_draw &corner_ne
-		}
-	}
-][
-	[
-		1	1	0
-		1	0	-
-		0	-	0
-	] {
-		cover {
-			cur_draw &corner_se
-		}
-	}
-][
-	[
-		0	1	1
-		-	0	1
-		0	-	0
-	] {
-		cover {
-			cur_draw &corner_sw
-		}
-	}
-][
 	[
 		0	-	0
 		1	0	1
@@ -349,6 +309,46 @@
 	] {
 		cover {
 			cur_draw &side_w
+		}
+	}
+][
+	[
+		0	-	0
+		-	0	1
+		0	1	1
+	] {
+		cover {
+			cur_draw &corner_nw
+		}
+	}
+][
+	[
+		0	-	0
+		1	0	-
+		1	1	0
+	] {
+		cover {
+			cur_draw &corner_ne
+		}
+	}
+][
+	[
+		1	1	0
+		1	0	-
+		0	-	0
+	] {
+		cover {
+			cur_draw &corner_se
+		}
+	}
+][
+	[
+		0	1	1
+		-	0	1
+		0	-	0
+	] {
+		cover {
+			cur_draw &corner_sw
 		}
 	}
 ][

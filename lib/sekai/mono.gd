@@ -171,6 +171,7 @@ func getpRD(key: StringName, default: Variant) -> Variant:
 ## D -> Direct: set without trigger watchers
 ## L -> Layer:  only set on certain layer
 ## B -> Base:   only set on base layer
+## R -> Raw:    only set on define (Direct)
 ## [/codeblock]
 func setp(key: StringName, value: Variant) -> void:
 	for l in layers:
@@ -214,6 +215,9 @@ func setpBD(key: StringName, value: Variant) -> void:
 		layers[-1][1][key] = value
 		return
 	cover(&"base", {key: value})
+
+func setpR(key: StringName, value: Variant) -> void:
+	define._props[key] = value
 
 ## push onto stack methods
 ## [codeblock]

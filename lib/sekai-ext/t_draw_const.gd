@@ -8,7 +8,6 @@ var props := {
 }
 
 static func on_draw(_sekai, this: Mono, _item) -> void:
-	@warning_ignore("shadowed_variable")
 	var cur_draw = this.getp(&"cur_draw")
 	if cur_draw == &"":
 		this.define._props[&"on_draw"] = null
