@@ -18,8 +18,8 @@ func _init() -> void:
 	LisperCommons.def_commons(CommonContext)
 	def_commons(CommonContext)
 
-func def_commons(ctx: ProcedureContext) -> void:
-	ctx.def_vars([Lisper.VarFlag.CONST, Lisper.VarFlag.FIX], {
+func def_commons(context: ProcedureContext) -> void:
+	context.def_vars([Lisper.VarFlag.CONST, Lisper.VarFlag.FIX], {
 		&"block": Lisper.FuncGDRawPure( func (ctx: ProcedureContext, body: Array) -> Variant:
 			return (await ctx.exec_async(body))[-1] if body.size() > 0 else null),
 		&"if": Lisper.FuncGDRawPure( func (ctx: ProcedureContext, body: Array) -> Variant:
@@ -34,6 +34,7 @@ func def_commons(ctx: ProcedureContext) -> void:
 					await ctx.exec_node_async(node)
 			return null),
 		&"loop*": Lisper.FuncGDRaw( func (ctx: ProcedureContext, body: Array) -> Variant:
+			ctx = ctx.fork()
 			var state := [false, false]
 			var res = [null]
 			var skip_ref := ctx.exec_as_keyword(body[0]) as StringName

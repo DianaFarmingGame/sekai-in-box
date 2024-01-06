@@ -1,6 +1,7 @@
 class_name TJump extends MonoTrait
 
 var id := &"jump"
+var requires := [&"position"]
 
 var props := {
 	&"gravity": 9.8,
@@ -9,7 +10,7 @@ var props := {
 	&"jump_time": 0,
 	&"on_jump": false,
 	&"on_input_action": Prop.puts({
-		&"1:jump": func (_sekai, this: Mono, all: Dictionary, press: Dictionary, _release) -> void:
+		&"1:jump": func (_sekai, this: Mono, _all, press: Dictionary, _release) -> void:
 			if press.has(&"dialog_confirm"):
 				this.setp(&"init_z", this.position.z)
 				this.setp(&"on_jump", true)

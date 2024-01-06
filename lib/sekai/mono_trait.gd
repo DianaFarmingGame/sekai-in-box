@@ -6,9 +6,7 @@ class_name MonoTrait extends TraitLike
 # var requires: Array[StringName]
 
 func _finalize() -> void:
-#	prepare()
 	super._finalize()
-#	ready()
 
 func merge(sets: Array[Dictionary], uids: Array, prequires := []) -> Array[Dictionary]:
 	var uid := _get_uid()
@@ -48,12 +46,6 @@ func _get_uid() -> StringName:
 
 func _get_requires() -> Array:
 	return get_requires()
-
-#func prepare() -> void:
-#	pass
-#
-#func ready() -> void:
-#	pass
 
 func get_uid() -> StringName:
 	var vid = get(&"id")

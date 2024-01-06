@@ -36,12 +36,10 @@ func _ready() -> void:
 	_init_sekai()
 	Input.use_accumulated_input = false
 	var tree := get_tree()
-#	tree.root.window_input.connect(_on_input)
 	tree.process_frame.connect(func (): before_process.emit())
 	input_mapper.updated.connect(_on_input)
 
 func _exit_tree() -> void:
-#	print("Sekai exit")
 	_clear_monos()
 
 func _clear_monos() -> void:
@@ -89,11 +87,11 @@ func _init_sekai() -> void:
 	print()
 
 func make_lisper_context() -> LisperContext:
-	var ctx := LisperCommons.fork()
+	var context := LisperCommons.fork()
 	
-	ctx.def_vars([Lisper.VarFlag.CONST, Lisper.VarFlag.FIX], root_vars)
+	context.def_vars([Lisper.VarFlag.CONST, Lisper.VarFlag.FIX], root_vars)
 	
-	ctx.def_vars([Lisper.VarFlag.CONST, Lisper.VarFlag.FIX], {
+	context.def_vars([Lisper.VarFlag.CONST, Lisper.VarFlag.FIX], {
 		&"define/make": Lisper.FuncGDRawPure( func (ctx: LisperContext, body: Array) -> Variant:
 			var def = ctx.exec_node(body[0])
 			if def != null:
@@ -184,8 +182,18 @@ func make_lisper_context() -> LisperContext:
 			map.size = size
 			map.data = PackedInt32Array(data)
 			return map),
+		&"csgv/load": Lisper.FuncGDRaw( func (ctx: LisperContext, body: Array) -> Array:
+			var src := ctx.exec_node(body[0]) as String
+			return load_csgv(root_dir.path_join(src))),
+		&"csgv/map-let": Lisper.FuncGDMacro( func (body: Array) -> Array:
+			return Lisper.Call(&"array/map", [[
+				Lisper.Call(&"csgv/load", [[body[0]]]),
+				Lisper.Func([&"$record"], [[
+					Lisper.Call(&"array/let", [[Lisper.Token(&"$record"), body[1]], body.slice(2)])
+				]]),
+			]])),
 	})
-	return ctx
+	return context
 
 var _indent := 0
 
@@ -203,6 +211,15 @@ func exec_gss(path: String) -> void:
 	gss_ctx.eval(expr)
 	print_rich("[sekai] ", _line_head_end(), "[color=gray]", (Time.get_ticks_usec() - stime) / 1000.0, " ms[/color]")
 	_indent -= 1
+
+func load_csgv(path: String) -> Array:
+	var content := []
+	var file := FileAccess.open(path, FileAccess.READ)
+	var _head := file.get_csv_line()
+	while file.get_position() < file.get_length():
+		content.append(Array(file.get_csv_line()).map(func (entry: String):
+			return gss_ctx.eval(entry.replace('“', '"').replace('”', '"'))[0]))
+	return content
 
 func sign_define(define: MonoDefine) -> void:
 	define.finalize()

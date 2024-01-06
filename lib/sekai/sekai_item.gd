@@ -10,9 +10,6 @@ var ratio_yz := 1.0
 func _ready() -> void:
 	base_transform = Transform2D(0, Vector2(unit_size.x, unit_size.y), 0, Vector2(0, -position.y))
 
-#func _exit_tree() -> void:
-#	print("SekaiItem exit")
-
 var _time := 0.0
 var _t_delta := 0.0
 
