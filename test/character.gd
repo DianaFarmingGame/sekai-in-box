@@ -28,7 +28,7 @@ func do_merge(sets: Array[Dictionary]) -> Array[Dictionary]:
 						if mono != null and sqrt(min_dis) <= this.getp(&"touch_radius"):
 							var action = mono.getp(&"actions").get(&"interact")
 							if action != null:
-								sekai.proc_ctx.call_fn_async(action, [sekai, mono, this])
+								sekai.gss_ctx.call_fn(action, [sekai, mono, this])
 					elif press.has(&"combo"):
 						this.callm(&"state_to", &"combo")
 					else:
@@ -47,12 +47,12 @@ func do_merge(sets: Array[Dictionary]) -> Array[Dictionary]:
 		}),
 		
 		&"on_move": func (_sekai, this: Mono) -> void:
-			var collides := this.emitm(&"solid_collide_all_by") as Array
-			var drops := collides.filter(func (m): return m.callm(&"group_in", &"drop"))
+			var collides := await this.emitm(&"solid_collide_all_by") as Array
+			var drops := await Async.array_filter(collides, func (m): return await m.callm(&"group_in", &"drop"))
 			for drop in drops:
 				for item in drop.getp("contains"):
-					if this.callm(&"container_put", item):
-						drop.callm(&"container_pick", item)
+					if await this.callm(&"container_put", item):
+						await drop.callm(&"container_pick", item)
 				if drop.getp("contains").size() == 0:
 					drop.destroy()
 			pass,
@@ -84,10 +84,10 @@ func do_merge(sets: Array[Dictionary]) -> Array[Dictionary]:
 				this.setp(&"cur_dir", 1),
 		
 		&"move_by": func (_sekai, this: Mono, delta: Vector2) -> bool:
-			return await this.applymA(&"move_by_at_speed", [delta, this.getp(&"max_speed")]),
+			return await this.applym(&"move_by_at_speed", [delta, this.getp(&"max_speed")]),
 		
 		&"move_by_at_speed": func (sekai: Sekai, this: Mono, delta: Vector2, max_speed: float) -> bool:
-			this.callm(&"state_to", &"walk")
+			await this.callm(&"state_to", &"walk")
 			var target := Vector2(this.position.x, this.position.y) + delta
 			var blocked := false
 			var block_cnt := 0
@@ -108,17 +108,17 @@ func do_merge(sets: Array[Dictionary]) -> Array[Dictionary]:
 				else:
 					block_cnt = 0
 			this.setp(&"cur_speed", Vector2(0, 0))
-			this.callm(&"state_to", &"idle")
+			await this.callm(&"state_to", &"idle")
 			return not blocked,
 		
 		&"move_to": func (_sekai, this: Mono, target: Variant) -> bool:
-			return await this.applymA(&"move_to_at_speed", [target, this.getp(&"max_speed")]),
+			return await this.applym(&"move_to_at_speed", [target, this.getp(&"max_speed")]),
 		
 		&"move_to_at_speed": func (sekai: Sekai, this: Mono, target: Variant, max_speed: float) -> bool:
 			var delta: Vector2
 			var blocked := false
 			var block_cnt := 0
-			this.callm(&"state_to", &"walk")
+			await this.callm(&"state_to", &"walk")
 			if target is Vector2:
 				delta = target - Vector2(this.position.x, this.position.y)
 				while delta.length() > 0.1:
@@ -157,7 +157,7 @@ func do_merge(sets: Array[Dictionary]) -> Array[Dictionary]:
 					else:
 						block_cnt = 0
 			this.setp(&"cur_speed", Vector2(0, 0))
-			this.callm(&"state_to", &"idle")
+			await this.callm(&"state_to", &"idle")
 			return not blocked,
 		
 		&"say_to": func (sekai: Sekai, this: Mono, _target: Mono, meta_text, text = null) -> void:
@@ -185,7 +185,7 @@ func do_merge(sets: Array[Dictionary]) -> Array[Dictionary]:
 					&"cur_draw": &"idle",
 				},
 				&"on_enter": func (_sekai, this: Mono, _pres) -> void:
-					this.emitm(&"draw_reset"),
+					await this.emitm(&"draw_reset"),
 			},
 			&"walk": {
 				&"cover": {
@@ -195,11 +195,11 @@ func do_merge(sets: Array[Dictionary]) -> Array[Dictionary]:
 						if cur_speed != Vector2(0, 0):
 							var delta := this.item.get_delta_time() as float
 							var dpos := cur_speed * delta as Vector2
-							this.callm(&"solid_move", Vector3(dpos.x, 0, 0))
-							this.callm(&"solid_move", Vector3(0, dpos.y, 0)),
+							await this.callm(&"solid_move", Vector3(dpos.x, 0, 0))
+							await this.callm(&"solid_move", Vector3(0, dpos.y, 0)),
 				},
 				&"on_enter": func (_sekai, this: Mono, _pres) -> void:
-					this.emitm(&"draw_reset"),
+					await this.emitm(&"draw_reset"),
 			},
 		}
 	}

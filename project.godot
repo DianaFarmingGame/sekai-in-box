@@ -29,7 +29,7 @@ gdscript/warnings/confusable_local_declaration=0
 
 window/size/viewport_width=576
 window/size/viewport_height=640
-window/vsync/vsync_mode=2
+window/vsync/vsync_mode=3
 window/defaults/default_clear_color=Color(1, 1, 1, 1)
 
 [editor_plugins]

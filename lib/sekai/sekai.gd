@@ -367,17 +367,17 @@ func make_item() -> SekaiItem:
 func will_route(point: Vector2, z_pos: int) -> Array:
 	var result := []
 	for mono in monos_need_route:
-		mono.will_route(point, z_pos, result)
+		await mono.will_route(point, z_pos, result)
 	return result
 
 func will_collide(region: Rect2, z_pos: int) -> Array:
 	var result := []
 	for mono in monos_need_collision:
-		mono.will_collide(region, z_pos, result)
+		await mono.will_collide(region, z_pos, result)
 	return result
 
 func can_pass(region: Rect2, z_pos: int) -> bool:
-	return will_collide(region, z_pos).size() == 0 and will_route(region.get_center(), z_pos - 1).size() > 0
+	return (await will_collide(region, z_pos)).size() == 0 and (await will_route(region.get_center(), z_pos - 1)).size() > 0
 
 func timeout(time: float):
 	return get_tree().create_timer(time).timeout

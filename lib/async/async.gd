@@ -10,3 +10,8 @@ static func array_filter(ary: Array, handle: Callable) -> Array:
 	for e in ary:
 		if await handle.call(e): res.append(e)
 	return res
+
+static func array_any(ary: Array, handle: Callable) -> bool:
+	for e in ary:
+		if await handle.call(e): return true
+	return false

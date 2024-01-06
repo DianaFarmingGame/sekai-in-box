@@ -12,7 +12,7 @@ var props := {
 		and this.getp(&"stackable") \
 		and item.getp(&"stackable"):
 			var icount := item.getp(&"stack_count") as int
-			var res = this.callm(&"stack_put_count", icount)
+			var res = await this.callm(&"stack_put_count", icount)
 			if is_same(res, true):
 				return true
 			else:
@@ -42,6 +42,6 @@ var props := {
 				return this
 		return null,
 	&"stack_try_pick": func (_sekai, this: Mono, count = 1) -> Variant:
-		return this.callm(&"stack_pick", mini(count, this.getp(&"stack_count"))),
+		return await this.callm(&"stack_pick", mini(count, this.getp(&"stack_count"))),
 }
 

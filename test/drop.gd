@@ -20,7 +20,7 @@ func do_merge(sets: Array[Dictionary]) -> Array[Dictionary]:
 				var hoffset := sin(2 * PI * t / this.getp(&"float_cycle_time")) * this.getp(&"float_radius") as float
 				var rect := Rect2(-0.5, -0.8, 1, 1)
 				rect.position += pos + Vector2(0, hoffset)
-				item.applym(&"icon_draw", [sitem, rect]),
+				await item.applym(&"icon_draw", [sitem, rect]),
 		})
 	})
 	return sets

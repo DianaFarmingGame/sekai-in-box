@@ -127,7 +127,7 @@ func _ready() -> void:
 			item_box.clear()
 			for item in contains:
 				var vname := item.getp(&"name") as String
-				var icon := item.emitm(&"icon_get_texture") as Texture2D
+				var icon := await item.emitm(&"icon_get_texture") as Texture2D
 				var text := vname
 				if item.getp(&"stackable"):
 					text += " x" + str(item.getp(&"stack_count"))
