@@ -13,6 +13,7 @@ anchors_preset = 0
 script = ExtResource("1_hw424")
 
 [node name="date" type="TextureRect" parent="."]
+layout_mode = 0
 offset_top = 32.0
 offset_right = 71.0
 offset_bottom = 55.0
@@ -20,6 +21,7 @@ texture = ExtResource("2_gwyc2")
 expand_mode = 3
 
 [node name="time" type="TextureRect" parent="."]
+layout_mode = 0
 offset_top = 1.0
 offset_right = 85.2353
 offset_bottom = 24.0
@@ -27,6 +29,7 @@ texture = ExtResource("3_0ip18")
 expand_mode = 3
 
 [node name="month" type="Label" parent="."]
+layout_mode = 0
 offset_left = 20.0
 offset_top = 36.0
 offset_right = 45.0
@@ -36,6 +39,7 @@ label_settings = SubResource("LabelSettings_xdu5i")
 horizontal_alignment = 1
 
 [node name="day" type="Label" parent="."]
+layout_mode = 0
 offset_left = 47.0
 offset_top = 36.0
 offset_right = 66.0
@@ -45,6 +49,7 @@ label_settings = SubResource("LabelSettings_xdu5i")
 horizontal_alignment = 1
 
 [node name="hour" type="Label" parent="."]
+layout_mode = 0
 offset_left = 18.0
 offset_top = 5.0
 offset_right = 60.0
@@ -54,6 +59,7 @@ label_settings = SubResource("LabelSettings_xdu5i")
 horizontal_alignment = 1
 
 [node name="minute" type="Label" parent="."]
+layout_mode = 0
 offset_left = 62.0
 offset_top = 5.0
 offset_right = 81.0
