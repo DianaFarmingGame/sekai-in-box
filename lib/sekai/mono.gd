@@ -16,14 +16,14 @@ func _outof_sekai() -> void:
 func _on_init() -> void:
 	if not inited:
 		inited = true
-		emitm(&"on_init")
-		emitm(&"on_inited")
+		await emitm(&"on_init")
+		await emitm(&"on_inited")
 
 func _on_store() -> void:
-	emitm(&"on_store")
+	await emitm(&"on_store")
 
 func _on_restore() -> void:
-	emitm(&"on_restore")
+	await emitm(&"on_restore")
 
 func clone() -> Mono:
 	var mono := get_script().new() as Mono
@@ -79,11 +79,11 @@ func call_watcher(key: StringName, value: Variant, force := false) -> Variant:
 	if force or getp(key) != value:
 		var hkey = StringName("on_" + key)
 		var handle = define._props.get(hkey)
-		if handle != null: value = handle.call(sekai, self, value)
+		if handle != null: value = await handle.call(sekai, self, value)
 		var lidx = layers.size() - 1
 		while lidx >= 0:
 			handle = layers[lidx][1].get(hkey)
-			if handle != null: value = handle.call(sekai, self, value)
+			if handle != null: value = await handle.call(sekai, self, value)
 			lidx -= 1
 	return value
 
@@ -176,7 +176,7 @@ func setp(key: StringName, value: Variant) -> void:
 		var v = l[1].get(key)
 		if v != null:
 			if v != value:
-				l[1][key] = call_watcher(key, value)
+				l[1][key] = await call_watcher(key, value)
 			return
 	setpB(key, value)
 
@@ -192,7 +192,7 @@ func setpD(key: StringName, value: Variant) -> void:
 func setpL(layer_name: StringName, key: StringName, value: Variant) -> void:
 	for l in layers:
 		if l[0] == layer_name:
-			l[1][key] = call_watcher(key, value)
+			l[1][key] = await call_watcher(key, value)
 			return
 
 func setpLD(layer_name: StringName, key: StringName, value: Variant) -> void:
@@ -202,7 +202,7 @@ func setpLD(layer_name: StringName, key: StringName, value: Variant) -> void:
 			return
 
 func setpB(key: StringName, value: Variant) -> void:
-	value = call_watcher(key, value)
+	value = await call_watcher(key, value)
 	if layers.size() > 0:
 		layers[-1][1][key] = value
 		return
@@ -365,163 +365,9 @@ func delsB(key: StringName, head: Variant) -> Variant:
 ## R -> Raw:    only call on define
 ## S -> Single: not batch call stacks
 ## U -> Usafe:  fail when handle not found
-## A -> Async:  call func with await
 ## [/codeblock]
+
 func emitm(key: StringName) -> Variant:
-	var value = null
-	var data = define._props.get(key)
-	if data is Callable:
-		value = data.call(sekai, self)
-	elif data is Array:
-		for entry in data:
-			value = entry[1].call(sekai, self)
-	var lidx = layers.size() - 1
-	while lidx >= 0:
-		data = layers[lidx][1].get(key)
-		if data is Array:
-			for entry in data:
-				value = entry[1].call(sekai, self)
-		elif data is Callable:
-			value = data.call(sekai, self)
-		lidx -= 1
-	return value
-
-func emitmS(key: StringName) -> Variant:
-	var value = null
-	var handle = define._props.get(key)
-	if handle != null: value = handle.call(sekai, self)
-	var lidx = layers.size() - 1
-	while lidx >= 0:
-		handle = layers[lidx][1].get(key)
-		if handle != null: value = handle.call(sekai, self)
-		lidx -= 1
-	return value
-
-func callm(key: StringName, arg: Variant) -> Variant:
-	var value = null
-	var data = define._props.get(key)
-	if data is Callable:
-		value = data.call(sekai, self, arg)
-	elif data is Array:
-		for entry in data:
-			value = entry[1].call(sekai, self, arg)
-	var lidx = layers.size() - 1
-	while lidx >= 0:
-		data = layers[lidx][1].get(key)
-		if data is Array:
-			for entry in data:
-				value = entry[1].call(sekai, self, arg)
-		elif data is Callable:
-			value = data.call(sekai, self, arg)
-		lidx -= 1
-	return value
-
-func callmS(key: StringName, arg: Variant) -> Variant:
-	var value = null
-	var handle = define._props.get(key)
-	if handle != null: value = handle.call(sekai, self, arg)
-	var lidx = layers.size() - 1
-	while lidx >= 0:
-		handle = layers[lidx][1].get(key)
-		if handle != null: value = handle.call(sekai, self, arg)
-		lidx -= 1
-	return value
-
-func applym(key: StringName, argv: Array) -> Variant:
-	var vargv := [sekai, self]
-	vargv.append_array(argv)
-	var value = null
-	var data = define._props.get(key)
-	if data is Callable:
-		value = data.callv(vargv)
-	elif data is Array:
-		for entry in data:
-			value = entry[1].callv(vargv)
-	var lidx = layers.size() - 1
-	while lidx >= 0:
-		data = layers[lidx][1].get(key)
-		if data is Array:
-			for entry in data:
-				value = entry[1].callv(vargv)
-		elif data is Callable:
-			value = data.callv(vargv)
-		lidx -= 1
-	return value
-
-func applymS(key: StringName, argv: Array) -> Variant:
-	var vargv := [sekai, self]
-	vargv.append_array(argv)
-	var value = null
-	var handle = define._props.get(key)
-	if handle != null: value = handle.callv(vargv)
-	var lidx = layers.size() - 1
-	while lidx >= 0:
-		handle = layers[lidx][1].get(key)
-		if handle != null: value = handle.callv(vargv)
-		lidx -= 1
-	return value
-
-func emitmR(key: StringName) -> Variant:
-	var value = null
-	var data = define._props.get(key)
-	if data is Callable:
-		value = data.call(sekai, self)
-	elif data is Array:
-		for entry in data:
-			value = entry[1].call(sekai, self)
-	return value
-
-func emitmRS(key: StringName) -> Variant:
-	var handle = define._props.get(key)
-	if handle != null: return handle.call(sekai, self)
-	return null
-
-func emitmRSU(key: StringName) -> Variant:
-	return define._props[key].call(sekai, self)
-
-func callmR(key: StringName, arg: Variant) -> Variant:
-	var value = null
-	var data = define._props.get(key)
-	if data is Callable:
-		value = data.call(sekai, self, arg)
-	elif data is Array:
-		for entry in data:
-			value = entry[1].call(sekai, self, arg)
-	return value
-
-func callmRS(key: StringName, arg: Variant) -> Variant:
-	var handle = define._props.get(key)
-	if handle != null: return handle.call(sekai, self, arg)
-	return null
-
-func callmRSU(key: StringName, arg: Variant) -> Variant:
-	return define._props[key].call(sekai, self, arg)
-
-func applymR(key: StringName, argv: Array) -> Variant:
-	var vargv := [sekai, self]
-	vargv.append_array(argv)
-	var value = null
-	var data = define._props.get(key)
-	if data is Callable:
-		value = data.callv(vargv)
-	elif data is Array:
-		for entry in data:
-			value = entry[1].callv(vargv)
-	return value
-
-func applymRS(key: StringName, argv: Array) -> Variant:
-	var vargv := [sekai, self]
-	vargv.append_array(argv)
-	var handle = define._props.get(key)
-	if handle != null: return handle.callv(vargv)
-	return null
-
-func applymRSU(key: StringName, argv: Array) -> Variant:
-	var vargv := [sekai, self]
-	vargv.append_array(argv)
-	return define._props[key].callv(vargv)
-
-func emitmA(key: StringName) -> Variant:
 	var value = null
 	var data = define._props.get(key)
 	if data is Callable:
@@ -540,7 +386,7 @@ func emitmA(key: StringName) -> Variant:
 		lidx -= 1
 	return value
 
-func emitmAS(key: StringName) -> Variant:
+func emitmS(key: StringName) -> Variant:
 	var value = null
 	var handle = define._props.get(key)
 	if handle != null: value = await handle.call(sekai, self)
@@ -551,7 +397,7 @@ func emitmAS(key: StringName) -> Variant:
 		lidx -= 1
 	return value
 
-func callmA(key: StringName, arg: Variant) -> Variant:
+func callm(key: StringName, arg: Variant) -> Variant:
 	var value = null
 	var data = define._props.get(key)
 	if data is Callable:
@@ -570,7 +416,7 @@ func callmA(key: StringName, arg: Variant) -> Variant:
 		lidx -= 1
 	return value
 
-func callmAS(key: StringName, arg: Variant) -> Variant:
+func callmS(key: StringName, arg: Variant) -> Variant:
 	var value = null
 	var handle = define._props.get(key)
 	if handle != null: value = await handle.call(sekai, self, arg)
@@ -581,7 +427,7 @@ func callmAS(key: StringName, arg: Variant) -> Variant:
 		lidx -= 1
 	return value
 
-func applymA(key: StringName, argv: Array) -> Variant:
+func applym(key: StringName, argv: Array) -> Variant:
 	var vargv := [sekai, self]
 	vargv.append_array(argv)
 	var value = null
@@ -602,7 +448,7 @@ func applymA(key: StringName, argv: Array) -> Variant:
 		lidx -= 1
 	return value
 
-func applymAS(key: StringName, argv: Array) -> Variant:
+func applymS(key: StringName, argv: Array) -> Variant:
 	var vargv := [sekai, self]
 	vargv.append_array(argv)
 	var value = null
@@ -615,7 +461,7 @@ func applymAS(key: StringName, argv: Array) -> Variant:
 		lidx -= 1
 	return value
 
-func emitmAR(key: StringName) -> Variant:
+func emitmR(key: StringName) -> Variant:
 	var value = null
 	var data = define._props.get(key)
 	if data is Callable:
@@ -625,15 +471,15 @@ func emitmAR(key: StringName) -> Variant:
 			value = await entry[1].call(sekai, self)
 	return value
 
-func emitmARS(key: StringName) -> Variant:
+func emitmRS(key: StringName) -> Variant:
 	var handle = define._props.get(key)
 	if handle != null: return await handle.call(sekai, self)
 	return null
 
-func emitmARSU(key: StringName) -> Variant:
+func emitmRSU(key: StringName) -> Variant:
 	return await define._props[key].call(sekai, self)
 
-func callmAR(key: StringName, arg: Variant) -> Variant:
+func callmR(key: StringName, arg: Variant) -> Variant:
 	var value = null
 	var data = define._props.get(key)
 	if data is Callable:
@@ -643,15 +489,15 @@ func callmAR(key: StringName, arg: Variant) -> Variant:
 			value = await entry[1].call(sekai, self, arg)
 	return value
 
-func callmARS(key: StringName, arg: Variant) -> Variant:
+func callmRS(key: StringName, arg: Variant) -> Variant:
 	var handle = define._props.get(key)
 	if handle != null: return await handle.call(sekai, self, arg)
 	return null
 
-func callmARSU(key: StringName, arg: Variant) -> Variant:
+func callmRSU(key: StringName, arg: Variant) -> Variant:
 	return await define._props[key].call(sekai, self, arg)
 
-func applymAR(key: StringName, argv: Array) -> Variant:
+func applymR(key: StringName, argv: Array) -> Variant:
 	var vargv := [sekai, self]
 	vargv.append_array(argv)
 	var value = null
@@ -663,14 +509,14 @@ func applymAR(key: StringName, argv: Array) -> Variant:
 			value = await entry[1].callv(vargv)
 	return value
 
-func applymARS(key: StringName, argv: Array) -> Variant:
+func applymRS(key: StringName, argv: Array) -> Variant:
 	var vargv := [sekai, self]
 	vargv.append_array(argv)
 	var handle = define._props.get(key)
 	if handle != null: return await handle.callv(vargv)
 	return null
 
-func applymARSU(key: StringName, argv: Array) -> Variant:
+func applymRSU(key: StringName, argv: Array) -> Variant:
 	var vargv := [sekai, self]
 	vargv.append_array(argv)
 	return await define._props[key].callv(vargv)
@@ -684,9 +530,9 @@ func is_need_route() -> bool:
 	return getpD(&"need_route", false)
 
 func will_route(point: Vector2, z_pos: int, result: Array) -> void:
-	if applym(&"route_test", [point, z_pos]):
+	if await applym(&"route_test", [point, z_pos]):
 		result.append(self)
 
 func will_collide(region: Rect2, z_pos: int, result: Array) -> void:
-	if applym(&"collide_test", [region, z_pos]):
+	if await applym(&"collide_test", [region, z_pos]):
 		result.append(self)
