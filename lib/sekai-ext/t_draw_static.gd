@@ -19,7 +19,6 @@ var props := {
 }
 
 static func update(_sekai, this: Mono) -> void:
-	this = this.upgrade()
 	var cur_draw = this.getp(&"cur_draw")
 	if cur_draw == &"": return
 	var draw = this.getp(&"draw_data")[cur_draw]

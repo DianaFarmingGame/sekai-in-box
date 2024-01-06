@@ -16,7 +16,6 @@ var props := {
 }
 
 static func update(sekai: Sekai, this: Mono) -> void:
-	this = this.upgrade()
 	var pos := this.position
 	var size := this.getp(&"size") as Vector3
 	var atile_size := this.getp(&"atile_size") as Vector3

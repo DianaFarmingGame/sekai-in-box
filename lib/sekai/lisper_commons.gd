@@ -143,9 +143,16 @@ func def_commons(context: LisperContext) -> void:
 			return float(value)),
 		&"array/size": Lisper.FuncGDCallPure( func (ary: Array) -> int:
 			return ary.size()),
+		&"str/concat": Lisper.FuncGDRawPure( func (ctx: LisperContext, body: Array) -> String:
+			var res := ''
+			body := await ctx.exec(body)
+			for v in body[0]:
+				assert(v is String)
+				res += v
+			return res),
 		&"array/concat": Lisper.FuncGDRawPure( func (ctx: LisperContext, body: Array) -> Array:
 			var res := []
-			body = await ctx.exec(body)
+			body := await ctx.exec(body)
 			for v in body:
 				assert(v is Array)
 				res.append_array(v)
