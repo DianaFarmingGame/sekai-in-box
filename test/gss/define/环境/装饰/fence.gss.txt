@@ -27,12 +27,46 @@
 		atile_matches [[2420]]
 		atile_rules [[
 				[
-					1	1	1
-					1	0	1
-					1	1	1
+					0	-	0
+					-	0	1
+					0	1	1
 				] {
 					cover {
-						cur_draw &center
+						cur_draw &corner_nw
+						collision_boxes [(rect2 -0.2 -0.2 0.7 0.1) (rect2 -0.3 -0.2 0.1 0.7)]
+					}
+				}
+			][
+				[
+					0	-	0
+					1	0	-
+					1	1	0
+				] {
+					cover {
+						cur_draw &corner_ne
+						collision_boxes [(rect2 -0.5 -0.2 0.7 0.1) (rect2 0.2 -0.2 0.1 0.7)]
+					}
+				}
+			][
+				[
+					1	1	0
+					1	0	-
+					0	-	0
+				] {
+					cover {
+						cur_draw &corner_se
+						collision_boxes [(rect2 -0.5 0.3 0.7 0.1) (rect2 0.2 -0.5 0.1 0.8)]
+					}
+				}
+			][
+				[
+					0	1	1
+					-	0	1
+					0	-	0
+				] {
+					cover {
+						cur_draw &corner_sw
+						collision_boxes [(rect2 -0.2 0.3 0.7 0.1) (rect2 -0.3 -0.5 0.1 0.8)]
 					}
 				}
 			][
@@ -81,46 +115,12 @@
 				}
 			][
 				[
-					0	-	0
-					-	0	1
-					0	1	1
+					1	1	1
+					1	0	1
+					1	1	1
 				] {
 					cover {
-						cur_draw &corner_nw
-						collision_boxes [(rect2 -0.2 -0.2 0.7 0.1) (rect2 -0.3 -0.2 0.1 0.7)]
-					}
-				}
-			][
-				[
-					0	-	0
-					1	0	-
-					1	1	0
-				] {
-					cover {
-						cur_draw &corner_ne
-						collision_boxes [(rect2 -0.5 -0.2 0.7 0.1) (rect2 0.2 -0.2 0.1 0.7)]
-					}
-				}
-			][
-				[
-					1	1	0
-					1	0	-
-					0	-	0
-				] {
-					cover {
-						cur_draw &corner_se
-						collision_boxes [(rect2 -0.5 0.3 0.7 0.1) (rect2 0.2 -0.5 0.1 0.8)]
-					}
-				}
-			][
-				[
-					0	1	1
-					-	0	1
-					0	-	0
-				] {
-					cover {
-						cur_draw &corner_sw
-						collision_boxes [(rect2 -0.2 0.3 0.7 0.1) (rect2 -0.3 -0.5 0.1 0.8)]
+						cur_draw &center
 					}
 				}
 			][

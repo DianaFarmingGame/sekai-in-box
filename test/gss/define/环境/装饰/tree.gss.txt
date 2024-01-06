@@ -1,6 +1,4 @@
-; common tree
-(define BlockStaticExt
-	ref 2406
+(Define Tree BlockStaticExt
 	props {
 		need_route 	#f
 		routable 	#f
@@ -8,29 +6,25 @@
 		asserts {
 			main "assert/树.png"
 		}
-		cur_draw &common_tree
 		draw_data {
 			common_tree [&static &main (clip3x3_build 0 0)] 
 		}
+	})
+
+; common tree
+(define Tree
+	ref 2406
+	props {
+		cur_draw &common_tree
 		groups(prop/pushs [2406])
 	}
 )
 
 ; ramdom tree
-(define BlockStaticExt
+(define Tree
 	ref 2422
 	props {
-		need_route 	#f
-		routable 	#f
-		collision_boxes [(rect2 -0.2 -0.5 0.4 0.5)]
-		asserts {
-			main "assert/树.png"
-		}
 		cur_draw &
-		draw_data {
-			common_tree [&static &main (clip3x3_build 0 0)] 
-		}
-
 		random_rules [
 			[1 { cover { cur_draw &common_tree }}]
 			[50 { cover { need_destroy #t }}]
@@ -71,11 +65,11 @@
 				0	0	0
 				
 				0	0	0
-				0	0	0
+				0	4	0
 				0	0	0
 				
 				0	0	0
-				0	3	0
+				0	0	0
 				0	0	0
 			] { cover { need_destroy #t }}
 		] [
@@ -85,11 +79,11 @@
 				0	0	0
 				
 				0	0	0
-				0	4	0
+				0	0	0
 				0	0	0
 				
 				0	0	0
-				0	0	0
+				0	3	0
 				0	0	0
 			] { cover { need_destroy #t }}
 		] [
