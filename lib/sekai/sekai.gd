@@ -21,6 +21,8 @@ var control_stack := []
 
 var external_fns := {}
 
+var database_static := {}
+
 static var root_vars := {
 	&"MonoDefine": MonoDefine.new(),
 	&"Entity": GEntity.new(),
@@ -260,6 +262,15 @@ func make_lisper_context() -> LisperContext:
 			return Lisper.Call(&"array/map-let", [[
 				Lisper.Call(&"csv/load", [[body[0]]]),
 			], body.slice(1)])),
+		&"dbs/define": Lisper.FuncGDCallPure( func (body: Array) -> void:
+			dbs_define(body[0], body[1], body[2])
+			),
+		&"dbs/getp": Lisper.FuncGDCallPure( func (body: Array) -> Variant:
+			return dbs_getp(body[0], body[1], body[2])
+			),
+		&"dbs/setp": Lisper.FuncGDCallPure( func (body: Array) -> void:
+			dbs_setp(body[0], body[1], body[2], body[3])
+			),
 	})
 	return context
 
@@ -280,9 +291,32 @@ func exec_gss(path: String) -> void:
 	print_rich("[sekai] ", _line_head_end(), "[color=gray]", (Time.get_ticks_usec() - stime) / 1000.0, " ms[/color]")
 	_indent -= 1
 
+func dbs_define(group: StringName, key: StringName, value: Dictionary) -> void:
+	database_static[group] = database_static[group] if database_static.has(group) else {}
+	database_static[group][key] = value
+
+func dbs_getp(group: StringName, key: StringName, props: StringName) -> Variant:
+	if database_static.has(group) and database_static[group].has(key):
+		var data = database_static[group][key]
+		assert(data is Dictionary)
+		return data[props] if data.has(props) else null
+	else:
+		return null
+
+func dbs_setp(group: StringName, key: StringName, props: StringName, value) -> void:
+	if database_static.has(group) and database_static[group].has(key):
+		var data = database_static[group][key]
+		assert(data is Dictionary)
+		data[props] = value
+	else:
+		database_static[group] = database_static[group] if database_static.has(group) else {}
+		database_static[group][key] = {props: value}
+	return
+
 func load_csgv(path: String) -> Array:
 	var content := []
 	var file := FileAccess.open(path, FileAccess.READ)
+	file.get_csv_line()
 	var _head := file.get_csv_line()
 	while file.get_position() < file.get_length():
 		content.append(Array(file.get_csv_line()).map(func (entry: String):
@@ -292,6 +326,7 @@ func load_csgv(path: String) -> Array:
 func load_csv(path: String) -> Array:
 	var content := []
 	var file := FileAccess.open(path, FileAccess.READ)
+	file.get_csv_line()
 	var _head := file.get_csv_line()
 	while file.get_position() < file.get_length():
 		content.append(Array(file.get_csv_line()))

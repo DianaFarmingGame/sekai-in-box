@@ -1,8 +1,7 @@
 (block
-	(defvar CraftTable {})
-	(defvar table (csv/map-let (str/concat [*config_dir* "craft_table.csv"])
+	(csv/map-let (str/concat [*config_dir* "craft_table.csv"])
 		[ID 需求物品 合成物品 描述]
-		{
+		(dbs/define ["craft_table" ID {
 			ID (keyword ID)
 			need ( => 需求物品
 				(string/split ";")
@@ -20,7 +19,7 @@
 			)
 
 			desc 描述
-		}
-	))
-	(echo table)
+		}])
+	)
+	;; (echo table)
 )
