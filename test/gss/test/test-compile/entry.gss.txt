@@ -1,0 +1,14 @@
+defvar(TEST raw(block(
+
+[1 #t &test "test" {id "test"}]
+
++(1 2)
+
+)))
+
+raw/echo(TEST)
+
+raw/echo(compile(TEST))
+
+display(+(*(2 3) /(4 2)))
+display(#(2 * 3 + (4 / 2)))

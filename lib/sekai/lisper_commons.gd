@@ -63,6 +63,57 @@ func template(ctx: LisperContext, node: Array) -> Array:
 			return [node[0], body]
 	return node
 
+func compile(ctx: LisperContext, ext_env: Dictionary, node: Array) -> Array:
+	match node[0]:
+		Lisper.TType.TOKEN:
+			return node
+		Lisper.TType.NUMBER, Lisper.TType.BOOL, Lisper.TType.KEYWORD, Lisper.TType.STRING:
+			return Lisper.Raw(node[1])
+		Lisper.TType.LIST:
+			var head := node[1][0] as Array
+			var body := node[1].slice(1) as Array
+			var cdata := [head]
+			cdata.append_array(body.map(func (n): return compile(ctx, ext_env, n)))
+			return Lisper.List(cdata)
+		Lisper.TType.ARRAY:
+			var body := node[1] as Array
+			var cdata := []
+			var is_const := true
+			cdata.resize(body.size())
+			for i in body.size():
+				var v := compile(ctx, ext_env, body[i])
+				if v[0] != Lisper.TType.RAW: is_const = false
+				cdata[i] = v
+			if is_const:
+				return Lisper.Raw(cdata.map(func (n): return n[1]))
+			else:
+				return Lisper.Array(cdata)
+		Lisper.TType.MAP:
+			var pairs := node[1] as Array
+			var cdata := []
+			var is_const := true
+			cdata.resize(pairs.size())
+			for i in pairs.size() / 2:
+				cdata[2 * i] = Lisper.Raw(ctx.exec_as_keyword(pairs[2 * i]))
+				var v := compile(ctx, ext_env, pairs[2 * i + 1])
+				if v[0] != Lisper.TType.RAW: is_const = false
+				cdata[2 * i + 1] = v
+			if is_const:
+				var res := {}
+				for i in cdata.size() / 2:
+					var k = cdata[2 * i][1]
+					var v = cdata[2 * i + 1][1]
+					res[k] = v
+				return Lisper.Raw(res)
+			else:
+				return [Lisper.TType.MAP, cdata]
+		Lisper.TType.RAW:
+			return node
+	push_error("unknown typed node: ", node)
+	printerr("unknown typed node: ", node, " @:")
+	printerr(Lisper.stringify(node))
+	return node
+
 func def_commons(context: LisperContext) -> void:
 	context.def_vars([Lisper.VarFlag.CONST, Lisper.VarFlag.FIX], {
 		&"raw": Lisper.FuncGDRawPure( func (_ctx, body: Array) -> Array:
@@ -80,6 +131,8 @@ func def_commons(context: LisperContext) -> void:
 					Lisper.Call(&"raw", [body]),
 				]]),
 			]])),
+		&"compile": Lisper.FuncGDRaw( func (ctx: LisperContext, body: Array) -> Array:
+			return compile(ctx, {}, await ctx.exec_node(body[0]))),
 		&"template": Lisper.FuncGDRawPure( func (ctx: LisperContext, body: Array) -> Array:
 			return await template(ctx, body[0])),
 		&"block": Lisper.FuncGDRawPure( func (ctx: LisperContext, body: Array) -> Variant:

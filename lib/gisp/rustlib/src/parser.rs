@@ -113,6 +113,57 @@ impl GispParser {
         true
     }
 
+    fn r_expresser(&mut self) -> bool {
+        if self.rpick() == Some('#') && self.rpick_offset(1) == Some('(') {
+            self.offset += 1;
+            if self.r_expression() {
+                true
+            } else {
+                self.offset -= 1;
+                false
+            }
+        } else {
+            false
+        }
+    }
+
+    fn r_expression(&mut self) -> bool {
+        if self.rpick() == Some('(') {
+            let mut np = self.rfork();
+            np.offset += 1;
+            while np.r_blank() && np.r_expr_item() {}
+            np.r_blank();
+            if np.rpick() == Some(')') {
+                let mut body = np.result.into_iter();
+                if let Some(mut tar) = body.next() {
+                    loop {
+                        if let Some(opt) = body.next() {
+                            if let Some(src) = body.next() {
+                                tar = Array::from(&[(TType::CALL as u32).to_variant(), Array::from(&[opt, tar, src]).to_variant()]).to_variant();
+                            } else { return false; }
+                        } else { break; }
+                    }
+                    self.offset = np.offset + 1;
+                    self.result.push(tar);
+                    return true;
+                }
+            }
+        }
+        false
+    }
+
+    fn r_expr_item(&mut self) -> bool {
+        if self.r_value()
+        || self.r_expression()
+        || self.r_set()
+        || self.r_token()
+        {
+            true
+        } else {
+            false
+        }
+    }
+
     fn r_token(&mut self) -> bool {
         if let Some(c) = self.rpick() && !_CS_N_TOKEN_HEAD.contains(c) {
             let mut chars = vec![c];
@@ -240,10 +291,10 @@ impl GispParser {
             if np.rpick() == Some(')') {
                 self.offset = np.offset + 1;
                 if let Some(prev) = self.result.pop() {
-                    let mut body = np.get_result();
-                    body.push_front(prev);
-                    self.push(TType::CALL, body.to_variant());
-                    return true
+                    let mut body = vec![prev.to_variant()];
+                    body.extend(np.result);
+                    self.push(TType::CALL, Array::from(body.as_slice()).to_variant());
+                    return true;
                 }
             }
         }
@@ -259,7 +310,7 @@ impl GispParser {
             if np.rpick() == Some(']') {
                 self.offset = np.offset + 1;
                 self.push(TType::ARRAY, np.get_result().to_variant());
-                return true
+                return true;
             }
         }
         false
@@ -274,7 +325,7 @@ impl GispParser {
             if np.rpick() == Some('}') {
                 self.offset = np.offset + 1;
                 self.push(TType::MAP, np.get_result().to_variant());
-                return true
+                return true;
             }
         }
         false
@@ -295,6 +346,7 @@ impl GispParser {
         || self.r_call()
         || self.r_set()
         || self.r_token()
+        || self.r_expresser()
         {
             true
         } else {
