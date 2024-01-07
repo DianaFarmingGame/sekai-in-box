@@ -1,6 +1,6 @@
-(defvar config_dir "gss/configurator/")
+(defvar *config_dir* "gss/configurator/")
 
-(defvar *item_configurator_dir* (str/concat [config_dir "item.csv"]))
 (gss/exec "gss/configurator/item.gss.txt")
+(gss/exec "gss/configurator/craft_table.gss.txt")
 
 (gss/exec "gss/test/dev-configs/item_test.gss.txt")
