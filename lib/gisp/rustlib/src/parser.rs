@@ -152,11 +152,25 @@ impl GispParser {
         false
     }
 
+    fn r_unexpresser(&mut self) -> bool {
+        if self.rpick() == Some('#') && self.rpick_offset(1) == Some(':') {
+            let mut np = self.rfork();
+            np.offset += 2;
+            if np.r_blank() && np.r_item() && np.r_blank() && np.r_call() {
+                self.offset = np.offset;
+                self.result.append(np.result.as_mut());
+                return true;
+            }
+        }
+        false
+    }
+
     fn r_expr_item(&mut self) -> bool {
         if self.r_value()
         || self.r_expression()
         || self.r_set()
         || self.r_token()
+        || self.r_unexpresser()
         {
             true
         } else {

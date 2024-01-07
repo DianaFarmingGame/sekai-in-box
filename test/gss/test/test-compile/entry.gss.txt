@@ -12,3 +12,4 @@ raw/echo(compile(TEST))
 
 display(+(*(2 3) /(4 2)))
 display(#(2 * 3 + (4 / 2)))
+display(#(2 * 3 + (4 / #:echo(2))))
