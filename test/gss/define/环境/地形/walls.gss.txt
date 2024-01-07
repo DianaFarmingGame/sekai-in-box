@@ -1,4 +1,4 @@
-(define BlockStaticExt
+define(BlockStaticExt
 	ref 304
 	props {
 		need_route	#f
@@ -8,18 +8,18 @@
 		}
 		cur_draw &
 		draw_data {
-			top_left		[&static &main (clip_wall 3 0)]
-			top_center		[&static &main (clip_wall 4 0)]
-			top_right		[&static &main (clip_wall 5 0)]
-			left			[&static &main (clip_wall 3 1)]
-			center			[&static &main (clip_wall 4 1)]
-			right			[&static &main (clip_wall 5 1)]
-			bottom_left		[&static &main (clip_wall 3 2)]
-			bottom_centre	[&static &main (clip_wall 4 2)]
-			bottom_right	[&static &main (clip_wall 5 2)]
+			top_left		[&static &main clip_wall(3 0)]
+			top_center		[&static &main clip_wall(4 0)]
+			top_right		[&static &main clip_wall(5 0)]
+			left			[&static &main clip_wall(3 1)]
+			center			[&static &main clip_wall(4 1)]
+			right			[&static &main clip_wall(5 1)]
+			bottom_left		[&static &main clip_wall(3 2)]
+			bottom_centre	[&static &main clip_wall(4 2)]
+			bottom_right	[&static &main clip_wall(5 2)]
 		}
-		atile_size (vec3 3 3 1)
-		groups (prop/pushs [304 300])
+		atile_size vec3(3 3 1)
+		groups prop/pushs([304 300])
 		atile_matches [[304]]
 		atile_rules *atile_wall_rules_3x3x1*
 	}
@@ -27,7 +27,7 @@
 
 ; 特殊处理
 ; 左中侧墙
-(define BlockStaticExt
+define(BlockStaticExt
 	ref 305
 	props {
 		need_route	#f
@@ -37,14 +37,14 @@
 		}
 		cur_draw &left
 		draw_data {
-			left			[&static &main (clip_wall 3 1)]
+			left			[&static &main clip_wall(3 1)]
 		}
-		groups (prop/pushs [304])
+		groups prop/pushs([304])
 	}
 )
 
 ; 左上侧墙
-(define BlockStaticExt
+define(BlockStaticExt
 	ref 306
 	props {
 		need_route	#f
@@ -54,14 +54,14 @@
 		}
 		cur_draw &top_left
 		draw_data {
-			top_left		[&static &main (clip_wall 3 0)]
+			top_left		[&static &main clip_wall(3 0)]
 		}
-		groups (prop/pushs [304])
+		groups prop/pushs([304])
 	}
 )
 
 ; 右中侧墙
-(define BlockStaticExt
+define(BlockStaticExt
 	ref 307
 	props {
 		need_route	#f
@@ -71,14 +71,14 @@
 		}
 		cur_draw &right
 		draw_data {
-			right			[&static &main (clip_wall 5 1)]
+			right			[&static &main clip_wall(5 1)]
 		}
-		groups (prop/pushs [304 300])
+		groups prop/pushs([304 300])
 	}
 )
 
 ; 中空白墙
-(define BlockStaticExt
+define(BlockStaticExt
 	ref 308
 	props {
 		need_route	#f
@@ -88,12 +88,12 @@
 		}
 		cur_draw &
 		draw_data {
-			top_center		[&static &main (clip_wall 6 0)]
-			center			[&static &main (clip_wall 6 1)]
-			bottom_centre	[&static &main (clip_wall 6 2)]
+			top_center		[&static &main clip_wall(6 0)]
+			center			[&static &main clip_wall(6 1)]
+			bottom_centre	[&static &main clip_wall(6 2)]
 		}
-		groups (prop/pushs [304 300])
-		atile_size (vec3 3 3 1)
+		groups prop/pushs([304 300])
+		atile_size vec3(3 3 1)
 		atile_matches [[304]]
 		atile_rules *atile_wall_rules_3x3x1*
 	}

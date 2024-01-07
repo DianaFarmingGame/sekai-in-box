@@ -29,7 +29,7 @@ enum TType {
     BOOL,
     KEYWORD,
     STRING,
-    LIST,
+    CALL,
     ARRAY,
     MAP,
 }
@@ -97,7 +97,8 @@ impl GispParser {
         if self.rpick() == Some('#') && self.rpick_offset(1) == Some(';') {
             self.offset += 2;
             let mut np = self.rfork();
-            np.r_blank(); np.r_item();
+            np.r_blank();
+            let _ = np.r_item() && np.r_blank() && np.r_call();
             self.offset = np.offset;
             true
         } else {
@@ -230,7 +231,7 @@ impl GispParser {
         }
     }
 
-    fn r_list(&mut self) -> bool {
+    fn r_call(&mut self) -> bool {
         if self.rpick() == Some('(') {
             let mut np = self.rfork();
             np.offset += 1;
@@ -238,8 +239,12 @@ impl GispParser {
             np.r_blank();
             if np.rpick() == Some(')') {
                 self.offset = np.offset + 1;
-                self.push(TType::LIST, np.get_result().to_variant());
-                return true
+                if let Some(prev) = self.result.pop() {
+                    let mut body = np.get_result();
+                    body.push_front(prev);
+                    self.push(TType::CALL, body.to_variant());
+                    return true
+                }
             }
         }
         false
@@ -276,8 +281,7 @@ impl GispParser {
     }
 
     fn r_set(&mut self) -> bool {
-        if self.r_list()
-        || self.r_array()
+        if self.r_array()
         || self.r_map()
         {
             true
@@ -288,6 +292,7 @@ impl GispParser {
 
     fn r_item(&mut self) -> bool {
         if self.r_value()
+        || self.r_call()
         || self.r_set()
         || self.r_token()
         {

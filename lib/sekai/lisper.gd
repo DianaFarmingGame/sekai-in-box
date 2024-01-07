@@ -84,12 +84,12 @@ static func stringify(node: Array, indent := 0) -> String:
 		TType.RAW:
 			var value = node[1]
 			if value is String:
-				return str('"', node[1].c_escape(), '"')
+				return str('<', '"', node[1].c_escape(), '"', '>')
 			if value is bool:
-				return "#t" if value else "#f"
+				return "<#t>" if value else "<#f>"
 			if value is StringName:
-				return str('&', value)
-			return var_to_str(node[1])
+				return str('<', '&', value, '>')
+			return '<' + var_to_str(node[1]) + '>'
 	push_error("unknown typed node: ", node)
 	return "<Unknown>"
 

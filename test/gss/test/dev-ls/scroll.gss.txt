@@ -1,4 +1,4 @@
-(define Item
+define(Item
 	ref 500
 	id &卷轴
 	props {
@@ -19,5 +19,5 @@
 		asserts {
 			icon "assert/ui/icon/卷轴.png"
 		}
-		icon [&icon (rect2 0 0 32 32)]
+		icon [&icon rect2(0 0 32 32)]
 	})

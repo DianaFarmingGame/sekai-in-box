@@ -1,27 +1,27 @@
-(Define Tree BlockStaticExt
+Define(Tree BlockStaticExt
 	props {
 		need_route 	#f
 		routable 	#f
-		collision_boxes [(rect2 -0.2 -0.5 0.4 0.5)]
+		collision_boxes [rect2(-0.2 -0.5 0.4 0.5)]
 		asserts {
 			main "assert/树.png"
 		}
 		draw_data {
-			common_tree [&static &main (clip3x3_build 0 0)] 
+			common_tree [&static &main clip3x3_build(0 0)]
 		}
 	})
 
 ; common tree
-(define Tree
+define(Tree
 	ref 2406
 	props {
 		cur_draw &common_tree
-		groups(prop/pushs [2406])
+		groupsprop/pushs([2406])
 	}
 )
 
 ; ramdom tree
-(define Tree
+define(Tree
 	ref 2422
 	props {
 		cur_draw &
@@ -29,12 +29,12 @@
 			[1 { cover { cur_draw &common_tree }}]
 			[50 { cover { need_destroy #t }}]
 		]
-		groups(prop/pushs [2406])
+		groupsprop/pushs([2406])
 	}
 )
 
 ; 灌木
-(define BlockStaticExt
+define(BlockStaticExt
 	ref 2407
 	props {
 		need_route 		#f
@@ -46,8 +46,8 @@
 		}
 		cur_draw &
 		draw_data {
-			common [&static &main (clip_build 0 3)]
-			real [&static &main (clip_build 1 3)]	; with flower 
+			common [&static &main clip_build(0 3)]
+			real [&static &main clip_build(1 3)]	; with flower
 		}
 
 		random_rules [
@@ -56,7 +56,7 @@
 			[500 { cover { need_destroy #t }}]
 		]
 
-		atile_size (vec3 3 3 3)
+		atile_size vec3(3 3 3)
 		atile_matches [[2401] [2101] [2403 2402 2405] [2409 2415 2420]]
 		atile_rules [[
 			[

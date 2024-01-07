@@ -65,7 +65,7 @@ func log_error(node: Array, msg) -> void:
 
 func exec_as_keyword(node: Array) -> Variant:
 	match node[0]:
-		Lisper.TType.TOKEN, Lisper.TType.KEYWORD:
+		Lisper.TType.RAW, Lisper.TType.TOKEN, Lisper.TType.KEYWORD:
 			return node[1]
 		Lisper.TType.STRING:
 			return StringName(node[1])
@@ -99,10 +99,10 @@ func exec(nodes: Array) -> Array:
 
 func exec_node(node: Array) -> Variant:
 	match node[0]:
-		Lisper.TType.TOKEN:
-			return get_var(node[1])
 		Lisper.TType.RAW, Lisper.TType.NUMBER, Lisper.TType.BOOL, Lisper.TType.KEYWORD, Lisper.TType.STRING:
 			return node[1]
+		Lisper.TType.TOKEN:
+			return get_var(node[1])
 		Lisper.TType.LIST:
 			var head = node[1][0]
 			var body = (node[1] as Array).slice(1)

@@ -1,8 +1,8 @@
-(csgv/map-let *item_configurator_dir*
+csgv/map-let(*item_configurator_dir*
 	[ref ID 名称 能否取得 能否堆叠 堆叠上限 能否修复 可用度 最高可用度 能否交易 价格 保值度 图片/图标]
-	;; (echo ref ID 名称 能否取得 能否堆叠 堆叠上限 能否修复 可用度 最高可用度 能否交易 价格 保值度)
+	;; echo(ref ID 名称 能否取得 能否堆叠 堆叠上限 能否修复 可用度 最高可用度 能否交易 价格 保值度)
 
-	(define Item
+	define(Item
 		ref ref
 		id ID
 		props {
@@ -21,7 +21,7 @@
 				icon 图片/图标
 			}
 
-			icon [&icon (rect2 0 0 32 32)]
+			icon [&icon rect2(0 0 32 32)]
 		}
 	)
 )
