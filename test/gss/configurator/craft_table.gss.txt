@@ -1,25 +1,84 @@
+;; ID StringName
+;; need [ [ID, int], [ID int], ...]
+;; craft [ID, int]
+;; desc String
+;; fuel [ID, int]
+;; time int
+
 (block
 	(csv/map-let (str/concat [*config_dir* "craft_table.csv"])
-		[ID 需求物品 合成物品 描述]
-		(dbs/define ["craft_table" ID {
-			ID (keyword ID)
-			need ( => 需求物品
-				(string/split ";")
-				(array/filter (func [l] (!= l "")))
-				(array/map (
-					func [l] ( => l
+		[ID 需求物品 合成物品 描述 消耗燃料 合成时间 是否为附魔]
+		(if (!= 消耗燃料 "") 
+			(dbs/define ["cook" ID {
+				ID (keyword ID)
+				need ( => 需求物品
+					(string/split ";")
+					(array/filter (func [l] (!= l "")))
+					(array/map (
+						func [l] ( => l
+							(string/split ":")
+							(array/map string/trim)
+						)
+					))
+				)
+
+				craft ( => 合成物品
+					(string/split ":")
+					(array/map string/trim)
+				)
+
+				desc 描述
+				fuel ( => 消耗燃料
+					(string/split ":")
+					(array/map string/trim)
+				)
+
+				time (num 合成时间)
+			}])
+
+			(if (!= 是否为附魔 "")
+				(dbs/define ["enchant" ID {
+					ID (keyword ID)
+					need ( => 需求物品
+						(string/split ";")
+						(array/filter (func [l] (!= l "")))
+						(array/map (
+							func [l] ( => l
+								(string/split ":")
+								(array/map string/trim)
+							)
+						))
+					)
+
+					craft ( => 合成物品
 						(string/split ":")
 						(array/map string/trim)
 					)
-				))
-			)
 
-			craft (
-				string/split (string/trim 合成物品) ":"
-			)
+					desc 描述
+				}])
 
-			desc 描述
-		}])
+				(dbs/define ["craft" ID {
+					ID (keyword ID)
+					need ( => 需求物品
+						(string/split ";")
+						(array/filter (func [l] (!= l "")))
+						(array/map (
+							func [l] ( => l
+								(string/split ":")
+								(array/map string/trim)
+							)
+						))
+					)
+
+					craft ( => 合成物品
+						(string/split ":")
+						(array/map string/trim)
+					)
+
+					desc 描述
+				}])
+			)
+		)
 	)
-	;; (echo table)
 )
