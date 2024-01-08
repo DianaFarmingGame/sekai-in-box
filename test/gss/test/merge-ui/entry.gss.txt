@@ -1,0 +1,17 @@
+(gss/exec "gss/test/dev-ls/scene.gss.txt")
+
+((func [我 你]
+		(delay 2)
+		(do 我 move_to 你)
+		(do 你 face_to 我)
+		(do 我 say_to 你 "和我一起SAY：\n1～2～1～\n1～2～1～")
+		(do 你 say_to 我 "1～2～1～\n1～2～1～")
+		(echo (loop* skip escape
+			(do 我 say_to 你 {emotion &高兴} "说得不错，再来一次！\n1～2～1～\n1～2～1～")
+			(do 你 choose_single {emotion &高兴} "做出你的选择："
+				"好的！" (do 你 say_to 我 "1～2～1～\n1～2～1～")
+				"不要！" (escape "是拒绝的返回值！")
+			)
+		))
+	)
+	嘉心糖 嘉然)
