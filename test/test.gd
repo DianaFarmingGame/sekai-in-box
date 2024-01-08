@@ -5,6 +5,7 @@ extends Control
 @onready var dialog_box := %DialogBox as Control
 @onready var item_box := %ItemBox as ItemList
 @onready var dialog = $dialog
+@onready var select = $Select
 
 var picture_dict = {
 	# ^Lane Sun: 使用 preload 可以用相对路径访问文件
@@ -18,6 +19,7 @@ var skip_dialog := false
 
 func _ready() -> void:
 	dialog.hide()
+	select.hide()
 	var tree := get_tree()
 	tree.auto_accept_quit = false
 	tree.root.close_requested.connect(func ():
@@ -92,21 +94,16 @@ func _ready() -> void:
 						text += "\n  > " + choices[i]
 					else:
 						text += "\n    " + choices[i]
-				dialog.set_content(text)
+				select.text = text
 			update_inner_text.call()
-			dialog.set_visiable_content(0)
-			var character_texture = picture_dict.get(_this.getp(&"name"))
-			if _meta.get(&"emotion") != null:
-				character_texture = picture_dict.get(_this.getp(&"name") + _meta.get(&"emotion"))
-			dialog.set_character_texture(character_texture)
-			dialog.set_character_name(_this.getp(&"name"))
-			dialog.show()
+			select.visible_characters = 0
+			select.show()
 			skip_dialog = false
-			while dialog.get_visiable_character_count() < dialog.get_total_character_count():
+			while select.visible_characters < select.get_total_character_count():
 				await tree.create_timer(0.02).timeout
 				if skip_dialog:
-					dialog.set_visiable_content(dialog.get_total_character_count())
-				dialog.set_visiable_content(dialog.get_visiable_character_count() + 1)
+					select.visible_characters = select.get_total_character_count()
+				select.visible_characters += 1
 			while true:
 				var inputs := await psekai.input_updating as Array
 				sekai.block_input()
@@ -121,7 +118,7 @@ func _ready() -> void:
 					update_inner_text.call()
 					continue
 			sekai.uncover_control()
-			dialog.hide()
+			select.hide()
 			return choose[0],
 		&"itembox_update": func (_sekai, _this, contains: Array) -> void:
 			item_box.clear()

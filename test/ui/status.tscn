@@ -23,139 +23,193 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_qog5n")
 
-[node name="diana" type="Control" parent="."]
-layout_mode = 1
-anchor_left = 0.0295139
-anchor_top = 0.0328125
-anchor_right = 0.204861
-anchor_bottom = 0.0875
-metadata/_edit_group_ = true
-metadata/_edit_use_anchors_ = true
-
-[node name="hp_progress" type="TextureProgressBar" parent="diana"]
-layout_mode = 0
-offset_right = 640.0
-offset_bottom = 360.0
-max_value = 1000.0
-value = 500.0
-texture_under = ExtResource("2_j1ik3")
-texture_progress = ExtResource("3_rjlgw")
-texture_progress_offset = Vector2(14, 4)
-radial_center_offset = Vector2(10.05, 2.08165e-12)
-
-[node name="mp_progress" type="TextureProgressBar" parent="diana"]
-layout_mode = 0
-offset_top = 17.0
-offset_right = 640.0
-offset_bottom = 377.0
-max_value = 270.0
-value = 100.0
-texture_under = ExtResource("4_hrdfy")
-texture_progress = ExtResource("5_hxflh")
-texture_progress_offset = Vector2(14, 4)
-
-[node name="max_hp" type="Label" parent="diana"]
-layout_mode = 0
-offset_left = 62.0
-offset_top = 2.0
-offset_right = 89.0
-offset_bottom = 18.0
-text = "/ 100"
-label_settings = SubResource("LabelSettings_o2wtf")
-
-[node name="hp" type="Label" parent="diana"]
-layout_mode = 0
-offset_left = 42.0
-offset_top = 2.0
-offset_right = 69.0
-offset_bottom = 18.0
-text = "100"
-label_settings = SubResource("LabelSettings_o2wtf")
-
-[node name="max_mp" type="Label" parent="diana"]
-layout_mode = 0
-offset_left = 62.0
-offset_top = 19.0
-offset_right = 89.0
-offset_bottom = 35.0
-text = "/ 100"
-label_settings = SubResource("LabelSettings_o2wtf")
-
-[node name="mp" type="Label" parent="diana"]
-layout_mode = 0
-offset_left = 42.0
-offset_top = 19.0
-offset_right = 69.0
-offset_bottom = 35.0
-text = "100"
-label_settings = SubResource("LabelSettings_o2wtf")
-
 [node name="traveler" type="Control" parent="."]
-anchors_preset = 0
-anchor_left = 0.0295139
-anchor_top = 0.0328125
-anchor_right = 0.204861
-anchor_bottom = 0.0875
-metadata/_edit_group_ = true
+layout_mode = 1
+anchor_left = 0.029703
+anchor_top = 0.0285714
+anchor_right = 0.20505
+anchor_bottom = 0.0770089
+offset_left = -0.108918
+offset_top = 2.71428
+offset_right = -0.108975
+offset_bottom = 6.7143
 metadata/_edit_use_anchors_ = true
+metadata/_edit_group_ = true
 
 [node name="hp_progress" type="TextureProgressBar" parent="traveler"]
-layout_mode = 0
-offset_right = 640.0
-offset_bottom = 360.0
+layout_mode = 1
+anchors_preset = -1
+anchor_right = 1.0
+anchor_bottom = 0.457143
+grow_horizontal = 2
+grow_vertical = 2
 max_value = 1000.0
 value = 500.0
 texture_under = ExtResource("2_j1ik3")
 texture_progress = ExtResource("3_rjlgw")
 texture_progress_offset = Vector2(14, 4)
 radial_center_offset = Vector2(10.05, 2.08165e-12)
+metadata/_edit_use_anchors_ = true
 
 [node name="mp_progress" type="TextureProgressBar" parent="traveler"]
-layout_mode = 0
-offset_top = 17.0
-offset_right = 640.0
-offset_bottom = 377.0
+layout_mode = 1
+anchors_preset = -1
+anchor_top = 0.457143
+anchor_right = 1.0
+anchor_bottom = 0.914286
+grow_horizontal = 2
+grow_vertical = 2
 max_value = 270.0
 value = 100.0
 texture_under = ExtResource("4_hrdfy")
 texture_progress = ExtResource("5_hxflh")
 texture_progress_offset = Vector2(14, 4)
+metadata/_edit_use_anchors_ = true
 
 [node name="max_hp" type="Label" parent="traveler"]
-layout_mode = 0
-offset_left = 62.0
-offset_top = 2.0
-offset_right = 89.0
-offset_bottom = 18.0
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.613862
+anchor_top = 0.0285714
+anchor_right = 0.881189
+anchor_bottom = 0.485714
+grow_horizontal = 2
+grow_vertical = 2
 text = "/ 100"
 label_settings = SubResource("LabelSettings_o2wtf")
+metadata/_edit_use_anchors_ = true
 
 [node name="hp" type="Label" parent="traveler"]
-layout_mode = 0
-offset_left = 42.0
-offset_top = 2.0
-offset_right = 69.0
-offset_bottom = 18.0
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.415842
+anchor_top = 0.0285714
+anchor_right = 0.683169
+anchor_bottom = 0.485714
+grow_horizontal = 2
+grow_vertical = 2
 text = "100"
 label_settings = SubResource("LabelSettings_o2wtf")
+metadata/_edit_use_anchors_ = true
 
 [node name="max_mp" type="Label" parent="traveler"]
-layout_mode = 0
-offset_left = 62.0
-offset_top = 19.0
-offset_right = 89.0
-offset_bottom = 35.0
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.613862
+anchor_top = 0.514286
+anchor_right = 0.881189
+anchor_bottom = 0.971429
+grow_horizontal = 2
+grow_vertical = 2
 text = "/ 100"
 label_settings = SubResource("LabelSettings_o2wtf")
+metadata/_edit_use_anchors_ = true
 
 [node name="mp" type="Label" parent="traveler"]
-layout_mode = 0
-offset_left = 42.0
-offset_top = 19.0
-offset_right = 69.0
-offset_bottom = 35.0
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.415842
+anchor_top = 0.514286
+anchor_right = 0.683169
+anchor_bottom = 0.971429
+grow_horizontal = 2
+grow_vertical = 2
 text = "100"
 label_settings = SubResource("LabelSettings_o2wtf")
+metadata/_edit_use_anchors_ = true
+
+[node name="diana" type="Control" parent="."]
+layout_mode = 1
+anchor_left = 0.03
+anchor_top = 0.033
+anchor_right = 0.204861
+anchor_bottom = 0.0875
+offset_left = -0.279995
+offset_top = -0.12
+metadata/_edit_use_anchors_ = true
+metadata/_edit_group_ = true
+
+[node name="hp_progress" type="TextureProgressBar" parent="diana"]
+layout_mode = 1
+anchors_preset = -1
+anchor_right = 1.0
+anchor_bottom = 0.457143
+grow_horizontal = 2
+grow_vertical = 2
+max_value = 1000.0
+value = 500.0
+texture_under = ExtResource("2_j1ik3")
+texture_progress = ExtResource("3_rjlgw")
+texture_progress_offset = Vector2(14, 4)
+radial_center_offset = Vector2(10.05, 2.08165e-12)
+metadata/_edit_use_anchors_ = true
+
+[node name="mp_progress" type="TextureProgressBar" parent="diana"]
+layout_mode = 1
+anchors_preset = -1
+anchor_top = 0.457143
+anchor_right = 1.0
+anchor_bottom = 0.914286
+grow_horizontal = 2
+grow_vertical = 2
+max_value = 270.0
+value = 100.0
+texture_under = ExtResource("4_hrdfy")
+texture_progress = ExtResource("5_hxflh")
+texture_progress_offset = Vector2(14, 4)
+metadata/_edit_use_anchors_ = true
+
+[node name="max_hp" type="Label" parent="diana"]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.613862
+anchor_top = 0.0285714
+anchor_right = 0.881189
+anchor_bottom = 0.485714
+grow_horizontal = 2
+grow_vertical = 2
+text = "/ 100"
+label_settings = SubResource("LabelSettings_o2wtf")
+metadata/_edit_use_anchors_ = true
+
+[node name="hp" type="Label" parent="diana"]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.415842
+anchor_top = 0.0285714
+anchor_right = 0.683169
+anchor_bottom = 0.485714
+grow_horizontal = 2
+grow_vertical = 2
+text = "100"
+label_settings = SubResource("LabelSettings_o2wtf")
+metadata/_edit_use_anchors_ = true
+
+[node name="max_mp" type="Label" parent="diana"]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.613862
+anchor_top = 0.514286
+anchor_right = 0.881189
+anchor_bottom = 0.971429
+grow_horizontal = 2
+grow_vertical = 2
+text = "/ 100"
+label_settings = SubResource("LabelSettings_o2wtf")
+metadata/_edit_use_anchors_ = true
+
+[node name="mp" type="Label" parent="diana"]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.415842
+anchor_top = 0.514286
+anchor_right = 0.683169
+anchor_bottom = 0.971429
+grow_horizontal = 2
+grow_vertical = 2
+text = "100"
+label_settings = SubResource("LabelSettings_o2wtf")
+metadata/_edit_use_anchors_ = true
 
 [node name="money" type="TextureRect" parent="."]
 layout_mode = 1
