@@ -1,7 +1,7 @@
 defvar(tester func([expr]
-	echo("================================\n")
+	echo_rich("[color=green][b]================================[/b][/color]\n")
 	raw/echo(expr)
-	echo("\n↑↑ Raw ↑↑ ------- ↓↓ Compiled ↓↓\n")
+	echo_rich("\n[color=teal]↑↑ Raw ↑↑ ------- ↓↓ Compiled ↓↓[/color]\n")
 	raw/echo(compile(expr))
 	echo()
 ))
@@ -14,5 +14,13 @@ tester(raw(
 	=>(4
 		+(1)
 		*(=>(1
-			+(2))))
+			+(x))))
+))
+
+tester(raw(
+	if(#t +(2 1) *(2 1))
+))
+
+tester(raw(
+	switch(1 2 +(1 1) 3 +(2 1) 1 +(3 1))
 ))

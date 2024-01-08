@@ -134,7 +134,8 @@ func def_commons(context: LisperContext) -> void:
 			return Lisper.Raw(body[0])),
 		&"raw<-": Lisper.FnGDCallP( func (value: Variant) -> Array:
 			return Lisper.Raw(value)),
-		&"raw->string": Lisper.FnGDCallP(Lisper.stringify),
+		&"raw->string": Lisper.FnGDApplyP( func (ctx: LisperContext, args: Array) -> String:
+			return ctx.stringify(args[0])),
 		&"raw/echo": Lisper.FnGDMacro( func (_ctx, body: Array) -> Array:
 			return Lisper.Call(&"echo", [[
 				Lisper.Call(&"raw->string", [body]),
@@ -339,8 +340,15 @@ func def_commons(context: LisperContext) -> void:
 				assert(v is String)
 				res += v
 			return res),
-		&"echo": Lisper.FnGDApply( func (_ctx, args: Array) -> Variant:
-			print(' '.join(args.map(func (e): return str(e))))
+		&"echo": Lisper.FnGDApply( func (ctx: LisperContext, args: Array) -> Variant:
+			var msg := ' '.join(args.map(func (e): return str(e)))
+			var lines := msg.split('\n')
+			print('\n'.join(Array(lines).map(func (l): return ctx.print_head + l)))
+			return args[-1] if args.size() > 0 else null),
+		&"echo_rich": Lisper.FnGDApply( func (ctx: LisperContext, args: Array) -> Variant:
+			var msg := ' '.join(args.map(func (e): return str(e)))
+			var lines := msg.split('\n')
+			print_rich('\n'.join(Array(lines).map(func (l): return ctx.print_head + l)))
 			return args[-1] if args.size() > 0 else null),
 		&"eval": Lisper.FnGDApply( func (ctx: LisperContext, args: Array) -> Variant:
 			return (await ctx.execs(args))[-1]),

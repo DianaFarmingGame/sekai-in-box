@@ -63,68 +63,6 @@ static func count_last_len(pstr: String, indent: int) -> int:
 	else:
 		return indent + slices[0].length()
 
-static func stringify_raw(data: Variant, indent := 0) -> String:
-	if data is Dictionary:
-		var res := ['{']
-		for k in data.keys():
-			var v = data[k]
-			res.append('\n' + ''.lpad(indent + 4, ' ') + k + ': ' + Lisper.stringify_raw(v, indent + 4))
-		res.append('\n' + ''.lpad(indent, ' ') + '}')
-		return ''.join(res)
-	if data is Array:
-		return '[' + ' '.join(data.map(func (n): return Lisper.stringify_raw(n, indent))) + ']'
-	if data is String:
-		var slices := (data as String).split('\n')
-		return '"' + slices[0] + ''.join(Array(slices.slice(1)).map(func (s): return '\n' + ''.lpad(indent + 1, ' ') + s)) + '"'
-	return var_to_str(data)
-
-static func stringify(node: Array, indent := 0) -> String:
-	match node[0]:
-		TType.TOKEN:
-			return str(node[1])
-		TType.NUMBER:
-			return str(node[1])
-		TType.BOOL:
-			return "#t" if node[1] else "#f"
-		TType.KEYWORD:
-			return str('&', node[1])
-		TType.STRING:
-			var slices := (node[1] as String).split('\n')
-			return '"' + slices[0] + ''.join(Array(slices.slice(1)).map(func (s): return '\n' + ''.lpad(indent + 1, ' ') + s)) + '"'
-		TType.LIST:
-			var head_str := Lisper.stringify(node[1][0], indent)
-			indent = count_last_len(head_str, indent) + 2
-			var body := node[1].slice(1) as Array
-			if body.size() <= 1:
-				return head_str + ' (' + ' '.join(body.map(func (n): return Lisper.stringify(n, indent))) + ')'
-			return head_str + ' (' + \
-			Lisper.stringify(body[0], indent) + \
-			''.join(body.slice(1).map(func (n): return '\n' + ''.lpad(indent, ' ') + Lisper.stringify(n, indent))) + ')'
-		TType.ARRAY:
-			return '[' + ' '.join(node[1].map(func (n): return Lisper.stringify(n, indent))) + ']'
-		TType.MAP:
-			var res := ['{']
-			var key := true
-			var idn := indent
-			for n in node[1]:
-				if key:
-					var vstr := '\n' + ''.lpad(indent + 4, ' ') + Lisper.stringify(n, indent + 4)
-					idn = count_last_len(vstr, indent) + 1
-					res.append(vstr)
-				else:
-					res.append(' ' + Lisper.stringify(n, idn))
-				key = not key
-			res.append('\n' + ''.lpad(indent, ' ') + '}')
-			return ''.join(res)
-		TType.RAW:
-			var value = node[1]
-			return '<' + Lisper.stringify_raw(value, indent + 1) + '>'
-	push_error("unknown typed node: ", node)
-	return "<unknown>"
-
-static func stringifys(body: Array) -> String:
-	return ' '.join(body.map(Lisper.stringify))
-
 static func test_parser() -> void:
 	print(Lisper.tokenize("1 0 .5 10 204.2 3.30"))
 	print(Lisper.tokenize("#t #f#t"))

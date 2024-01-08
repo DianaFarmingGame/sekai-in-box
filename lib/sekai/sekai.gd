@@ -274,8 +274,9 @@ func exec_gss(path: String) -> void:
 	print_rich("[sekai] ", _line_head_body(), "[color=green][b]gss: ", path, "[/b][/color]")
 	_indent += 1
 	var stime := Time.get_ticks_usec()
+	gss_ctx.print_head = "        " + ('' if _indent == 0 else ''.rpad(_indent - 1, "│ ") + '╎  ')
 	await gss_ctx.eval(expr)
-	print_rich("[sekai] ", _line_head_end(), "[color=gray]", (Time.get_ticks_usec() - stime) / 1000.0, " ms[/color]")
+	print_rich("        ", _line_head_end(), "[color=gray]", (Time.get_ticks_usec() - stime) / 1000.0, " ms[/color]")
 	_indent -= 1
 
 func load_csgv(path: String) -> Array:

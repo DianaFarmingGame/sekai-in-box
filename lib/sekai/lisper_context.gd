@@ -1,14 +1,16 @@
 class_name LisperContext
 
-var ENABLE_AGGRESSIVE_OPT := ProjectSettings.get_setting(&"global/enable_aggressive_opt", true) as bool
+static var ENABLE_AGGRESSIVE_OPT := ProjectSettings.get_setting(&"global/enable_aggressive_opt", true) as bool
 
 var parent = null
 var vars := {}
 var source = null
+var print_head := ""
 
 static func extend(ctx: LisperContext) -> LisperContext:
 	var nctx := LisperContext.new()
 	nctx.parent = ctx
+	nctx.print_head = ctx.print_head
 	return nctx
 
 func clone() -> LisperContext:
@@ -16,11 +18,13 @@ func clone() -> LisperContext:
 	ctx.parent = parent
 	ctx.vars = vars.duplicate(true)
 	ctx.source = source
+	ctx.print_head = print_head
 	return ctx
 
 func fork() -> LisperContext:
 	var ctx := LisperContext.new()
 	ctx.parent = self
+	ctx.print_head = print_head
 	return ctx
 
 func get_var(name: StringName) -> Variant:
@@ -55,7 +59,15 @@ func def_fns(flags: Array[Lisper.VarFlag], type: Lisper.FnType, handle_map: Dict
 	for k in handle_map.keys():
 		vars[k] = [flags, [type, handle_map[k]]]
 
-func is_const(name: StringName) -> bool:
+func find_var(value: Variant) -> Variant:
+	var res = null
+	for k in vars:
+		if is_same(value, vars[k][1]):
+			res = k
+			break
+	return res if res != null else parent.find_var(value) if parent != null else null
+
+func is_const(name: StringName) -> Variant:
 	var res = vars.get(name)
 	return res[0].has(Lisper.VarFlag.CONST) if res != null else parent.is_const(name) if parent != null else null
 
@@ -74,7 +86,7 @@ func log_error(node: Array, msg) -> void:
 		printerr(msg, "\n", '\n'.join(lines))
 	else:
 		printerr(msg, " @:")
-		printerr(Lisper.stringify(node))
+		printerr(stringify(node))
 	print('')
 
 func exec_as_keyword(node: Array) -> Variant:
@@ -163,7 +175,7 @@ func call_rawfn(handle: Array, body: Array) -> Variant:
 				push_error("argument list not match expect ", args.size(), " found ", body.size())
 				printerr("argument list not match expect ", args.size(), " found ", body.size())
 				printerr("need: ", args)
-				printerr("provide: ", Lisper.stringifys(body))
+				printerr("provide: ", stringifys(body))
 				return null
 			var vargs := await execs(body)
 			for iarg in args.size():
@@ -172,7 +184,7 @@ func call_rawfn(handle: Array, body: Array) -> Variant:
 		_:
 			push_error("unknown call handle type: ", handle)
 			printerr("unknown call handle type: ", handle)
-			printerr("arguments: ", Lisper.stringifys(body))
+			printerr("arguments: ", stringifys(body))
 			return null
 
 func call_fn(handle: Array, vargs: Array) -> Variant:
@@ -227,7 +239,7 @@ func check_valid_handle(handle: Array) -> bool:
 		return true
 
 func compile(node: Array) -> Array:
-	var eao := ENABLE_AGGRESSIVE_OPT
+	var eao := LisperContext.ENABLE_AGGRESSIVE_OPT
 	match node[0]:
 		Lisper.TType.TOKEN:
 			var vname := exec_as_keyword(node) as StringName
@@ -247,7 +259,7 @@ func compile(node: Array) -> Array:
 					var res := await handle[1].call(self, body, true) as Array
 					_flag_comptime = false
 					if Lisper.is_raw_override(res):
-						return await compile(res)
+						return await compile(res[1])
 					body = await compiles(res)
 					var cdata := [head]
 					cdata.append_array(body)
@@ -293,7 +305,7 @@ func compile(node: Array) -> Array:
 			for i in pairs.size() / 2:
 				cdata[2 * i] = Lisper.Raw(exec_as_keyword(pairs[2 * i]))
 				var v := await compile(pairs[2 * i + 1])
-				if not Lisper.is_raw(v[0]): is_pure = false
+				if not Lisper.is_raw(v): is_pure = false
 				cdata[2 * i + 1] = v
 			if is_pure and eao:
 				var res := {}
@@ -311,3 +323,69 @@ func compile(node: Array) -> Array:
 
 func compiles(body: Array) -> Array:
 	return await Async.array_map(body, func (n): return await compile(n))
+
+func stringify_raw(data: Variant, indent := 0) -> String:
+	if data is Callable or data is Array or data is Dictionary:
+		var vname = find_var(data)
+		if vname != null:
+			return '#' + vname
+	if data is Dictionary:
+		var res := ['{']
+		for k in data.keys():
+			var v = data[k]
+			res.append('\n' + ''.lpad(indent + 4, ' ') + k + ': ' + stringify_raw(v, indent + 4))
+		res.append('\n' + ''.lpad(indent, ' ') + '}')
+		return ''.join(res)
+	if data is Array:
+		return '[' + ' '.join(data.map(func (n): return stringify_raw(n, indent))) + ']'
+	if data is String:
+		var slices := (data as String).split('\n')
+		return '"' + slices[0] + ''.join(Array(slices.slice(1)).map(func (s): return '\n' + ''.lpad(indent + 1, ' ') + s)) + '"'
+	return var_to_str(data)
+
+func stringify(node: Array, indent := 0) -> String:
+	match node[0]:
+		Lisper.TType.TOKEN:
+			return str(node[1])
+		Lisper.TType.NUMBER:
+			return str(node[1])
+		Lisper.TType.BOOL:
+			return "#t" if node[1] else "#f"
+		Lisper.TType.KEYWORD:
+			return str('&', node[1])
+		Lisper.TType.STRING:
+			var slices := (node[1] as String).split('\n')
+			return '"' + slices[0] + ''.join(Array(slices.slice(1)).map(func (s): return '\n' + ''.lpad(indent + 1, ' ') + s)) + '"'
+		Lisper.TType.LIST:
+			var head_str := stringify(node[1][0], indent)
+			indent = Lisper.count_last_len(head_str, indent) + 2
+			var body := node[1].slice(1) as Array
+			if body.size() <= 1:
+				return head_str + ' (' + ' '.join(body.map(func (n): return stringify(n, indent))) + ')'
+			return head_str + ' (' + \
+			stringify(body[0], indent) + \
+			''.join(body.slice(1).map(func (n): return '\n' + ''.lpad(indent, ' ') + stringify(n, indent))) + ')'
+		Lisper.TType.ARRAY:
+			return '[' + ' '.join(node[1].map(func (n): return stringify(n, indent))) + ']'
+		Lisper.TType.MAP:
+			var res := ['{']
+			var key := true
+			var idn := indent
+			for n in node[1]:
+				if key:
+					var vstr := '\n' + ''.lpad(indent + 4, ' ') + stringify(n, indent + 4)
+					idn = Lisper.count_last_len(vstr, indent) + 1
+					res.append(vstr)
+				else:
+					res.append(' ' + stringify(n, idn))
+				key = not key
+			res.append('\n' + ''.lpad(indent, ' ') + '}')
+			return ''.join(res)
+		Lisper.TType.RAW:
+			var value = node[1]
+			return '<' + stringify_raw(value, indent + 1) + '>'
+	push_error("unknown typed node: ", node)
+	return "<unknown>"
+
+func stringifys(body: Array) -> String:
+	return ' '.join(body.map(stringify))
