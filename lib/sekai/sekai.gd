@@ -147,7 +147,7 @@ func make_lisper_context() -> LisperContext:
 	context.def_vars([Lisper.VarFlag.CONST, Lisper.VarFlag.FIX], root_vars)
 	
 	context.def_vars([Lisper.VarFlag.CONST, Lisper.VarFlag.FIX], {
-		&"define/make": Lisper.FuncGDRawPure( func (ctx: LisperContext, body: Array) -> Variant:
+		&"define/make": Lisper.FnGDRaw( func (ctx: LisperContext, body: Array) -> Variant:
 			var def = await ctx.exec_node(body[0])
 			if def != null:
 				def = def.fork()
@@ -162,13 +162,13 @@ func make_lisper_context() -> LisperContext:
 			else:
 				ctx.log_error(body[0], str("define/make: ", body[0], " is not a valid token"))
 				return null),
-		&"define/sign": Lisper.FuncGDCall( func (define: MonoDefine) -> MonoDefine:
+		&"define/sign": Lisper.FnGDCall( func (define: MonoDefine) -> MonoDefine:
 			sign_define(define)
 			return define),
-		&"mono/add": Lisper.FuncGDCall( func (mono: Variant) -> Variant:
+		&"mono/add": Lisper.FnGDCall( func (mono: Variant) -> Variant:
 			add_mono(mono)
 			return mono),
-		&"mono/make": Lisper.FuncGDRawPure( func (ctx: LisperContext, body: Array) -> Mono:
+		&"mono/make": Lisper.FnGDRaw( func (ctx: LisperContext, body: Array) -> Mono:
 			var mono_class = await ctx.exec_node(body[0])
 			if mono_class != null:
 				var define = get_define(await ctx.exec_node(body[1]))
@@ -187,56 +187,56 @@ func make_lisper_context() -> LisperContext:
 			else:
 				ctx.log_error(body[0], str("mono/make: ", body[0], " is not a valid token"))
 				return null),
-		&"mono": Lisper.FuncGDMacro( func (body: Array) -> Array:
+		&"mono": Lisper.FnGDMacro( func (body: Array) -> Array:
 			return Lisper.Call(&"mono/add", [
 				[Lisper.Call(&"mono/make", [body])],
 			])),
-		&"mono_map": Lisper.FuncGDMacro( func (body: Array) -> Array:
+		&"mono_map": Lisper.FnGDMacro( func (body: Array) -> Array:
 			return Lisper.Call(&"mono/add", [
 				[Lisper.Call(&"mono_map/make", [body])],
 			])),
-		&"Define": Lisper.FuncGDMacro( func (body: Array) -> Array:
+		&"Define": Lisper.FnGDMacro( func (body: Array) -> Array:
 			return Lisper.Call(&"defvar", [
 				[body[0]],
 				[Lisper.Call(&"define/make", [
 					body.slice(1),
 				])],
 			])),
-		&"define": Lisper.FuncGDMacro( func (body: Array) -> Array:
+		&"define": Lisper.FnGDMacro( func (body: Array) -> Array:
 			return Lisper.Call(&"define/sign", [
 				[Lisper.Call(&"define/make", [body])],
 			])),
-		&"import": Lisper.FuncGDMacro( func (body: Array) -> Array:
+		&"import": Lisper.FnGDMacro( func (body: Array) -> Array:
 			return Lisper.Call(&"defvar", [
 				[body[0]],
 				[Lisper.Call(&"load", [
 					body.slice(1),
 				])],
 			])),
-		&"define/import": Lisper.FuncGDMacro( func (body: Array) -> Array:
+		&"define/import": Lisper.FnGDMacro( func (body: Array) -> Array:
 			return Lisper.Call(&"defvar", [
 				[body[0]],
 				[Lisper.Call(&"define/load", [
 					body.slice(1),
 				])],
 			])),
-		&"control/set": Lisper.FuncGDCall( func (mono: Mono) -> Mono:
+		&"control/set": Lisper.FnGDCall( func (mono: Mono) -> Mono:
 			control_target = mono
 			return mono),
-		&"control/clear": Lisper.FuncGDCall( func () -> void:
+		&"control/clear": Lisper.FnGDCall( func () -> void:
 			control_target = null),
-		&"cam/set": Lisper.FuncGDCall( func (mono: Mono) -> Mono:
+		&"cam/set": Lisper.FnGDCall( func (mono: Mono) -> Mono:
 			cam_target = mono
 			return mono),
-		&"cam/clear": Lisper.FuncGDCall( func () -> void:
+		&"cam/clear": Lisper.FnGDCall( func () -> void:
 			cam_target = null),
-		&"load": Lisper.FuncGDCallPure( func (path: String) -> Resource:
+		&"load": Lisper.FnGDCallP( func (path: String) -> Resource:
 			return get_assert(path)),
-		&"define/load": Lisper.FuncGDCallPure( func (path: String) -> Resource:
+		&"define/load": Lisper.FnGDCallP( func (path: String) -> Resource:
 			return get_assert(path).new()),
-		&"gss/exec": Lisper.FuncGDCallPure( func (path: String) -> void:
+		&"gss/exec": Lisper.FnGDCallP( func (path: String) -> void:
 			exec_gss(root_dir.path_join(path))),
-		&"mono_map/make": Lisper.FuncGDCallPure( func (offset: Vector3, cell_size: Vector3, psize: Vector2, data := []) -> MonoMap:
+		&"mono_map/make": Lisper.FnGDCallP( func (offset: Vector3, cell_size: Vector3, psize: Vector2, data := []) -> MonoMap:
 			var map := MonoMap.new()
 			map.sekai = self
 			map.offset = offset
@@ -244,17 +244,17 @@ func make_lisper_context() -> LisperContext:
 			map.size = psize
 			map.data = PackedInt32Array(data)
 			return map),
-		&"csgv/load": Lisper.FuncGDRaw( func (ctx: LisperContext, body: Array) -> Array:
+		&"csgv/load": Lisper.FnGDRaw( func (ctx: LisperContext, body: Array) -> Array:
 			var src := await ctx.exec_node(body[0]) as String
 			return load_csgv(root_dir.path_join(src))),
-		&"csgv/map-let": Lisper.FuncGDMacro( func (body: Array) -> Array:
+		&"csgv/map-let": Lisper.FnGDMacro( func (body: Array) -> Array:
 			return Lisper.Call(&"array/map-let", [[
 				Lisper.Call(&"csgv/load", [[body[0]]]),
 			], body.slice(1)])),
-		&"csv/load": Lisper.FuncGDRaw( func (ctx: LisperContext, body: Array) -> Array:
+		&"csv/load": Lisper.FnGDRaw( func (ctx: LisperContext, body: Array) -> Array:
 			var src := await ctx.exec_node(body[0]) as String
 			return load_csv(root_dir.path_join(src))),
-		&"csv/map-let": Lisper.FuncGDMacro( func (body: Array) -> Array:
+		&"csv/map-let": Lisper.FnGDMacro( func (body: Array) -> Array:
 			return Lisper.Call(&"array/map-let", [[
 				Lisper.Call(&"csv/load", [[body[0]]]),
 			], body.slice(1)])),

@@ -206,14 +206,14 @@ func do_merge(sets: Array[Dictionary]) -> Array[Dictionary]:
 	merge_props(sets, vprops)
 	merge_props(sets, {
 		&"actions": Prop.mergep({
-			&"face_to": Lisper.FuncGDCall(vprops[&"face_to"]),
-			&"move_by": Lisper.FuncGDCall(vprops[&"move_by"]),
-			&"move_by_at_speed": Lisper.FuncGDCall(vprops[&"move_by_at_speed"]),
-			&"move_to": Lisper.FuncGDCall(vprops[&"move_to"]),
-			&"move_to_at_speed": Lisper.FuncGDCall(vprops[&"move_to_at_speed"]),
-			&"say_to": Lisper.FuncGDCall(vprops[&"say_to"]),
-			&"show_aside": Lisper.FuncGDCall(vprops[&"show_aside"]),
-			&"choose_single": Lisper.FuncGDRaw( func (ctx: LisperContext, body: Array) -> Variant:
+			&"face_to": Lisper.FnGDCall(vprops[&"face_to"]),
+			&"move_by": Lisper.FnGDCall(vprops[&"move_by"]),
+			&"move_by_at_speed": Lisper.FnGDCall(vprops[&"move_by_at_speed"]),
+			&"move_to": Lisper.FnGDCall(vprops[&"move_to"]),
+			&"move_to_at_speed": Lisper.FnGDCall(vprops[&"move_to_at_speed"]),
+			&"say_to": Lisper.FnGDCall(vprops[&"say_to"]),
+			&"show_aside": Lisper.FnGDCall(vprops[&"show_aside"]),
+			&"choose_single": Lisper.FnGDRaw( func (ctx: LisperContext, body: Array) -> Variant:
 				var sekai := await ctx.exec_node(body[0]) as Sekai
 				var this := await ctx.exec_node(body[1]) as Mono
 				var meta = {}
@@ -238,7 +238,7 @@ func do_merge(sets: Array[Dictionary]) -> Array[Dictionary]:
 					branches[i] = patterns[2 * i + 1] as Array
 				var choose := await vprops[&"choose_single"].call(sekai, this, meta, title, choices) as int
 				return await ctx.exec_node(branches[choose])),
-			&"dialog_to": Lisper.FuncGDRaw( func (ctx: LisperContext, body: Array) -> Variant:
+			&"dialog_to": Lisper.FnGDRaw( func (ctx: LisperContext, body: Array) -> Variant:
 				var vid = await ctx.exec_node(body[3])
 				var dialog = ctx.get_var(&"Dialogs")[vid]
 				return await ctx.call_rawfn(dialog, body.slice(0, 3))),

@@ -1,4 +1,7 @@
 class_name LisperContext
+
+var ENABLE_AGGRESSIVE_OPT := ProjectSettings.get_setting(&"global/enable_aggressive_opt", true) as bool
+
 var parent = null
 var vars := {}
 var source = null
@@ -34,9 +37,16 @@ func set_var(name: StringName, data: Variant) -> void:
 func def_var(flags: Array[Lisper.VarFlag], name: StringName, data: Variant) -> void:
 	vars[name] = [flags, data]
 
+func def_const(name: StringName, data: Variant) -> void:
+	vars[name] = [[Lisper.VarFlag.CONST], data]
+
 func def_vars(flags: Array[Lisper.VarFlag], data_map: Dictionary) -> void:
 	for k in data_map.keys():
 		vars[k] = [flags, data_map[k]]
+
+func def_consts(data_map: Dictionary) -> void:
+	for k in data_map.keys():
+		vars[k] = [[Lisper.VarFlag.CONST], data_map[k]]
 
 func def_fn(flags: Array[Lisper.VarFlag], type: Lisper.FnType, name: StringName, handle: Variant) -> void:
 	vars[name] = [flags, [type, handle]]
@@ -44,6 +54,10 @@ func def_fn(flags: Array[Lisper.VarFlag], type: Lisper.FnType, name: StringName,
 func def_fns(flags: Array[Lisper.VarFlag], type: Lisper.FnType, handle_map: Dictionary) -> void:
 	for k in handle_map.keys():
 		vars[k] = [flags, [type, handle_map[k]]]
+
+func is_const(name: StringName) -> bool:
+	var res = vars.get(name)
+	return res[0].has(Lisper.VarFlag.CONST) if res != null else parent.is_const(name) if parent != null else null
 
 func get_source() -> Variant:
 	return source if source != null else parent.get_source() if parent != null else null
@@ -81,7 +95,7 @@ func eval(expr: String) -> Variant:
 	var tokens = Lisper.tokenize(expr)
 	source = expr
 	if tokens != null:
-		var res = await exec(tokens)
+		var res = await execs(tokens)
 		source = null
 		return res
 	else:
@@ -90,14 +104,14 @@ func eval(expr: String) -> Variant:
 		printerr(source)
 		return null
 
-func exec(nodes: Array) -> Array:
+func execs(nodes: Array) -> Array:
 	var res := []
 	res.resize(nodes.size())
 	for idx in nodes.size():
-		res[idx] = await exec_node(nodes[idx])
+		res[idx] = await exec(nodes[idx])
 	return res
 
-func exec_node(node: Array) -> Variant:
+func exec(node: Array) -> Variant:
 	match node[0]:
 		Lisper.TType.RAW, Lisper.TType.NUMBER, Lisper.TType.BOOL, Lisper.TType.KEYWORD, Lisper.TType.STRING:
 			return node[1]
@@ -106,7 +120,7 @@ func exec_node(node: Array) -> Variant:
 		Lisper.TType.LIST:
 			var head = node[1][0]
 			var body = (node[1] as Array).slice(1)
-			var handle = await exec_node(head)
+			var handle = await exec(head)
 			if handle is Array:
 				return await call_rawfn(handle, body)
 			elif handle == null:
@@ -115,7 +129,7 @@ func exec_node(node: Array) -> Variant:
 				log_error(node, str("unexpected call handle: ", handle))
 			return null
 		Lisper.TType.ARRAY:
-			return await exec(node[1])
+			return await execs(node[1])
 		Lisper.TType.MAP:
 			return await exec_map_part(node[1])
 	log_error(node, str("unknown node: ", node))
@@ -126,19 +140,22 @@ func exec_map_part(pairs: Array) -> Dictionary:
 	var res := {}
 	for i in pairs.size() / 2:
 		var k = exec_as_keyword(pairs[2 * i])
-		var v = await exec_node(pairs[2 * i + 1])
+		var v = await exec(pairs[2 * i + 1])
 		res[k] = v
 	return res
 
 func call_rawfn(handle: Array, body: Array) -> Variant:
 	match handle[0]:
-		Lisper.FnType.GD_RAW, Lisper.FnType.GD_RAW_PURE:
-			return await handle[1].call(self, body)
+		Lisper.FnType.GD_RAW:
+			return await handle[1].call(self, body, false)
 		Lisper.FnType.GD_MACRO:
-			return await exec_node(handle[1].call(body))
+			return await exec(await handle[1].call(self, body))
 		Lisper.FnType.GD_CALL, Lisper.FnType.GD_CALL_PURE:
-			var vargs := await exec(body)
+			var vargs := await execs(body)
 			return await handle[1].callv(vargs)
+		Lisper.FnType.GD_APPLY, Lisper.FnType.GD_APPLY_PURE:
+			var vargs := await execs(body)
+			return await handle[1].call(self, vargs)
 		Lisper.FnType.LP_CALL:
 			var fctx := fork()
 			var args := handle[1] as Array
@@ -148,10 +165,10 @@ func call_rawfn(handle: Array, body: Array) -> Variant:
 				printerr("need: ", args)
 				printerr("provide: ", Lisper.stringifys(body))
 				return null
-			var vargs := await exec(body)
+			var vargs := await execs(body)
 			for iarg in args.size():
 				fctx.def_var([], args[iarg], vargs[iarg])
-			return (await fctx.exec(handle[2]))[-1]
+			return (await fctx.execs(handle[2]))[-1]
 		_:
 			push_error("unknown call handle type: ", handle)
 			printerr("unknown call handle type: ", handle)
@@ -160,12 +177,14 @@ func call_rawfn(handle: Array, body: Array) -> Variant:
 
 func call_fn(handle: Array, vargs: Array) -> Variant:
 	match handle[0]:
-		Lisper.FnType.GD_RAW, Lisper.FnType.GD_RAW_PURE:
-			return await handle[1].call(self, vargs.map(Lisper.Raw))
+		Lisper.FnType.GD_RAW:
+			return await handle[1].call(self, vargs.map(Lisper.Raw), false)
 		Lisper.FnType.GD_MACRO:
-			return await exec_node(handle[1].call(vargs.map(Lisper.Raw)))
+			return await exec(await handle[1].call(self, vargs.map(Lisper.Raw)))
 		Lisper.FnType.GD_CALL, Lisper.FnType.GD_CALL_PURE:
 			return await handle[1].callv(vargs)
+		Lisper.FnType.GD_APPLY, Lisper.FnType.GD_APPLY_PURE:
+			return await handle[1].call(self, vargs)
 		Lisper.FnType.LP_CALL:
 			var fctx := fork()
 			var args := handle[1] as Array
@@ -177,7 +196,7 @@ func call_fn(handle: Array, vargs: Array) -> Variant:
 				return null
 			for iarg in args.size():
 				fctx.def_var([], args[iarg], vargs[iarg])
-			return (await fctx.exec(handle[2]))[-1]
+			return (await fctx.execs(handle[2]))[-1]
 		_:
 			push_error("unknown call handle type: ", handle)
 			printerr("unknown call handle type: ", handle)
@@ -193,3 +212,102 @@ func call_anyway(handle: Variant, vargs: Array) -> Variant:
 	printerr("unknown call handle type: ", handle)
 	printerr("arguments: ", vargs)
 	return null
+
+var _flag_comptime := false
+var _flag_pure_rollback := false
+
+func check_valid_handle(handle: Array) -> bool:
+	if _flag_comptime:
+		match handle[0]:
+			Lisper.FnType.GD_CALL_PURE, Lisper.FnType.GD_APPLY_PURE:
+				return true
+		_flag_pure_rollback = true
+		return false
+	else:
+		return true
+
+func compile(node: Array) -> Array:
+	var eao := ENABLE_AGGRESSIVE_OPT
+	match node[0]:
+		Lisper.TType.TOKEN:
+			var vname := exec_as_keyword(node) as StringName
+			if is_const(vname):
+				return Lisper.Raw(await exec(node))
+			return node
+		Lisper.TType.NUMBER, Lisper.TType.BOOL, Lisper.TType.KEYWORD, Lisper.TType.STRING:
+			return Lisper.Raw(node[1]) if eao else node
+		Lisper.TType.LIST:
+			var head := node[1][0] as Array
+			var body := node[1].slice(1) as Array
+			head = await compile(head)
+			if head[0] == Lisper.TType.RAW:
+				var handle := head[1] as Array
+				if handle[0] == Lisper.FnType.GD_RAW:
+					_flag_comptime = true
+					var res := await handle[1].call(self, body, true) as Array
+					_flag_comptime = false
+					if Lisper.is_raw_override(res):
+						return await compile(res)
+					body = await compiles(res)
+					var cdata := [head]
+					cdata.append_array(body)
+					return Lisper.List(cdata)
+				if eao:
+					match handle[0]:
+						Lisper.FnType.GD_MACRO:
+							var cdata := [head]
+							cdata.append_array(body)
+							_flag_comptime = true
+							var res = await handle[1].call(self, body)
+							_flag_comptime = false
+							return await compile(res)
+						Lisper.FnType.GD_CALL_PURE, Lisper.FnType.GD_APPLY_PURE:
+							body = await compiles(body)
+							if body.all(Lisper.is_raw):
+								var cdata := [head]
+								cdata.append_array(body)
+								_flag_comptime = true
+								_flag_pure_rollback = false
+								var res = await exec(Lisper.List(cdata))
+								_flag_comptime = false
+								if _flag_pure_rollback:
+									return Lisper.List(cdata)
+								else:
+									return Lisper.Raw(res)
+			var cdata := [head]
+			body = await compiles(body)
+			cdata.append_array(body)
+			return Lisper.List(cdata)
+		Lisper.TType.ARRAY:
+			var body := node[1] as Array
+			body = await compiles(body)
+			if body.all(Lisper.is_raw) and eao:
+				return Lisper.Raw(body.map(func (n): return n[1]))
+			else:
+				return Lisper.Array(body)
+		Lisper.TType.MAP:
+			var pairs := node[1] as Array
+			var cdata := []
+			var is_pure := true
+			cdata.resize(pairs.size())
+			for i in pairs.size() / 2:
+				cdata[2 * i] = Lisper.Raw(exec_as_keyword(pairs[2 * i]))
+				var v := await compile(pairs[2 * i + 1])
+				if not Lisper.is_raw(v[0]): is_pure = false
+				cdata[2 * i + 1] = v
+			if is_pure and eao:
+				var res := {}
+				for i in cdata.size() / 2:
+					var k = cdata[2 * i][1]
+					var v = cdata[2 * i + 1][1]
+					res[k] = v
+				return Lisper.Raw(res)
+			else:
+				return [Lisper.TType.MAP, cdata]
+		Lisper.TType.RAW:
+			return node
+	log_error(node, str("unknown node: ", node))
+	return node
+
+func compiles(body: Array) -> Array:
+	return await Async.array_map(body, func (n): return await compile(n))

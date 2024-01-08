@@ -44,6 +44,7 @@ import/fbx/enabled=false
 [global]
 
 debug_draw=false
+enable_aggressive_opt=true
 
 [gui]
 

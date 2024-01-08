@@ -7,6 +7,8 @@ static func tokenize(expr: String) -> Variant:
 	else:
 		return null
 
+static func is_node(node: Variant) -> bool: return node is Array and node.size() > 0 and node[0] is TType
+
 static func List(nodes: Array) -> Array: return [TType.LIST, nodes]
 
 static func Token(name: StringName) -> Array: return [TType.TOKEN, name]
@@ -23,6 +25,12 @@ static func Array(nodes: Array) -> Array: return [TType.ARRAY, nodes]
 
 static func Raw(value: Variant) -> Array: return [TType.RAW, value]
 
+static func is_raw(node: Variant) -> bool: return is_node(node) and TType.RAW == node[0]
+
+static func RawOverride(value: Variant) -> Array: return [TType.RAW_OVERRIDE, value]
+
+static func is_raw_override(node: Variant) -> bool: return is_node(node) and TType.RAW_OVERRIDE == node[0]
+
 static func Call(name: StringName, tails = null) -> Array:
 	var body := [Token(name)]
 	if tails != null: for tail in tails:
@@ -36,15 +44,17 @@ static func Func(args: Array[StringName], body: Array) -> Array:
 	vbody.append_array(body)
 	return Lisper.Call(&"func", vbody)
 
-static func FuncGDRaw(handle: Callable) -> Array: return [FnType.GD_RAW, handle]
+static func FnGDRaw(handle: Callable) -> Array: return [FnType.GD_RAW, handle]
 
-static func FuncGDRawPure(handle: Callable) -> Array: return [FnType.GD_RAW_PURE, handle]
+static func FnGDMacro(handle: Callable) -> Array: return [FnType.GD_MACRO, handle]
 
-static func FuncGDCall(handle: Callable) -> Array: return [FnType.GD_CALL, handle]
+static func FnGDCall(handle: Callable) -> Array: return [FnType.GD_CALL, handle]
 
-static func FuncGDCallPure(handle: Callable) -> Array: return [FnType.GD_CALL_PURE, handle]
+static func FnGDCallP(handle: Callable) -> Array: return [FnType.GD_CALL_PURE, handle]
 
-static func FuncGDMacro(handle: Callable) -> Array: return [FnType.GD_MACRO, handle]
+static func FnGDApply(handle: Callable) -> Array: return [FnType.GD_APPLY, handle]
+
+static func FnGDApplyP(handle: Callable) -> Array: return [FnType.GD_APPLY_PURE, handle]
 
 static func count_last_len(pstr: String, indent: int) -> int:
 	var slices := pstr.split('\n')
@@ -110,7 +120,7 @@ static func stringify(node: Array, indent := 0) -> String:
 			var value = node[1]
 			return '<' + Lisper.stringify_raw(value, indent + 1) + '>'
 	push_error("unknown typed node: ", node)
-	return "<Unknown>"
+	return "<unknown>"
 
 static func stringifys(body: Array) -> String:
 	return ' '.join(body.map(Lisper.stringify))
@@ -139,20 +149,24 @@ enum TType {
 	MAP,
 	
 	RAW,
+	RAW_OVERRIDE,
 }
 
 ## 函数类型
 enum FnType {
+	## Raw型Callable，首位传入执行上下文
+	## 慎用: 实现较复杂，且需要手动维持词法作用域
+	GD_RAW,
+	## Macro型Callable
+	GD_MACRO,
 	## 一般Callable
 	GD_CALL,
 	## 一般Callable(纯函数，输出与输入绝对对应且无副作用)
 	GD_CALL_PURE,
-	## Raw型Callable
-	GD_RAW,
-	## Raw型Callable(纯函数，输出与输入绝对对应且无副作用)
-	GD_RAW_PURE,
-	## Macro型Callable
-	GD_MACRO,
+	## 一般Callable，传入参数为数组形式，首位传入执行上下文
+	GD_APPLY,
+	## 一般Callable，传入参数为数组形式，首位传入执行上下文(纯函数，输出与输入绝对对应且无副作用)
+	GD_APPLY_PURE,
 	
 	LP_CALL,
 }
