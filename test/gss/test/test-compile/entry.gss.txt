@@ -2,14 +2,19 @@ defvar(TEST raw(block(
 
 [1 #t &test "test" {id "test"}]
 
+"long string
+second line
+third line"
+
 +(1 2)
+
+=>(4
+	+(1)
+	*(=>(1
+		+(2))))
 
 )))
 
 raw/echo(TEST)
 
 raw/echo(compile(TEST))
-
-display(+(*(2 3) /(4 2)))
-display(#(2 * 3 + (4 / 2)))
-display(#(2 * 3 + (4 / #:echo(2))))

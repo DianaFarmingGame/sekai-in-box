@@ -46,6 +46,28 @@ static func FuncGDCallPure(handle: Callable) -> Array: return [FnType.GD_CALL_PU
 
 static func FuncGDMacro(handle: Callable) -> Array: return [FnType.GD_MACRO, handle]
 
+static func count_last_len(pstr: String, indent: int) -> int:
+	var slices := pstr.split('\n')
+	if slices.size() > 1:
+		return slices[-1].length()
+	else:
+		return indent + slices[0].length()
+
+static func stringify_raw(data: Variant, indent := 0) -> String:
+	if data is Dictionary:
+		var res := ['{']
+		for k in data.keys():
+			var v = data[k]
+			res.append('\n' + ''.lpad(indent + 4, ' ') + k + ': ' + Lisper.stringify_raw(v, indent + 4))
+		res.append('\n' + ''.lpad(indent, ' ') + '}')
+		return ''.join(res)
+	if data is Array:
+		return '[' + ' '.join(data.map(func (n): return Lisper.stringify_raw(n, indent))) + ']'
+	if data is String:
+		var slices := (data as String).split('\n')
+		return '"' + slices[0] + ''.join(Array(slices.slice(1)).map(func (s): return '\n' + ''.lpad(indent + 1, ' ') + s)) + '"'
+	return var_to_str(data)
+
 static func stringify(node: Array, indent := 0) -> String:
 	match node[0]:
 		TType.TOKEN:
@@ -57,39 +79,36 @@ static func stringify(node: Array, indent := 0) -> String:
 		TType.KEYWORD:
 			return str('&', node[1])
 		TType.STRING:
-			return str('"', (node[1] as String).c_escape(), '"')
+			var slices := (node[1] as String).split('\n')
+			return '"' + slices[0] + ''.join(Array(slices.slice(1)).map(func (s): return '\n' + ''.lpad(indent + 1, ' ') + s)) + '"'
 		TType.LIST:
-			var body = node[1]
-			if body.size() <= 2:
-				return '(' + ' '.join(node[1].map(func (n): return Lisper.stringify(n, indent))) + ')'
-			return '(' + \
-			Lisper.stringify(body[0], indent) + ' ' + \
-			Lisper.stringify(body[1], indent) + \
-			''.join(body.slice(2).map(func (n): return '\n' + ''.lpad(indent+1, '\t') + Lisper.stringify(n, indent + 1))) + ')'
+			var head_str := Lisper.stringify(node[1][0], indent)
+			indent = count_last_len(head_str, indent) + 2
+			var body := node[1].slice(1) as Array
+			if body.size() <= 1:
+				return head_str + ' (' + ' '.join(body.map(func (n): return Lisper.stringify(n, indent))) + ')'
+			return head_str + ' (' + \
+			Lisper.stringify(body[0], indent) + \
+			''.join(body.slice(1).map(func (n): return '\n' + ''.lpad(indent, ' ') + Lisper.stringify(n, indent))) + ')'
 		TType.ARRAY:
 			return '[' + ' '.join(node[1].map(func (n): return Lisper.stringify(n, indent))) + ']'
 		TType.MAP:
 			var res := ['{']
 			var key := true
+			var idn := indent
 			for n in node[1]:
 				if key:
-					res.append('\n' + ''.lpad(indent+1, '\t'))
-					res.append(Lisper.stringify(n, indent + 1))
+					var vstr := '\n' + ''.lpad(indent + 4, ' ') + Lisper.stringify(n, indent + 4)
+					idn = count_last_len(vstr, indent) + 1
+					res.append(vstr)
 				else:
-					res.append(' ')
-					res.append(Lisper.stringify(n, indent + 2))
+					res.append(' ' + Lisper.stringify(n, idn))
 				key = not key
-			res.append('\n' + ''.lpad(indent, '\t') + '}')
+			res.append('\n' + ''.lpad(indent, ' ') + '}')
 			return ''.join(res)
 		TType.RAW:
 			var value = node[1]
-			if value is String:
-				return str('<', '"', node[1].c_escape(), '"', '>')
-			if value is bool:
-				return "<#t>" if value else "<#f>"
-			if value is StringName:
-				return str('<', '&', value, '>')
-			return '<' + var_to_str(node[1]) + '>'
+			return '<' + Lisper.stringify_raw(value, indent + 1) + '>'
 	push_error("unknown typed node: ", node)
 	return "<Unknown>"
 
