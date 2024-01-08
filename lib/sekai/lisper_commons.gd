@@ -46,7 +46,7 @@ func template(ctx: LisperContext, node: Array) -> Array:
 							is_raw = true
 							continue
 				match act_type:
-					&"": i += 1; continue
+					&"": body[i] = await template(ctx, body[i]); i += 1; continue
 					&":eval":
 						var res = await ctx.exec(body[i])
 						body[i] = res if is_raw else Lisper.Raw(res)
@@ -66,43 +66,71 @@ func template(ctx: LisperContext, node: Array) -> Array:
 func compile_template(ctx: LisperContext, node: Array) -> Array:
 	match node[0]:
 		Lisper.TType.LIST, Lisper.TType.ARRAY, Lisper.TType.MAP:
+			var is_pure := true
 			var body := (node[1] as Array).duplicate()
 			var act_type := &""
 			var is_raw := false
 			var i := 0
+			var acts := []
 			while i < body.size():
 				var n := body[i] as Array
 				if n[0] == Lisper.TType.TOKEN:
 					match n[1]:
 						&":eval":
-							body.remove_at(i)
 							act_type = &":eval"
+							acts.append(i)
+							i += 1
 							continue
 						&":expand":
-							body.remove_at(i)
 							act_type = &":expand"
+							acts.append(i)
+							i += 1
 							continue
 						&":raw":
-							body.remove_at(i)
 							is_raw = true
+							acts.append(i)
+							i += 1
 							continue
 				match act_type:
-					&"": i += 1; continue
+					&"":
+						var res := await compile_template(ctx, body[i])
+						if not res[0]: is_pure = false
+						body[i] = res[1]
+						i += 1; continue
 					&":eval":
-						var res = await ctx.exec(body[i])
-						body[i] = res if is_raw else Lisper.Raw(res)
-						act_type = &""; is_raw = false
+						var cnode := await ctx.compile(body[i])
+						if Lisper.is_raw(cnode):
+							var res = cnode[1]
+							body[i] = res if is_raw else Lisper.Raw(res)
+							acts.reverse()
+							for idx in acts: body.remove_at(idx)
+							i -= acts.size()
+						else:
+							is_pure = false
+							body[i] = cnode
+						act_type = &""; is_raw = false; acts = []
 						i += 1; continue
 					&":expand":
-						var res := await ctx.exec(body.pop_at(i)) as Array
-						var nbody = body.slice(0, i)
-						nbody.append_array(res if is_raw else res.map(Lisper.Raw))
-						nbody.append_array(body.slice(i))
-						body = nbody
-						act_type = &""; is_raw = false
-						i += res.size(); continue
-			return [node[0], body]
-	return await ctx.compile(node)
+						var cnode := await ctx.compile(body[i])
+						if Lisper.is_raw(cnode):
+							var res := cnode[1] as Array
+							body.remove_at(i)
+							var nbody = body.slice(0, i)
+							nbody.append_array(res if is_raw else res.map(Lisper.Raw))
+							nbody.append_array(body.slice(i))
+							body = nbody
+							acts.reverse()
+							for idx in acts: body.remove_at(idx)
+							i -= acts.size()
+							i += res.size() - 1
+						else:
+							is_pure = false
+							body[i] = cnode
+							i += 1
+						act_type = &""; is_raw = false; acts = []
+						continue
+			return [is_pure, [node[0], body]]
+	return [true, node]
 
 func compile_block(ctx: LisperContext, body: Array) -> Array:
 	body = await ctx.compiles(body)
@@ -150,7 +178,11 @@ func def_commons(context: LisperContext) -> void:
 			return await ctx.compile(args[0])),
 		&"template": Lisper.FnGDRaw( func (ctx: LisperContext, body: Array, comptime: bool) -> Variant:
 			if comptime:
-				return await compile_template(ctx, body[0])
+				var res := await compile_template(ctx, body[0])
+				if res[0]:
+					return Lisper.RawOverride(Lisper.Raw(res[1]))
+				else:
+					return [res[1]]
 			else:
 				return await template(ctx, body[0])),
 		&"block": Lisper.FnGDRaw( func (ctx: LisperContext, body: Array, comptime: bool) -> Variant:

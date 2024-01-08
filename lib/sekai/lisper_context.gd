@@ -260,9 +260,8 @@ func compile(node: Array) -> Array:
 					_flag_comptime = false
 					if Lisper.is_raw_override(res):
 						return await compile(res[1])
-					body = await compiles(res)
 					var cdata := [head]
-					cdata.append_array(body)
+					cdata.append_array(res)
 					return Lisper.List(cdata)
 				if eao:
 					match handle[0]:
@@ -333,14 +332,23 @@ func stringify_raw(data: Variant, indent := 0) -> String:
 		var res := ['{']
 		for k in data.keys():
 			var v = data[k]
-			res.append('\n' + ''.lpad(indent + 4, ' ') + k + ': ' + stringify_raw(v, indent + 4))
+			res.append('\n' + ''.lpad(indent + 2, ' ') + k + ' ' + stringify_raw(v, indent + 2))
 		res.append('\n' + ''.lpad(indent, ' ') + '}')
 		return ''.join(res)
 	if data is Array:
-		return '[' + ' '.join(data.map(func (n): return stringify_raw(n, indent))) + ']'
+		var res := '[' + stringify_raw(data[0], indent + 1)
+		for n in data.slice(1):
+			res += ' ' + stringify_raw(n, Lisper.count_last_len(res, indent) + 1)
+		res += ']'
+		return res
 	if data is String:
 		var slices := (data as String).split('\n')
 		return '"' + slices[0] + ''.join(Array(slices.slice(1)).map(func (s): return '\n' + ''.lpad(indent + 1, ' ') + s)) + '"'
+	if data is StringName:
+		var slices := String(data).split('\n')
+		return '&' + slices[0] + ''.join(Array(slices.slice(1)).map(func (s): return '\n' + ''.lpad(indent + 1, ' ') + s))
+	if data is bool:
+		return "#t" if data else "#f"
 	return var_to_str(data)
 
 func stringify(node: Array, indent := 0) -> String:
@@ -366,14 +374,18 @@ func stringify(node: Array, indent := 0) -> String:
 			stringify(body[0], indent) + \
 			''.join(body.slice(1).map(func (n): return '\n' + ''.lpad(indent, ' ') + stringify(n, indent))) + ')'
 		Lisper.TType.ARRAY:
-			return '[' + ' '.join(node[1].map(func (n): return stringify(n, indent))) + ']'
+			var res := '[' + stringify(node[1][0], indent + 1)
+			for n in node[1].slice(1):
+				res += ' ' + stringify(n, Lisper.count_last_len(res, indent) + 1)
+			res += ']'
+			return res
 		Lisper.TType.MAP:
 			var res := ['{']
 			var key := true
 			var idn := indent
 			for n in node[1]:
 				if key:
-					var vstr := '\n' + ''.lpad(indent + 4, ' ') + stringify(n, indent + 4)
+					var vstr := '\n' + ''.lpad(indent + 2, ' ') + stringify(n, indent + 2)
 					idn = Lisper.count_last_len(vstr, indent) + 1
 					res.append(vstr)
 				else:

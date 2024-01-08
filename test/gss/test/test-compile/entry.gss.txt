@@ -24,3 +24,14 @@ tester(raw(
 tester(raw(
 	switch(1 2 +(1 1) 3 +(2 1) 1 +(3 1))
 ))
+
+tester(raw(
+	template(ROOT(NODE(
+		"test template"
+		:eval +(2 3)
+		:eval +(*(2 3) preserve)
+		:expand [1 2 3]
+		:expand :raw [raw(node) raw(2) template(NODE(1 2 3))]
+		:expand array/concat(["a" "b"] outer_call())
+	)))
+))
