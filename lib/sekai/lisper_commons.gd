@@ -141,10 +141,21 @@ func compile_block(ctx: LisperContext, body: Array) -> Array:
 	tbody.append(res)
 	return tbody
 
+func compile_map(ctx: LisperContext, body: Array) -> Array:
+	var cdata := []
+	var is_key := true
+	for n in body:
+		if is_key:
+			cdata.append(Lisper.Raw(ctx.exec_as_keyword(n)))
+		else:
+			cdata.append(await ctx.compile(n))
+		is_key = not is_key
+	return cdata
+
 func compile_keyword_mask_1(ctx: LisperContext, body: Array) -> Array:
 	var kw := ctx.exec_as_keyword(body[0]) as StringName
 	var rest := await ctx.compiles(body.slice(1))
-	var cdata := [kw]
+	var cdata := [Lisper.Raw(kw)]
 	cdata.append_array(rest)
 	return cdata
 
@@ -152,7 +163,7 @@ func compile_keyword_mask_01(ctx: LisperContext, body: Array) -> Array:
 	var arg0 := await ctx.compile(body[0])
 	var kw := ctx.exec_as_keyword(body[1]) as StringName
 	var rest := await ctx.compiles(body.slice(2))
-	var cdata := [arg0, kw]
+	var cdata := [arg0, Lisper.Raw(kw)]
 	cdata.append_array(rest)
 	return cdata
 
@@ -318,7 +329,7 @@ func def_commons(context: LisperContext) -> void:
 			if comptime:
 				var defs := body[1][1].map(ctx.exec_as_keyword) as Array
 				var ary_node := await ctx.compile(body[0])
-				var cdata := [ary_node, Lisper.Raw(defs)]
+				var cdata := [ary_node, Lisper.Array(defs.map(Lisper.Raw))]
 				if Lisper.is_raw(ary_node):
 					var ary := ary_node[1] as Array
 					for i in defs.size():
@@ -337,7 +348,7 @@ func def_commons(context: LisperContext) -> void:
 				return cdata
 			else:
 				var ary := await ctx.exec(body[0]) as Array
-				var defs := await ctx.exec(body[1]) as Array
+				var defs := (body[1][1] as Array).map(ctx.exec_as_keyword)
 				for i in defs.size():
 					ctx.def_var([], defs[i], ary[i])
 				return (await ctx.execs(body.slice(2)))[-1]),
