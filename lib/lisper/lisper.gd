@@ -33,30 +33,46 @@ static func RawOverride(value: Variant) -> Array: return [TType.RAW_OVERRIDE, va
 
 static func is_raw_override(node: Variant) -> bool: return is_node(node) and TType.RAW_OVERRIDE == node[0]
 
-static func Call(name: StringName, tails = null) -> Array:
+static func apply(name: StringName, tails = null) -> Array:
 	var body := [Token(name)]
 	if tails != null: for tail in tails:
 		body.append_array(tail)
 	return List(body)
 
-static func Func(args: Array[StringName], body: Array) -> Array:
+static func make_func(args: Array[StringName], body: Array) -> Array:
 	var vbody := [[
 		Lisper.Array(args.map(func (token): return Lisper.Token(token))),
 	]]
 	vbody.append_array(body)
-	return Lisper.Call(&"func", vbody)
+	return Lisper.apply(&"func", vbody)
 
-static func FnGDRaw(handle: Callable) -> Array: return [FnType.GD_RAW, handle]
+static var SymFunc := RefCounted.new()
 
-static func FnGDMacro(handle: Callable) -> Array: return [FnType.GD_MACRO, handle]
+static func FnGDRaw(handle: Callable) -> Array: return [Lisper.SymFunc, FnType.GD_RAW, handle]
 
-static func FnGDCall(handle: Callable) -> Array: return [FnType.GD_CALL, handle]
+static func FnGDMacro(handle: Callable) -> Array: return [Lisper.SymFunc, FnType.GD_MACRO, handle]
 
-static func FnGDCallP(handle: Callable) -> Array: return [FnType.GD_CALL_PURE, handle]
+static func FnGDCall(handle: Callable) -> Array: return [Lisper.SymFunc, FnType.GD_CALL, handle]
 
-static func FnGDApply(handle: Callable) -> Array: return [FnType.GD_APPLY, handle]
+static func FnGDCallP(handle: Callable) -> Array: return [Lisper.SymFunc, FnType.GD_CALL_PURE, handle]
 
-static func FnGDApplyP(handle: Callable) -> Array: return [FnType.GD_APPLY_PURE, handle]
+static func FnGDApply(handle: Callable) -> Array: return [Lisper.SymFunc, FnType.GD_APPLY, handle]
+
+static func FnGDApplyP(handle: Callable) -> Array: return [Lisper.SymFunc, FnType.GD_APPLY_PURE, handle]
+
+static func fn_gd_get_handle(handle: Array) -> Callable: return handle[2]
+
+static func FnLPCall(args: Array, body: Array) -> Array: return [Lisper.SymFunc, FnType.LP_CALL, args, body]
+
+static func FnLPCallP(args: Array, body: Array) -> Array: return [Lisper.SymFunc, FnType.LP_CALL_PURE, args, body]
+
+static func fn_lp_get_args(handle: Array) -> Array: return handle[2]
+
+static func fn_lp_get_body(handle: Array) -> Array: return handle[3]
+
+static func fn_get_type(handle: Array) -> FnType: return handle[1]
+
+static func is_fn(handle: Variant) -> bool: return handle is Array and handle.size() > 0 and is_same(handle[0], Lisper.SymFunc)
 
 static func count_last_len(pstr: String, indent: int) -> int:
 	var slices := pstr.split('\n')

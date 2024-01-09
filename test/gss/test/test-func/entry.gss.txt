@@ -1,8 +1,8 @@
 defunc (tester [expr]
 	echo_rich("[color=green][b]================================[/b][/color]")
-	raw/echo(expr)
+	echo_raw(expr)
 	echo_rich("[color=teal]↑↑ Raw ↑↑ --------- ↓↓ Evaled ↓↓[/color]")
-	func/echo(eval(expr))
+	echo_val(eval(expr))
 )
 
 tester (raw(
@@ -25,11 +25,7 @@ tester (raw(
 		#(x + (*const_var* + #:const_fn()) + #:pure_fn("gss")))
 ))
 
-defunc (fn-factory [x]
-	defvar (:const *x* x)
-	func ([y]
-		#(*x* + y)
-	)
-)
-
-echo(fn-factory(10)(20)) ; => 30
+tester (raw(
+	func ([x y]
+		#(x #:factor([x y] +(x y)) y))
+))

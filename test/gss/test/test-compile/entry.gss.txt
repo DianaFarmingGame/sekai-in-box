@@ -1,58 +1,58 @@
 defvar(tester func([expr]
 	echo_rich("[color=green][b]================================[/b][/color]")
-	raw/echo(expr)
+	echo_raw(expr)
 	echo_rich("[color=teal]↑↑ Raw ↑↑ ------- ↓↓ Compiled ↓↓[/color]")
-	raw/echo(compile(expr))
+	echo_raw(compile(expr))
 ))
 
-tester(raw([1 #t &test "test" {id "test"}]))
+tester (raw( [1 #t &test "test" {id "test"}] ))
 
-tester(raw(+(1 2)))
+tester (raw( +(1 2) ))
 
 tester(raw(
-	=>(4
-		+(1)
-		*(=>(1
-			+(x))))
+	=> (4
+		+ (1)
+		* (=> (1
+				+ (x))))
 ))
 
-tester(raw(
-	if(#t +(2 1) *(2 1))
+tester (raw(
+	if (#t +(2 1) *(2 1))
 ))
 
-tester(raw(
-	switch(1 2 +(1 1) 3 +(2 1) 1 +(3 1))
+tester (raw(
+	switch (1 2 +(1 1) 3 +(2 1) 1 +(3 1))
 ))
 
-tester(raw(
-	template(ROOT(NODE(
+tester (raw(
+	template (ROOT(NODE(
 		"test template"
 		:eval +(2 3)
 		:eval +(*(2 3) preserve)
 		:expand [1 2 3]
-		:expand :raw [raw(node) raw(2) template(NODE(1 2 3))]
+		:expand :raw [raw(node) raw(2) template (NODE(1 2 3))]
 		:expand array/concat(["a" "b"] outer_call())
 	)))
 ))
 
 defunc (:const :pure plus [x] #(x + 1))
 
-tester(raw(
+tester (raw(
 	array/map ([1 2 3] plus)
 ))
 
-tester(raw(
+tester (raw(
 	array/concat ([1 2 3] [4 5 6])
 ))
 
-defunc(:const :pure filter [x] #(x > 2))
+defunc (:const :pure filter [x] #(x > 2))
 
-tester(raw(
+tester (raw(
 	array/filter ([1 2 3 4 5] filter)
 ))
 
 ; TODO: test let
 
-tester(raw(
+tester (raw(
 	array/slice ([1 2 3 4 5] 1 3)
 ))

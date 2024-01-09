@@ -180,15 +180,11 @@ func def_commons(context: LisperContext) -> void:
 		&"raw<-": Lisper.FnGDCallP( func (value: Variant) -> Array:
 			return Lisper.Raw(value)),
 		&"raw->string": Lisper.FnGDApplyP( func (ctx: LisperContext, args: Array) -> String:
-			return ctx.stringify(args[0])),
-		&"raw/echo": Lisper.FnGDMacro( func (_ctx, body: Array) -> Array:
-			return Lisper.Call(&"echo", [[
-				Lisper.Call(&"raw->string", [body]),
-			]])),
+			return ctx.stringifys(args)),
 		&"display": Lisper.FnGDMacro( func (_ctx, body: Array) -> Array:
-			return Lisper.Call(&"echo", [[
-				Lisper.Call(&"raw->string", [[
-					Lisper.Call(&"raw", [body]),
+			return Lisper.apply(&"echo", [[
+				Lisper.apply(&"raw->string", [[
+					Lisper.apply(&"raw", [body]),
 				]]),
 			]])),
 		&"compile": Lisper.FnGDApplyP( func (ctx: LisperContext, args: Array) -> Array:
@@ -294,16 +290,27 @@ func def_commons(context: LisperContext) -> void:
 		&"func": Lisper.FnGDRaw( func (ctx: LisperContext, body: Array, comptime: bool) -> Variant:
 			if comptime: return body
 			var res := ctx.strip_flags(body)
-			var type: Lisper.FnType = Lisper.FnType.LP_CALL
-			if res[0].has(&":pure"):
-				type = Lisper.FnType.LP_CALL_PURE
 			body = res[1]
 			var args := body[0][1].map(ctx.exec_as_keyword) as Array
 			var tbody := await ctx.compiles(body.slice(1))
-			return [type, args, tbody]),
+			if res[0].has(&":pure"):
+				return Lisper.FnLPCallP(args, tbody)
+			return Lisper.FnLPCall(args, tbody)),
+		&"factor": Lisper.FnGDRaw( func (ctx: LisperContext, body: Array, comptime: bool) -> Variant:
+			var res := ctx.strip_flags(body)
+			body = res[1]
+			var args := body[0][1].map(ctx.exec_as_keyword) as Array
+			var tbody := await ctx.compiles(body.slice(1))
+			var handle: Array
+			if res[0].has(&":pure"):
+				handle = Lisper.FnLPCallP(args, tbody)
+			else:
+				handle = Lisper.FnLPCall(args, tbody)
+			if comptime: return Lisper.RawOverride(Lisper.Raw(handle))
+			return handle),
 		&"func/echo": Lisper.FnGDApply( func (ctx: LisperContext, args: Array) -> Variant:
 			var handle := args[0] as Array
-			var msg := "func ([" + ' '.join(handle[1]) + "]\n      " + ctx.stringifys(handle[2], 6) + ')'
+			var msg := "func ([" + ' '.join(Lisper.fn_lp_get_args(handle)) + "]\n      " + ctx.stringifys(Lisper.fn_lp_get_body(handle), 6) + ')'
 			var lines := msg.split('\n')
 			print('\n'.join(Array(lines).map(func (l): return ctx.print_head + l)))
 			return args[0]),
@@ -366,10 +373,10 @@ func def_commons(context: LisperContext) -> void:
 					ctx.def_var([], defs[i], ary[i])
 				return (await ctx.execs(body.slice(2)))[-1]),
 		&"array/map-let": Lisper.FnGDMacro( func (_ctx, body: Array) -> Array:
-			return Lisper.Call(&"array/map", [[
+			return Lisper.apply(&"array/map", [[
 				body[0],
-				Lisper.Func([&"$item"], [[
-					Lisper.Call(&"array/let", [[Lisper.Token(&"$item"), body[1]], body.slice(2)])
+				Lisper.make_func([&"$item"], [[
+					Lisper.apply(&"array/let", [[Lisper.Token(&"$item"), body[1]], body.slice(2)])
 				]]),
 			]])),
 		&"array/for": Lisper.FnGDApplyP( func (ctx: LisperContext, args: Array) -> void:
@@ -398,6 +405,16 @@ func def_commons(context: LisperContext) -> void:
 			return res),
 		&"echo": Lisper.FnGDApply( func (ctx: LisperContext, args: Array) -> Variant:
 			var msg := ' '.join(args.map(func (e): return str(e)))
+			var lines := msg.split('\n')
+			print('\n'.join(Array(lines).map(func (l): return ctx.print_head + l)))
+			return args[-1] if args.size() > 0 else null),
+		&"echo_val": Lisper.FnGDApply( func (ctx: LisperContext, args: Array) -> Variant:
+			var msg := ' '.join(args.map(func (e): return ctx.stringify_raw(e)))
+			var lines := msg.split('\n')
+			print('\n'.join(Array(lines).map(func (l): return ctx.print_head + l)))
+			return args[-1] if args.size() > 0 else null),
+		&"echo_raw": Lisper.FnGDApply( func (ctx: LisperContext, args: Array) -> Variant:
+			var msg := ' '.join(args.map(func (e): return ctx.stringify(e)))
 			var lines := msg.split('\n')
 			print('\n'.join(Array(lines).map(func (l): return ctx.print_head + l)))
 			return args[-1] if args.size() > 0 else null),
@@ -430,9 +447,9 @@ func def_commons(context: LisperContext) -> void:
 					&":const", &":fix": var_flags.append(f)
 					&":pure": fn_flags.append(f)
 			body = res[1]
-			return Lisper.Call(&"defvar", [var_flags.map(Lisper.Token), [
+			return Lisper.apply(&"defvar", [var_flags.map(Lisper.Token), [
 				body[0],
-				Lisper.Call(&"func", [fn_flags.map(Lisper.Token), body.slice(1)]),
+				Lisper.apply(&"func", [fn_flags.map(Lisper.Token), body.slice(1)]),
 			]])),
 		&"do": Lisper.FnGDRaw( func (ctx: LisperContext, body: Array, comptime: bool) -> Variant:
 			if comptime: return await compile_keyword_mask_01(ctx, body)
@@ -443,7 +460,7 @@ func def_commons(context: LisperContext) -> void:
 				if action == null: action = this.getpR(&"actions").get(act_name) # FIXME
 				var argv := [Lisper.Raw(this.sekai), Lisper.Raw(this)]
 				argv.append_array(body.slice(2))
-				return await ctx.call_rawfn(action, argv)),
+				return await ctx.call_fn_raw(action, argv)),
 		&"callm": Lisper.FnGDRaw( func (ctx: LisperContext, body: Array, comptime: bool) -> Variant:
 			if comptime: return await compile_keyword_mask_01(ctx, body)
 			else:

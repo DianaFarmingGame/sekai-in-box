@@ -196,35 +196,35 @@ func make_lisper_context() -> LisperContext:
 				ctx.log_error(body[0], str("mono/make: ", body[0], " is not a valid token"))
 				return null),
 		&"mono": Lisper.FnGDMacro( func (_ctx, body: Array) -> Array:
-			return Lisper.Call(&"mono/add", [
-				[Lisper.Call(&"mono/make", [body])],
+			return Lisper.apply(&"mono/add", [
+				[Lisper.apply(&"mono/make", [body])],
 			])),
 		&"mono_map": Lisper.FnGDMacro( func (_ctx, body: Array) -> Array:
-			return Lisper.Call(&"mono/add", [
-				[Lisper.Call(&"mono_map/make", [body])],
+			return Lisper.apply(&"mono/add", [
+				[Lisper.apply(&"mono_map/make", [body])],
 			])),
 		&"Define": Lisper.FnGDMacro( func (_ctx, body: Array) -> Array:
-			return Lisper.Call(&"defvar", [
+			return Lisper.apply(&"defvar", [
 				[body[0]],
-				[Lisper.Call(&"define/make", [
+				[Lisper.apply(&"define/make", [
 					body.slice(1),
 				])],
 			])),
 		&"define": Lisper.FnGDMacro( func (_ctx, body: Array) -> Array:
-			return Lisper.Call(&"define/sign", [
-				[Lisper.Call(&"define/make", [body])],
+			return Lisper.apply(&"define/sign", [
+				[Lisper.apply(&"define/make", [body])],
 			])),
 		&"import": Lisper.FnGDMacro( func (_ctx, body: Array) -> Array:
-			return Lisper.Call(&"defvar", [
+			return Lisper.apply(&"defvar", [
 				[body[0]],
-				[Lisper.Call(&"load", [
+				[Lisper.apply(&"load", [
 					body.slice(1),
 				])],
 			])),
 		&"define/import": Lisper.FnGDMacro( func (_ctx, body: Array) -> Array:
-			return Lisper.Call(&"defvar", [
+			return Lisper.apply(&"defvar", [
 				[body[0]],
-				[Lisper.Call(&"define/load", [
+				[Lisper.apply(&"define/load", [
 					body.slice(1),
 				])],
 			])),
@@ -255,14 +255,14 @@ func make_lisper_context() -> LisperContext:
 		&"csgv/load": Lisper.FnGDCallP( func (path: String) -> Array:
 			return load_csgv(root_dir.path_join(path))),
 		&"csgv/map-let": Lisper.FnGDMacro( func (_ctx, body: Array) -> Array:
-			return Lisper.Call(&"array/map-let", [[
-				Lisper.Call(&"csgv/load", [[body[0]]]),
+			return Lisper.apply(&"array/map-let", [[
+				Lisper.apply(&"csgv/load", [[body[0]]]),
 			], body.slice(1)])),
 		&"csv/load": Lisper.FnGDCallP( func (path: String) -> Array:
 			return load_csv(root_dir.path_join(path))),
 		&"csv/map-let": Lisper.FnGDMacro( func (_ctx, body: Array) -> Array:
-			return Lisper.Call(&"array/map-let", [[
-				Lisper.Call(&"csv/load", [[body[0]]]),
+			return Lisper.apply(&"array/map-let", [[
+				Lisper.apply(&"csv/load", [[body[0]]]),
 			], body.slice(1)])),
 	})
 	return context

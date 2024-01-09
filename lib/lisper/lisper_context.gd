@@ -134,7 +134,7 @@ func exec(node: Array) -> Variant:
 			var body = (node[1] as Array).slice(1)
 			var handle = await exec(head)
 			if handle is Array:
-				return await call_rawfn(handle, body)
+				return await call_fn_raw(handle, body)
 			elif handle == null:
 				log_error(node, str("call handle not found: ", head))
 			else:
@@ -147,7 +147,6 @@ func exec(node: Array) -> Variant:
 	log_error(node, str("unknown node: ", node))
 	return null
 
-@warning_ignore("integer_division")
 func exec_map_part(pairs: Array) -> Dictionary:
 	var res := {}
 	for i in pairs.size() / 2:
@@ -156,21 +155,21 @@ func exec_map_part(pairs: Array) -> Dictionary:
 		res[k] = v
 	return res
 
-func call_rawfn(handle: Array, body: Array) -> Variant:
-	match handle[0]:
+func call_fn_raw(handle: Array, body: Array) -> Variant:
+	match Lisper.fn_get_type(handle):
 		Lisper.FnType.GD_RAW:
-			return await handle[1].call(self, body, false)
+			return await Lisper.fn_gd_get_handle(handle).call(self, body, false)
 		Lisper.FnType.GD_MACRO:
-			return await exec(await handle[1].call(self, body))
+			return await exec(await Lisper.fn_gd_get_handle(handle).call(self, body))
 		Lisper.FnType.GD_CALL, Lisper.FnType.GD_CALL_PURE:
 			var vargs := await execs(body)
-			return await handle[1].callv(vargs)
+			return await Lisper.fn_gd_get_handle(handle).callv(vargs)
 		Lisper.FnType.GD_APPLY, Lisper.FnType.GD_APPLY_PURE:
 			var vargs := await execs(body)
-			return await handle[1].call(self, vargs)
+			return await Lisper.fn_gd_get_handle(handle).call(self, vargs)
 		Lisper.FnType.LP_CALL, Lisper.FnType.LP_CALL_PURE:
 			var fctx := fork()
-			var args := handle[1] as Array
+			var args := Lisper.fn_lp_get_args(handle)
 			if args.size() != body.size():
 				push_error("argument list not match expect ", args.size(), " found ", body.size())
 				printerr("argument list not match expect ", args.size(), " found ", body.size())
@@ -180,7 +179,7 @@ func call_rawfn(handle: Array, body: Array) -> Variant:
 			var vargs := await execs(body)
 			for iarg in args.size():
 				fctx.def_var([], args[iarg], vargs[iarg])
-			return (await fctx.execs(handle[2]))[-1]
+			return (await fctx.execs(Lisper.fn_lp_get_body(handle)))[-1]
 		_:
 			push_error("unknown call handle type: ", handle)
 			printerr("unknown call handle type: ", handle)
@@ -188,18 +187,18 @@ func call_rawfn(handle: Array, body: Array) -> Variant:
 			return null
 
 func call_fn(handle: Array, vargs: Array) -> Variant:
-	match handle[0]:
+	match Lisper.fn_get_type(handle):
 		Lisper.FnType.GD_RAW:
-			return await handle[1].call(self, vargs.map(Lisper.Raw), false)
+			return await Lisper.fn_gd_get_handle(handle).call(self, vargs.map(Lisper.Raw), false)
 		Lisper.FnType.GD_MACRO:
-			return await exec(await handle[1].call(self, vargs.map(Lisper.Raw)))
+			return await exec(await Lisper.fn_gd_get_handle(handle).call(self, vargs.map(Lisper.Raw)))
 		Lisper.FnType.GD_CALL, Lisper.FnType.GD_CALL_PURE:
-			return await handle[1].callv(vargs)
+			return await Lisper.fn_gd_get_handle(handle).callv(vargs)
 		Lisper.FnType.GD_APPLY, Lisper.FnType.GD_APPLY_PURE:
-			return await handle[1].call(self, vargs)
+			return await Lisper.fn_gd_get_handle(handle).call(self, vargs)
 		Lisper.FnType.LP_CALL, Lisper.FnType.LP_CALL_PURE:
 			var fctx := fork()
-			var args := handle[1] as Array
+			var args := Lisper.fn_lp_get_args(handle)
 			if args.size() != vargs.size():
 				push_error("argument list not match expect ", args.size(), " found ", vargs.size())
 				printerr("argument list not match expect ", args.size(), " found ", vargs.size())
@@ -208,7 +207,7 @@ func call_fn(handle: Array, vargs: Array) -> Variant:
 				return null
 			for iarg in args.size():
 				fctx.def_var([], args[iarg], vargs[iarg])
-			return (await fctx.execs(handle[2]))[-1]
+			return (await fctx.execs(Lisper.fn_lp_get_body(handle)))[-1]
 		_:
 			push_error("unknown call handle type: ", handle)
 			printerr("unknown call handle type: ", handle)
@@ -230,7 +229,7 @@ var _flag_pure_rollback := false
 
 func check_valid_handle(handle: Array) -> bool:
 	if _flag_comptime:
-		match handle[0]:
+		match Lisper.fn_get_type(handle):
 			Lisper.FnType.GD_CALL_PURE, \
 			Lisper.FnType.GD_APPLY_PURE, \
 			Lisper.FnType.LP_CALL_PURE:
@@ -256,9 +255,9 @@ func compile(node: Array) -> Array:
 			head = await compile(head)
 			if head[0] == Lisper.TType.RAW:
 				var handle := head[1] as Array
-				if handle[0] == Lisper.FnType.GD_RAW:
+				if Lisper.fn_get_type(handle) == Lisper.FnType.GD_RAW:
 					_flag_comptime = true
-					var res := await handle[1].call(self, body, true) as Array
+					var res := await Lisper.fn_gd_get_handle(handle).call(self, body, true) as Array
 					_flag_comptime = false
 					if Lisper.is_raw_override(res):
 						return await compile(res[1])
@@ -266,12 +265,12 @@ func compile(node: Array) -> Array:
 					cdata.append_array(res)
 					return Lisper.List(cdata)
 				if eao:
-					match handle[0]:
+					match Lisper.fn_get_type(handle):
 						Lisper.FnType.GD_MACRO:
 							var cdata := [head]
 							cdata.append_array(body)
 							_flag_comptime = true
-							var res = await handle[1].call(self, body)
+							var res = await Lisper.fn_gd_get_handle(handle).call(self, body)
 							_flag_comptime = false
 							return await compile(res)
 						Lisper.FnType.GD_CALL_PURE, \
@@ -332,6 +331,14 @@ func stringify_raw(data: Variant, indent := 0) -> String:
 		var vname = find_var(data)
 		if vname != null:
 			return '#' + vname
+	if Lisper.is_fn(data):
+		var type = Lisper.FnType.find_key(Lisper.fn_get_type(data))
+		var msg := 'λ:' + type as String
+		match Lisper.fn_get_type(data):
+			Lisper.FnType.LP_CALL, Lisper.FnType.LP_CALL_PURE:
+				indent += msg.length() + 2
+				msg += " ([" + ' '.join(Lisper.fn_lp_get_args(data)) + "]\n" + ''.lpad(indent) + stringifys(Lisper.fn_lp_get_body(data), indent) + ')'
+		return msg
 	if data is Dictionary:
 		var res := ['{']
 		for k in data.keys():
