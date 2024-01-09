@@ -1,0 +1,7 @@
+defvar(任务素材 (make_define GItem
+	prop {
+		groups (prop/pushs [&物品])
+		name "任务素材"
+		}
+			)
+)

@@ -1,0 +1,7 @@
+defvar(环境道具 (make_define GItem
+	prop {
+		groups (prop/pushs [&物品])
+		name "环境道具"
+		}
+			)
+)

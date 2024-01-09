@@ -1,0 +1,37 @@
+(defvar 剑 (make_define GItem
+	prop {
+		groups (prop/pushs [&工具])
+		
+	
+		name "剑"
+		}
+			)
+)
+
+(define 剑
+	ref 400
+	id &Item/工具/武器
+	prop {
+		name "铁剑"
+		description "铁制成的剑"
+		groups (prop/pushs ["武器"])
+		item_icon [&static &main (clip_item 0 0)]
+		
+		pickable #t ; 能否取得
+		
+		stackable #f ; 能否堆叠
+		stack_capacity 64 ; 堆叠上限
+		stack_count 1 ; 堆叠数量
+	
+		lp 255 ; 可用度
+		chargeable #t ; 能否修复
+		
+		tradeable #t ; 能否交易
+		price 500 ; 价格
+		
+		action {
+			default & ; 攻击
+			smash & ; 破坏方块
+				}
+		}
+)

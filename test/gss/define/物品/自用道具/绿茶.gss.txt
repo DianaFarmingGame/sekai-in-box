@@ -1,0 +1,30 @@
+define(自用道具
+	ref 3801
+	id &物品/自用道具/绿茶
+	prop {
+		name "绿茶"
+		description "绿茶叶冲泡出的饮品，提神醒脑"
+		groups (prop/pushs ["自用道具"])
+		item_icon [&static &main (clip_item 0 0)]
+		
+		&pickable #t ;能否取得
+
+		&stackable #f ;能否堆叠
+		&stack_count 1 ;堆叠数量
+		&stack_capacity 1 ;堆叠上限
+
+		&chargeable #f ;能否修复
+		&cur_charge 1 ;可用度
+		&charge_capacity 1 ;最高可用度
+		&primary_charge 1 ;主要行为的消耗
+		&secondary_charge 1 ;次要行为的消耗
+
+		&tradeable #t ;能否交易
+		&trade_price 15 ;价格
+		&trade_stability 1 ;保值度
+		action {
+			default & ; 攻击
+			smash & ; 破坏方块
+				}
+		}
+)

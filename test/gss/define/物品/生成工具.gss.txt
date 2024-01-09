@@ -1,0 +1,7 @@
+defvar(生成工具 (make_define GItem
+	prop {
+		groups (prop/pushs [&物品])
+		name "生成工具"
+		}
+			)
+)
