@@ -1,9 +1,8 @@
 defvar(tester func([expr]
-	echo_rich("[color=green][b]================================[/b][/color]\n")
+	echo_rich("[color=green][b]================================[/b][/color]")
 	raw/echo(expr)
-	echo_rich("\n[color=teal]↑↑ Raw ↑↑ ------- ↓↓ Compiled ↓↓[/color]\n")
+	echo_rich("[color=teal]↑↑ Raw ↑↑ ------- ↓↓ Compiled ↓↓[/color]")
 	raw/echo(compile(expr))
-	echo()
 ))
 
 tester(raw([1 #t &test "test" {id "test"}]))

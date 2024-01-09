@@ -336,7 +336,7 @@ func stringify_raw(data: Variant, indent := 0) -> String:
 		res.append('\n' + ''.lpad(indent, ' ') + '}')
 		return ''.join(res)
 	if data is Array:
-		var res := '[' + stringify_raw(data[0], indent + 1)
+		var res := '[' + (stringify_raw(data[0], indent + 1) if data.size() > 0 else '')
 		for n in data.slice(1):
 			res += ' ' + stringify_raw(n, Lisper.count_last_len(res, indent) + 1)
 		res += ']'
@@ -374,7 +374,7 @@ func stringify(node: Array, indent := 0) -> String:
 			stringify(body[0], indent) + \
 			''.join(body.slice(1).map(func (n): return '\n' + ''.lpad(indent, ' ') + stringify(n, indent))) + ')'
 		Lisper.TType.ARRAY:
-			var res := '[' + stringify(node[1][0], indent + 1)
+			var res := '[' + (stringify(node[1][0], indent + 1) if node[1].size() > 0 else '')
 			for n in node[1].slice(1):
 				res += ' ' + stringify(n, Lisper.count_last_len(res, indent) + 1)
 			res += ']'
