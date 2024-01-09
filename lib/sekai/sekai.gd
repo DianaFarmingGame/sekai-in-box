@@ -20,15 +20,6 @@ var control_stack := []
 
 var external_fns := {}
 
-static var root_vars := {
-	&"MonoDefine": MonoDefine.new(),
-	&"Entity": GEntity.new(),
-	&"Tile": GTile.new(),
-	
-	&"Mono": Mono,
-	&"MonoEntity": MonoEntity,
-}
-
 func _init() -> void:
 	y_sort_enabled = true
 
@@ -129,11 +120,11 @@ func _unhandled_input(event: InputEvent) -> void:
 func _init_sekai() -> void:
 	defines.clear()
 	defines_by_id.clear()
-	gss_ctx = make_lisper_context()
+	gss_ctx = await make_lisper_context()
 	_clear_monos()
 	control_target = null
-	if define_gss: await exec_gss(define_gss)
-	if entry_gss: await exec_gss(entry_gss)
+	if define_gss: await exec_gsx(define_gss)
+	if entry_gss: await exec_gsx(entry_gss)
 	var stime := Time.get_ticks_usec()
 	for mono in monos:
 		mono._on_init()
@@ -142,129 +133,8 @@ func _init_sekai() -> void:
 
 func make_lisper_context() -> LisperContext:
 	var context := LisperContext.new()
-	LisperCommons.def_commons(context)
-	
-	context.def_vars([Lisper.VarFlag.CONST, Lisper.VarFlag.FIX], root_vars)
-	
-	context.def_vars([Lisper.VarFlag.CONST, Lisper.VarFlag.FIX], {
-		&"define/make": Lisper.FnGDRaw( func (ctx: LisperContext, body: Array, comptime: bool) -> Variant:
-			if comptime:
-				var cdata := [await ctx.compile(body[0])]
-				cdata.append_array(await LisperCommons.compile_map(ctx, body.slice(1)))
-				return cdata
-			var def = await ctx.exec(body[0])
-			if def != null:
-				def = def.fork()
-				var args = await ctx.exec_map_part(body.slice(1))
-				for k in args.keys():
-					match k:
-						&"props":
-							def.do_override_props(args[k])
-						_:
-							def.set(k, args[k])
-				return def
-			else:
-				ctx.log_error(body[0], str("define/make: ", body[0], " is not a valid token"))
-				return null),
-		&"define/sign": Lisper.FnGDCall( func (define: MonoDefine) -> MonoDefine:
-			sign_define(define)
-			return define),
-		&"mono/add": Lisper.FnGDCall( func (mono: Variant) -> Variant:
-			add_mono(mono)
-			return mono),
-		&"mono/make": Lisper.FnGDRaw( func (ctx: LisperContext, body: Array, comptime: bool) -> Variant:
-			if comptime:
-				var cdata := await ctx.compiles(body.slice(0, 2))
-				cdata.append_array(await LisperCommons.compile_map(ctx, body.slice(2)))
-				return cdata
-			var mono_class = await ctx.exec(body[0])
-			if mono_class != null:
-				var define = get_define(await ctx.exec(body[1]))
-				if define == null: return null
-				var mono := mono_class.new() as Mono
-				mono.sekai = self
-				mono.define = define
-				var args = await ctx.exec_map_part(body.slice(2))
-				for k in args.keys():
-					match k:
-						&"props":
-							mono.cover(&"base", args[k])
-						_:
-							mono.set(k, args[k])
-				return mono
-			else:
-				ctx.log_error(body[0], str("mono/make: ", body[0], " is not a valid token"))
-				return null),
-		&"mono": Lisper.FnGDMacro( func (_ctx, body: Array) -> Array:
-			return Lisper.apply(&"mono/add", [
-				[Lisper.apply(&"mono/make", [body])],
-			])),
-		&"mono_map": Lisper.FnGDMacro( func (_ctx, body: Array) -> Array:
-			return Lisper.apply(&"mono/add", [
-				[Lisper.apply(&"mono_map/make", [body])],
-			])),
-		&"Define": Lisper.FnGDMacro( func (_ctx, body: Array) -> Array:
-			return Lisper.apply(&"defvar", [
-				[body[0]],
-				[Lisper.apply(&"define/make", [
-					body.slice(1),
-				])],
-			])),
-		&"define": Lisper.FnGDMacro( func (_ctx, body: Array) -> Array:
-			return Lisper.apply(&"define/sign", [
-				[Lisper.apply(&"define/make", [body])],
-			])),
-		&"import": Lisper.FnGDMacro( func (_ctx, body: Array) -> Array:
-			return Lisper.apply(&"defvar", [
-				[body[0]],
-				[Lisper.apply(&"load", [
-					body.slice(1),
-				])],
-			])),
-		&"define/import": Lisper.FnGDMacro( func (_ctx, body: Array) -> Array:
-			return Lisper.apply(&"defvar", [
-				[body[0]],
-				[Lisper.apply(&"define/load", [
-					body.slice(1),
-				])],
-			])),
-		&"control/set": Lisper.FnGDCall( func (mono: Mono) -> Mono:
-			control_target = mono
-			return mono),
-		&"control/clear": Lisper.FnGDCall( func () -> void:
-			control_target = null),
-		&"cam/set": Lisper.FnGDCall( func (mono: Mono) -> Mono:
-			cam_target = mono
-			return mono),
-		&"cam/clear": Lisper.FnGDCall( func () -> void:
-			cam_target = null),
-		&"load": Lisper.FnGDCallP( func (path: String) -> Resource:
-			return get_assert(path)),
-		&"define/load": Lisper.FnGDCallP( func (path: String) -> Resource:
-			return get_assert(path).new()),
-		&"gss/exec": Lisper.FnGDCall( func (path: String) -> void:
-			exec_gss(root_dir.path_join(path))),
-		&"mono_map/make": Lisper.FnGDCall( func (offset: Vector3, cell_size: Vector3, psize: Vector2, data := []) -> MonoMap:
-			var map := MonoMap.new()
-			map.sekai = self
-			map.offset = offset
-			map.cell_size = cell_size
-			map.size = psize
-			map.data = PackedInt32Array(data)
-			return map),
-		&"csgv/load": Lisper.FnGDCallP( func (path: String) -> Array:
-			return load_csgv(root_dir.path_join(path))),
-		&"csgv/map-let": Lisper.FnGDMacro( func (_ctx, body: Array) -> Array:
-			return Lisper.apply(&"array/map-let", [[
-				Lisper.apply(&"csgv/load", [[body[0]]]),
-			], body.slice(1)])),
-		&"csv/load": Lisper.FnGDCallP( func (path: String) -> Array:
-			return load_csv(root_dir.path_join(path))),
-		&"csv/map-let": Lisper.FnGDMacro( func (_ctx, body: Array) -> Array:
-			return Lisper.apply(&"array/map-let", [[
-				Lisper.apply(&"csv/load", [[body[0]]]),
-			], body.slice(1)])),
-	})
+	await LisperCommons.def_commons(context)
+	await Lisper.exec_gsm(context, self)
 	return context
 
 var _indent := 0
@@ -275,13 +145,12 @@ func _line_head_body() -> String:
 func _line_head_end() -> String:
 	return '' if _indent == 0 else "[color=gray]" + ''.rpad(_indent - 1, "│ ") + "└╴" + "[/color]"
 
-func exec_gss(path: String) -> void:
-	var expr := FileAccess.get_file_as_string(path)
-	print_rich("[sekai] ", _line_head_body(), "[color=green][b]gss: ", path, "[/b][/color]")
+func exec_gsx(path: String) -> void:
+	print_rich("[sekai] ", _line_head_body(), "[color=green][b]exec: ", path, "[/b][/color]")
 	_indent += 1
 	var stime := Time.get_ticks_usec()
 	gss_ctx.print_head = "        " + ('' if _indent == 0 else ''.rpad(_indent - 1, "│ ") + '╎  ')
-	await gss_ctx.eval(expr)
+	await Lisper.exec(gss_ctx, path)
 	print_rich("        ", _line_head_end(), "[color=gray]", (Time.get_ticks_usec() - stime) / 1000.0, " ms[/color]")
 	_indent -= 1
 
@@ -416,9 +285,9 @@ func load_from_path(path: String) -> void:
 	unit_size = load_data[&"unit_size"]
 	defines.clear()
 	defines_by_id.clear()
-	gss_ctx = make_lisper_context()
+	gss_ctx = await make_lisper_context()
 	_clear_monos()
-	if define_gss: await exec_gss(define_gss)
+	if define_gss: await exec_gsx(define_gss)
 	var vmonos := load_data[&"monos"] as Array
 	for entry in vmonos:
 		var script = load(entry[0])
@@ -434,3 +303,247 @@ func load_from_path(path: String) -> void:
 	for mono in monos: mono._on_restore()
 	print_rich("[sekai] restore in ", (Time.get_ticks_usec() - stime) / 1000.0, " ms")
 	print()
+
+func gsm(): return ["""
+
+defvar (:const MonoDefine """, MonoDefine.new() ,""")
+defvar (:const Entity """, GEntity.new() ,""")
+defvar (:const Tile """, GTile.new() ,""")
+defvar (:const Mono """, Mono ,""")
+defvar (:const MonoEntity """, MonoEntity ,""")
+
+defunc (do :const :gd :raw """,
+	func (ctx: LisperContext, body: Array, comptime: bool) -> Variant:
+		if comptime: return await LisperCommons.compile_keyword_mask_01(ctx, body)
+		else:
+			var this := await ctx.exec(body[0]) as Mono
+			var act_name := ctx.exec_as_keyword(body[1]) as StringName
+			var action = this.getp(&"actions").get(act_name)
+			if action == null: action = this.getpR(&"actions").get(act_name) # FIXME
+			var argv := [Lisper.Raw(this.sekai), Lisper.Raw(this)]
+			argv.append_array(body.slice(2))
+			return await ctx.call_fn_raw(action, argv)
+,""")
+
+defunc (callm :const :gd :raw """,
+	func (ctx: LisperContext, body: Array, comptime: bool) -> Variant:
+		if comptime: return await LisperCommons.compile_keyword_mask_01(ctx, body)
+		else:
+			var this := await ctx.exec(body[0]) as Mono
+			var method := ctx.exec_as_keyword(body[1]) as StringName
+			var argv := await ctx.execs(body.slice(2)) as Array
+			return await this.applym(method, argv)
+,""")
+
+defunc (getp :const :gd :raw """,
+	func (ctx: LisperContext, body: Array, comptime: bool) -> Variant:
+		if comptime: return await LisperCommons.compile_keyword_mask_01(ctx, body)
+		else:
+			var this := await ctx.exec(body[0]) as Mono
+			var key := ctx.exec_as_keyword(body[1]) as StringName
+			return this.getp(key)
+,""")
+
+defunc (setp :const :gd :raw """,
+	func (ctx: LisperContext, body: Array, comptime: bool) -> Variant:
+		if comptime: return await LisperCommons.compile_keyword_mask_01(ctx, body)
+		else:
+			var this := await ctx.exec(body[0]) as Mono
+			var key := ctx.exec_as_keyword(body[1]) as StringName
+			var value = await ctx.exec(body[2])
+			this.setp(key, value)
+			return null
+,""")
+
+defunc (destroy :const :gd """, func (this: Mono): this.destroy() ,""")
+defunc (queue_destroy :const :gd """, func (this: Mono): this.destroy.call_deferred() ,""")
+
+defunc (prop/setp :const :gd :pure """, Prop.setp ,""")
+defunc (prop/pushs :const :gd :pure """, Prop.pushs ,""")
+defunc (prop/puts :const :gd :pure """, Prop.puts ,""")
+defunc (prop/mergep :const :gd :pure """, Prop.mergep ,""")
+
+defunc (define/make :const :gd :raw """,
+	func (ctx: LisperContext, body: Array, comptime: bool) -> Variant:
+		if comptime:
+			var cdata := [await ctx.compile(body[0])]
+			cdata.append_array(await LisperCommons.compile_map(ctx, body.slice(1)))
+			return cdata
+		var def = await ctx.exec(body[0])
+		if def != null:
+			def = def.fork()
+			var args = await ctx.exec_map_part(body.slice(1))
+			for k in args.keys():
+				match k:
+					&"props":
+						def.do_override_props(args[k])
+					_:
+						def.set(k, args[k])
+			return def
+		else:
+			ctx.log_error(body[0], str("define/make: ", body[0], " is not a valid token"))
+			return null
+,""")
+
+defunc (define/sign :const :gd """,
+	func (define: MonoDefine) -> MonoDefine:
+		sign_define(define)
+		return define
+,""")
+
+defunc (mono/add :const :gd """,
+	func (mono: Variant) -> Variant:
+		add_mono(mono)
+		return mono
+,""")
+
+defunc (mono/make :const :gd :raw """,
+	func (ctx: LisperContext, body: Array, comptime: bool) -> Variant:
+		if comptime:
+			var cdata := await ctx.compiles(body.slice(0, 2))
+			cdata.append_array(await LisperCommons.compile_map(ctx, body.slice(2)))
+			return cdata
+		var mono_class = await ctx.exec(body[0])
+		if mono_class != null:
+			var define = get_define(await ctx.exec(body[1]))
+			if define == null: return null
+			var mono := mono_class.new() as Mono
+			mono.sekai = self
+			mono.define = define
+			var args = await ctx.exec_map_part(body.slice(2))
+			for k in args.keys():
+				match k:
+					&"props":
+						mono.cover(&"base", args[k])
+					_:
+						mono.set(k, args[k])
+			return mono
+		else:
+			ctx.log_error(body[0], str("mono/make: ", body[0], " is not a valid token"))
+			return null
+,""")
+
+defunc (mono :const :gd :macro """,
+	func (_ctx, body: Array) -> Array:
+		return Lisper.apply(&"mono/add", [
+			[Lisper.apply(&"mono/make", [body])],
+		])
+,""")
+
+defunc (mono_map :const :gd :macro """,
+	func (_ctx, body: Array) -> Array:
+		return Lisper.apply(&"mono/add", [
+			[Lisper.apply(&"mono_map/make", [body])],
+		])
+,""")
+
+defunc (Define :const :gd :macro """,
+	func (_ctx, body: Array) -> Array:
+		return Lisper.apply(&"defvar", [
+			[body[0]],
+			[Lisper.apply(&"define/make", [
+				body.slice(1),
+			])],
+		])
+,""")
+
+defunc (define :const :gd :macro """,
+	func (_ctx, body: Array) -> Array:
+		return Lisper.apply(&"define/sign", [
+			[Lisper.apply(&"define/make", [body])],
+		])
+,""")
+
+defunc (import :const :gd :macro """,
+	func (_ctx, body: Array) -> Array:
+		return Lisper.apply(&"defvar", [[
+			body[0],
+			Lisper.apply(&"load", [
+				body.slice(1),
+			]),
+		]])
+,""")
+
+defunc (define/import :const :gd :macro """,
+	func (_ctx, body: Array) -> Array:
+		return Lisper.apply(&"defvar", [[
+			body[0],
+			Lisper.apply(&"define/load", [
+				body.slice(1),
+			]),
+		]])
+,""")
+
+defunc (control/set :const :gd """,
+	func (mono: Mono) -> Mono:
+		control_target = mono
+		return mono
+,""")
+
+defunc (control/clear :const :gd """,
+	func () -> void:
+		control_target = null
+,""")
+
+defunc (cam/set :const :gd """,
+	func (mono: Mono) -> Mono:
+		cam_target = mono
+		return mono
+,""")
+
+defunc (cam/clear :const :gd """,
+	func () -> void:
+		cam_target = null
+,""")
+
+defunc (gss/exec :const :gd """,
+	func (path: String) -> void:
+		exec_gsx(root_dir.path_join(path))
+,""")
+
+defunc (mono_map/make :const :gd """,
+	func (offset: Vector3, cell_size: Vector3, psize: Vector2, data := []) -> MonoMap:
+		var map := MonoMap.new()
+		map.sekai = self
+		map.offset = offset
+		map.cell_size = cell_size
+		map.size = psize
+		map.data = PackedInt32Array(data)
+		return map
+,""")
+
+defunc (csgv/map-let :const :gd :macro """,
+	func (_ctx, body: Array) -> Array:
+		return Lisper.apply(&"array/map-let", [[
+			Lisper.apply(&"csgv/load", [[body[0]]]),
+		], body.slice(1)])
+,""")
+
+defunc (csv/map-let :const :gd :macro """,
+	func (_ctx, body: Array) -> Array:
+		return Lisper.apply(&"array/map-let", [[
+			Lisper.apply(&"csv/load", [[body[0]]]),
+		], body.slice(1)])
+,""")
+
+defunc (load :const :gd :pure """,
+	func (path: String) -> Resource:
+		return get_assert(path)
+,""")
+
+defunc (define/load :const :gd :pure """,
+	func (path: String) -> Resource:
+		return get_assert(path).new()
+,""")
+
+defunc (csgv/load :const :gd :pure """,
+	func (path: String) -> Array:
+		return load_csgv(root_dir.path_join(path))
+,""")
+
+defunc (csv/load :const :gd :pure """,
+	func (path: String) -> Array:
+		return load_csv(root_dir.path_join(path))
+,""")
+
+"""]

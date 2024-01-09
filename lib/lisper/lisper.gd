@@ -81,6 +81,78 @@ static func count_last_len(pstr: String, indent: int) -> int:
 	else:
 		return indent + slices[0].length()
 
+static func exec(ctx: LisperContext, path: String) -> void:
+	if path.ends_with(".gss.txt"):
+		var expr := FileAccess.get_file_as_string(path)
+		await Lisper.exec_gss(ctx, expr, path)
+	elif path.ends_with(".gsm.gd"):
+		await Lisper.exec_gsm(ctx, load(path))
+	else:
+		push_error("unknown gsx file: ", path)
+		printerr("unknown gsx file: ", path)
+
+static func exec_gss(ctx: LisperContext, gss: String, path: String) -> void:
+	var pmod_path = ctx.get_var(&"*mod-path*")
+	var pmod_dir = ctx.get_var(&"*mod-dir*")
+	var pself = ctx.get_var(&"self")
+	ctx.def_consts({
+		&"*mod-path*": path,
+		&"*mod-dir*": path.get_base_dir(),
+		&"self": null,
+	})
+	await ctx.eval(gss)
+	ctx.def_vars([], {
+		&"*mod-path*": pmod_path,
+		&"*mod-dir*": pmod_dir,
+		&"self": pself,
+	})
+
+static func exec_gsm(ctx: LisperContext, gsm: Object) -> void:
+	if gsm.has_method(&"new"): gsm = gsm.new()
+	var path = gsm.get_script().resource_path
+	var pmod_path = ctx.get_var(&"*mod-path*")
+	var pmod_dir = ctx.get_var(&"*mod-dir*")
+	var pself = ctx.get_var(&"self")
+	ctx.def_consts({
+		&"*mod-path*": path,
+		&"*mod-dir*": path.get_base_dir(),
+		&"self": gsm,
+	})
+	if gsm.has_method(&"gsm_init"): await gsm.gsm_init(ctx)
+	var content := await gsm.gsm() as Array
+	var gss_parts := []
+	var inserts := []
+	var is_gss := true
+	for part in content:
+		if is_gss:
+			gss_parts.append(part)
+		else:
+			gss_parts.append(str(":gsm-insert-", inserts.size()))
+			inserts.append(part)
+		is_gss = not is_gss
+	var gss := ' '.join(gss_parts)
+	var gss_data = Lisper.tokenize(gss)
+	if gss_data != null:
+		gss_data = gss_data.map(func (n): return _gsm_replace(inserts, n))
+		await ctx.execs(gss_data)
+	if gsm.has_method(&"gsm_inited"): await gsm.gsm_inited(ctx)
+	ctx.def_vars([], {
+		&"*mod-path*": pmod_path,
+		&"*mod-dir*": pmod_dir,
+		&"self": pself,
+	})
+
+static func _gsm_replace(inserts: Array, node: Array) -> Array:
+	match node[0]:
+		Lisper.TType.LIST, Lisper.TType.ARRAY, Lisper.TType.MAP:
+			var body := (node[1] as Array).map(func (n): return Lisper._gsm_replace(inserts, n))
+			return [node[0], body]
+		TType.TOKEN:
+			if node[1].begins_with(":gsm-insert-"):
+				var idx := int(node[1].rsplit('-', true, 1)[1])
+				return Lisper.Raw(inserts[idx])
+	return node
+
 static func test_parser() -> void:
 	print(Lisper.tokenize("1 0 .5 10 204.2 3.30"))
 	print(Lisper.tokenize("#t #f#t"))
