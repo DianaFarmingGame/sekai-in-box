@@ -39,7 +39,7 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("2_l2l10")
 define_gss = "res://test/gss/define_entry.gss.txt"
-entry_gss = "res://test/gss/test/dev-ls/entry.gss.txt"
+entry_gss = "res://test/gss/test/merge-ui/entry.gss.txt"
 root_dir = "res://test"
 unit_size = Vector3(64, 64, 64)
 
