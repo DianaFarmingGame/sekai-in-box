@@ -1,3 +1,5 @@
+; {drops: [{itemID: stringName, min_count: int, max_count: int, probability: [float]}, ...]}}
+
 (block
 	(csv/map-let (str/concat [*config_dir* "drop.csv"])
 		[破坏方块 掉落 数量 概率] 
