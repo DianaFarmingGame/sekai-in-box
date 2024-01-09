@@ -3,10 +3,9 @@
 ;; desc String
 
 (block
-	(csv/map-let (str/concat [*config_dir* "craft.csv"])
+	(csv/map-let (str/concat [*config_dir* "enhance.csv"])
 		[需求物品 合成物品 描述]
-		(dbs/define ["合成" (@ (string/split 合成物品 ":") 0) {
-
+		(dbs/define ["附魔" (@ (string/split 合成物品 ":") 0) {
 			need ( => 需求物品
 				(string/split ";")
 				(array/filter (func [l] (!= l "")))

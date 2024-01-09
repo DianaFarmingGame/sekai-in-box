@@ -3,10 +3,9 @@
 ;; desc String
 
 (block
-	(csv/map-let (str/concat [*config_dir* "craft.csv"])
-		[需求物品 合成物品 描述]
-		(dbs/define ["合成" (@ (string/split 合成物品 ":") 0) {
-
+	(csv/map-let (str/concat [*config_dir* "cook.csv"])
+		[需求物品 合成物品 描述 消耗燃料 合成时间]
+		(dbs/define ["烹饪" (@ (string/split 合成物品 ":") 0) {
 			need ( => 需求物品
 				(string/split ";")
 				(array/filter (func [l] (!= l "")))
@@ -24,6 +23,13 @@
 			)
 
 			desc 描述
+
+			fuel ( => 消耗燃料
+				(string/split ":")
+				(array/map string/trim)
+			)
+			
+			time (num 合成时间)
 		}])
 	)
 )
