@@ -4,5 +4,6 @@
 (gss/exec "gss/configurator/craft.gss.txt")
 (gss/exec "gss/configurator/cook.gss.txt")
 (gss/exec "gss/configurator/enhance.gss.txt")
+(gss/exec "gss/configurator/drop.gss.txt")
 
 (gss/exec "gss/test/dev-configs/item_test.gss.txt")

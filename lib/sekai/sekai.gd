@@ -271,6 +271,9 @@ func make_lisper_context() -> LisperContext:
 		&"dbs/setp": Lisper.FuncGDCallPure( func (body: Array) -> void:
 			dbs_setp(body[0], body[1], body[2], body[3])
 			),
+		&"dbs/pushp": Lisper.FuncGDCallPure( func (body: Array) -> void:
+			dbs_pushp(body[0], body[1], body[2], body[3])
+			),
 	})
 	return context
 
@@ -311,6 +314,16 @@ func dbs_setp(group: StringName, key: StringName, props: StringName, value) -> v
 	else:
 		database_static[group] = database_static[group] if database_static.has(group) else {}
 		database_static[group][key] = {props: value}
+	return
+
+func dbs_pushp(group: StringName, key: StringName, props: StringName, value) -> void:
+	if database_static.has(group) and database_static[group].has(key):
+		var data = database_static[group][key]
+		assert(data is Dictionary)
+		data[props].append(value)
+	else:
+		database_static[group] = database_static[group] if database_static.has(group) else {}
+		database_static[group][key] = {props: [value]}
 	return
 
 func load_csgv(path: String) -> Array:
