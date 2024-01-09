@@ -153,18 +153,24 @@ func compile_map(ctx: LisperContext, body: Array) -> Array:
 	return cdata
 
 func compile_keyword_mask_1(ctx: LisperContext, body: Array) -> Array:
-	var kw := ctx.exec_as_keyword(body[0]) as StringName
-	var rest := await ctx.compiles(body.slice(1))
-	var cdata := [Lisper.Raw(kw)]
-	cdata.append_array(rest)
+	var cdata := []
+	var cid := 0
+	for n in body:
+		if Lisper.is_flag(n): cdata.append(n); continue
+		if cid == 0: cdata.append(Lisper.Raw(ctx.exec_as_keyword(n)))
+		else: cdata.append(await ctx.compile(n))
+		cid += 1
 	return cdata
 
 func compile_keyword_mask_01(ctx: LisperContext, body: Array) -> Array:
-	var arg0 := await ctx.compile(body[0])
-	var kw := ctx.exec_as_keyword(body[1]) as StringName
-	var rest := await ctx.compiles(body.slice(2))
-	var cdata := [arg0, Lisper.Raw(kw)]
-	cdata.append_array(rest)
+	var cdata := []
+	var cid := 0
+	for n in body:
+		if Lisper.is_flag(n): cdata.append(n); continue
+		if cid == 0: cdata.append(await ctx.compile(n))
+		if cid == 1: cdata.append(Lisper.Raw(ctx.exec_as_keyword(n)))
+		else: cdata.append(await ctx.compile(n))
+		cid += 1
 	return cdata
 
 func def_commons(context: LisperContext) -> void:

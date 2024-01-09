@@ -18,9 +18,18 @@ defvar (:const *const_var* "hello")
 
 defunc (:const const_fn [] " world")
 
-defunc (:const :pure pure_fn [name] #("hello " + name))
+defunc (:const :pure pure_fn [name] #(*const_var* + " " + name))
 
 tester (raw(
 	func ([x]
 		#(x + (*const_var* + #:const_fn()) + #:pure_fn("gss")))
 ))
+
+defunc (fn-factory [x]
+	defvar (:const *x* x)
+	func ([y]
+		#(*x* + y)
+	)
+)
+
+echo(fn-factory(10)(20)) ; => 30

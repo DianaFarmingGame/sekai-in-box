@@ -13,6 +13,8 @@ static func List(nodes: Array) -> Array: return [TType.LIST, nodes]
 
 static func Token(name: StringName) -> Array: return [TType.TOKEN, name]
 
+static func is_flag(node: Variant) -> bool: return is_node(node) and TType.TOKEN == node[0] and node[1].begins_with(':')
+
 static func Keyword(name: StringName) -> Array: return [TType.KEYWORD, name]
 
 static func String(content: String) -> Array: return [TType.STRING, content]
