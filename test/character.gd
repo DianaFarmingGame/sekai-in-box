@@ -55,6 +55,7 @@ func do_merge(sets: Array[Dictionary]) -> Array[Dictionary]:
 						await drop.callm(&"container_pick", item)
 				if drop.getp("contains").size() == 0:
 					drop.destroy()
+					
 			pass,
 		
 		&"on_contains": func (sekai: Sekai, this: Mono, contains: Array) -> Array:

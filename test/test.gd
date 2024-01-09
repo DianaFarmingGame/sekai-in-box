@@ -121,6 +121,7 @@ func _ready() -> void:
 			select.hide()
 			return choose[0],
 		&"itembox_update": func (_sekai, _this, contains: Array) -> void:
+			print("111")
 			item_box.clear()
 			for item in contains:
 				var vname := item.getp(&"name") as String
