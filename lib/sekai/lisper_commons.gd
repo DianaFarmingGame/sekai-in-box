@@ -285,15 +285,22 @@ func def_commons(context: LisperContext) -> void:
 			var handle = args[1]
 			if not ctx.check_valid_handle(handle): return null
 			return await Async.array_map(range(size), func (i): return await ctx.call_fn(handle, [i]))),
-		&"func": Lisper.FnGDMacro( func (ctx: LisperContext, body: Array) -> Array:
-			var args := []
-			var args_src = body[0][1]
-			var idx := 0
-			while idx < args_src.size():
-				var node = args_src[idx]
-				args.append(ctx.exec_as_keyword(node))
-				idx += 1
-			return Lisper.Raw([Lisper.FnType.LP_CALL, args, body.slice(1)])),
+		&"func": Lisper.FnGDRaw( func (ctx: LisperContext, body: Array, comptime: bool) -> Variant:
+			if comptime: return body
+			var res := ctx.strip_flags(body)
+			var type: Lisper.FnType = Lisper.FnType.LP_CALL
+			if res[0].has(&":pure"):
+				type = Lisper.FnType.LP_CALL_PURE
+			body = res[1]
+			var args := body[0][1].map(ctx.exec_as_keyword) as Array
+			var tbody := await ctx.compiles(body.slice(1))
+			return [type, args, tbody]),
+		&"func/echo": Lisper.FnGDApply( func (ctx: LisperContext, args: Array) -> Variant:
+			var handle := args[0] as Array
+			var msg := "func ([" + ' '.join(handle[1]) + "]\n      " + ctx.stringifys(handle[2], 6) + ')'
+			var lines := msg.split('\n')
+			print('\n'.join(Array(lines).map(func (l): return ctx.print_head + l)))
+			return args[0]),
 		&"keyword": Lisper.FnGDCallP( func (value: Variant) -> StringName:
 			return StringName(value)),
 		&"num": Lisper.FnGDCallP( func (value: Variant) -> float:
@@ -397,11 +404,30 @@ func def_commons(context: LisperContext) -> void:
 			return (await ctx.execs(args))[-1]),
 		&"defvar": Lisper.FnGDRaw( func (ctx: LisperContext, body: Array, comptime: bool) -> Variant:
 			if comptime: return await compile_keyword_mask_1(ctx, body)
-			else:
-				var vname := ctx.exec_as_keyword(body[0]) as StringName
-				var data = await ctx.exec(body[1])
-				ctx.def_var([], vname, data)
-				return null), # TODO
+			var res := ctx.strip_flags(body)
+			var flags: Array[Lisper.VarFlag] = []
+			for f in res[0]:
+				match f:
+					&":const": flags.append(Lisper.VarFlag.CONST)
+					&":fix": flags.append(Lisper.VarFlag.FIX)
+			body = res[1]
+			var vname := ctx.exec_as_keyword(body[0]) as StringName
+			var data = await ctx.exec(body[1])
+			ctx.def_var(flags, vname, data)
+			return null),
+		&"defunc": Lisper.FnGDMacro( func (ctx: LisperContext, body: Array) -> Array:
+			var res := ctx.strip_flags(body)
+			var var_flags := []
+			var fn_flags := []
+			for f in res[0]:
+				match f:
+					&":const", &":fix": var_flags.append(f)
+					&":pure": fn_flags.append(f)
+			body = res[1]
+			return Lisper.Call(&"defvar", [var_flags.map(Lisper.Token), [
+				body[0],
+				Lisper.Call(&"func", [fn_flags.map(Lisper.Token), body.slice(1)]),
+			]])),
 		&"do": Lisper.FnGDRaw( func (ctx: LisperContext, body: Array, comptime: bool) -> Variant:
 			if comptime: return await compile_keyword_mask_01(ctx, body)
 			else:

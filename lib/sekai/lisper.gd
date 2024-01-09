@@ -92,21 +92,24 @@ enum TType {
 
 ## 函数类型
 enum FnType {
-	## Raw型Callable，首位传入执行上下文
-	## 慎用: 实现较复杂，且需要手动维持词法作用域
+	## Raw型Callable, 首位传入执行上下文
+	## 慎用: 实现较复杂, 且需要手动维持词法作用域
 	GD_RAW,
 	## Macro型Callable
 	GD_MACRO,
 	## 一般Callable
 	GD_CALL,
-	## 一般Callable(纯函数，输出与输入绝对对应且无副作用)
+	## 一般Callable(纯函数, 输出与输入绝对对应且无副作用)
 	GD_CALL_PURE,
-	## 一般Callable，传入参数为数组形式，首位传入执行上下文
+	## 一般Callable, 传入参数为数组形式, 首位传入执行上下文
 	GD_APPLY,
-	## 一般Callable，传入参数为数组形式，首位传入执行上下文(纯函数，输出与输入绝对对应且无副作用)
+	## 一般Callable, 传入参数为数组形式, 首位传入执行上下文(纯函数, 输出与输入绝对对应且无副作用)
 	GD_APPLY_PURE,
 	
+	## 一般Lisper函数
 	LP_CALL,
+	## 一般Lisper函数(纯函数, 输出与输入绝对对应且无副作用)
+	LP_CALL_PURE,
 }
 
 ## 变量标记

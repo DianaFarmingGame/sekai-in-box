@@ -1,0 +1,26 @@
+defunc (tester [expr]
+	echo_rich("[color=green][b]================================[/b][/color]")
+	raw/echo(expr)
+	echo_rich("[color=teal]↑↑ Raw ↑↑ --------- ↓↓ Evaled ↓↓[/color]")
+	func/echo(eval(expr))
+)
+
+tester (raw(
+	func ([] +(1 2))
+))
+
+tester (raw(
+	func ([x y]
+		#((1 * 6 + x) * y))
+))
+
+defvar (:const *const_var* "hello")
+
+defunc (:const const_fn [] " world")
+
+defunc (:const :pure pure_fn [name] #("hello " + name))
+
+tester (raw(
+	func ([x]
+		#(x + (*const_var* + #:const_fn()) + #:pure_fn("gss")))
+))

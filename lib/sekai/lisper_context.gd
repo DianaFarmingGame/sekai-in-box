@@ -168,7 +168,7 @@ func call_rawfn(handle: Array, body: Array) -> Variant:
 		Lisper.FnType.GD_APPLY, Lisper.FnType.GD_APPLY_PURE:
 			var vargs := await execs(body)
 			return await handle[1].call(self, vargs)
-		Lisper.FnType.LP_CALL:
+		Lisper.FnType.LP_CALL, Lisper.FnType.LP_CALL_PURE:
 			var fctx := fork()
 			var args := handle[1] as Array
 			if args.size() != body.size():
@@ -197,7 +197,7 @@ func call_fn(handle: Array, vargs: Array) -> Variant:
 			return await handle[1].callv(vargs)
 		Lisper.FnType.GD_APPLY, Lisper.FnType.GD_APPLY_PURE:
 			return await handle[1].call(self, vargs)
-		Lisper.FnType.LP_CALL:
+		Lisper.FnType.LP_CALL, Lisper.FnType.LP_CALL_PURE:
 			var fctx := fork()
 			var args := handle[1] as Array
 			if args.size() != vargs.size():
@@ -231,7 +231,9 @@ var _flag_pure_rollback := false
 func check_valid_handle(handle: Array) -> bool:
 	if _flag_comptime:
 		match handle[0]:
-			Lisper.FnType.GD_CALL_PURE, Lisper.FnType.GD_APPLY_PURE:
+			Lisper.FnType.GD_CALL_PURE, \
+			Lisper.FnType.GD_APPLY_PURE, \
+			Lisper.FnType.LP_CALL_PURE:
 				return true
 		_flag_pure_rollback = true
 		return false
@@ -272,7 +274,9 @@ func compile(node: Array) -> Array:
 							var res = await handle[1].call(self, body)
 							_flag_comptime = false
 							return await compile(res)
-						Lisper.FnType.GD_CALL_PURE, Lisper.FnType.GD_APPLY_PURE:
+						Lisper.FnType.GD_CALL_PURE, \
+						Lisper.FnType.GD_APPLY_PURE, \
+						Lisper.FnType.LP_CALL_PURE:
 							body = await compiles(body)
 							if body.all(Lisper.is_raw):
 								var cdata := [head]
@@ -399,5 +403,15 @@ func stringify(node: Array, indent := 0) -> String:
 	push_error("unknown typed node: ", node)
 	return "<unknown>"
 
-func stringifys(body: Array) -> String:
-	return ' '.join(body.map(stringify))
+func stringifys(body: Array, indent := 0) -> String:
+	return ' '.join(body.map(func (n): return stringify(n, indent)))
+
+func strip_flags(body: Array) -> Array:
+	var nbody := []
+	var flags := []
+	for n in body:
+		if n[0] == Lisper.TType.TOKEN and (n[1] as StringName).begins_with(':'):
+			flags.append(n[1])
+		else:
+			nbody.append(n)
+	return [flags, nbody]
