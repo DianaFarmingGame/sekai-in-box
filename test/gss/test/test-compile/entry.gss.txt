@@ -34,3 +34,25 @@ tester(raw(
 		:expand array/concat(["a" "b"] outer_call())
 	)))
 ))
+
+defunc (:const :pure plus [x] #(x + 1))
+
+tester(raw(
+	array/map ([1 2 3] plus)
+))
+
+tester(raw(
+	array/concat ([1 2 3] [4 5 6])
+))
+
+defunc(:const :pure filter [x] #(x > 2))
+
+tester(raw(
+	array/filter ([1 2 3 4 5] filter)
+))
+
+; TODO: test let
+
+tester(raw(
+	array/slice ([1 2 3 4 5] 1 3)
+))
