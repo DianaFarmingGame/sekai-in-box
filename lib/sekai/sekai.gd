@@ -52,11 +52,12 @@ func _draw() -> void:
 	_next_nearest = INF
 	_min_count = min_inits_per_frame
 	var cpos := Vector3()
+	var usize2 := Vector2(unit_size.x, unit_size.y)
 	if cam_target is Vector3: cpos = cam_target
 	elif cam_target is Mono: cpos = cam_target.position
 	var pos := Vector2(cpos.x, cpos.y - (cpos.z * unit_size.y) / unit_size.z)
-	var offset := -pos + (Vector2(size) * 0.5) / Vector2(unit_size.x, unit_size.y)
-	var box := Rect2(-offset, size / Vector2(unit_size.x, unit_size.y)).grow(render_border_radius)
+	var offset := -pos + (Vector2(size) * 0.5).floor() / usize2
+	var box := Rect2(-offset, size / usize2).grow(render_border_radius)
 	_cam_pos = pos
 	_item_offset = offset
 	_render_box = box
