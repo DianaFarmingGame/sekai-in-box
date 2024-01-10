@@ -1,20 +1,27 @@
-class_name Sekai extends Node2D
+class_name Sekai extends Control
 
 @export_file var define_gss: String
 @export_file var entry_gss: String
 @export_dir var root_dir: String
+@export var render_border_radius := 4
+@export var min_inits_per_frame := 8
 
 var defines: Array[MonoDefine]
 var defines_by_id := {}
 var gss_ctx: LisperContext
+var proc_ctx: ProcedureContext
 var monos := []
 var monos_need_route := []
 var monos_need_collision := []
 var control_target = null
+@export var cam_target = Vector2()
+var control_stack := []
 
 @export var unit_size := Vector3(16, 16, 12)
 
 var external_fns := {}
+
+var database_static := {}
 
 static var root_vars := {
 	&"MonoDefine": MonoDefine.new(),
@@ -39,6 +46,49 @@ func _ready() -> void:
 	tree.process_frame.connect(func (): before_process.emit())
 	input_mapper.updated.connect(_on_input)
 
+func _process(_delta: float) -> void:
+	queue_redraw()
+
+var _item_offset := Vector2()
+var _cam_pos := Vector2()
+var _render_box := Rect2()
+var _frame_time := 0.0
+var _min_count := 0
+var _cur_nearest: float = INF
+var _next_nearest: float = INF
+
+func _draw() -> void:
+	_cur_nearest = _next_nearest
+	_next_nearest = INF
+	_min_count = min_inits_per_frame
+	var cpos := Vector3()
+	if cam_target is Vector3: cpos = cam_target
+	elif cam_target is Mono: cpos = cam_target.position
+	var pos := Vector2(cpos.x, cpos.y - (cpos.z * unit_size.y) / unit_size.z)
+	var offset := -pos + (Vector2(size) * 0.5) / Vector2(unit_size.x, unit_size.y)
+	var box := Rect2(-offset, size / Vector2(unit_size.x, unit_size.y)).grow(render_border_radius)
+	_cam_pos = pos
+	_item_offset = offset
+	_render_box = box
+	_frame_time = Time.get_ticks_usec()
+
+func is_idle(pos: Vector2) -> bool:
+	var ne := _cam_pos.distance_squared_to(pos)
+	if 1 < (_cur_nearest + 1) / ne:
+		_min_count -= 1
+		return _min_count >= 0 or Time.get_ticks_usec() - _frame_time < 10_000
+	return false
+
+func update_padding_pos(pos: Vector2) -> void:
+	var ne := _cam_pos.distance_squared_to(pos)
+	if ne < _next_nearest: _next_nearest = ne
+
+func get_item_offset() -> Vector2:
+	return _item_offset
+
+func get_render_box() -> Rect2:
+	return _render_box
+
 func _exit_tree() -> void:
 	_clear_monos()
 
@@ -51,6 +101,13 @@ func _clear_monos() -> void:
 signal input_updating(triggered: Dictionary, pressings: Dictionary, releasings: Dictionary)
 
 signal input_updated(triggered: Dictionary, pressings: Dictionary, releasings: Dictionary)
+
+func cover_control(control = null) -> void:
+	control_stack.append(control_target)
+	control_target = control
+
+func uncover_control() -> void:
+	control_target = control_stack.pop_back()
 
 var _block_input := false
 
@@ -76,6 +133,8 @@ func _init_sekai() -> void:
 	defines.clear()
 	defines_by_id.clear()
 	gss_ctx = make_lisper_context()
+	proc_ctx = ProcedureContext.extend(gss_ctx)
+	ProcedureCommons.def_commons(proc_ctx)
 	_clear_monos()
 	control_target = null
 	if define_gss: exec_gss(define_gss)
@@ -107,11 +166,13 @@ func make_lisper_context() -> LisperContext:
 			else:
 				ctx.log_error(body[0], str("define/make: ", body[0], " is not a valid token"))
 				return null),
-		&"define/sign": Lisper.FuncGDRaw( func (ctx: LisperContext, body: Array) -> Variant:
-			var def = ctx.exec_node(body[0])
-			sign_define(def)
-			return def),
-		&"mono/make": Lisper.FuncGDRaw( func (ctx: LisperContext, body: Array) -> Mono:
+		&"define/sign": Lisper.FuncGDCall( func (define: MonoDefine) -> MonoDefine:
+			sign_define(define)
+			return define),
+		&"mono/add": Lisper.FuncGDCall( func (mono: Variant) -> Variant:
+			add_mono(mono)
+			return mono),
+		&"mono/make": Lisper.FuncGDRawPure( func (ctx: LisperContext, body: Array) -> Mono:
 			var mono_class = ctx.exec_node(body[0])
 			if mono_class != null:
 				var define = get_define(ctx.exec_node(body[1]))
@@ -130,14 +191,14 @@ func make_lisper_context() -> LisperContext:
 			else:
 				ctx.log_error(body[0], str("mono/make: ", body[0], " is not a valid token"))
 				return null),
-		&"mono": Lisper.FuncGDRaw( func (ctx: LisperContext, body: Array) -> Mono:
-			var mono = ctx.exec_node(Lisper.Call(&"mono/make", [body]))
-			add_mono(mono)
-			return mono),
-		&"mono_map": Lisper.FuncGDRaw( func (ctx: LisperContext, body: Array) -> MonoMap:
-			var map = ctx.exec_node(Lisper.Call(&"mono_map/make", [body]))
-			add_mono(map)
-			return map),
+		&"mono": Lisper.FuncGDMacro( func (body: Array) -> Array:
+			return Lisper.Call(&"mono/add", [
+				[Lisper.Call(&"mono/make", [body])],
+			])),
+		&"mono_map": Lisper.FuncGDMacro( func (body: Array) -> Array:
+			return Lisper.Call(&"mono/add", [
+				[Lisper.Call(&"mono_map/make", [body])],
+			])),
 		&"Define": Lisper.FuncGDMacro( func (body: Array) -> Array:
 			return Lisper.Call(&"defvar", [
 				[body[0]],
@@ -168,30 +229,51 @@ func make_lisper_context() -> LisperContext:
 			return mono),
 		&"control/clear": Lisper.FuncGDCall( func () -> void:
 			control_target = null),
+		&"cam/set": Lisper.FuncGDCall( func (mono: Mono) -> Mono:
+			cam_target = mono
+			return mono),
+		&"cam/clear": Lisper.FuncGDCall( func () -> void:
+			cam_target = null),
 		&"load": Lisper.FuncGDCallPure( func (path: String) -> Resource:
 			return get_assert(path)),
 		&"define/load": Lisper.FuncGDCallPure( func (path: String) -> Resource:
 			return get_assert(path).new()),
 		&"gss/exec": Lisper.FuncGDCallPure( func (path: String) -> void:
 			exec_gss(root_dir.path_join(path))),
-		&"mono_map/make": Lisper.FuncGDCallPure( func (offset: Vector3, cell_size: Vector3, size: Vector2, data := []) -> MonoMap:
+		&"mono_map/make": Lisper.FuncGDCallPure( func (offset: Vector3, cell_size: Vector3, psize: Vector2, data := []) -> MonoMap:
 			var map := MonoMap.new()
 			map.sekai = self
 			map.offset = offset
 			map.cell_size = cell_size
-			map.size = size
+			map.size = psize
 			map.data = PackedInt32Array(data)
 			return map),
 		&"csgv/load": Lisper.FuncGDRaw( func (ctx: LisperContext, body: Array) -> Array:
 			var src := ctx.exec_node(body[0]) as String
 			return load_csgv(root_dir.path_join(src))),
 		&"csgv/map-let": Lisper.FuncGDMacro( func (body: Array) -> Array:
-			return Lisper.Call(&"array/map", [[
+			return Lisper.Call(&"array/map-let", [[
 				Lisper.Call(&"csgv/load", [[body[0]]]),
-				Lisper.Func([&"$record"], [[
-					Lisper.Call(&"array/let", [[Lisper.Token(&"$record"), body[1]], body.slice(2)])
-				]]),
-			]])),
+			], body.slice(1)])),
+		&"csv/load": Lisper.FuncGDRaw( func (ctx: LisperContext, body: Array) -> Array:
+			var src := ctx.exec_node(body[0]) as String
+			return load_csv(root_dir.path_join(src))),
+		&"csv/map-let": Lisper.FuncGDMacro( func (body: Array) -> Array:
+			return Lisper.Call(&"array/map-let", [[
+				Lisper.Call(&"csv/load", [[body[0]]]),
+			], body.slice(1)])),
+		&"dbs/define": Lisper.FuncGDCallPure( func (body: Array) -> void:
+			dbs_define(body[0], body[1], body[2])
+			),
+		&"dbs/getp": Lisper.FuncGDCallPure( func (body: Array) -> Variant:
+			return dbs_getp(body[0], body[1], body[2])
+			),
+		&"dbs/setp": Lisper.FuncGDCallPure( func (body: Array) -> void:
+			dbs_setp(body[0], body[1], body[2], body[3])
+			),
+		&"dbs/pushp": Lisper.FuncGDCallPure( func (body: Array) -> void:
+			dbs_pushp(body[0], body[1], body[2], body[3])
+			),
 	})
 	return context
 
@@ -212,13 +294,55 @@ func exec_gss(path: String) -> void:
 	print_rich("[sekai] ", _line_head_end(), "[color=gray]", (Time.get_ticks_usec() - stime) / 1000.0, " ms[/color]")
 	_indent -= 1
 
+func dbs_define(group: StringName, key: StringName, value: Dictionary) -> void:
+	database_static[group] = database_static[group] if database_static.has(group) else {}
+	database_static[group][key] = value
+
+func dbs_getp(group: StringName, key: StringName, props: StringName) -> Variant:
+	if database_static.has(group) and database_static[group].has(key):
+		var data = database_static[group][key]
+		assert(data is Dictionary)
+		return data[props] if data.has(props) else null
+	else:
+		return null
+
+func dbs_setp(group: StringName, key: StringName, props: StringName, value) -> void:
+	if database_static.has(group) and database_static[group].has(key):
+		var data = database_static[group][key]
+		assert(data is Dictionary)
+		data[props] = value
+	else:
+		database_static[group] = database_static[group] if database_static.has(group) else {}
+		database_static[group][key] = {props: value}
+	return
+
+func dbs_pushp(group: StringName, key: StringName, props: StringName, value) -> void:
+	if database_static.has(group) and database_static[group].has(key):
+		var data = database_static[group][key]
+		assert(data is Dictionary)
+		data[props].append(value)
+	else:
+		database_static[group] = database_static[group] if database_static.has(group) else {}
+		database_static[group][key] = {props: [value]}
+	return
+
 func load_csgv(path: String) -> Array:
 	var content := []
 	var file := FileAccess.open(path, FileAccess.READ)
+	file.get_csv_line()
 	var _head := file.get_csv_line()
 	while file.get_position() < file.get_length():
 		content.append(Array(file.get_csv_line()).map(func (entry: String):
 			return gss_ctx.eval(entry.replace('“', '"').replace('”', '"'))[0]))
+	return content
+
+func load_csv(path: String) -> Array:
+	var content := []
+	var file := FileAccess.open(path, FileAccess.READ)
+	file.get_csv_line()
+	var _head := file.get_csv_line()
+	while file.get_position() < file.get_length():
+		content.append(Array(file.get_csv_line()))
 	return content
 
 func sign_define(define: MonoDefine) -> void:
@@ -329,7 +453,8 @@ func save_to_path(path: String) -> void:
 		&"define_gss": define_gss,
 		&"root_dir": root_dir,
 		&"monos": vmono,
-		&"control_target": monos.find(control_target) if control_target != null else null,
+		&"control_target": monos.find(control_target) if control_target is Mono else control_target,
+		&"cam_target": monos.find(cam_target) if cam_target is Mono else cam_target,
 		&"unit_size": unit_size,
 	}
 	file.store_var(save_data, false)
@@ -353,8 +478,10 @@ func load_from_path(path: String) -> void:
 		var mono = script.new()
 		mono.from_data(self, data)
 		add_mono(mono)
-	var target = load_data[&"control_target"]
-	control_target = monos[target] if target != null else null
+	var vcontrol_target = load_data[&"control_target"]
+	control_target = monos[vcontrol_target] if vcontrol_target is int else vcontrol_target
+	var vcam_target = load_data[&"cam_target"]
+	cam_target = monos[vcam_target] if vcam_target is int else vcam_target
 	var stime := Time.get_ticks_usec()
 	for mono in monos: mono._on_restore()
 	print_rich("[sekai] restore in ", (Time.get_ticks_usec() - stime) / 1000.0, " ms")

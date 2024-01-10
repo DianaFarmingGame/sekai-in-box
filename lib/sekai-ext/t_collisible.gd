@@ -25,10 +25,12 @@ var props := {
 }
 
 static func draw_debug(sekai: Sekai, this: Mono, item: SekaiItem) -> void:
-	if this.getp(&"collisible") and floori(this.position.z) == floori(sekai.control_target.position.z):
-		var pos := Vector2(this.position.x, this.position.y - this.position.z * item.ratio_yz)
-		var rboxes = this.getp(&"collision_boxes")
-		for rbox in rboxes:
-			var box := Rect2(pos + rbox.position, rbox.size)
-			item.draw_rect(box, 0xff000044)
-			item.draw_rect(box, 0xff0000ff, false)
+	var tar := sekai.control_target as Mono
+	if tar != null:
+		if this.getp(&"collisible") and floori(this.position.z) == floori(tar.position.z):
+			var pos := Vector2(this.position.x, this.position.y - this.position.z * item.ratio_yz)
+			var rboxes = this.getp(&"collision_boxes")
+			for rbox in rboxes:
+				var box := Rect2(pos + rbox.position, rbox.size)
+				item.draw_rect(box, 0xff000044)
+				item.draw_rect(box, 0xff0000ff, false)

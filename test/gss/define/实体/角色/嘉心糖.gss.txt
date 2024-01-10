@@ -1,5 +1,5 @@
 (define (define/load "gss/define/实体/角色/嘉心糖.gd")
-	ref 200
+	ref 1100
 	id &实体/角色/嘉心糖
 	props {
 		name "嘉心糖"

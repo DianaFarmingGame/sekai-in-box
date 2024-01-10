@@ -1,5 +1,5 @@
 (define Character
-	ref 201
+	ref 1101
 	id &实体/角色/嘉然
 	props {
 		name "嘉然"
