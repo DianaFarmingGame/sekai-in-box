@@ -8,18 +8,18 @@ var props := {
 	&"on_init": Prop.puts({
 		&"0:state": func (_sekai, this: Mono):
 			var init_state = this.getp(&"init_state")
-			this.callm(&"state_to", init_state),
+			await this.callm(&"state_to", init_state),
 	}),
 	&"on_store": Prop.puts({
 		&"0:state": func (_sekai, this: Mono):
 			var cur_state = this.getp(&"cur_state")
 			this.setp(&"init_state", cur_state)
-			this.callm(&"state_to", null),
+			await this.callm(&"state_to", null),
 	}),
 	&"on_restore": Prop.puts({
 		&"0:state": func (_sekai, this: Mono):
 			var init_state = this.getp(&"init_state")
-			this.callm(&"state_to", init_state),
+			await this.callm(&"state_to", init_state),
 	}),
 	&"state_to": func (sekai: Sekai, this: Mono, dist: Variant) -> void:
 		var state_data = this.getp(&"state_data")
@@ -28,14 +28,14 @@ var props := {
 		if prev != null:
 			var prev_data = state_data[prev]
 			var exit = prev_data.get(&"on_exit")
-			if exit != null: sekai.gss_ctx.call_anyway_async(exit, [sekai, this, dist])
+			if exit != null: await sekai.gss_ctx.call_anyway(exit, [sekai, this, dist])
 			this.uncover(&"state")
 		if dist != null:
 			var dist_data = state_data[dist]
 			var cover = dist_data.get(&"cover")
 			var enter = dist_data.get(&"on_enter")
 			if cover != null: this.cover(&"state", cover)
-			if enter != null: sekai.gss_ctx.call_anyway_async(enter, [sekai, this, prev])
+			if enter != null: await sekai.gss_ctx.call_anyway(enter, [sekai, this, prev])
 		this.setp(&"cur_state", dist),
 	&"state_data": {},
 }

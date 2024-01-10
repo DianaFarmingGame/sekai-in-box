@@ -1,19 +1,19 @@
-extends CanvasLayer
+extends Control
 
 func set_character_name(value: String):
-	$name.text = value
+	$TextureRect/name.text = value
 	
 func set_content(value: String):
-	$content.text = value
+	$TextureRect/content.text = value
 	
 func set_character_texture(value: Texture):
-	$character.texture = value
+	$TextureRect/character.texture = value
 
 func set_visiable_content(value: int):
-	$content.visible_characters = value
+	$TextureRect/content.visible_characters = value
 	
 func get_visiable_character_count():
-	return $content.visible_characters
+	return $TextureRect/content.visible_characters
 	
 func get_total_character_count():
-	return $content.get_total_character_count()
+	return $TextureRect/content.get_total_character_count()

@@ -57,7 +57,7 @@
 	嘉心糖 嘉然)
 
 ; 测试：掉落物/背包
-#;(block
+(block
 	(gss/exec "gss/test/dev-ls/scroll.gss.txt")
 	(mono MonoEntity &drop
 		props {

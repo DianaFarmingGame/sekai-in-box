@@ -9,13 +9,12 @@ class_name Sekai extends Control
 var defines: Array[MonoDefine]
 var defines_by_id := {}
 var gss_ctx: LisperContext
-var proc_ctx: ProcedureContext
 var monos := []
 var monos_need_route := []
 var monos_need_collision := []
 var control_target = null
-@export var cam_target = Vector2()
 var control_stack := []
+@export var cam_target = Vector2()
 
 @export var unit_size := Vector3(16, 16, 12)
 
@@ -133,12 +132,10 @@ func _init_sekai() -> void:
 	defines.clear()
 	defines_by_id.clear()
 	gss_ctx = make_lisper_context()
-	proc_ctx = ProcedureContext.extend(gss_ctx)
-	ProcedureCommons.def_commons(proc_ctx)
 	_clear_monos()
 	control_target = null
-	if define_gss: exec_gss(define_gss)
-	if entry_gss: exec_gss(entry_gss)
+	if define_gss: await exec_gss(define_gss)
+	if entry_gss: await exec_gss(entry_gss)
 	var stime := Time.get_ticks_usec()
 	for mono in monos:
 		mono._on_init()
@@ -146,16 +143,17 @@ func _init_sekai() -> void:
 	print()
 
 func make_lisper_context() -> LisperContext:
-	var context := LisperCommons.fork()
+	var context := LisperContext.new()
+	LisperCommons.def_commons(context)
 	
 	context.def_vars([Lisper.VarFlag.CONST, Lisper.VarFlag.FIX], root_vars)
 	
 	context.def_vars([Lisper.VarFlag.CONST, Lisper.VarFlag.FIX], {
 		&"define/make": Lisper.FuncGDRawPure( func (ctx: LisperContext, body: Array) -> Variant:
-			var def = ctx.exec_node(body[0])
+			var def = await ctx.exec_node(body[0])
 			if def != null:
 				def = def.fork()
-				var args = ctx.exec_map_part(body.slice(1))
+				var args = await ctx.exec_map_part(body.slice(1))
 				for k in args.keys():
 					match k:
 						&"props":
@@ -173,14 +171,14 @@ func make_lisper_context() -> LisperContext:
 			add_mono(mono)
 			return mono),
 		&"mono/make": Lisper.FuncGDRawPure( func (ctx: LisperContext, body: Array) -> Mono:
-			var mono_class = ctx.exec_node(body[0])
+			var mono_class = await ctx.exec_node(body[0])
 			if mono_class != null:
-				var define = get_define(ctx.exec_node(body[1]))
+				var define = get_define(await ctx.exec_node(body[1]))
 				if define == null: return null
 				var mono := mono_class.new() as Mono
 				mono.sekai = self
 				mono.define = define
-				var args = ctx.exec_map_part(body.slice(2))
+				var args = await ctx.exec_map_part(body.slice(2))
 				for k in args.keys():
 					match k:
 						&"props":
@@ -249,14 +247,14 @@ func make_lisper_context() -> LisperContext:
 			map.data = PackedInt32Array(data)
 			return map),
 		&"csgv/load": Lisper.FuncGDRaw( func (ctx: LisperContext, body: Array) -> Array:
-			var src := ctx.exec_node(body[0]) as String
+			var src := await ctx.exec_node(body[0]) as String
 			return load_csgv(root_dir.path_join(src))),
 		&"csgv/map-let": Lisper.FuncGDMacro( func (body: Array) -> Array:
 			return Lisper.Call(&"array/map-let", [[
 				Lisper.Call(&"csgv/load", [[body[0]]]),
 			], body.slice(1)])),
 		&"csv/load": Lisper.FuncGDRaw( func (ctx: LisperContext, body: Array) -> Array:
-			var src := ctx.exec_node(body[0]) as String
+			var src := await ctx.exec_node(body[0]) as String
 			return load_csv(root_dir.path_join(src))),
 		&"csv/map-let": Lisper.FuncGDMacro( func (body: Array) -> Array:
 			return Lisper.Call(&"array/map-let", [[
@@ -290,7 +288,7 @@ func exec_gss(path: String) -> void:
 	print_rich("[sekai] ", _line_head_body(), "[color=green][b]gss: ", path, "[/b][/color]")
 	_indent += 1
 	var stime := Time.get_ticks_usec()
-	gss_ctx.eval(expr)
+	await gss_ctx.eval(expr)
 	print_rich("[sekai] ", _line_head_end(), "[color=gray]", (Time.get_ticks_usec() - stime) / 1000.0, " ms[/color]")
 	_indent -= 1
 
@@ -333,7 +331,7 @@ func load_csgv(path: String) -> Array:
 	var _head := file.get_csv_line()
 	while file.get_position() < file.get_length():
 		content.append(Array(file.get_csv_line()).map(func (entry: String):
-			return gss_ctx.eval(entry.replace('“', '"').replace('”', '"'))[0]))
+			return (await gss_ctx.eval(entry.replace('“', '"').replace('”', '"')))[0]))
 	return content
 
 func load_csv(path: String) -> Array:
@@ -367,15 +365,6 @@ func remove_mono(mono) -> void:
 	monos_need_route.erase(mono)
 	mono._outof_sekai()
 	monos.erase(mono)
-
-func call_ref_method(ref: int, method: StringName, argv := []) -> Variant:
-	var handle := defines[ref].get_method(method) as Callable
-	var rargv := [self]
-	rargv.append_array(argv)
-	if handle != null:
-		return handle.callv(rargv)
-	else:
-		return null
 
 func get_define_by_ref(ref: int) -> Variant:
 	return defines[ref]
@@ -426,17 +415,17 @@ func make_item() -> SekaiItem:
 func will_route(point: Vector2, z_pos: int) -> Array:
 	var result := []
 	for mono in monos_need_route:
-		mono.will_route(point, z_pos, result)
+		await mono.will_route(point, z_pos, result)
 	return result
 
 func will_collide(region: Rect2, z_pos: int) -> Array:
 	var result := []
 	for mono in monos_need_collision:
-		mono.will_collide(region, z_pos, result)
+		await mono.will_collide(region, z_pos, result)
 	return result
 
 func can_pass(region: Rect2, z_pos: int) -> bool:
-	return will_collide(region, z_pos).size() == 0 and will_route(region.get_center(), z_pos - 1).size() > 0
+	return (await will_collide(region, z_pos)).size() == 0 and (await will_route(region.get_center(), z_pos - 1)).size() > 0
 
 func timeout(time: float):
 	return get_tree().create_timer(time).timeout
@@ -470,7 +459,7 @@ func load_from_path(path: String) -> void:
 	defines_by_id.clear()
 	gss_ctx = make_lisper_context()
 	_clear_monos()
-	if define_gss: exec_gss(define_gss)
+	if define_gss: await exec_gss(define_gss)
 	var vmonos := load_data[&"monos"] as Array
 	for entry in vmonos:
 		var script = load(entry[0])

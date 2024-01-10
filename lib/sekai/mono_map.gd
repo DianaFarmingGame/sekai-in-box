@@ -176,7 +176,7 @@ func is_need_route() -> bool:
 
 func will_route(point: Vector2, z_pos: int, result: Array) -> void:
 	var monos = get_monos_by_pos(Vector3(point.x, point.y, z_pos))
-	if monos.size() > 0: monos[0].will_route(point, z_pos, result)
+	if monos.size() > 0: await monos[0].will_route(point, z_pos, result)
 
 func will_collide(region: Rect2, z_pos: int, result: Array) -> void:
 	if abs(offset.z - z_pos) < cell_size.z / 2:
@@ -184,22 +184,22 @@ func will_collide(region: Rect2, z_pos: int, result: Array) -> void:
 		if size_rti.grow(1).has_point(cen):
 			# center
 			var mono = get_mono(cen)
-			if mono != null: mono.will_collide(region, z_pos, result)
+			if mono != null: await mono.will_collide(region, z_pos, result)
 			# sides
 			mono = get_mono(cen + Vector2i(1, 0))
-			if mono != null: mono.will_collide(region, z_pos, result)
+			if mono != null: await mono.will_collide(region, z_pos, result)
 			mono = get_mono(cen + Vector2i(0, 1))
-			if mono != null: mono.will_collide(region, z_pos, result)
+			if mono != null: await mono.will_collide(region, z_pos, result)
 			mono = get_mono(cen + Vector2i(-1, 0))
-			if mono != null: mono.will_collide(region, z_pos, result)
+			if mono != null: await mono.will_collide(region, z_pos, result)
 			mono = get_mono(cen + Vector2i(0, -1))
-			if mono != null: mono.will_collide(region, z_pos, result)
+			if mono != null: await mono.will_collide(region, z_pos, result)
 			# corners
 			mono = get_mono(cen + Vector2i(1, 1))
-			if mono != null: mono.will_collide(region, z_pos, result)
+			if mono != null: await mono.will_collide(region, z_pos, result)
 			mono = get_mono(cen + Vector2i(1, -1))
-			if mono != null: mono.will_collide(region, z_pos, result)
+			if mono != null: await mono.will_collide(region, z_pos, result)
 			mono = get_mono(cen + Vector2i(-1, 1))
-			if mono != null: mono.will_collide(region, z_pos, result)
+			if mono != null: await mono.will_collide(region, z_pos, result)
 			mono = get_mono(cen + Vector2i(-1, -1))
-			if mono != null: mono.will_collide(region, z_pos, result)
+			if mono != null: await mono.will_collide(region, z_pos, result)
