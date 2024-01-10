@@ -1,4 +1,3 @@
-(gss/exec "gss/utils/utils.gss.txt")
-(gss/exec "gss/import.gss.txt")
-(gss/exec "gss/define.gss.txt")
-
+gsx/exec("/gss/utils/utils.gss.txt")
+gsx/exec("/gss/import.gss.txt")
+gsx/exec("/gss/define.gss.txt")

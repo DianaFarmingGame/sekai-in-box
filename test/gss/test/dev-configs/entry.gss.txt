@@ -1,9 +1,9 @@
-(defvar *config_dir* "gss/configurator/csvs/")
+defvar (*config_dir* "gss/configurator/csvs/")
 
-(gss/exec "gss/configurator/item.gss.txt")
-(gss/exec "gss/configurator/craft.gss.txt")
-(gss/exec "gss/configurator/cook.gss.txt")
-(gss/exec "gss/configurator/enhance.gss.txt")
-(gss/exec "gss/configurator/drop.gss.txt")
+gsx/exec ("/gss/configurator/item.gss.txt")
+gsx/exec ("/gss/configurator/craft.gss.txt")
+gsx/exec ("/gss/configurator/cook.gss.txt")
+gsx/exec ("/gss/configurator/enhance.gss.txt")
+gsx/exec ("/gss/configurator/drop.gss.txt")
 
-(gss/exec "gss/test/dev-configs/item_test.gss.txt")
+gsx/exec ("/gss/test/dev-configs/item_test.gss.txt")

@@ -1,31 +1,38 @@
-(defvar clip_ground (func [x y]
-	[(rect2 -0.5 -1.5 1 1) (rect2 (* x 32) (* y 32) 32 32)]))
-(defvar clip_box (func [x y]
-	[(rect2 -0.5 -1.5 1 2) (rect2 (* x 32) (* y 32) 32 64)]))
-(defvar clip_wall (func [x y]
-	[(rect2 -0.5 -0.5 1 1) (rect2 (* x 32) (* y 32) 32 32)]))
-(defvar clip_cover (func [x y]
-	[(rect2 -0.5 -0.5 1 1) (rect2 (* x 32) (* y 32) 32 32)]))
+defunc (clip_ground [x y]
+	[rect2(-0.5 -1.5 1 1) rect2(*(x 32) *(y 32) 32 32)]
+)
+defunc (clip_box [x y]
+	[rect2(-0.5 -1.5 1 2) rect2(*(x 32) *(y 32) 32 64)]
+)
+defunc (clip_wall [x y]
+	[rect2(-0.5 -0.5 1 1) rect2(*(x 32) *(y 32) 32 32)]
+)
+defunc (clip_cover [x y]
+	[rect2(-0.5 -0.5 1 1) rect2(*(x 32) *(y 32) 32 32)]
+)
+defunc (clip16_cover [x y]
+	[rect2(-0.25 -0.25 0.5 0.5) rect2(*(x 16) *(y 16) 16 16)]
+)
+defunc (clip_build [x y]
+	[rect2(-0.5 -0.5 1 1) rect2(*(x 32) *(y 32) 32 32)]
+)
+defunc (clip3x3_build [x y]
+	[rect2(-1.5 -2.5 3 3) rect2(*(x 96) *(y 96) 96 96)]
+)
+defunc (clip3x4_build [x y]
+	[rect2(-1.5 -3.5 3 4) rect2(*(x 96) *(y 128) 96 128)]
+)
+defunc (clip3x5_build [x y]
+	[rect2(-1.5 -4.5 3 5) rect2(*(x 96) *(y 160) 96 160)]
+)
+defunc (clip_char [x]
+	[rect2(-1.5 -2 3 3) rect2(*(x 96) 0 96 96)]
+)
+defunc (anim_char [frame]
+	array/unfold(frame clip_char)
+)
 
-(defvar clip16_cover (func [x y]
-	[(rect2 -0.25 -0.25 0.5 0.5) (rect2 (* x 16) (* y 16) 16 16)]))
-
-(defvar clip_build (func [x y]
-	[(rect2 -0.5 -0.5 1 1) (rect2 (* x 32) (* y 32) 32 32)]))
-(defvar clip3x3_build (func [x y]
-	[(rect2 -1.5 -2.5 3 3) (rect2 (* x 96) (* y 96) 96 96)]))
-(defvar clip3x4_build (func [x y]
-	[(rect2 -1.5 -3.5 3 4) (rect2 (* x 96) (* y 128) 96 128)]))
-(defvar clip3x5_build (func [x y]
-	[(rect2 -1.5 -4.5 3 5) (rect2 (* x 96) (* y 160) 96 160)]))
-
-(defvar clip_char (func [x]
-	[(rect2 -1.5 -2 3 3) (rect2 (* x 96) 0 96 96)]))
-
-(defvar anim_char (func [frame]
-	(unfold frame clip_char)))
-
-(defvar *atile_rules_3x3x1* [[
+defvar(*atile_rules_3x3x1* [[
 	[
 		0	-	0
 		-	0	1
@@ -157,7 +164,7 @@
 	}
 ]])
 
-(defvar *atile_rules_3x3x1_crossed* (array/concat *atile_rules_3x3x1* [[
+defvar(*atile_rules_3x3x1_crossed* array/concat(*atile_rules_3x3x1* [[
 	[
 		-	1	1
 		1	0	1
@@ -179,7 +186,7 @@
 	}
 ]]))
 
-(defvar *atile_wall_rules_3x3x1* [[
+defvar(*atile_wall_rules_3x3x1* [[
 	[
 		0	0	0
 		-	0	0
@@ -271,7 +278,7 @@
 	}
 ]])
 
-(defvar *atile_top_rules_3x3x1* [[
+defvar(*atile_top_rules_3x3x1* [[
 	[
 		0	-	0
 		-	0	1

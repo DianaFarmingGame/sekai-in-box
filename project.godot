@@ -18,7 +18,7 @@ config/icon="res://icon.svg"
 [autoload]
 
 DebugMenu="*res://addons/debug_menu/debug_menu.tscn"
-LisperCommons="*res://lib/sekai/lisper_commons.gd"
+LisperCommons="*res://lib/lisper/lisper_commons.gd"
 
 [debug]
 
@@ -44,6 +44,7 @@ import/fbx/enabled=false
 [global]
 
 debug_draw=false
+enable_aggressive_opt=true
 
 [gui]
 

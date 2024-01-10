@@ -1,5 +1,5 @@
 ; 垂直地板
-(define BlockStaticExt
+define(BlockStaticExt
 	ref 302
 	props {
 		need_collision  #f
@@ -9,13 +9,13 @@
 		}
 		cur_draw &floor
 		draw_data {
-			floor       [&static &main (clip_ground 4 3)]
+			floor       [&static &main clip_ground(4 3)]
 		}
 	}
 )
 
 ; 水平地板
-(define BlockStaticExt
+define(BlockStaticExt
 	ref 303
 	props {
 		need_collision  #f
@@ -25,7 +25,7 @@
 		}
 		cur_draw &floor
 		draw_data {
-			floor       [&static &main (clip_ground 3 3)]
+			floor       [&static &main clip_ground(3 3)]
 		}
 	}
 )

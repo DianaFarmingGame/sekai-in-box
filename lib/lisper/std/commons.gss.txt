@@ -1,0 +1,5 @@
+exec ("base.gsm.gd")
+exec ("string.gsm.gd")
+exec ("math.gsm.gd")
+exec ("array.gsm.gd")
+exec ("dict.gsm.gd")

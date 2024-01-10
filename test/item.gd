@@ -10,7 +10,7 @@ func do_merge(sets: Array[Dictionary]) -> Array[Dictionary]:
 		&"stackable": true, # 能否堆叠
 		&"stack_count": 1, # 堆叠数量
 		&"stack_capacity": 99, # 堆叠上限
-	
+		
 		&"chargeable": true, # 能否修复
 		&"charge_point": 1, # 可用度
 		&"charge_capacity": 1, # 最高可用度

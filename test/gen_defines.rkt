@@ -11,7 +11,13 @@
               (build-path cwd "gss" "define")))
 
 (define rel-paths (map (λ (path) (find-relative-path cwd path)) gsses))
-(define execs (map (λ (path) `(gss/exec ,(string-replace (path->string path) "\\" "/"))) rel-paths))
-(define content `(block ,@execs))
+(define execs (apply append (map (λ (path) `(gsx/exec(,(string-append "/" (string-replace (path->string path) "\\" "/"))))) rel-paths)))
 
-(write-to-file content (build-path "gss" "define.gss.txt") #:exists 'replace #:mode 'text)
+(define o (open-output-string))
+(write execs o)
+(define execs-str (get-output-string o))
+
+(define content (substring execs-str 1 (- (string-length execs-str) 1)))
+
+(with-output-to-file (build-path "gss" "define.gss.txt") #:exists 'replace #:mode 'text
+  (lambda () (printf content)))
