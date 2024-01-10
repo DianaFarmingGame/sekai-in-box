@@ -496,9 +496,12 @@ defunc (cam/clear :const :gd """,
 		cam_target = null
 ,""")
 
-defunc (gss/exec :const :gd """,
+defunc (gsx/exec :const :gd """,
 	func (path: String) -> void:
-		exec_gsx(root_dir.path_join(path))
+		if path.begins_with('/'):
+			await exec_gsx(root_dir.path_join(path.substr(1)))
+		else:
+			await exec_gsx(path)
 ,""")
 
 defunc (mono_map/make :const :gd """,

@@ -1,4 +1,4 @@
-gss/exec("gss/test/dev-ls/scene.gss.txt")
+gsx/exec("/gss/test/dev-ls/scene.gss.txt")
 
 ; 测试：相对移动
 #;(func([我]
@@ -57,7 +57,7 @@ gss/exec("gss/test/dev-ls/scene.gss.txt")
 	嘉心糖 嘉然)
 
 ; 测试：掉落物/背包
-block(gss/exec("gss/test/dev-ls/scroll.gss.txt")
+block(gsx/exec("/gss/test/dev-ls/scroll.gss.txt")
 	mono(MonoEntity &drop
 		props {
 			position vec3(2 2 1)

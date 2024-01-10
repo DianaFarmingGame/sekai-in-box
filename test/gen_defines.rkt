@@ -11,7 +11,7 @@
               (build-path cwd "gss" "define")))
 
 (define rel-paths (map (λ (path) (find-relative-path cwd path)) gsses))
-(define execs (apply append (map (λ (path) `(gss/exec(,(string-replace (path->string path) "\\" "/")))) rel-paths)))
+(define execs (apply append (map (λ (path) `(gsx/exec(,(string-append "/" (string-replace (path->string path) "\\" "/"))))) rel-paths)))
 
 (define o (open-output-string))
 (write execs o)

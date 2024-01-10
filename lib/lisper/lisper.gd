@@ -84,7 +84,11 @@ static func count_last_len(pstr: String, indent: int) -> int:
 static func exec(ctx: LisperContext, path: String) -> void:
 	if path.ends_with(".gss.txt"):
 		var expr := FileAccess.get_file_as_string(path)
-		await Lisper.exec_gss(ctx, expr, path)
+		if FileAccess.get_open_error() == OK:
+			await Lisper.exec_gss(ctx, expr, path)
+		else:
+			push_error("failed to open gss file: ", path)
+			printerr("failed to open gss file: ", path)
 	elif path.ends_with(".gsm.gd"):
 		await Lisper.exec_gsm(ctx, load(path))
 	else:

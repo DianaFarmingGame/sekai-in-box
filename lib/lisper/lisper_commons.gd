@@ -53,7 +53,7 @@ func compile_keyword_mask_01(ctx: LisperContext, body: Array) -> Array:
 	for n in body:
 		if Lisper.is_flag(n): cdata.append(n); continue
 		if cid == 0: cdata.append(await ctx.compile(n))
-		if cid == 1: cdata.append(Lisper.Raw(ctx.exec_as_keyword(n)))
+		elif cid == 1: cdata.append(Lisper.Raw(ctx.exec_as_keyword(n)))
 		else: cdata.append(await ctx.compile(n))
 		cid += 1
 	return cdata

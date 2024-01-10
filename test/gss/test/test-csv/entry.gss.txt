@@ -1,4 +1,4 @@
-gss/exec("gss/test/test-csv/scene.gss.txt")
+gsx/exec("/gss/test/test-csv/scene.gss.txt")
 
 ; 测试：CSV映射到对话
 block
