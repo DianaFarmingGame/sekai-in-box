@@ -1,8 +1,8 @@
 gsx/exec("/gss/test/test-csv/scene.gss.txt")
 
 ; 测试：CSV映射到对话
-block
-	(defvar(Dialogs {})
+block (
+	defvar(Dialogs {})
 	defvar(data csv/map-let("gss/test/test-csv/dialog.csv"
 		[ID 类型 发起者 文本 跳转表] {
 			ID ID

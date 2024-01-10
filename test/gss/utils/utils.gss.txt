@@ -31,6 +31,9 @@ defunc (clip_char [x]
 defunc (anim_char [frame]
 	array/unfold(frame clip_char)
 )
+defunc (clip_item [x y]
+	rect2(*(x 32) *(y 32) 32 32)
+)
 
 defvar(*atile_rules_3x3x1* [[
 	[

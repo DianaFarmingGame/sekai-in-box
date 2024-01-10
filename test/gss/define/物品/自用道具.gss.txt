@@ -1,6 +1,6 @@
-defvar(自用道具 (make_define GItem
+defvar(自用道具 define/make (Item
 	prop {
-		groups (prop/pushs [&物品])
+		groups prop/pushs ([&物品])
 		name "自用道具"
 		}
 			)

@@ -1,6 +1,7 @@
 defvar(building/make func([ref x y id]
 	define/make(EntityBlock
 		ref ref
+		id id
 		props {
 			need_route 	#f
 			routable 	#f

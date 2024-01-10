@@ -4,8 +4,8 @@ define(自用工具
 	prop {
 		name "自愈卷轴"
 		description "灌注了魔力的卷轴，可以治愈伤口"
-		groups (prop/pushs ["自用工具"])
-		item_icon [&static &main (clip_item 0 0)]
+		groups prop/pushs (["自用工具"])
+		item_icon [&static &main clip_item (0 0)]
 		&pickable #t ;能否取得
 
 		&stackable #f ;能否堆叠

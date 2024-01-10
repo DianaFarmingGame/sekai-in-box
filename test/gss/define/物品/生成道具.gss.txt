@@ -1,6 +1,6 @@
-defvar(生成道具 (make_define GItem
+defvar(生成道具 define/make (Item
 	prop {
-		groups (prop/pushs [&物品])
+		groups prop/pushs ([&物品])
 		name "生成道具"
 		}
 			)

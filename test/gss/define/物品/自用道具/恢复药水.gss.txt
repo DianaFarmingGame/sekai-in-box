@@ -4,8 +4,8 @@ define(自用道具
 	prop {
 		name "恢复药水"
 		description "饮用后恢复一部分生命值，生效快得离谱"
-		groups (prop/pushs ["自用道具"])
-		item_icon [&static &main (clip_item 0 0)]
+		groups prop/pushs (["自用道具"])
+		item_icon [&static &main clip_item (0 0)]
 		
 		&pickable #t ;能否取得
 

@@ -4,8 +4,8 @@ define(自用道具
 	prop {
 		name "草莓蛋糕"
 		description "选用最新鲜的食材制作，没人不爱吃"
-		groups (prop/pushs ["自用道具"])
-		item_icon [&static &main (clip_item 0 0)]
+		groups prop/pushs (["自用道具"])
+		item_icon [&static &main clip_item (0 0)]
 		
 		&pickable #t ;能否取得
 

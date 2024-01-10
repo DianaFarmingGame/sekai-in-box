@@ -4,8 +4,8 @@ define(环境道具
 	prop {
 		name "小麦种子"
 		description "小麦的种子，嗯，就这么多"
-		groups (prop/pushs ["环境道具"])
-		item_icon [&static &main (clip_item 0 0)]
+		groups prop/pushs (["环境道具"])
+		item_icon [&static &main clip_item (0 0)]
 		
 		&pickable #t ;能否取得
 

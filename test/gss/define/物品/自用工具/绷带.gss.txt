@@ -4,8 +4,8 @@ define(自用工具
 	prop {
 		name "绷带"
 		description "用来治愈伤口"
-		groups (prop/pushs ["自用工具"])
-		item_icon [&static &main (clip_item 0 0)]
+		groups prop/pushs (["自用工具"])
+		item_icon [&static &main clip_item (0 0)]
 		
 		&pickable #t ;能否取得
 

@@ -4,8 +4,8 @@ define(特殊工具
 	prop {
 		name "调试棒"
 		description "内部调试工具，占位用"
-		groups (prop/pushs ["特殊工具"])
-		item_icon [&static &main (clip_item 0 0)]
+		groups prop/pushs (["特殊工具"])
+		item_icon [&static &main clip_item (0 0)]
 		
 		&pickable #f ;能否取得
 

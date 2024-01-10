@@ -4,8 +4,8 @@ define(任务素材
 	prop {
 		name "纪念品"
 		description "任务素材，占位用"
-		groups (prop/pushs ["任务素材"])
-		item_icon [&static &main (clip_item 0 0)]
+		groups prop/pushs (["任务素材"])
+		item_icon [&static &main clip_item (0 0)]
 		
 		&pickable #t ;能否取得
 

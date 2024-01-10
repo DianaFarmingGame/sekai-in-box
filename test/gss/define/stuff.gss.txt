@@ -1,20 +1,20 @@
-(defvar 道具 (make_define GItem
+defvar (道具 define/make (Item
 	prop {
-		groups (prop/pushs [&物品])
+		groups prop/pushs ([&物品])
 		name "道具"
 		}
 			)
 )
 
-#染料
-(define 道具
+; 染料
+define (道具
 	ref 1100
 	id &Item/道具/染料
 	prop {
 		name "染料"
 		description "用来染色，不然还能干嘛？"
-		groups (prop/pushs ["食物"])
-		item_icon [&static &main (clip_item 0 0)]
+		groups prop/pushs (["食物"])
+		item_icon [&static &main clip_item (0 0)]
 		pickable #t ; 能否取得
 		stackable #t ; 能否堆叠
 		stack_capacity 64 ; 堆叠上限

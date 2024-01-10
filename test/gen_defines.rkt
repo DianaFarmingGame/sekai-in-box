@@ -11,6 +11,11 @@
               (build-path cwd "gss" "define")))
 
 (define rel-paths (map (λ (path) (find-relative-path cwd path)) gsses))
+
+(set! rel-paths (sort rel-paths (λ (a b) (< (length (explode-path a)) (length (explode-path b))))))
+
+(for-each (λ (path) (printf "found: ~a/\n" (path->string path))) rel-paths)
+
 (define execs (apply append (map (λ (path) `(gsx/exec(,(string-append "/" (string-replace (path->string path) "\\" "/"))))) rel-paths)))
 
 (define o (open-output-string))
@@ -21,3 +26,5 @@
 
 (with-output-to-file (build-path "gss" "define.gss.txt") #:exists 'replace #:mode 'text
   (lambda () (printf content)))
+
+(printf "all complete!")

@@ -9,7 +9,7 @@ func _ready() -> void:
 	start_time = Time.get_unix_time_from_datetime_string(START_TIME)
 	game_time = start_time
 
-func _process(delta: float) -> void:
+func _process(_delta: float) -> void:
 	var process_time = Time.get_ticks_msec() / 1000
 	game_time = start_time + (process_time * 60 * 10)
 
@@ -20,7 +20,7 @@ func time_update(value):
 	$day.text = str(date_time['day'])
 	$hour.text = str(date_time['hour'])
 	$minute.text = str(date_time['minute'])
-	var hour = date_time['hour']
+	var _hour = date_time['hour']
 #	var node = get_tree().root.get_node("MainWorld/sun")
 #	if hour == 18 or hour == 19:
 #		node.status = Alternation.DayTime.SUNSET

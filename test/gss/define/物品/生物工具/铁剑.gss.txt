@@ -4,8 +4,8 @@ define(生物工具
 	prop {
 		name "铁剑"
 		description "经常被用来砍僵尸，所幸这里没有"
-		groups (prop/pushs ["生物工具"])
-		item_icon [&static &main (clip_item 0 0)]
+		groups prop/pushs (["生物工具"])
+		item_icon [&static &main clip_item (0 0)]
 		
 		&pickable #t ;能否取得
 

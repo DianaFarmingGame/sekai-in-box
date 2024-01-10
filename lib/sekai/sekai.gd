@@ -139,18 +139,6 @@ func make_lisper_context() -> LisperContext:
 	await Lisper.exec_gsm(context, self)
 	
 	context.def_vars([Lisper.VarFlag.CONST, Lisper.VarFlag.FIX], {
-		&"dbs/define": Lisper.FuncGDCallPure( func (body: Array) -> void:
-			dbs_define(body[0], body[1], body[2])
-			),
-		&"dbs/getp": Lisper.FuncGDCallPure( func (body: Array) -> Variant:
-			return dbs_getp(body[0], body[1], body[2])
-			),
-		&"dbs/setp": Lisper.FuncGDCallPure( func (body: Array) -> void:
-			dbs_setp(body[0], body[1], body[2], body[3])
-			),
-		&"dbs/pushp": Lisper.FuncGDCallPure( func (body: Array) -> void:
-			dbs_pushp(body[0], body[1], body[2], body[3])
-			),
 	})
 	return context
 
@@ -598,6 +586,26 @@ defunc (csgv/load :const :gd :pure """,
 defunc (csv/load :const :gd :pure """,
 	func (path: String) -> Array:
 		return load_csv(root_dir.path_join(path))
+,""")
+
+defunc (dbs/define :const :gd """,
+	func (body: Array) -> void:
+			dbs_define(body[0], body[1], body[2])
+,""")
+
+defunc (dbs/getp :const :gd """,
+	func (body: Array) -> Variant:
+			return dbs_getp(body[0], body[1], body[2])
+,""")
+
+defunc (dbs/setp :const :gd """,
+	func (body: Array) -> void:
+			dbs_setp(body[0], body[1], body[2], body[3])
+,""")
+
+defunc (dbs/pushp :const :gd """,
+	func (body: Array) -> void:
+			dbs_pushp(body[0], body[1], body[2], body[3])
 ,""")
 
 """]

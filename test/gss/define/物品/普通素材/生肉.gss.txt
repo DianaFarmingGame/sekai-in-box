@@ -4,8 +4,8 @@ define(普通素材
 	prop {
 		name "生肉"
 		description "各种生物的肉，可以用来烹饪"
-		groups (prop/pushs ["普通素材"])
-		item_icon [&static &main (clip_item 0 0)]
+		groups prop/pushs (["普通素材"])
+		item_icon [&static &main clip_item (0 0)]
 		
 		&pickable #t ;能否取得
 

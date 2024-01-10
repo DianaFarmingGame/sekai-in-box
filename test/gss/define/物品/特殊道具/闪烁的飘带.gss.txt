@@ -4,8 +4,8 @@ define(特殊道具
 	prop {
 		name "闪烁的飘带"
 		description "具有奇妙力量的罕见道具，能自行漂浮在空中"
-		groups (prop/pushs ["特殊道具"])
-		item_icon [&static &main (clip_item 0 0)]
+		groups prop/pushs (["特殊道具"])
+		item_icon [&static &main clip_item (0 0)]
 		
 		&pickable #t ;能否取得
 

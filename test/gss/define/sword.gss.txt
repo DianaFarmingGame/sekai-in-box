@@ -1,6 +1,6 @@
-(defvar 剑 (make_define GItem
+defvar (剑 define/make (Item
 	prop {
-		groups (prop/pushs [&工具])
+		groups prop/pushs ([&工具])
 		
 	
 		name "剑"
@@ -8,14 +8,14 @@
 			)
 )
 
-(define 剑
+define (剑
 	ref 400
 	id &Item/工具/武器
 	prop {
 		name "铁剑"
 		description "铁制成的剑"
-		groups (prop/pushs ["武器"])
-		item_icon [&static &main (clip_item 0 0)]
+		groups prop/pushs (["武器"])
+		item_icon [&static &main clip_item (0 0)]
 		
 		pickable #t ; 能否取得
 		

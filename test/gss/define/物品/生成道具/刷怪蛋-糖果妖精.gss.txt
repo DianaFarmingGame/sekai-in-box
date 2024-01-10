@@ -4,8 +4,8 @@ define(生成道具
 	prop {
 		name "刷怪蛋-糖果妖精"
 		description "糖果妖精的刷怪蛋"
-		groups (prop/pushs ["生成道具"])
-		item_icon [&static &main (clip_item 0 0)]
+		groups prop/pushs (["生成道具"])
+		item_icon [&static &main clip_item (0 0)]
 		
 		&pickable #f ;能否取得
 

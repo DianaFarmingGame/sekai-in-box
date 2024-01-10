@@ -4,8 +4,8 @@ define(环境道具
 	prop {
 		name "肥料"
 		description "用于农作物的催熟，人为的自然循环"
-		groups (prop/pushs ["环境道具"])
-		item_icon [&static &main (clip_item 0 0)]
+		groups prop/pushs (["环境道具"])
+		item_icon [&static &main clip_item (0 0)]
 		
 		&pickable #t ;能否取得
 
