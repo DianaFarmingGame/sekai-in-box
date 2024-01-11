@@ -1,5 +1,7 @@
 class_name Lisper extends Object
 
+const ENABLE_DEBUGGER := true
+
 static func tokenize(expr: String) -> Variant:
 	var parser := GispParser.make(expr)
 	if parser.parse():

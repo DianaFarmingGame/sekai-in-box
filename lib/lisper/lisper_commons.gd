@@ -1,7 +1,7 @@
 class_name LisperCommons
 
-static func make_common_context() -> LisperContext:
-	var context = LisperContext.new()
+static func make_common_context(pname = null) -> LisperContext:
+	var context := LisperContext.make(pname)
 	await def_commons(context)
 	return context
 
@@ -88,6 +88,15 @@ static func def_commons(context: LisperContext) -> void:
 			if path.is_relative_path() and mod_dir != null:
 				path = (mod_dir as String).path_join(path)
 			await Lisper.exec_gsm(ctx, load(path))),
+		&"!break": Lisper.FnGDRaw( func (ctx: LisperContext, body: Array, comptime: bool) -> Variant:
+			if comptime: return await ctx.compiles(body)
+			var vname := "!::" + str(await ctx.exec(body[0])) if body.size() > 0 else "!::break"
+			LisperDebugger.sign_context(vname, ctx)
+			LisperDebugger.break_waiting = true
+			await LisperDebugger.break_passed
+			LisperDebugger.break_waiting = false
+			LisperDebugger.unsign_context(vname, ctx)
+			return null),
 		&"defvar": Lisper.FnGDRaw( func (ctx: LisperContext, body: Array, comptime: bool) -> Variant:
 			if comptime: return await compile_keyword_mask_1(ctx, body)
 			var res := ctx.strip_flags(body)

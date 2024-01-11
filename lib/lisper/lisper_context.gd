@@ -1,17 +1,28 @@
 class_name LisperContext
 
 static var ENABLE_AGGRESSIVE_OPT := ProjectSettings.get_setting(&"sekai/enable_aggressive_opt", true) as bool
+static var ENABLE_STRINGIFY_REVERSE_TRACE := true
 
 var parent = null
 var vars := {}
 var source = null
 var print_head := ""
+var jumps := []
 
 static func extend(ctx: LisperContext) -> LisperContext:
 	var nctx := LisperContext.new()
 	nctx.parent = ctx
 	nctx.print_head = ctx.print_head
 	return nctx
+
+static var _root_idx := 0
+
+static func make(pname = null) -> LisperContext:
+	if pname == null: pname = str("root::", _root_idx)
+	var ctx := LisperContext.new()
+	LisperDebugger.sign_context(pname, ctx)
+	_root_idx += 1
+	return ctx
 
 func clone() -> LisperContext:
 	var ctx := LisperContext.new()
@@ -163,7 +174,10 @@ func exec(node: Array) -> Variant:
 			var body = (node[1] as Array).slice(1)
 			var handle = await exec(head)
 			if handle is Callable or handle is Array:
-				return await call_fn_raw(handle, body)
+				jumps.push_back(node)
+				var res = await call_fn_raw(handle, body)
+				jumps.pop_back()
+				return res
 			elif handle == null:
 				log_error(node, str("call handle not found: ", head))
 			else:
@@ -355,11 +369,13 @@ func compile(node: Array) -> Array:
 func compiles(body: Array) -> Array:
 	return await Async.array_map(body, func (n): return await compile(n))
 
-func stringify_raw(data: Variant, indent := 0) -> String:
-	if data is Callable or data is Array or data is Dictionary:
+func stringify_raw(data: Variant, indent := 0, enable_rev_trace := ENABLE_STRINGIFY_REVERSE_TRACE) -> String:
+	if enable_rev_trace and (data is Callable or data is Array or data is Dictionary):
 		var vname = find_var(data)
 		if vname != null:
 			return '#' + vname
+	if data is float:
+		return str(floori(data)) if is_zero_approx(fmod(data, 1)) else str(data)
 	if Lisper.is_fn(data):
 		var type = Lisper.FnType.find_key(Lisper.fn_get_type(data))
 		var msg := 'λ:' + type as String
@@ -378,7 +394,11 @@ func stringify_raw(data: Variant, indent := 0) -> String:
 	if data is Array:
 		var res := '[' + (stringify_raw(data[0], indent + 1) if data.size() > 0 else '')
 		for n in data.slice(1):
-			res += ' ' + stringify_raw(n, Lisper.count_last_len(res, indent) + 1)
+			var idn := Lisper.count_last_len(res, indent)
+			if idn > 8:
+				res += '\n' + ''.lpad(indent, ' ') + ' ' + stringify_raw(n, indent + 1)
+			else:
+				res += ' ' + stringify_raw(n, idn + 1)
 		res += ']'
 		return res
 	if data is String:
@@ -416,7 +436,11 @@ func stringify(node: Array, indent := 0) -> String:
 		Lisper.TType.ARRAY:
 			var res := '[' + (stringify(node[1][0], indent + 1) if node[1].size() > 0 else '')
 			for n in node[1].slice(1):
-				res += ' ' + stringify(n, Lisper.count_last_len(res, indent) + 1)
+				var idn := Lisper.count_last_len(res, indent)
+				if idn > 8:
+					res += '\n' + ''.lpad(indent, ' ') + ' ' + stringify(n, indent + 1)
+				else:
+					res += ' ' + stringify(n, idn + 1)
 			res += ']'
 			return res
 		Lisper.TType.MAP:

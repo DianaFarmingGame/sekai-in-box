@@ -26,10 +26,10 @@ defvar (hello ', hello ,')
 defvar (name ', vname ,')
 
 ; 直接使用 GD 的 Lambda 函数
-func (:gd ', func (pstr): print(gtx.print_head + pstr) ,')(hello(name))
+func (:gd ', func (pstr): print(gtx.print_head + pstr) ,') (hello (name))
 
 ; 对应的免包装写法
-', func (pstr): print(gtx.print_head + pstr) ,'(hello(name))
+', func (pstr): print(gtx.print_head + pstr) ,' (hello (name))
 
 ; 获取当前模块的路径和父目录
 echo (*mod-path*)
@@ -37,5 +37,14 @@ echo (*mod-dir*)
 
 ; 获取当前模块对应的 Godot 对象 (相当于 GDScript 内的 self)
 echo (self)
+
+; 使用 Lisper 调试器对断点进行分析
+defunc (test [arg]
+	switch (arg
+		"yes" echo ("all right!")
+		"oops" !break ()
+	)
+)
+test ("oops")
 
 '] # 固定句式

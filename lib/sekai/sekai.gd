@@ -140,7 +140,7 @@ func _init_sekai() -> void:
 	print_rich("[sekai] inited in ", (Time.get_ticks_usec() - stime) / 1000.0, " ms\n")
 
 func make_lisper_context() -> LisperContext:
-	var context := await LisperCommons.make_common_context()
+	var context := await LisperCommons.make_common_context("sekai")
 	await Lisper.exec_gsm(context, self)
 	return context
 
