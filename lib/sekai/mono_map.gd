@@ -25,7 +25,7 @@ func _into_sekai() -> void:
 	for iy in size.y:
 		var layer := sekai.make_item()
 		layers[iy] = layer
-	if ProjectSettings.get_setting(&"global/debug_draw"):
+	if ProjectSettings.get_setting(&"sekai/debug_draw"):
 		debug_layers.resize(size.y as int)
 		for iy in size.y:
 			var layer := sekai.make_item()
@@ -73,7 +73,7 @@ func _into_sekai() -> void:
 								mono._on_init()
 							else:
 								sekai.update_padding_pos(pos))
-		if ProjectSettings.get_setting(&"global/debug_draw"):
+		if ProjectSettings.get_setting(&"sekai/debug_draw"):
 			var debug_layer := debug_layers[iy] as SekaiItem
 			debug_layer.set_y(iy * cell_size.y + offset.y + floorf(offset.z) * 64 + 4096)
 			debug_layer.on_draw.connect(func ():

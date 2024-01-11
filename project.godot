@@ -29,7 +29,9 @@ gdscript/warnings/confusable_local_declaration=0
 
 window/size/viewport_width=576
 window/size/viewport_height=640
+window/subwindows/embed_subwindows=false
 window/vsync/vsync_mode=2
+mouse_cursor/custom_image="res://test/assert/ui/鼠标箭头.png"
 window/defaults/default_clear_color=Color(0, 0, 0, 1)
 
 [editor_plugins]
@@ -40,11 +42,6 @@ enabled=PackedStringArray("res://addons/debug_menu/plugin.cfg")
 
 import/blender/enabled=false
 import/fbx/enabled=false
-
-[global]
-
-debug_draw=false
-enable_aggressive_opt=true
 
 [gui]
 
@@ -67,9 +64,21 @@ dialog_confirm={
 
 buffering/agile_event_flushing=true
 
+[lisper]
+
+enable_aggressive_opt=true
+
 [rendering]
 
 environment/ssao/quality=0
 environment/ssil/quality=0
 anti_aliasing/screen_space_roughness_limiter/enabled=false
 environment/defaults/default_clear_color=Color(0, 0, 0, 1)
+
+[sekai]
+
+debug_draw_collisible=false
+debug_draw_routable=false
+debug_draw_solid=false
+debug_draw_contactable=false
+debug_draw_pickable=false

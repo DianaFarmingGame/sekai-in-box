@@ -7,7 +7,8 @@
 (define cwd (find-system-path 'orig-dir))
 
 (define gsses
-  (find-files (λ (path) (string-suffix? (path->string (file-name-from-path path)) ".gss.txt"))
+  (find-files (λ (path) (or (string-suffix? (path->string (file-name-from-path path)) ".gss.txt")
+                            (string-suffix? (path->string (file-name-from-path path)) ".gsm.gd")))
               (build-path cwd "gss" "define")))
 
 (define rel-paths (map (λ (path) (find-relative-path cwd path)) gsses))

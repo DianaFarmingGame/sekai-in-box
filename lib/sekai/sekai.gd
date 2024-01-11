@@ -23,6 +23,13 @@ var external_fns := {}
 var database_static := {}
 
 func _init() -> void:
+	ProjectSettings.set_setting(&"sekai/debug_draw",
+		ProjectSettings.get_setting(&"sekai/debug_draw_collisible") or \
+		ProjectSettings.get_setting(&"sekai/debug_draw_contactable") or \
+		ProjectSettings.get_setting(&"sekai/debug_draw_pickable") or \
+		ProjectSettings.get_setting(&"sekai/debug_draw_routable") or \
+		ProjectSettings.get_setting(&"sekai/debug_draw_solid")
+	)
 	y_sort_enabled = true
 
 signal before_process
@@ -344,15 +351,17 @@ func load_from_path(path: String) -> void:
 	print_rich("[sekai] restore in ", (Time.get_ticks_usec() - stime) / 1000.0, " ms")
 	print()
 
-func gsm(): return ["""
+func gsm(): return ['
 
-defvar (:const MonoDefine """, MonoDefine.new() ,""")
-defvar (:const Entity """, GEntity.new() ,""")
-defvar (:const Tile """, GTile.new() ,""")
-defvar (:const Mono """, Mono ,""")
-defvar (:const MonoEntity """, MonoEntity ,""")
+defvar (:const *sekai* ', self ,')
 
-defunc (do :const :gd :raw """,
+defvar (:const MonoDefine ', MonoDefine.new() ,')
+defvar (:const Entity ', GEntity.new() ,')
+defvar (:const Tile ', GTile.new() ,')
+defvar (:const Mono ', Mono ,')
+defvar (:const MonoEntity ', MonoEntity ,')
+
+defunc (do :const :gd :raw ',
 	func (ctx: LisperContext, body: Array, comptime: bool) -> Variant:
 		if comptime: return await LisperCommons.compile_keyword_mask_01(ctx, body)
 		else:
@@ -363,9 +372,9 @@ defunc (do :const :gd :raw """,
 			var argv := [Lisper.Raw(this.sekai), Lisper.Raw(this)]
 			argv.append_array(body.slice(2))
 			return await ctx.call_fn_raw(action, argv)
-,""")
+,')
 
-defunc (callm :const :gd :raw """,
+defunc (callm :const :gd :raw ',
 	func (ctx: LisperContext, body: Array, comptime: bool) -> Variant:
 		if comptime: return await LisperCommons.compile_keyword_mask_01(ctx, body)
 		else:
@@ -373,18 +382,18 @@ defunc (callm :const :gd :raw """,
 			var method := ctx.exec_as_keyword(body[1]) as StringName
 			var argv := await ctx.execs(body.slice(2)) as Array
 			return await this.applym(method, argv)
-,""")
+,')
 
-defunc (getp :const :gd :raw """,
+defunc (getp :const :gd :raw ',
 	func (ctx: LisperContext, body: Array, comptime: bool) -> Variant:
 		if comptime: return await LisperCommons.compile_keyword_mask_01(ctx, body)
 		else:
 			var this := await ctx.exec(body[0]) as Mono
 			var key := ctx.exec_as_keyword(body[1]) as StringName
 			return this.getp(key)
-,""")
+,')
 
-defunc (setp :const :gd :raw """,
+defunc (setp :const :gd :raw ',
 	func (ctx: LisperContext, body: Array, comptime: bool) -> Variant:
 		if comptime: return await LisperCommons.compile_keyword_mask_01(ctx, body)
 		else:
@@ -393,17 +402,17 @@ defunc (setp :const :gd :raw """,
 			var value = await ctx.exec(body[2])
 			this.setp(key, value)
 			return null
-,""")
+,')
 
-defunc (destroy :const :gd """, func (this: Mono): this.destroy() ,""")
-defunc (queue_destroy :const :gd """, func (this: Mono): this.destroy.call_deferred() ,""")
+defunc (destroy :const :gd ', func (this: Mono): this.destroy() ,')
+defunc (queue_destroy :const :gd ', func (this: Mono): this.destroy.call_deferred() ,')
 
-defunc (prop/setp :const :gd :pure """, Prop.setp ,""")
-defunc (prop/pushs :const :gd :pure """, Prop.pushs ,""")
-defunc (prop/puts :const :gd :pure """, Prop.puts ,""")
-defunc (prop/mergep :const :gd :pure """, Prop.mergep ,""")
+defunc (prop/setp :const :gd :pure ', Prop.setp ,')
+defunc (prop/pushs :const :gd :pure ', Prop.pushs ,')
+defunc (prop/puts :const :gd :pure ', Prop.puts ,')
+defunc (prop/mergep :const :gd :pure ', Prop.mergep ,')
 
-defunc (define/make :const :gd :raw """,
+defunc (define/make :const :gd :raw ',
 	func (ctx: LisperContext, body: Array, comptime: bool) -> Variant:
 		if comptime:
 			var cdata := [await ctx.compile(body[0])]
@@ -423,21 +432,21 @@ defunc (define/make :const :gd :raw """,
 		else:
 			ctx.log_error(body[0], str("define/make: ", body[0], " is not a valid token"))
 			return null
-,""")
+,')
 
-defunc (define/sign :const :gd """,
+defunc (define/sign :const :gd ',
 	func (define: MonoDefine) -> MonoDefine:
 		sign_define(define)
 		return define
-,""")
+,')
 
-defunc (mono/add :const :gd """,
+defunc (mono/add :const :gd ',
 	func (mono: Variant) -> Variant:
 		add_mono(mono)
 		return mono
-,""")
+,')
 
-defunc (mono/make :const :gd :raw """,
+defunc (mono/make :const :gd :raw ',
 	func (ctx: LisperContext, body: Array, comptime: bool) -> Variant:
 		if comptime:
 			var cdata := await ctx.compiles(body.slice(0, 2))
@@ -461,23 +470,23 @@ defunc (mono/make :const :gd :raw """,
 		else:
 			ctx.log_error(body[0], str("mono/make: ", body[0], " is not a valid token"))
 			return null
-,""")
+,')
 
-defunc (mono :const :gd :macro """,
+defunc (mono :const :gd :macro ',
 	func (_ctx, body: Array) -> Array:
 		return Lisper.apply(&"mono/add", [
 			[Lisper.apply(&"mono/make", [body])],
 		])
-,""")
+,')
 
-defunc (mono_map :const :gd :macro """,
+defunc (mono_map :const :gd :macro ',
 	func (_ctx, body: Array) -> Array:
 		return Lisper.apply(&"mono/add", [
 			[Lisper.apply(&"mono_map/make", [body])],
 		])
-,""")
+,')
 
-defunc (Define :const :gd :macro """,
+defunc (Define :const :gd :macro ',
 	func (_ctx, body: Array) -> Array:
 		return Lisper.apply(&"defvar", [
 			[body[0]],
@@ -485,16 +494,16 @@ defunc (Define :const :gd :macro """,
 				body.slice(1),
 			])],
 		])
-,""")
+,')
 
-defunc (define :const :gd :macro """,
+defunc (define :const :gd :macro ',
 	func (_ctx, body: Array) -> Array:
 		return Lisper.apply(&"define/sign", [
 			[Lisper.apply(&"define/make", [body])],
 		])
-,""")
+,')
 
-defunc (import :const :gd :macro """,
+defunc (import :const :gd :macro ',
 	func (_ctx, body: Array) -> Array:
 		return Lisper.apply(&"defvar", [[
 			body[0],
@@ -502,9 +511,9 @@ defunc (import :const :gd :macro """,
 				body.slice(1),
 			]),
 		]])
-,""")
+,')
 
-defunc (define/import :const :gd :macro """,
+defunc (define/import :const :gd :macro ',
 	func (_ctx, body: Array) -> Array:
 		return Lisper.apply(&"defvar", [[
 			body[0],
@@ -512,39 +521,39 @@ defunc (define/import :const :gd :macro """,
 				body.slice(1),
 			]),
 		]])
-,""")
+,')
 
-defunc (control/set :const :gd """,
+defunc (control/set :const :gd ',
 	func (mono: Mono) -> Mono:
 		control_target = mono
 		return mono
-,""")
+,')
 
-defunc (control/clear :const :gd """,
+defunc (control/clear :const :gd ',
 	func () -> void:
 		control_target = null
-,""")
+,')
 
-defunc (cam/set :const :gd """,
+defunc (cam/set :const :gd ',
 	func (mono: Mono) -> Mono:
 		cam_target = mono
 		return mono
-,""")
+,')
 
-defunc (cam/clear :const :gd """,
+defunc (cam/clear :const :gd ',
 	func () -> void:
 		cam_target = null
-,""")
+,')
 
-defunc (gsx/exec :const :gd """,
+defunc (gsx/exec :const :gd ',
 	func (path: String) -> void:
 		if path.begins_with('/'):
 			await exec_gsx(root_dir.path_join(path.substr(1)))
 		else:
 			await exec_gsx(path)
-,""")
+,')
 
-defunc (mono_map/make :const :gd """,
+defunc (mono_map/make :const :gd ',
 	func (offset: Vector3, cell_size: Vector3, psize: Vector2, data := []) -> MonoMap:
 		var map := MonoMap.new()
 		map.sekai = self
@@ -553,60 +562,60 @@ defunc (mono_map/make :const :gd """,
 		map.size = psize
 		map.data = PackedInt32Array(data)
 		return map
-,""")
+,')
 
-defunc (csgv/map-let :const :gd :macro """,
+defunc (csgv/map-let :const :gd :macro ',
 	func (_ctx, body: Array) -> Array:
 		return Lisper.apply(&"array/map-let", [[
 			Lisper.apply(&"csgv/load", [[body[0]]]),
 		], body.slice(1)])
-,""")
+,')
 
-defunc (csv/map-let :const :gd :macro """,
+defunc (csv/map-let :const :gd :macro ',
 	func (_ctx, body: Array) -> Array:
 		return Lisper.apply(&"array/map-let", [[
 			Lisper.apply(&"csv/load", [[body[0]]]),
 		], body.slice(1)])
-,""")
+,')
 
-defunc (load :const :gd :pure """,
+defunc (load :const :gd :pure ',
 	func (path: String) -> Resource:
 		return get_assert(path)
-,""")
+,')
 
-defunc (define/load :const :gd :pure """,
+defunc (define/load :const :gd :pure ',
 	func (path: String) -> Resource:
 		return get_assert(path).new()
-,""")
+,')
 
-defunc (csgv/load :const :gd :pure """,
+defunc (csgv/load :const :gd :pure ',
 	func (path: String) -> Array:
 		return load_csgv(root_dir.path_join(path))
-,""")
+,')
 
-defunc (csv/load :const :gd :pure """,
+defunc (csv/load :const :gd :pure ',
 	func (path: String) -> Array:
 		return load_csv(root_dir.path_join(path))
-,""")
+,')
 
-defunc (dbs/define :const :gd """,
+defunc (dbs/define :const :gd ',
 	func (body: Array) -> void:
 			dbs_define(body[0], body[1], body[2])
-,""")
+,')
 
-defunc (dbs/getp :const :gd """,
+defunc (dbs/getp :const :gd ',
 	func (body: Array) -> Variant:
 			return dbs_getp(body[0], body[1], body[2])
-,""")
+,')
 
-defunc (dbs/setp :const :gd """,
+defunc (dbs/setp :const :gd ',
 	func (body: Array) -> void:
 			dbs_setp(body[0], body[1], body[2], body[3])
-,""")
+,')
 
-defunc (dbs/pushp :const :gd """,
+defunc (dbs/pushp :const :gd ',
 	func (body: Array) -> void:
 			dbs_pushp(body[0], body[1], body[2], body[3])
-,""")
+,')
 
-"""]
+']

@@ -113,38 +113,38 @@ func compile_template(ctx: LisperContext, node: Array) -> Array:
 			return [is_pure, [node[0], body]]
 	return [true, node]
 
-func gsm(): return ["""
+func gsm(): return ['
 
-defunc (raw :const :gd :macro """,
+defunc (raw :const :gd :macro ',
 	func (_ctx, body: Array) -> Array:
 		return Lisper.Raw(body[0])
-,""")
+,')
 
-defunc (raw<- :const :gd :pure """,
+defunc (raw<- :const :gd :pure ',
 	func (value: Variant) -> Array:
 		return Lisper.Raw(value)
-,""")
+,')
 
-defunc (raw->string :const :gd :apply :pure """,
+defunc (raw->string :const :gd :apply :pure ',
 	func (value: Variant) -> Array:
 		return Lisper.Raw(value)
-,""")
+,')
 
-defunc (display :const :gd :macro """,
+defunc (display :const :gd :macro ',
 	func (_ctx, body: Array) -> Array:
 		return Lisper.apply(&"echo", [[
 			Lisper.apply(&"raw->string", [[
 				Lisper.apply(&"raw", [body]),
 			]]),
 		]])
-,""")
+,')
 
-defunc (compile :const :gd :apply :pure """,
+defunc (compile :const :gd :apply :pure ',
 	func (ctx: LisperContext, args: Array) -> Array:
 		return await ctx.compile(args[0])
-,""")
+,')
 
-defunc (template :const :gd :raw """,
+defunc (template :const :gd :raw ',
 	func (ctx: LisperContext, body: Array, comptime: bool) -> Variant:
 		if comptime:
 			var res := await compile_template(ctx, body[0])
@@ -154,17 +154,17 @@ defunc (template :const :gd :raw """,
 				return [res[1]]
 		else:
 			return await template(ctx, body[0])
-,""")
+,')
 
-defunc (block :const :gd :raw """,
+defunc (block :const :gd :raw ',
 	func (ctx: LisperContext, body: Array, comptime: bool) -> Variant:
 		if comptime:
 			return await LisperCommons.compile_block(ctx, body)
 		else:
 			return (await ctx.execs(body))[-1] if body.size() > 0 else null
-,""")
+,')
 
-defunc (=> :const :gd :macro """,
+defunc (=> :const :gd :macro ',
 	func (_ctx, body: Array) -> Array:
 		var inner = body[0]
 		for step in body.slice(1):
@@ -173,9 +173,9 @@ defunc (=> :const :gd :macro """,
 			step[1].insert(1, inner)
 			inner = step
 		return inner
-,""")
+,')
 
-defunc (if :const :gd :raw """,
+defunc (if :const :gd :raw ',
 	func (ctx: LisperContext, body: Array, comptime: bool) -> Variant:
 		if comptime:
 			body = await ctx.compiles(body)
@@ -191,9 +191,9 @@ defunc (if :const :gd :raw """,
 			elif body.size() > 2:
 				return await ctx.exec(body[2])
 			return null
-,""")
+,')
 
-defunc (switch :const :gd :raw """,
+defunc (switch :const :gd :raw ',
 	func (ctx: LisperContext, body: Array, comptime: bool) -> Variant:
 		if comptime:
 			body = await ctx.compiles(body)
@@ -221,9 +221,9 @@ defunc (switch :const :gd :raw """,
 				if is_same(caser, true) or is_same(caser, value):
 					return await ctx.exec(body[2 * i + 2])
 			return null
-,""")
+,')
 
-defunc (loop :const :gd :raw """,
+defunc (loop :const :gd :raw ',
 	func (ctx: LisperContext, body: Array, comptime: bool) -> Variant:
 		if comptime:
 			body = await ctx.compiles(body)
@@ -233,9 +233,9 @@ defunc (loop :const :gd :raw """,
 			while true:
 				await ctx.execs(body)
 			return null
-,""")
+,')
 
-defunc (loop* :const :gd :raw """,
+defunc (loop* :const :gd :raw ',
 	func (ctx: LisperContext, body: Array, comptime: bool) -> Variant:
 		ctx = ctx.fork()
 		var state := [false, false]
@@ -256,85 +256,85 @@ defunc (loop* :const :gd :raw """,
 						break
 					await ctx.exec(node)
 			return res[0]
-,""")
+,')
 
-defunc (keyword :const :gd :pure """,
+defunc (keyword :const :gd :pure ',
 	func (value: Variant) -> StringName:
 		return StringName(value)
-,""")
+,')
 
-defunc (num :const :gd :pure """,
+defunc (num :const :gd :pure ',
 	func (value: Variant) -> float:
 		return float(value)
-,""")
+,')
 
-defunc (echo :const :gd :apply """,
+defunc (echo :const :gd :apply ',
 	func (ctx: LisperContext, args: Array) -> Variant:
 		var msg := ' '.join(args.map(func (e): return str(e)))
 		var lines := msg.split('\n')
 		print('\n'.join(Array(lines).map(func (l): return ctx.print_head + l)))
 		return args[-1] if args.size() > 0 else null
-,""")
+,')
 
-defunc (echo_val :const :gd :apply """,
+defunc (echo_val :const :gd :apply ',
 	func (ctx: LisperContext, args: Array) -> Variant:
 		var msg := ' '.join(args.map(func (e): return ctx.stringify_raw(e)))
 		var lines := msg.split('\n')
 		print('\n'.join(Array(lines).map(func (l): return ctx.print_head + l)))
 		return args[-1] if args.size() > 0 else null
-,""")
+,')
 
-defunc (echo_raw :const :gd :apply """,
+defunc (echo_raw :const :gd :apply ',
 	func (ctx: LisperContext, args: Array) -> Variant:
 		var msg := ' '.join(args.map(func (e): return ctx.stringify(e)))
 		var lines := msg.split('\n')
 		print('\n'.join(Array(lines).map(func (l): return ctx.print_head + l)))
 		return args[-1] if args.size() > 0 else null
-,""")
+,')
 
-defunc (echo_rich :const :gd :apply """,
+defunc (echo_rich :const :gd :apply ',
 	func (ctx: LisperContext, args: Array) -> Variant:
 		var msg := ' '.join(args.map(func (e): return str(e)))
 		var lines := msg.split('\n')
 		print_rich('\n'.join(Array(lines).map(func (l): return ctx.print_head + l)))
 		return args[-1] if args.size() > 0 else null
-,""")
+,')
 
-defunc (eval :const :gd :apply """,
+defunc (eval :const :gd :apply ',
 	func (ctx: LisperContext, args: Array) -> Variant:
 		return (await ctx.execs(args))[-1]
-,""")
+,')
 
-defunc (debug :const :gd :raw """,
+defunc (debug :const :gd :raw ',
 	func (ctx: LisperContext, body: Array, comptime: bool) -> Variant:
 		breakpoint
 		if comptime: return await ctx.compiles(body)
 		return (await ctx.execs(body))[-1]
-,""")
+,')
 
-defunc (go :const :gd :raw """,
+defunc (go :const :gd :raw ',
 	func (ctx: LisperContext, body: Array, comptime: bool) -> Variant:
 		if comptime: return await ctx.compiles(body)
 		return body.map(ctx.exec)
-,""")
+,')
 
-defunc (+ :const :gd :pure """, func (a, b): return a + b ,""")
-defunc (,- :const :gd :pure """, func (a, b): return a - b ,""")
-defunc (* :const :gd :pure """, func (a, b): return a * b ,""")
-defunc (/ :const :gd :pure """, func (a, b): return a / b ,""")
+defunc (+ :const :gd :pure ', func (a, b): return a + b ,')
+defunc (,- :const :gd :pure ', func (a, b): return a - b ,')
+defunc (* :const :gd :pure ', func (a, b): return a * b ,')
+defunc (/ :const :gd :pure ', func (a, b): return a / b ,')
 
-defunc (< :const :gd :pure """, func (a, b): return a < b ,""")
-defunc (<= :const :gd :pure """, func (a, b): return a <= b ,""")
-defunc (> :const :gd :pure """, func (a, b): return a > b ,""")
-defunc (>= :const :gd :pure """, func (a, b): return a >= b ,""")
-defunc (== :const :gd :pure """, func (a, b): return a == b ,""")
-defunc (!= :const :gd :pure """, func (a, b): return a != b ,""")
-defunc (not :const :gd :pure """, func (v): return not v ,""")
+defunc (< :const :gd :pure ', func (a, b): return a < b ,')
+defunc (<= :const :gd :pure ', func (a, b): return a <= b ,')
+defunc (> :const :gd :pure ', func (a, b): return a > b ,')
+defunc (>= :const :gd :pure ', func (a, b): return a >= b ,')
+defunc (== :const :gd :pure ', func (a, b): return a == b ,')
+defunc (!= :const :gd :pure ', func (a, b): return a != b ,')
+defunc (not :const :gd :pure ', func (v): return not v ,')
 
-defunc (@ :const :gd :pure """, func (src, ref): return src[ref] ,""")
-defunc (@= :const :gd :pure """, func (src, ref, value): src[ref] = value ,""")
+defunc (@ :const :gd :pure ', func (src, ref): return src[ref] ,')
+defunc (@= :const :gd :pure ', func (src, ref, value): src[ref] = value ,')
 
-defunc (and :const :gd :raw """,
+defunc (and :const :gd :raw ',
 	func (ctx: LisperContext, body: Array, comptime: bool) -> Variant:
 		if comptime:
 			var result := Lisper.Raw(true)
@@ -352,9 +352,9 @@ defunc (and :const :gd :raw """,
 				res = await ctx.exec(expr)
 				if not res: return res
 			return res
-,""")
+,')
 
-defunc (or :const :gd :raw """,
+defunc (or :const :gd :raw ',
 	func (ctx: LisperContext, body: Array, comptime: bool) -> Variant:
 		if comptime:
 			var result := Lisper.Raw(false)
@@ -372,36 +372,36 @@ defunc (or :const :gd :raw """,
 				res = await ctx.exec(expr)
 				if res: return res
 			return res
-,""")
+,')
 
-defunc (+1 :const :gd :raw """,
+defunc (+1 :const :gd :raw ',
 	func (ctx: LisperContext, body: Array, comptime: bool) -> Variant:
 		if comptime: return await LisperCommons.compile_keyword_mask_1(ctx, body)
 		else:
 			var vname := ctx.exec_as_keyword(body[0]) as StringName
 			ctx.set_var(vname, ctx.get_var(vname) + 1)
 			return null
-,""")
+,')
 
-defunc (,-1 :const :gd :raw """,
+defunc (,-1 :const :gd :raw ',
 	func (ctx: LisperContext, body: Array, comptime: bool) -> Variant:
 		if comptime: return await LisperCommons.compile_keyword_mask_1(ctx, body)
 		else:
 			var vname := ctx.exec_as_keyword(body[0]) as StringName
 			ctx.set_var(vname, ctx.get_var(vname) - 1)
 			return null
-,""")
+,')
 
-defunc (vec2 :const :gd :pure """, func (x, y): return Vector2(x, y) ,""")
-defunc (vec3 :const :gd :pure """, func (x, y, z): return Vector3(x, y, z) ,""")
-defunc (rect2 :const :gd :pure """, func (x, y, w, h): return Rect2(x, y, w, h) ,""")
-defunc (color :const :gd :pure """,
+defunc (vec2 :const :gd :pure ', func (x, y): return Vector2(x, y) ,')
+defunc (vec3 :const :gd :pure ', func (x, y, z): return Vector3(x, y, z) ,')
+defunc (rect2 :const :gd :pure ', func (x, y, w, h): return Rect2(x, y, w, h) ,')
+defunc (color :const :gd :pure ',
 	func (r_c = null, g_a = null, b = null, a = null) -> Color:
 		if r_c == null: return Color()
 		if g_a == null: return Color(r_c)
 		if b == null: return Color(r_c, g_a)
 		if a == null: return Color(r_c, g_a, b)
 		return Color(r_c, g_a, b, a)
-,""")
+,')
 
-"""]
+']

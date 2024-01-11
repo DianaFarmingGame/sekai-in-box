@@ -33,7 +33,7 @@ var props := {
 	
 	&"on_draw_debug": Prop.puts({
 		&"99:solid_box": TSolid.draw_debug,
-	})
+	} if ProjectSettings.get_setting(&"sekai/debug_draw_solid") else {})
 }
 
 static func test_pos(sekai: Sekai, this: Mono, pos: Vector3) -> bool:

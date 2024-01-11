@@ -21,7 +21,7 @@ var props := {
 	
 	&"on_draw_debug": Prop.puts({
 		&"99:route_boxes": TRoutable.draw_debug,
-	})
+	} if ProjectSettings.get_setting(&"sekai/debug_draw_routable") else {})
 }
 
 static func draw_debug(sekai: Sekai, this: Mono, item: SekaiItem) -> void:
