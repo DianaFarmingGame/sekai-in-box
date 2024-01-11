@@ -1,3 +1,3 @@
-func gsm(): return ["""
+func gsm(): return ['
 
-"""]
+']

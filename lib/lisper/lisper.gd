@@ -60,7 +60,7 @@ static func FnGDApply(handle: Callable) -> Array: return [Lisper.SymFunc, FnType
 
 static func FnGDApplyP(handle: Callable) -> Array: return [Lisper.SymFunc, FnType.GD_APPLY_PURE, handle]
 
-static func fn_gd_get_handle(handle: Array) -> Callable: return handle[2]
+static func fn_gd_get_handle(handle: Variant) -> Callable: return handle[2] if handle is Array else handle
 
 static func FnLPCall(args: Array, body: Array) -> Array: return [Lisper.SymFunc, FnType.LP_CALL, args, body]
 
@@ -70,9 +70,9 @@ static func fn_lp_get_args(handle: Array) -> Array: return handle[2]
 
 static func fn_lp_get_body(handle: Array) -> Array: return handle[3]
 
-static func fn_get_type(handle: Array) -> FnType: return handle[1]
+static func fn_get_type(handle: Variant) -> FnType: return handle[1] if handle is Array else FnType.GD_CALL
 
-static func is_fn(handle: Variant) -> bool: return handle is Array and handle.size() > 0 and is_same(handle[0], Lisper.SymFunc)
+static func is_fn(handle: Variant) -> bool: return handle is Callable or (handle is Array and handle.size() > 0 and is_same(handle[0], Lisper.SymFunc))
 
 static func count_last_len(pstr: String, indent: int) -> int:
 	var slices := pstr.split('\n')
@@ -126,38 +126,13 @@ static func exec_gsm(ctx: LisperContext, gsm: Object) -> void:
 	if need_gtx == true: gsm.gtx = ctx
 	if gsm.has_method(&"gsm_init"): await gsm.gsm_init(ctx)
 	var content := await gsm.gsm() as Array
-	var gss_parts := []
-	var inserts := []
-	var is_gss := true
-	for part in content:
-		if is_gss:
-			gss_parts.append(part)
-		else:
-			gss_parts.append(str(":gsm-insert-", inserts.size()))
-			inserts.append(part)
-		is_gss = not is_gss
-	var gss := ' '.join(gss_parts)
-	var gss_data = Lisper.tokenize(gss)
-	if gss_data != null:
-		gss_data = gss_data.map(func (n): return _gsm_replace(inserts, n))
-		await ctx.execs(gss_data)
+	await ctx.meval(content)
 	if gsm.has_method(&"gsm_inited"): await gsm.gsm_inited(ctx)
 	ctx.def_vars([], {
 		&"*mod-path*": pmod_path,
 		&"*mod-dir*": pmod_dir,
 		&"self": pself,
 	})
-
-static func _gsm_replace(inserts: Array, node: Array) -> Array:
-	match node[0]:
-		Lisper.TType.LIST, Lisper.TType.ARRAY, Lisper.TType.MAP:
-			var body := (node[1] as Array).map(func (n): return Lisper._gsm_replace(inserts, n))
-			return [node[0], body]
-		TType.TOKEN:
-			if node[1].begins_with(":gsm-insert-"):
-				var idx := int(node[1].rsplit('-', true, 1)[1])
-				return Lisper.Raw(inserts[idx])
-	return node
 
 static func test_parser() -> void:
 	print(Lisper.tokenize("1 0 .5 10 204.2 3.30"))

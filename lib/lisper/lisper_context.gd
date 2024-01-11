@@ -1,6 +1,6 @@
 class_name LisperContext
 
-static var ENABLE_AGGRESSIVE_OPT := ProjectSettings.get_setting(&"global/enable_aggressive_opt", true) as bool
+static var ENABLE_AGGRESSIVE_OPT := ProjectSettings.get_setting(&"sekai/enable_aggressive_opt", true) as bool
 
 var parent = null
 var vars := {}
@@ -116,6 +116,35 @@ func eval(expr: String) -> Variant:
 		printerr(source)
 		return null
 
+func meval(content: Array) -> Variant:
+	var gss_parts := []
+	var inserts := []
+	var is_gss := true
+	for part in content:
+		if is_gss:
+			gss_parts.append(part)
+		else:
+			gss_parts.append(str(":gsm-insert-", inserts.size()))
+			inserts.append(part)
+		is_gss = not is_gss
+	var gss := ' '.join(gss_parts)
+	var gss_data = Lisper.tokenize(gss)
+	if gss_data != null:
+		gss_data = gss_data.map(func (n): return _gsm_replace(inserts, n))
+		return await execs(gss_data)
+	return null
+
+func _gsm_replace(inserts: Array, node: Array) -> Array:
+	match node[0]:
+		Lisper.TType.LIST, Lisper.TType.ARRAY, Lisper.TType.MAP:
+			var body := (node[1] as Array).map(func (n): return _gsm_replace(inserts, n))
+			return [node[0], body]
+		Lisper.TType.TOKEN:
+			if node[1].begins_with(":gsm-insert-"):
+				var idx := int(node[1].rsplit('-', true, 1)[1])
+				return Lisper.Raw(inserts[idx])
+	return node
+
 func execs(nodes: Array) -> Array:
 	var res := []
 	res.resize(nodes.size())
@@ -133,7 +162,7 @@ func exec(node: Array) -> Variant:
 			var head = node[1][0]
 			var body = (node[1] as Array).slice(1)
 			var handle = await exec(head)
-			if handle is Array:
+			if handle is Callable or handle is Array:
 				return await call_fn_raw(handle, body)
 			elif handle == null:
 				log_error(node, str("call handle not found: ", head))
@@ -155,7 +184,7 @@ func exec_map_part(pairs: Array) -> Dictionary:
 		res[k] = v
 	return res
 
-func call_fn_raw(handle: Array, body: Array) -> Variant:
+func call_fn_raw(handle: Variant, body: Array) -> Variant:
 	match Lisper.fn_get_type(handle):
 		Lisper.FnType.GD_RAW:
 			return await Lisper.fn_gd_get_handle(handle).call(self, body, false)
@@ -186,7 +215,7 @@ func call_fn_raw(handle: Array, body: Array) -> Variant:
 			printerr("arguments: ", stringifys(body))
 			return null
 
-func call_fn(handle: Array, vargs: Array) -> Variant:
+func call_fn(handle: Variant, vargs: Array) -> Variant:
 	match Lisper.fn_get_type(handle):
 		Lisper.FnType.GD_RAW:
 			return await Lisper.fn_gd_get_handle(handle).call(self, vargs.map(Lisper.Raw), false)

@@ -16,7 +16,7 @@ func _into_sekai() -> void:
 		item.set_y(position.y + floorf(position.z) * 64)
 		item.pen_clear_transform()
 		callm(&"on_draw", item))
-	if ProjectSettings.get_setting(&"global/debug_draw"):
+	if ProjectSettings.get_setting(&"sekai/debug_draw"):
 		debug_item = sekai.make_item()
 		debug_item.on_draw.connect(func ():
 			debug_item.set_y(position.y + floorf(position.z) * 64 + 4096)
