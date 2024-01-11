@@ -136,18 +136,12 @@ func _init_sekai() -> void:
 	if define_gss: await exec_gsx(define_gss)
 	if entry_gss: await exec_gsx(entry_gss)
 	var stime := Time.get_ticks_usec()
-	for mono in monos:
-		mono._on_init()
-	print_rich("[sekai] inited in ", (Time.get_ticks_usec() - stime) / 1000.0, " ms")
-	print()
+	for mono in monos: mono._on_init()
+	print_rich("[sekai] inited in ", (Time.get_ticks_usec() - stime) / 1000.0, " ms\n")
 
 func make_lisper_context() -> LisperContext:
-	var context := LisperContext.new()
-	await LisperCommons.def_commons(context)
+	var context := await LisperCommons.make_common_context()
 	await Lisper.exec_gsm(context, self)
-	
-	context.def_vars([Lisper.VarFlag.CONST, Lisper.VarFlag.FIX], {
-	})
 	return context
 
 var _indent := 0
@@ -358,6 +352,11 @@ defvar (:const Entity ', GEntity.new() ,')
 defvar (:const Tile ', GTile.new() ,')
 defvar (:const Mono ', Mono ,')
 defvar (:const MonoEntity ', MonoEntity ,')
+
+defunc (delay :const :gd :raw ',
+	func (ptimeout: float) -> void:
+		await get_tree().create_timer(ptimeout).timeout
+,')
 
 defunc (do :const :gd :raw ',
 	func (ctx: LisperContext, body: Array, comptime: bool) -> Variant:
