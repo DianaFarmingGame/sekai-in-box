@@ -353,6 +353,8 @@ func load_from_path(path: String) -> void:
 
 func gsm(): return ['
 
+defvar (:const *sekai* ', self ,')
+
 defvar (:const MonoDefine ', MonoDefine.new() ,')
 defvar (:const Entity ', GEntity.new() ,')
 defvar (:const Tile ', GTile.new() ,')
