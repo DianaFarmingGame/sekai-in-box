@@ -6,10 +6,11 @@ func gsm():
 defunc (produce :gd """, produce,""")
 defunc (number_t :gd """, number_t,""")
 defunc (probability_t :gd """, probability_t,""")
+defunc (final :gd """, final,""")
 
 csv/map-let (+ (*config_base* "drop.csv")
 	[破坏方块 掉落 数量 概率]
-	produce(sekai {
+	produce(*sekai* {
 		destoryID 	keyword(破坏方块)
 		itemID 		keyword(掉落)
 		countList 	number_t(数量)
@@ -18,6 +19,7 @@ csv/map-let (+ (*config_base* "drop.csv")
 		
 )
 
+final(*sekai*)
 	
 """]
 
@@ -33,16 +35,13 @@ func produce(sekai: Sekai, o: Dictionary):
 	assert(count_list.size() == probability.size(), "数量列表与概率列表数量不符")
 
 	if o["destoryID"] != "":
+		if drop_map.size() > 0:
+			sekai.dbs_define("掉落", destory_id, drop_map)
+
 		destory_id = o["destoryID"]
-		
-		sekai.dbs_define("掉落", destory_id, drop_map)
-		
-		drop_map[destory_id] = []
-		drop_map[item_id] = {"countList": count_list, "probability": probability}
+		drop_map = {}
 	
 	drop_map[item_id] = {"countList": count_list, "probability": probability}
-
-
 
 func number_t(num: String) -> Array:
 	var num_group := num.split(" ")
@@ -66,3 +65,7 @@ func probability_t(prob: String) -> Array:
 			continue
 		prob_list.append(i.to_float())
 	return prob_list
+
+func final(sekai: Sekai):
+	if drop_map.size() > 0:
+		sekai.dbs_define("掉落", destory_id, drop_map)
