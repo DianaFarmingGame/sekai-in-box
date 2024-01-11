@@ -19,7 +19,6 @@ config/icon="res://icon.svg"
 
 DebugMenu="*res://addons/debug_menu/debug_menu.tscn"
 LisperCommons="*res://lib/lisper/lisper_commons.gd"
-Debugger="*res://lib/lisper/debugger.tscn"
 
 [debug]
 
