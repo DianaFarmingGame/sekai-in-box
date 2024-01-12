@@ -259,13 +259,13 @@ func _on_sd_raw_btn_pressed() -> void:
 func _on_sd_val_btn_pressed() -> void:
 	var name := str("temp", _sd_count)
 	_sd_count += 1
-	cur_ctx.def_var([], name, cur_ctx.exec(_decomp_sel))
+	cur_ctx.def_var([], name, await cur_ctx.exec(_decomp_sel))
 	await exec_expr(name, false)
 
 func _on_eval_btn_pressed() -> void:
 	var name := ":eval"
 	_sd_count += 1
-	cur_ctx.def_var([], name, cur_ctx.exec(_decomp_sel))
+	cur_ctx.def_var([], name, await cur_ctx.exec(_decomp_sel))
 	await exec_expr(name, false)
 	cur_ctx.undef_var(name)
 	update_vars()
