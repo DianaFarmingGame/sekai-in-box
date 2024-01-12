@@ -127,7 +127,10 @@ func _on_input(triggered: Dictionary, pressings: Dictionary, releasings: Diction
 func _unhandled_input(event: InputEvent) -> void:
 	input_mapper.update(event)
 
+var _inited := false
+
 func _init_sekai() -> void:
+	_inited = false
 	defines.clear()
 	defines_by_id.clear()
 	if gss_ctx != null: gss_ctx.destroy()
@@ -138,6 +141,7 @@ func _init_sekai() -> void:
 	if entry_gss: await exec_gsx(entry_gss)
 	var stime := Time.get_ticks_usec()
 	for mono in monos: mono._on_init()
+	_inited = true
 	print_rich("[sekai] inited in ", (Time.get_ticks_usec() - stime) / 1000.0, " ms\n")
 
 func make_lisper_context() -> LisperContext:
@@ -229,6 +233,7 @@ func add_mono(mono) -> void:
 	mono._into_sekai()
 	if mono.is_need_collision(): monos_need_collision.append(mono)
 	if mono.is_need_route(): monos_need_route.append(mono)
+	if _inited: mono._on_init()
 
 func remove_mono(mono) -> void:
 	monos_need_collision.erase(mono)
@@ -330,6 +335,7 @@ func load_from_path(path: String) -> void:
 	if gss_ctx != null: gss_ctx.destroy()
 	gss_ctx = await make_lisper_context()
 	_clear_monos()
+	_inited = false
 	if define_gss: await exec_gsx(define_gss)
 	var vmonos := load_data[&"monos"] as Array
 	for entry in vmonos:
@@ -344,6 +350,7 @@ func load_from_path(path: String) -> void:
 	cam_target = monos[vcam_target] if vcam_target is int else vcam_target
 	var stime := Time.get_ticks_usec()
 	for mono in monos: mono._on_restore()
+	_inited = true
 	print_rich("[sekai] restore in ", (Time.get_ticks_usec() - stime) / 1000.0, " ms")
 	print()
 
@@ -367,7 +374,7 @@ defunc (do :const :gd :raw ',
 		if comptime: return await LisperCommons.compile_keyword_mask_01(ctx, body)
 		else:
 			var this := await ctx.exec(body[0]) as Mono
-			var act_name := ctx.exec_as_keyword(body[1]) as StringName
+			var act_name := await ctx.exec_as_keyword(body[1]) as StringName
 			var action = this.getp(&"actions").get(act_name)
 			if action == null: action = this.getpR(&"actions").get(act_name) # FIXME
 			var argv := [Lisper.Raw(this.sekai), Lisper.Raw(this)]
@@ -380,7 +387,7 @@ defunc (callm :const :gd :raw ',
 		if comptime: return await LisperCommons.compile_keyword_mask_01(ctx, body)
 		else:
 			var this := await ctx.exec(body[0]) as Mono
-			var method := ctx.exec_as_keyword(body[1]) as StringName
+			var method := await ctx.exec_as_keyword(body[1]) as StringName
 			var argv := await ctx.execs(body.slice(2)) as Array
 			return await this.applym(method, argv)
 ,')
@@ -390,7 +397,7 @@ defunc (getp :const :gd :raw ',
 		if comptime: return await LisperCommons.compile_keyword_mask_01(ctx, body)
 		else:
 			var this := await ctx.exec(body[0]) as Mono
-			var key := ctx.exec_as_keyword(body[1]) as StringName
+			var key := await ctx.exec_as_keyword(body[1]) as StringName
 			return this.getp(key)
 ,')
 
@@ -399,7 +406,7 @@ defunc (setp :const :gd :raw ',
 		if comptime: return await LisperCommons.compile_keyword_mask_01(ctx, body)
 		else:
 			var this := await ctx.exec(body[0]) as Mono
-			var key := ctx.exec_as_keyword(body[1]) as StringName
+			var key := await ctx.exec_as_keyword(body[1]) as StringName
 			var value = await ctx.exec(body[2])
 			this.setp(key, value)
 			return null
@@ -431,7 +438,7 @@ defunc (define/make :const :gd :raw ',
 						def.set(k, args[k])
 			return def
 		else:
-			ctx.log_error(body[0], str("define/make: ", body[0], " is not a valid token"))
+			await ctx.log_error(body[0], str("define/make: ", body[0], " is not a valid token"))
 			return null
 ,')
 
@@ -469,7 +476,7 @@ defunc (mono/make :const :gd :raw ',
 						mono.set(k, args[k])
 			return mono
 		else:
-			ctx.log_error(body[0], str("mono/make: ", body[0], " is not a valid token"))
+			await ctx.log_error(body[0], str("mono/make: ", body[0], " is not a valid token"))
 			return null
 ,')
 

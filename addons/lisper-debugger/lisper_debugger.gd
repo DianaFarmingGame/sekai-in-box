@@ -182,14 +182,14 @@ func exec_expr(expr: String, revt := false) -> void:
 		REPLInput.set_text.call_deferred("")
 		output_clear_bg(_last_eval_start, _last_eval_end)
 		_last_eval_start = REPLOutput.get_line_count()
-		output(expr, 0x0088ff33, "   ┌ ", "   │ ", "   └ ", "   [ ")
+		output(expr, 0x0088ff33, "   ~ ", "     ")
 		var tokens := Lisper.tokenize(expr)
 		if TToggle.button_pressed: output(cur_ctx.stringifys(tokens), 0x0088ff22, " T ┌ ", "   │ ", "   └ ", " T [ ")
 		var compiles := cur_ctx.compiles(tokens) as Array
 		if CToggle.button_pressed: output(cur_ctx.stringifys(compiles), 0x0088ff22, " C ┌ ", "   │ ", "   └ ", " C [ ")
 		var results := await (cur_ctx as LisperContext).execs(compiles)
 		for res in results:
-			output(cur_ctx.stringify_raw(res, 0, revt), 0x0088ff22, ">>>> ", "     ")
+			output(cur_ctx.stringify_raw(res, 0, 0, revt), 0x0088ff22, ">>>> ", "     ")
 		_last_eval_end = REPLOutput.get_line_count()
 		_history.append(expr)
 		_cur_history = _history.size()

@@ -38,17 +38,23 @@ echo (*mod-dir*)
 ; 获取当前模块对应的 Godot 对象 (相当于 GDScript 内的 self)
 echo (self)
 
-; 使用 Lisper 调试器对断点进行分析
+; 调用其它模块
+;gsx/exec ("res://lib/lisper/std/math.gsm.gd") ; 绝对路径, 通过 Sekai 调用
+;gsx/exec ("xxx/xxx.gsm.gd") ; 相对路径, 通过 Sekai 调用
+;gsx/exec ("/xxx/xxx.gsm.gd") ; 绝对路径, 从 Sekai 根目录开始, 通过 Sekai 调用
+;exec ("res://lib/lisper/std/math.gsm.gd") ; 绝对路径, 通过 Lisper 调用
+;exec ("xxx/xxx.gsm.gd") ; 相对路径, 通过 Lisper 调用
+
+; 使用 Lisper 调试器对错误进行分析
 var (outer-var :const [1 2 3 4 5 6 7 8 9 0])
 fn (test [arg]
 	switch (arg
 		"yes" echo ("all right!")
 		"oops" block (
-			!break ()
 			failed-call (arg)
 		)
 	)
 )
-test ("oops")
+;test ("oops")
 
 '] # 固定句式

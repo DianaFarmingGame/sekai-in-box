@@ -19,7 +19,7 @@ static func compile_map(ctx: LisperContext, body: Array) -> Array:
 	var is_key := true
 	for n in body:
 		if is_key:
-			cdata.append(Lisper.Raw(ctx.exec_as_keyword(n)))
+			cdata.append(Lisper.Raw(await ctx.exec_as_keyword(n)))
 		else:
 			cdata.append(await ctx.compile(n))
 		is_key = not is_key
@@ -30,7 +30,7 @@ static func compile_keyword_mask_1(ctx: LisperContext, body: Array) -> Array:
 	var cid := 0
 	for n in body:
 		if Lisper.is_flag(n): cdata.append(n); continue
-		if cid == 0: cdata.append(Lisper.Raw(ctx.exec_as_keyword(n)))
+		if cid == 0: cdata.append(Lisper.Raw(await ctx.exec_as_keyword(n)))
 		else: cdata.append(await ctx.compile(n))
 		cid += 1
 	return cdata
@@ -41,7 +41,7 @@ static func compile_keyword_mask_01(ctx: LisperContext, body: Array) -> Array:
 	for n in body:
 		if Lisper.is_flag(n): cdata.append(n); continue
 		if cid == 0: cdata.append(await ctx.compile(n))
-		elif cid == 1: cdata.append(Lisper.Raw(ctx.exec_as_keyword(n)))
+		elif cid == 1: cdata.append(Lisper.Raw(await ctx.exec_as_keyword(n)))
 		else: cdata.append(await ctx.compile(n))
 		cid += 1
 	return cdata
@@ -74,7 +74,7 @@ static func _parse_func(ctx: LisperContext, body: Array) -> Array:
 			printerr("@: ", ctx.stringifys(body))
 			return []
 	else:
-		var args := body[0][1].map(ctx.exec_as_keyword) as Array
+		var args := await Async.array_map(body[0][1], ctx.exec_as_keyword)
 		var tbody := await ctx.compiles(body.slice(1))
 		if flags.has(&":pure"):
 			return Lisper.FnLPCallP(args, tbody)
@@ -102,7 +102,7 @@ static func def_commons(context: LisperContext) -> void:
 					&":const": flags.append(Lisper.VarFlag.CONST)
 					&":fix": flags.append(Lisper.VarFlag.FIX)
 			body = res[1]
-			var vname = ctx.exec_as_keyword(body[0])
+			var vname = await ctx.exec_as_keyword(body[0])
 			await ctx.test(vname is StringName, "failed to parse var name")
 			var data = await ctx.exec(body[1])
 			ctx.def_var(flags, vname, data)
@@ -110,7 +110,7 @@ static func def_commons(context: LisperContext) -> void:
 		&"setvar": Lisper.FnGDRaw( func (ctx: LisperContext, body: Array, comptime: bool) -> Variant:
 			if comptime: return await compile_keyword_mask_1(ctx, body)
 			else:
-				var vname := ctx.exec_as_keyword(body[0]) as StringName
+				var vname := await ctx.exec_as_keyword(body[0]) as StringName
 				var data = await ctx.exec(body[1])
 				ctx.set_var(vname, data)
 				return null),

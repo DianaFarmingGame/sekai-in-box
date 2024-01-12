@@ -94,19 +94,7 @@ func get_source() -> Variant:
 	return source if source != null else parent.get_source() if parent != null else null
 
 func log_error(node: Array, msg) -> void:
-	var src = get_source()
-	if src != null and node.size() > 2:
-		var offset := node[2] as Array
-		var pre_src := (src as String).substr(offset[0], offset[1] - offset[0])
-		var lines := pre_src.split('\n')
-		var slnum := (src as String).count('\n', 0, offset[0]) if offset[0] > 0 else 0
-		for i in lines.size():
-			lines[i] = String.num_uint64(i + slnum + 1).lpad(4) + "|\t" + lines[i]
-		printerr(msg, "\n", '\n'.join(lines))
-	else:
-		printerr(msg, " @:")
-		printerr(stringify(node))
-	print('')
+	await error(msg + " @:\n" + stringify(node))
 
 func exec_as_keyword(node: Array) -> Variant:
 	match node[0]:
@@ -114,7 +102,7 @@ func exec_as_keyword(node: Array) -> Variant:
 			return node[1]
 		Lisper.TType.STRING:
 			return StringName(node[1])
-	log_error(node, str("unable to convert node to keyword: ", node))
+	await log_error(node, str("unable to convert node to keyword: ", node))
 	return null
 
 func exec_as_string(node: Array) -> Variant:
@@ -182,28 +170,29 @@ func exec(node: Array) -> Variant:
 		Lisper.TType.LIST:
 			var head = node[1][0]
 			var body = (node[1] as Array).slice(1)
+			jumps.push_back(node)
 			var handle = await exec(head)
 			if handle is Callable or handle is Array:
-				jumps.push_back(node)
 				var res = await call_fn_raw(handle, body)
 				jumps.pop_back()
 				return res
 			elif handle == null:
-				log_error(node, str("call handle not found: ", head))
+				await log_error(node, str("call handle not found: ", head))
 			else:
-				log_error(node, str("unexpected call handle: ", handle))
+				await log_error(node, str("unexpected call handle: ", handle))
+			jumps.pop_back()
 			return null
 		Lisper.TType.ARRAY:
 			return await execs(node[1])
 		Lisper.TType.MAP:
 			return await exec_map_part(node[1])
-	log_error(node, str("unknown node: ", node))
+	await log_error(node, str("unknown node: ", node))
 	return null
 
 func exec_map_part(pairs: Array) -> Dictionary:
 	var res := {}
 	for i in pairs.size() / 2:
-		var k = exec_as_keyword(pairs[2 * i])
+		var k = await exec_as_keyword(pairs[2 * i])
 		var v = await exec(pairs[2 * i + 1])
 		res[k] = v
 	return res
@@ -224,19 +213,19 @@ func call_fn_raw(handle: Variant, body: Array) -> Variant:
 			var fctx := fork()
 			var args := Lisper.fn_lp_get_args(handle)
 			if args.size() != body.size():
-				push_error("argument list not match expect ", args.size(), " found ", body.size())
-				printerr("argument list not match expect ", args.size(), " found ", body.size())
-				printerr("need: ", args)
-				printerr("provide: ", stringifys(body))
+				await error(str("argument list not match expect ", args.size(), " found ", body.size(), '\n',
+					"need: ", args, '\n',
+					"provide: ", stringifys(body),
+				))
 				return null
 			var vargs := await execs(body)
 			for iarg in args.size():
 				fctx.def_var([], args[iarg], vargs[iarg])
 			return (await fctx.execs(Lisper.fn_lp_get_body(handle)))[-1]
 		_:
-			push_error("unknown call handle type: ", handle)
-			printerr("unknown call handle type: ", handle)
-			printerr("arguments: ", stringifys(body))
+			await error(str("unknown call handle type: ", handle, '\n',
+				"arguments: ", stringifys(body),
+			))
 			return null
 
 func call_fn(handle: Variant, vargs: Array) -> Variant:
@@ -253,29 +242,19 @@ func call_fn(handle: Variant, vargs: Array) -> Variant:
 			var fctx := fork()
 			var args := Lisper.fn_lp_get_args(handle)
 			if args.size() != vargs.size():
-				push_error("argument list not match expect ", args.size(), " found ", vargs.size())
-				printerr("argument list not match expect ", args.size(), " found ", vargs.size())
-				printerr("need: ", args)
-				printerr("provide: ", vargs)
+				await error(str("argument list not match expect ", args.size(), " found ", vargs.size(), '\n',
+					"need: ", args, '\n',
+					"provide: ", stringify_raws(vargs),
+				))
 				return null
 			for iarg in args.size():
 				fctx.def_var([], args[iarg], vargs[iarg])
 			return (await fctx.execs(Lisper.fn_lp_get_body(handle)))[-1]
 		_:
-			push_error("unknown call handle type: ", handle)
-			printerr("unknown call handle type: ", handle)
-			printerr("arguments: ", vargs)
+			await error(str("unknown call handle type: ", handle, '\n',
+				"arguments: ", stringify_raws(vargs),
+			))
 			return null
-
-func call_anyway(handle: Variant, vargs: Array) -> Variant:
-	if handle is Callable:
-		return await handle.callv(vargs)
-	if handle is Array:
-		return await call_fn(handle, vargs)
-	push_error("unknown call handle type: ", handle)
-	printerr("unknown call handle type: ", handle)
-	printerr("arguments: ", vargs)
-	return null
 
 var _flag_comptime := false
 var _flag_pure_rollback := false
@@ -296,7 +275,7 @@ func compile(node: Array) -> Array:
 	var eao := LisperContext.ENABLE_AGGRESSIVE_OPT
 	match node[0]:
 		Lisper.TType.TOKEN:
-			var vname := exec_as_keyword(node) as StringName
+			var vname := await exec_as_keyword(node) as StringName
 			if is_const(vname):
 				return Lisper.Raw(await exec(node))
 			return node
@@ -358,7 +337,7 @@ func compile(node: Array) -> Array:
 			var is_pure := true
 			cdata.resize(pairs.size())
 			for i in pairs.size() / 2:
-				cdata[2 * i] = Lisper.Raw(exec_as_keyword(pairs[2 * i]))
+				cdata[2 * i] = Lisper.Raw(await exec_as_keyword(pairs[2 * i]))
 				var v := await compile(pairs[2 * i + 1])
 				if not Lisper.is_raw(v): is_pure = false
 				cdata[2 * i + 1] = v
@@ -373,7 +352,7 @@ func compile(node: Array) -> Array:
 				return [Lisper.TType.MAP, cdata]
 		Lisper.TType.RAW:
 			return node
-	log_error(node, str("unknown node: ", node))
+	await log_error(node, str("unknown node: ", node))
 	return node
 
 func compiles(body: Array) -> Array:
@@ -381,7 +360,7 @@ func compiles(body: Array) -> Array:
 
 const STRINGIFY_MAX_DEPTH := 32
 
-func stringify_raw(data: Variant, indent := 0, enable_rev_trace := ENABLE_STRINGIFY_REVERSE_TRACE, depth := 0) -> String:
+func stringify_raw(data: Variant, indent := 0, depth := 0, enable_rev_trace := ENABLE_STRINGIFY_REVERSE_TRACE) -> String:
 	if depth > STRINGIFY_MAX_DEPTH: return "..."
 	if enable_rev_trace and (data is Callable or data is Array or data is Dictionary):
 		var vname = find_var(data)
@@ -398,8 +377,10 @@ func stringify_raw(data: Variant, indent := 0, enable_rev_trace := ENABLE_STRING
 				msg += " ([" + ' '.join(Lisper.fn_lp_get_args(data)) + "]\n" + ''.lpad(indent) + stringifys(Lisper.fn_lp_get_body(data), indent, depth + 8) + ')'
 		return msg
 	if data is Dictionary:
+		var ks := data.keys() as Array
+		if ks.size() == 0: return "{}"
 		var res := ['{']
-		for k in data.keys():
+		for k in ks:
 			var v = data[k]
 			res.append('\n' + ''.lpad(indent + 2) + k + ' ' + stringify_raw(v, indent + 2, depth + 1))
 		res.append('\n' + ''.lpad(indent) + '}')
@@ -408,7 +389,7 @@ func stringify_raw(data: Variant, indent := 0, enable_rev_trace := ENABLE_STRING
 		var res := '[' + (stringify_raw(data[0], indent + 1, depth + 1) if data.size() > 0 else '')
 		for n in data.slice(1):
 			var idn := Lisper.count_last_len(res, indent)
-			if idn > 8:
+			if idn - indent > 8:
 				res += '\n' + ''.lpad(indent) + ' ' + stringify_raw(n, indent + 1, depth + 1)
 			else:
 				res += ' ' + stringify_raw(n, idn + 1, depth + 1)
@@ -425,6 +406,9 @@ func stringify_raw(data: Variant, indent := 0, enable_rev_trace := ENABLE_STRING
 	if data is Object:
 		return "#GDObject"
 	return var_to_str(data)
+
+func stringify_raws(data_ary: Array, indent := 0, depth := 0, enable_rev_trace := ENABLE_STRINGIFY_REVERSE_TRACE) -> String:
+	return ' '.join(data_ary.map(func (n): return stringify_raw(n, indent, depth, enable_rev_trace)))
 
 func stringify_rich(node: Array, indent := 0, depth := 0) -> Array:
 	if depth > STRINGIFY_MAX_DEPTH: return [node, "..."]
@@ -481,6 +465,7 @@ func stringify_rich(node: Array, indent := 0, depth := 0) -> Array:
 			tags.append(']')
 			return tags
 		Lisper.TType.MAP:
+			if node[1].size() == 0: return [node, "{}"]
 			var tags := [node, '{']
 			var key := true
 			var idn := indent
@@ -531,6 +516,19 @@ func _test(cond: bool, info: String) -> String:
 		printerr("[lisper] " + info)
 		LisperDebugger.output(info, 0xff660044, " ⚠ : ", "     ")
 		await trigger_break("!::test")
+	return info
+
+func error(info := "<error>") -> void:
+	@warning_ignore("assert_always_true")
+	assert(true, await _error(info))
+	pass
+
+func _error(info: String) -> String:
+	info = "error: " + info
+	push_error("[lisper] " + info)
+	printerr("[lisper] " + info)
+	LisperDebugger.output(info, 0xff660044, "   ⚠ ", "     ")
+	await trigger_break("!::error")
 	return info
 
 func trigger_break(vname := "!::break") -> void:

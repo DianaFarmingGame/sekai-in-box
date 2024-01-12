@@ -74,7 +74,7 @@ static func fn_lp_get_args(handle: Array) -> Array: return handle[2]
 
 static func fn_lp_get_body(handle: Array) -> Array: return handle[3]
 
-static func fn_get_type(handle: Variant) -> FnType: return handle[1] if handle is Array else FnType.GD_CALL
+static func fn_get_type(handle: Variant) -> Variant: return (handle[1] if handle.size() > 1 else null) if handle is Array else FnType.GD_CALL
 
 static func is_fn(handle: Variant) -> bool: return handle is Callable or (handle is Array and handle.size() > 0 and is_same(handle[0], Lisper.SymFunc))
 
