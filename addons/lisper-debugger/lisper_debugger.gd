@@ -18,6 +18,9 @@ var break_waiting := false:
 @onready var StackList := %StackList as ItemList
 @onready var DecompView := %DecompView as TextEdit
 @onready var PassBtn := %PassBtn as Button
+@onready var EvalBtn := %EvalBtn as Button
+@onready var SDRawBtn := %SDRawBtn as Button
+@onready var SDValBtn := %SDValBtn as Button
 @onready var VarTree := %VarTree as Tree
 
 var contexts := []
@@ -144,7 +147,17 @@ func update_vars() -> void:
 		item.set_meta(&"ref", k)
 
 var _decomp_tag = null
-var _decomp_sel = null
+var _decomp_sel = null:
+	set(v):
+		_decomp_sel = v
+		if _decomp_sel != null:
+			EvalBtn.disabled = false
+			SDRawBtn.disabled = false
+			SDValBtn.disabled = false
+		else:
+			EvalBtn.disabled = true
+			SDRawBtn.disabled = true
+			SDValBtn.disabled = true
 
 func do_decompile(node, mark = null) -> void:
 	var tag := cur_ctx.stringify_rich(node) as Array
@@ -251,21 +264,24 @@ func _on_decomp_view_gui_input(event: InputEvent) -> void:
 var _sd_count := 0
 
 func _on_sd_raw_btn_pressed() -> void:
-	var name := str("temp", _sd_count)
-	_sd_count += 1
-	cur_ctx.def_var([], name, _decomp_sel)
-	await exec_expr(name, true)
+	if _decomp_sel != null:
+		var name := str("temp", _sd_count)
+		_sd_count += 1
+		cur_ctx.def_var([], name, _decomp_sel)
+		await exec_expr(name, true)
 
 func _on_sd_val_btn_pressed() -> void:
-	var name := str("temp", _sd_count)
-	_sd_count += 1
-	cur_ctx.def_var([], name, await cur_ctx.exec(_decomp_sel))
-	await exec_expr(name, false)
+	if _decomp_sel != null:
+		var name := str("temp", _sd_count)
+		_sd_count += 1
+		cur_ctx.def_var([], name, await cur_ctx.exec(_decomp_sel))
+		await exec_expr(name, false)
 
 func _on_eval_btn_pressed() -> void:
-	var name := ":eval"
-	_sd_count += 1
-	cur_ctx.def_var([], name, await cur_ctx.exec(_decomp_sel))
-	await exec_expr(name, false)
-	cur_ctx.undef_var(name)
-	update_vars()
+	if _decomp_sel != null:
+		var name := ":eval"
+		_sd_count += 1
+		cur_ctx.def_var([], name, await cur_ctx.exec(_decomp_sel))
+		await exec_expr(name, false)
+		cur_ctx.undef_var(name)
+		update_vars()

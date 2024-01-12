@@ -7,6 +7,7 @@ var parent = null
 var vars := {}
 var source = null
 var print_head := ""
+var dbg_name := ""
 var jumps := []
 
 static func extend(ctx: LisperContext) -> LisperContext:
@@ -20,7 +21,8 @@ static var _root_idx := 0
 static func make(pname = null) -> LisperContext:
 	if pname == null: pname = str("root::", _root_idx)
 	var ctx := LisperContext.new()
-	LisperDebugger.sign_context(pname, ctx)
+	ctx.dbg_name = pname
+	LisperDebugger.sign_context(ctx.dbg_name, ctx)
 	_root_idx += 1
 	return ctx
 
@@ -37,6 +39,9 @@ func fork() -> LisperContext:
 	ctx.parent = self
 	ctx.print_head = print_head
 	return ctx
+
+func destroy() -> void:
+	LisperDebugger.unsign_context(dbg_name, self)
 
 func get_var(name: StringName) -> Variant:
 	var res = vars.get(name)

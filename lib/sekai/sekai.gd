@@ -130,6 +130,7 @@ func _unhandled_input(event: InputEvent) -> void:
 func _init_sekai() -> void:
 	defines.clear()
 	defines_by_id.clear()
+	if gss_ctx != null: gss_ctx.destroy()
 	gss_ctx = await make_lisper_context()
 	_clear_monos()
 	control_target = null
@@ -326,6 +327,7 @@ func load_from_path(path: String) -> void:
 	unit_size = load_data[&"unit_size"]
 	defines.clear()
 	defines_by_id.clear()
+	if gss_ctx != null: gss_ctx.destroy()
 	gss_ctx = await make_lisper_context()
 	_clear_monos()
 	if define_gss: await exec_gsx(define_gss)

@@ -120,14 +120,12 @@ text = "Ｃ"
 unique_name_in_owner = true
 layout_mode = 2
 tooltip_text = "Previous History (Ctrl + Up)"
-toggle_mode = true
 text = " ▲ "
 
 [node name="NextBtn" type="Button" parent="DebuggerWindow/PanelContainer/MarginContainer/TabContainer/Console/HSplitContainer/HBoxContainer/VBoxContainer2/HBoxContainer"]
 unique_name_in_owner = true
 layout_mode = 2
 tooltip_text = "Next History (Ctrl + Down)"
-toggle_mode = true
 text = " ▼ "
 
 [node name="ExecBtn" type="Button" parent="DebuggerWindow/PanelContainer/MarginContainer/TabContainer/Console/HSplitContainer/HBoxContainer/VBoxContainer2/HBoxContainer"]
@@ -206,18 +204,24 @@ middle_mouse_paste_enabled = false
 layout_mode = 2
 
 [node name="EvalBtn" type="Button" parent="DebuggerWindow/PanelContainer/MarginContainer/TabContainer/Console/HSplitContainer/HSplitContainer/HSplitContainer/VBoxContainer/HBoxContainer"]
+unique_name_in_owner = true
 layout_mode = 2
 tooltip_text = "Eval the Value of Selection in REPL"
+disabled = true
 text = " ⤺ "
 
 [node name="SDRawBtn" type="Button" parent="DebuggerWindow/PanelContainer/MarginContainer/TabContainer/Console/HSplitContainer/HSplitContainer/HSplitContainer/VBoxContainer/HBoxContainer"]
+unique_name_in_owner = true
 layout_mode = 2
 tooltip_text = "Use the Raw of Selection in REPL"
+disabled = true
 text = "⤽ RAW"
 
 [node name="SDValBtn" type="Button" parent="DebuggerWindow/PanelContainer/MarginContainer/TabContainer/Console/HSplitContainer/HSplitContainer/HSplitContainer/VBoxContainer/HBoxContainer"]
+unique_name_in_owner = true
 layout_mode = 2
 tooltip_text = "Use the Value of Selection in REPL"
+disabled = true
 text = "⤽ VAL"
 
 [node name="Control" type="Control" parent="DebuggerWindow/PanelContainer/MarginContainer/TabContainer/Console/HSplitContainer/HSplitContainer/HSplitContainer/VBoxContainer/HBoxContainer"]
