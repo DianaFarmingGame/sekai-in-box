@@ -374,7 +374,10 @@ func compile(node: Array) -> Array:
 func compiles(body: Array) -> Array:
 	return await Async.array_map(body, func (n): return await compile(n))
 
-func stringify_raw(data: Variant, indent := 0, enable_rev_trace := ENABLE_STRINGIFY_REVERSE_TRACE) -> String:
+const STRINGIFY_MAX_DEPTH := 32
+
+func stringify_raw(data: Variant, indent := 0, enable_rev_trace := ENABLE_STRINGIFY_REVERSE_TRACE, depth := 0) -> String:
+	if depth > STRINGIFY_MAX_DEPTH: return "..."
 	if enable_rev_trace and (data is Callable or data is Array or data is Dictionary):
 		var vname = find_var(data)
 		if vname != null:
@@ -387,23 +390,23 @@ func stringify_raw(data: Variant, indent := 0, enable_rev_trace := ENABLE_STRING
 		match Lisper.fn_get_type(data):
 			Lisper.FnType.LP_CALL, Lisper.FnType.LP_CALL_PURE:
 				indent += msg.length() + 2
-				msg += " ([" + ' '.join(Lisper.fn_lp_get_args(data)) + "]\n" + ''.lpad(indent) + stringifys(Lisper.fn_lp_get_body(data), indent) + ')'
+				msg += " ([" + ' '.join(Lisper.fn_lp_get_args(data)) + "]\n" + ''.lpad(indent) + stringifys(Lisper.fn_lp_get_body(data), indent, depth + 8) + ')'
 		return msg
 	if data is Dictionary:
 		var res := ['{']
 		for k in data.keys():
 			var v = data[k]
-			res.append('\n' + ''.lpad(indent + 2) + k + ' ' + stringify_raw(v, indent + 2))
+			res.append('\n' + ''.lpad(indent + 2) + k + ' ' + stringify_raw(v, indent + 2, depth + 1))
 		res.append('\n' + ''.lpad(indent) + '}')
 		return ''.join(res)
 	if data is Array:
-		var res := '[' + (stringify_raw(data[0], indent + 1) if data.size() > 0 else '')
+		var res := '[' + (stringify_raw(data[0], indent + 1, depth + 1) if data.size() > 0 else '')
 		for n in data.slice(1):
 			var idn := Lisper.count_last_len(res, indent)
 			if idn > 8:
-				res += '\n' + ''.lpad(indent) + ' ' + stringify_raw(n, indent + 1)
+				res += '\n' + ''.lpad(indent) + ' ' + stringify_raw(n, indent + 1, depth + 1)
 			else:
-				res += ' ' + stringify_raw(n, idn + 1)
+				res += ' ' + stringify_raw(n, idn + 1, depth + 1)
 		res += ']'
 		return res
 	if data is String:
@@ -414,9 +417,12 @@ func stringify_raw(data: Variant, indent := 0, enable_rev_trace := ENABLE_STRING
 		return '&' + slices[0] + ''.join(Array(slices.slice(1)).map(func (s): return '\n' + ''.lpad(indent + 1) + s))
 	if data is bool:
 		return "#t" if data else "#f"
+	if data is Object:
+		return "#GDObject"
 	return var_to_str(data)
 
-func stringify_rich(node: Array, indent := 0) -> Array:
+func stringify_rich(node: Array, indent := 0, depth := 0) -> Array:
+	if depth > STRINGIFY_MAX_DEPTH: return [node, "..."]
 	match node[0]:
 		Lisper.TType.TOKEN:
 			return [node, str(node[1])]
@@ -431,7 +437,7 @@ func stringify_rich(node: Array, indent := 0) -> Array:
 			var res := '"' + slices[0] + ''.join(Array(slices.slice(1)).map(func (s): return '\n' + ''.lpad(indent + 1) + s)) + '"'
 			return [node, res]
 		Lisper.TType.LIST:
-			var head := stringify_rich(node[1][0], indent)
+			var head := stringify_rich(node[1][0], indent, depth + 1)
 			var head_str := Lisper.stringify_flatten(head)
 			var tags := [node, head, ' (']
 			indent = Lisper.count_last_len(head_str, indent) + 2
@@ -441,7 +447,7 @@ func stringify_rich(node: Array, indent := 0) -> Array:
 				if strip_first: strip_first = false
 				else:
 					tags.append('\n' + ''.lpad(indent))
-				tags.append(stringify_rich(n, indent))
+				tags.append(stringify_rich(n, indent, depth + 1))
 			tags.append(')')
 			return tags
 		Lisper.TType.ARRAY:
@@ -452,19 +458,19 @@ func stringify_rich(node: Array, indent := 0) -> Array:
 			for n in body:
 				if strip_first:
 					strip_first = false
-					var t := stringify_rich(n, indent + 1)
+					var t := stringify_rich(n, indent + 1, depth + 1)
 					res += Lisper.stringify_flatten(t)
 					tags.append(t)
 				else:
 					var idn := Lisper.count_last_len(res, indent)
 					if idn - indent > 8:
 						tags.append('\n' + ''.lpad(indent) + ' ')
-						var t := stringify_rich(n, indent + 1)
+						var t := stringify_rich(n, indent + 1, depth + 1)
 						res += tags[-1] + Lisper.stringify_flatten(t)
 						tags.append(t)
 					else:
 						tags.append(' ')
-						var t := stringify_rich(n, idn + 1)
+						var t := stringify_rich(n, idn + 1, depth + 1)
 						res += tags[-1] + Lisper.stringify_flatten(t)
 						tags.append(t)
 			tags.append(']')
@@ -475,28 +481,28 @@ func stringify_rich(node: Array, indent := 0) -> Array:
 			var idn := indent
 			for n in node[1]:
 				if key:
-					var t := stringify_rich(n, indent + 2)
+					var t := stringify_rich(n, indent + 2, depth + 1)
 					tags.append('\n' + ''.lpad(indent + 2))
 					var vstr := tags[-1] + Lisper.stringify_flatten(t) as String
 					tags.append(t)
 					idn = Lisper.count_last_len(vstr, indent) + 1
 				else:
 					tags.append(' ')
-					tags.append(stringify_rich(n, idn))
+					tags.append(stringify_rich(n, idn, depth + 1))
 				key = not key
 			tags.append('\n' + ''.lpad(indent) + '}')
 			return tags
 		Lisper.TType.RAW:
 			var value = node[1]
-			return [node, '<' + stringify_raw(value, indent + 1) + '>']
+			return [node, '<' + stringify_raw(value, indent + 1, depth + 8) + '>']
 	push_error("unknown typed node: ", node)
 	return [node, "<unknown>"]
 
-func stringify(node: Array, indent := 0) -> String:
-	return Lisper.stringify_flatten(stringify_rich(node, indent))
+func stringify(node: Array, indent := 0, depth := 0) -> String:
+	return Lisper.stringify_flatten(stringify_rich(node, indent, depth))
 
-func stringifys(body: Array, indent := 0) -> String:
-	return ' '.join(body.map(func (n): return stringify(n, indent)))
+func stringifys(body: Array, indent := 0, depth := 0) -> String:
+	return ' '.join(body.map(func (n): return stringify(n, indent, depth)))
 
 func strip_flags(body: Array) -> Array:
 	var nbody := []
