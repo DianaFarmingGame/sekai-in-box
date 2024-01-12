@@ -115,6 +115,17 @@ func compile_template(ctx: LisperContext, node: Array) -> Array:
 
 func gsm(): return ['
 
+defvar (var :const defvar)
+
+defunc (fn :const :gd :macro ',
+	func (ctx: LisperContext, body: Array) -> Array:
+		var head = ctx.strip_flags(body)[1][0]
+		if Lisper.is_array(head) or Lisper.is_raw(head):
+			return Lisper.apply(&"func", [body])
+		else:
+			return Lisper.apply(&"defunc", [body])
+,')
+
 defunc (raw :const :gd :macro ',
 	func (_ctx, body: Array) -> Array:
 		return Lisper.Raw(body[0])

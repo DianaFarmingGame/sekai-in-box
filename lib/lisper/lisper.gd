@@ -27,6 +27,8 @@ static func Number(value: float) -> Array: return [TType.NUMBER, value]
 
 static func Array(nodes: Array) -> Array: return [TType.ARRAY, nodes]
 
+static func is_array(node: Variant) -> bool: return is_node(node) and TType.ARRAY == node[0]
+
 static func Raw(value: Variant) -> Array: return [TType.RAW, value]
 
 static func is_raw(node: Variant) -> bool: return is_node(node) and TType.RAW == node[0]
@@ -82,6 +84,47 @@ static func count_last_len(pstr: String, indent: int) -> int:
 		return slices[-1].length()
 	else:
 		return indent + slices[0].length()
+
+static func stringify_flatten(tag: Array) -> String:
+	return ''.join(tag.slice(1).map(func (t):
+		if t is String:
+			return t
+		else:
+			return Lisper.stringify_flatten(t)))
+
+static func stringify_find_pos(tag: Array, column: int, line := 0) -> Variant:
+	var rstr := Lisper.stringify_flatten(tag)
+	var last_nl := -1
+	while line > 0:
+		last_nl = rstr.find('\n', last_nl + 1)
+		line -= 1
+	column += last_nl + 1
+	var res = _find_pos(0, tag, column)
+	if res != null:
+		return [res[0], res.slice(1), Lisper._cvt_poses(rstr, res.slice(1))]
+	else:
+		return null
+
+static func _find_pos(soffset: int, tag: Array, tarcol: int) -> Variant:
+	var coffset := soffset
+	for t in tag.slice(1):
+		#if coffset > tarcol: break;
+		if t is String:
+			coffset += t.length()
+		else:
+			var r = Lisper._find_pos(coffset, t, tarcol)
+			if r != null: return r
+			coffset += Lisper.stringify_flatten(t).length()
+	var eoffset := soffset + Lisper.stringify_flatten(tag).length()
+	if soffset <= tarcol and eoffset >= tarcol: return [tag[0], soffset, eoffset]
+	return null
+
+static func _cvt_poses(string: String, poses: Array) -> Array:
+	return poses.map(func (m):
+		var slice := string.substr(0, m)
+		var line := slice.count('\n')
+		var column := slice.length() - slice.rfind('\n') - 1
+		return [line, column])
 
 static func exec(ctx: LisperContext, path: String) -> void:
 	if path.ends_with(".gss.txt"):

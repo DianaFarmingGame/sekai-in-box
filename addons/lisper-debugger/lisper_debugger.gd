@@ -7,6 +7,7 @@ var break_waiting := false:
 		break_waiting = v
 		PassBtn.disabled = not break_waiting
 
+@onready var DebuggerWindow := %DebuggerWindow as Window
 @onready var ContextList := %ContextList as ItemList
 @onready var REPLInput := %REPLInput as CodeEdit
 @onready var REPLOutput := %REPLOutput as TextEdit
@@ -118,23 +119,40 @@ func update_ctx() -> void:
 		if JumpList.item_count > 0:
 			JumpList.select(0)
 			JumpList.item_selected.emit(0)
-		VarTree.clear()
-		var root = VarTree.create_item()
-		VarTree.hide_root = true
-		VarTree.columns = 2
-		VarTree.column_titles_visible = true
-		VarTree.set_column_title(0, "Name")
-		VarTree.set_column_title_alignment(0, HORIZONTAL_ALIGNMENT_LEFT)
-		VarTree.set_column_title(1, "F")
-		VarTree.set_column_title_alignment(1, HORIZONTAL_ALIGNMENT_LEFT)
-		for k in ctx.vars.keys():
-			var item := VarTree.create_item(root)
-			item.set_text(0, k)
-			item.set_text(1, "C" if ctx.vars[k][0].has(Lisper.VarFlag.CONST) else "")
-			item.set_meta(&"ref", k)
+		update_vars()
 	else:
 		REPLInput.editable = false
 		ExecBtn.disabled = true
+
+func update_vars() -> void:
+	var ctx := cur_ctx as LisperContext
+	VarTree.clear()
+	var root = VarTree.create_item()
+	VarTree.hide_root = true
+	VarTree.columns = 2
+	VarTree.column_titles_visible = true
+	VarTree.set_column_title(0, "Name")
+	VarTree.set_column_title_alignment(0, HORIZONTAL_ALIGNMENT_LEFT)
+	VarTree.set_column_title(1, "F")
+	VarTree.set_column_title_alignment(1, HORIZONTAL_ALIGNMENT_LEFT)
+	var ks := ctx.vars.keys()
+	for ik in ks.size():
+		var k = ks[-ik - 1]
+		var item := VarTree.create_item(root)
+		item.set_text(0, k)
+		item.set_text(1, "C" if ctx.vars[k][0].has(Lisper.VarFlag.CONST) else "")
+		item.set_meta(&"ref", k)
+
+var _decomp_tag = null
+var _decomp_sel = null
+
+func do_decompile(node, mark = null) -> void:
+	var tag := cur_ctx.stringify_rich(node) as Array
+	DecompView.text = Lisper.stringify_flatten(tag)
+	var highlighter := DecompileHighlighter.new()
+	highlighter.update(tag, mark)
+	DecompView.syntax_highlighter = highlighter
+	_decomp_tag = tag
 
 var _last_eval_start := 0
 var _last_eval_end := 0
@@ -146,7 +164,7 @@ func do_exec_repl() -> void:
 	var expr := REPLInput.text
 	await exec_expr(expr)
 
-func exec_expr(expr: String) -> void:
+func exec_expr(expr: String, revt := false) -> void:
 	if expr.length() > 0:
 		REPLInput.set_text.call_deferred("")
 		output_clear_bg(_last_eval_start, _last_eval_end)
@@ -158,10 +176,11 @@ func exec_expr(expr: String) -> void:
 		if CToggle.button_pressed: output(cur_ctx.stringifys(compiles), 0x0088ff22, " C ┌ ", "   │ ", "   └ ", " C [ ")
 		var results := await (cur_ctx as LisperContext).execs(compiles)
 		for res in results:
-			output(cur_ctx.stringify_raw(res, 0, false), 0x0088ff22, ">>>> ", "     ")
+			output(cur_ctx.stringify_raw(res, 0, revt), 0x0088ff22, ">>>> ", "     ")
 		_last_eval_end = REPLOutput.get_line_count()
 		_history.append(expr)
 		_cur_history = _history.size()
+		update_vars()
 
 func _on_repl_input_gui_input(event: InputEvent) -> void:
 	if event is InputEventKey and event.pressed:
@@ -196,7 +215,7 @@ func _on_pass_btn_pressed() -> void:
 
 func _on_jump_list_item_selected(index: int) -> void:
 	if index < cur_ctx.jumps.size():
-		DecompView.text = cur_ctx.stringify(cur_ctx.jumps[-index - 1])
+		do_decompile(cur_ctx.jumps[-index - 1], cur_ctx.jumps[-index] if index > 0 else null)
 
 func _on_refresh_btn_pressed() -> void:
 	update_ctx()
@@ -209,3 +228,44 @@ func _on_var_tree_item_activated() -> void:
 func _on_stack_list_item_selected(index: int) -> void:
 	cur_ctx = ctx_stack[index]
 	update_ctx()
+
+func _update_decomp_sel() -> void:
+	if DecompView.get_caret_count() > 0:
+		var line := DecompView.get_caret_line()
+		var column := DecompView.get_caret_column()
+		if _decomp_tag != null:
+			var res = Lisper.stringify_find_pos(_decomp_tag, column, line)
+			if res != null:
+				_decomp_sel = res[0]
+				var start := res[2][0] as Array
+				var end := res[2][1] as Array
+				DecompView.select.call_deferred(start[0], start[1], end[0], end[1])
+
+func _on_decomp_view_caret_changed() -> void:
+	_update_decomp_sel()
+
+func _on_decomp_view_gui_input(event: InputEvent) -> void:
+	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
+		_update_decomp_sel()
+
+var _sd_count := 0
+
+func _on_sd_raw_btn_pressed() -> void:
+	var name := str("temp", _sd_count)
+	_sd_count += 1
+	cur_ctx.def_var([], name, _decomp_sel)
+	await exec_expr(name, true)
+
+func _on_sd_val_btn_pressed() -> void:
+	var name := str("temp", _sd_count)
+	_sd_count += 1
+	cur_ctx.def_var([], name, cur_ctx.exec(_decomp_sel))
+	await exec_expr(name, false)
+
+func _on_eval_btn_pressed() -> void:
+	var name := ":eval"
+	_sd_count += 1
+	cur_ctx.def_var([], name, cur_ctx.exec(_decomp_sel))
+	await exec_expr(name, false)
+	cur_ctx.undef_var(name)
+	update_vars()

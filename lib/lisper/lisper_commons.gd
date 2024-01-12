@@ -91,11 +91,7 @@ static func def_commons(context: LisperContext) -> void:
 		&"!break": Lisper.FnGDRaw( func (ctx: LisperContext, body: Array, comptime: bool) -> Variant:
 			if comptime: return await ctx.compiles(body)
 			var vname := "!::" + str(await ctx.exec(body[0])) if body.size() > 0 else "!::break"
-			LisperDebugger.sign_context(vname, ctx)
-			LisperDebugger.break_waiting = true
-			await LisperDebugger.break_passed
-			LisperDebugger.break_waiting = false
-			LisperDebugger.unsign_context(vname, ctx)
+			await ctx.trigger_break(vname)
 			return null),
 		&"defvar": Lisper.FnGDRaw( func (ctx: LisperContext, body: Array, comptime: bool) -> Variant:
 			if comptime: return await compile_keyword_mask_1(ctx, body)
@@ -106,7 +102,8 @@ static func def_commons(context: LisperContext) -> void:
 					&":const": flags.append(Lisper.VarFlag.CONST)
 					&":fix": flags.append(Lisper.VarFlag.FIX)
 			body = res[1]
-			var vname := ctx.exec_as_keyword(body[0]) as StringName
+			var vname = ctx.exec_as_keyword(body[0])
+			await ctx.test(vname is StringName, "failed to parse var name")
 			var data = await ctx.exec(body[1])
 			ctx.def_var(flags, vname, data)
 			return null),
