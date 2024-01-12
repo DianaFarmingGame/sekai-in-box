@@ -1,6 +1,6 @@
 func gsm():
 	return ['
-defvar(data csv/map-let(+(*config_base* "dialog.csv")
+defvar(data csv/map-let(+(*config_base* "action.csv")
 	[ID 类型 发起者 文本 跳转表] {
 		ID ID
 		类型 keyword(类型)
