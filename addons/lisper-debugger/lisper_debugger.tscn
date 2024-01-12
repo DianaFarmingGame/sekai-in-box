@@ -40,6 +40,7 @@ theme_override_constants/margin_bottom = 4
 [node name="TabContainer" type="TabContainer" parent="DebuggerWindow/PanelContainer/MarginContainer"]
 layout_mode = 2
 tab_alignment = 1
+tabs_visible = false
 
 [node name="Console" type="MarginContainer" parent="DebuggerWindow/PanelContainer/MarginContainer/TabContainer"]
 layout_mode = 2
