@@ -54,12 +54,6 @@ mono_map(vec3(1 2 1) vec3(1 1 1) vec2(8 8) [
 ])
 
 
-
-defvar(幼女贤者 mono(MonoEntity &幼女贤者
-	props {
-		position vec3(5 8 1)
-	}))
-
 defvar(嘉然 mono(MonoEntity &实体/角色/嘉然
 	props {
 		position vec3(5 9 1)
