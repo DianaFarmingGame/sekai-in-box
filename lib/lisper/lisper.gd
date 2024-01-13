@@ -1,5 +1,7 @@
 class_name Lisper extends Object
 
+const ENABLE_DEBUGGER := true
+
 static func tokenize(expr: String) -> Variant:
 	var parser := GispParser.make(expr)
 	if parser.parse():
@@ -24,6 +26,8 @@ static func Bool(value: bool) -> Array: return [TType.BOOL, value]
 static func Number(value: float) -> Array: return [TType.NUMBER, value]
 
 static func Array(nodes: Array) -> Array: return [TType.ARRAY, nodes]
+
+static func is_array(node: Variant) -> bool: return is_node(node) and TType.ARRAY == node[0]
 
 static func Raw(value: Variant) -> Array: return [TType.RAW, value]
 
@@ -70,7 +74,7 @@ static func fn_lp_get_args(handle: Array) -> Array: return handle[2]
 
 static func fn_lp_get_body(handle: Array) -> Array: return handle[3]
 
-static func fn_get_type(handle: Variant) -> FnType: return handle[1] if handle is Array else FnType.GD_CALL
+static func fn_get_type(handle: Variant) -> Variant: return (handle[1] if handle.size() > 1 else null) if handle is Array else FnType.GD_CALL
 
 static func is_fn(handle: Variant) -> bool: return handle is Callable or (handle is Array and handle.size() > 0 and is_same(handle[0], Lisper.SymFunc))
 
@@ -80,6 +84,47 @@ static func count_last_len(pstr: String, indent: int) -> int:
 		return slices[-1].length()
 	else:
 		return indent + slices[0].length()
+
+static func stringify_flatten(tag: Array) -> String:
+	return ''.join(tag.slice(1).map(func (t):
+		if t is String:
+			return t
+		else:
+			return Lisper.stringify_flatten(t)))
+
+static func stringify_find_pos(tag: Array, column: int, line := 0) -> Variant:
+	var rstr := Lisper.stringify_flatten(tag)
+	var last_nl := -1
+	while line > 0:
+		last_nl = rstr.find('\n', last_nl + 1)
+		line -= 1
+	column += last_nl + 1
+	var res = _find_pos(0, tag, column)
+	if res != null:
+		return [res[0], res.slice(1), Lisper._cvt_poses(rstr, res.slice(1))]
+	else:
+		return null
+
+static func _find_pos(soffset: int, tag: Array, tarcol: int) -> Variant:
+	var coffset := soffset
+	for t in tag.slice(1):
+		#if coffset > tarcol: break;
+		if t is String:
+			coffset += t.length()
+		else:
+			var r = Lisper._find_pos(coffset, t, tarcol)
+			if r != null: return r
+			coffset += Lisper.stringify_flatten(t).length()
+	var eoffset := soffset + Lisper.stringify_flatten(tag).length()
+	if soffset <= tarcol and eoffset >= tarcol: return [tag[0], soffset, eoffset]
+	return null
+
+static func _cvt_poses(string: String, poses: Array) -> Array:
+	return poses.map(func (m):
+		var slice := string.substr(0, m)
+		var line := slice.count('\n')
+		var column := slice.length() - slice.rfind('\n') - 1
+		return [line, column])
 
 static func exec(ctx: LisperContext, path: String) -> void:
 	if path.ends_with(".gss.txt"):

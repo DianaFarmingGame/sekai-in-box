@@ -65,7 +65,7 @@ defunc (array/let :const :gd :raw ',
 	func (ctx: LisperContext, body: Array, comptime: bool) -> Variant:
 		ctx = ctx.fork()
 		if comptime:
-			var defs := body[1][1].map(ctx.exec_as_keyword) as Array
+			var defs := await Async.array_map(body[1][1], ctx.exec_as_keyword)
 			var ary_node := await ctx.compile(body[0])
 			var cdata := [ary_node, Lisper.Array(defs.map(Lisper.Raw))]
 			if Lisper.is_raw(ary_node):
@@ -86,7 +86,7 @@ defunc (array/let :const :gd :raw ',
 			return cdata
 		else:
 			var ary := await ctx.exec(body[0]) as Array
-			var defs := (body[1][1] as Array).map(ctx.exec_as_keyword)
+			var defs := await Async.array_map(body[1][1], ctx.exec_as_keyword)
 			for i in defs.size():
 				ctx.def_var([], defs[i], ary[i])
 			return (await ctx.execs(body.slice(2)))[-1]

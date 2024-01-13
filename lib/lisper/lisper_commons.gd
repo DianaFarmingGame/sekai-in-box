@@ -1,23 +1,11 @@
-extends Node
+class_name LisperCommons
 
-var CommonContext: LisperContext
+static func make_common_context(pname = null) -> LisperContext:
+	var context := LisperContext.make(pname)
+	await def_commons(context)
+	return context
 
-func eval(expr: String) -> Variant:
-	var ctx := CommonContext.fork()
-	var res = await ctx.eval(expr)
-	return [ctx, res]
-
-func fork() -> LisperContext:
-	return CommonContext.fork()
-
-func clone() -> LisperContext:
-	return CommonContext.clone()
-
-func _init() -> void:
-	CommonContext = LisperContext.new()
-	await def_commons(CommonContext)
-
-func compile_block(ctx: LisperContext, body: Array) -> Array:
+static func compile_block(ctx: LisperContext, body: Array) -> Array:
 	body = await ctx.compiles(body)
 	var res = body[-1]
 	var tbody := body.slice(0, -1).filter(func (n): return not Lisper.is_raw(n))
@@ -26,39 +14,39 @@ func compile_block(ctx: LisperContext, body: Array) -> Array:
 	tbody.append(res)
 	return tbody
 
-func compile_map(ctx: LisperContext, body: Array) -> Array:
+static func compile_map(ctx: LisperContext, body: Array) -> Array:
 	var cdata := []
 	var is_key := true
 	for n in body:
 		if is_key:
-			cdata.append(Lisper.Raw(ctx.exec_as_keyword(n)))
+			cdata.append(Lisper.Raw(await ctx.exec_as_keyword(n)))
 		else:
 			cdata.append(await ctx.compile(n))
 		is_key = not is_key
 	return cdata
 
-func compile_keyword_mask_1(ctx: LisperContext, body: Array) -> Array:
+static func compile_keyword_mask_1(ctx: LisperContext, body: Array) -> Array:
 	var cdata := []
 	var cid := 0
 	for n in body:
 		if Lisper.is_flag(n): cdata.append(n); continue
-		if cid == 0: cdata.append(Lisper.Raw(ctx.exec_as_keyword(n)))
+		if cid == 0: cdata.append(Lisper.Raw(await ctx.exec_as_keyword(n)))
 		else: cdata.append(await ctx.compile(n))
 		cid += 1
 	return cdata
 
-func compile_keyword_mask_01(ctx: LisperContext, body: Array) -> Array:
+static func compile_keyword_mask_01(ctx: LisperContext, body: Array) -> Array:
 	var cdata := []
 	var cid := 0
 	for n in body:
 		if Lisper.is_flag(n): cdata.append(n); continue
 		if cid == 0: cdata.append(await ctx.compile(n))
-		elif cid == 1: cdata.append(Lisper.Raw(ctx.exec_as_keyword(n)))
+		elif cid == 1: cdata.append(Lisper.Raw(await ctx.exec_as_keyword(n)))
 		else: cdata.append(await ctx.compile(n))
 		cid += 1
 	return cdata
 
-func _parse_func(ctx: LisperContext, body: Array) -> Array:
+static func _parse_func(ctx: LisperContext, body: Array) -> Array:
 	var res := ctx.strip_flags(body)
 	var flags := res[0] as Array
 	body = res[1]
@@ -86,13 +74,13 @@ func _parse_func(ctx: LisperContext, body: Array) -> Array:
 			printerr("@: ", ctx.stringifys(body))
 			return []
 	else:
-		var args := body[0][1].map(ctx.exec_as_keyword) as Array
+		var args := await Async.array_map(body[0][1], ctx.exec_as_keyword)
 		var tbody := await ctx.compiles(body.slice(1))
 		if flags.has(&":pure"):
 			return Lisper.FnLPCallP(args, tbody)
 		return Lisper.FnLPCall(args, tbody)
 
-func def_commons(context: LisperContext) -> void:
+static func def_commons(context: LisperContext) -> void:
 	context.def_vars([Lisper.VarFlag.CONST, Lisper.VarFlag.FIX], {
 		&"exec": Lisper.FnGDApply( func (ctx: LisperContext, args: Array) -> void:
 			var mod_dir = ctx.get_var(&"*mod-dir*")
@@ -100,6 +88,11 @@ func def_commons(context: LisperContext) -> void:
 			if path.is_relative_path() and mod_dir != null:
 				path = (mod_dir as String).path_join(path)
 			await Lisper.exec_gsm(ctx, load(path))),
+		&"!break": Lisper.FnGDRaw( func (ctx: LisperContext, body: Array, comptime: bool) -> Variant:
+			if comptime: return await ctx.compiles(body)
+			var vname := "!::" + str(await ctx.exec(body[0])) if body.size() > 0 else "!::break"
+			await ctx.trigger_break(vname)
+			return null),
 		&"defvar": Lisper.FnGDRaw( func (ctx: LisperContext, body: Array, comptime: bool) -> Variant:
 			if comptime: return await compile_keyword_mask_1(ctx, body)
 			var res := ctx.strip_flags(body)
@@ -109,14 +102,15 @@ func def_commons(context: LisperContext) -> void:
 					&":const": flags.append(Lisper.VarFlag.CONST)
 					&":fix": flags.append(Lisper.VarFlag.FIX)
 			body = res[1]
-			var vname := ctx.exec_as_keyword(body[0]) as StringName
+			var vname = await ctx.exec_as_keyword(body[0])
+			await ctx.test(vname is StringName, "failed to parse var name")
 			var data = await ctx.exec(body[1])
 			ctx.def_var(flags, vname, data)
 			return null),
 		&"setvar": Lisper.FnGDRaw( func (ctx: LisperContext, body: Array, comptime: bool) -> Variant:
 			if comptime: return await compile_keyword_mask_1(ctx, body)
 			else:
-				var vname := ctx.exec_as_keyword(body[0]) as StringName
+				var vname := await ctx.exec_as_keyword(body[0]) as StringName
 				var data = await ctx.exec(body[1])
 				ctx.set_var(vname, data)
 				return null),
@@ -140,7 +134,5 @@ func def_commons(context: LisperContext) -> void:
 			var handle := await _parse_func(ctx, body)
 			if comptime: return Lisper.RawOverride(Lisper.Raw(handle))
 			return handle),
-		&"delay": Lisper.FnGDCall( func (timeout: float) -> void:
-			await get_tree().create_timer(timeout).timeout),
 	})
 	await Lisper.exec(context, "res://lib/lisper/std/commons.gss.txt")

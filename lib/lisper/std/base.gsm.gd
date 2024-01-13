@@ -115,6 +115,17 @@ func compile_template(ctx: LisperContext, node: Array) -> Array:
 
 func gsm(): return ['
 
+defvar (var :const defvar)
+
+defunc (fn :const :gd :macro ',
+	func (ctx: LisperContext, body: Array) -> Array:
+		var head = ctx.strip_flags(body)[1][0]
+		if Lisper.is_array(head) or Lisper.is_raw(head):
+			return Lisper.apply(&"func", [body])
+		else:
+			return Lisper.apply(&"defunc", [body])
+,')
+
 defunc (raw :const :gd :macro ',
 	func (_ctx, body: Array) -> Array:
 		return Lisper.Raw(body[0])
@@ -240,8 +251,8 @@ defunc (loop* :const :gd :raw ',
 		ctx = ctx.fork()
 		var state := [false, false]
 		var res = [null]
-		var skip_ref := ctx.exec_as_keyword(body[0]) as StringName
-		var escape_ref := ctx.exec_as_keyword(body[1]) as StringName
+		var skip_ref := await ctx.exec_as_keyword(body[0]) as StringName
+		var escape_ref := await ctx.exec_as_keyword(body[1]) as StringName
 		ctx.def_var([], skip_ref, Lisper.FnGDCall( func (): state[0] = true ))
 		ctx.def_var([], escape_ref, Lisper.FnGDCall( func (pres = null): res[0] = pres; state[1] = true ))
 		if comptime:
@@ -378,7 +389,7 @@ defunc (+1 :const :gd :raw ',
 	func (ctx: LisperContext, body: Array, comptime: bool) -> Variant:
 		if comptime: return await LisperCommons.compile_keyword_mask_1(ctx, body)
 		else:
-			var vname := ctx.exec_as_keyword(body[0]) as StringName
+			var vname := await ctx.exec_as_keyword(body[0]) as StringName
 			ctx.set_var(vname, ctx.get_var(vname) + 1)
 			return null
 ,')
@@ -387,7 +398,7 @@ defunc (,-1 :const :gd :raw ',
 	func (ctx: LisperContext, body: Array, comptime: bool) -> Variant:
 		if comptime: return await LisperCommons.compile_keyword_mask_1(ctx, body)
 		else:
-			var vname := ctx.exec_as_keyword(body[0]) as StringName
+			var vname := await ctx.exec_as_keyword(body[0]) as StringName
 			ctx.set_var(vname, ctx.get_var(vname) - 1)
 			return null
 ,')

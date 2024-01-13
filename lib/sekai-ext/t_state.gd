@@ -30,14 +30,14 @@ var props := {
 		if prev != null:
 			var prev_data = state_data[prev]
 			var exit = prev_data.get(&"on_exit")
-			if exit != null: sekai.gss_ctx.call_anyway(exit, [sekai, this, dist])
+			if exit != null: sekai.gss_ctx.call_fn(exit, [sekai, this, dist])
 			this.uncover(&"state")
 		if dist != null:
 			var dist_data = state_data[dist]
 			var cover = dist_data.get(&"cover")
 			var enter = dist_data.get(&"on_enter")
 			if cover != null: this.cover(&"state", cover)
-			if enter != null: sekai.gss_ctx.call_anyway(enter, [sekai, this, prev])
+			if enter != null: sekai.gss_ctx.call_fn(enter, [sekai, this, prev])
 		this.setp(&"cur_state", dist),
 	&"state_data": {},
 }

@@ -1,17 +1,30 @@
 class_name LisperContext
 
 static var ENABLE_AGGRESSIVE_OPT := ProjectSettings.get_setting(&"sekai/enable_aggressive_opt", true) as bool
+static var ENABLE_STRINGIFY_REVERSE_TRACE := true
 
 var parent = null
 var vars := {}
 var source = null
 var print_head := ""
+var dbg_name := ""
+var jumps := []
 
 static func extend(ctx: LisperContext) -> LisperContext:
 	var nctx := LisperContext.new()
 	nctx.parent = ctx
 	nctx.print_head = ctx.print_head
 	return nctx
+
+static var _root_idx := 0
+
+static func make(pname = null) -> LisperContext:
+	if pname == null: pname = str("root::", _root_idx)
+	var ctx := LisperContext.new()
+	ctx.dbg_name = pname
+	LisperDebugger.sign_context(ctx.dbg_name, ctx)
+	_root_idx += 1
+	return ctx
 
 func clone() -> LisperContext:
 	var ctx := LisperContext.new()
@@ -27,6 +40,9 @@ func fork() -> LisperContext:
 	ctx.print_head = print_head
 	return ctx
 
+func destroy() -> void:
+	LisperDebugger.unsign_context(dbg_name, self)
+
 func get_var(name: StringName) -> Variant:
 	var res = vars.get(name)
 	return res[1] if res != null else parent.get_var(name) if parent != null else null
@@ -38,13 +54,16 @@ func set_var(name: StringName, data: Variant) -> void:
 	else:
 		parent.set_var(name, data) if parent != null else null
 
-func def_var(flags: Array[Lisper.VarFlag], name: StringName, data: Variant) -> void:
+func def_var(flags: Array, name: StringName, data: Variant) -> void:
 	vars[name] = [flags, data]
+
+func undef_var(name: StringName) -> void:
+	vars.erase(name)
 
 func def_const(name: StringName, data: Variant) -> void:
 	vars[name] = [[Lisper.VarFlag.CONST], data]
 
-func def_vars(flags: Array[Lisper.VarFlag], data_map: Dictionary) -> void:
+func def_vars(flags: Array, data_map: Dictionary) -> void:
 	for k in data_map.keys():
 		vars[k] = [flags, data_map[k]]
 
@@ -52,10 +71,10 @@ func def_consts(data_map: Dictionary) -> void:
 	for k in data_map.keys():
 		vars[k] = [[Lisper.VarFlag.CONST], data_map[k]]
 
-func def_fn(flags: Array[Lisper.VarFlag], type: Lisper.FnType, name: StringName, handle: Variant) -> void:
+func def_fn(flags: Array, type: Lisper.FnType, name: StringName, handle: Variant) -> void:
 	vars[name] = [flags, [type, handle]]
 
-func def_fns(flags: Array[Lisper.VarFlag], type: Lisper.FnType, handle_map: Dictionary) -> void:
+func def_fns(flags: Array, type: Lisper.FnType, handle_map: Dictionary) -> void:
 	for k in handle_map.keys():
 		vars[k] = [flags, [type, handle_map[k]]]
 
@@ -75,19 +94,7 @@ func get_source() -> Variant:
 	return source if source != null else parent.get_source() if parent != null else null
 
 func log_error(node: Array, msg) -> void:
-	var src = get_source()
-	if src != null and node.size() > 2:
-		var offset := node[2] as Array
-		var pre_src := (src as String).substr(offset[0], offset[1] - offset[0])
-		var lines := pre_src.split('\n')
-		var slnum := (src as String).count('\n', 0, offset[0]) if offset[0] > 0 else 0
-		for i in lines.size():
-			lines[i] = String.num_uint64(i + slnum + 1).lpad(4) + "|\t" + lines[i]
-		printerr(msg, "\n", '\n'.join(lines))
-	else:
-		printerr(msg, " @:")
-		printerr(stringify(node))
-	print('')
+	await error(msg + " @:\n" + stringify(node))
 
 func exec_as_keyword(node: Array) -> Variant:
 	match node[0]:
@@ -95,7 +102,7 @@ func exec_as_keyword(node: Array) -> Variant:
 			return node[1]
 		Lisper.TType.STRING:
 			return StringName(node[1])
-	log_error(node, str("unable to convert node to keyword: ", node))
+	await log_error(node, str("unable to convert node to keyword: ", node))
 	return null
 
 func exec_as_string(node: Array) -> Variant:
@@ -146,10 +153,12 @@ func _gsm_replace(inserts: Array, node: Array) -> Array:
 	return node
 
 func execs(nodes: Array) -> Array:
+	jumps.push_back(Lisper.apply(&":flow", [nodes]))
 	var res := []
 	res.resize(nodes.size())
 	for idx in nodes.size():
 		res[idx] = await exec(nodes[idx])
+	jumps.pop_back()
 	return res
 
 func exec(node: Array) -> Variant:
@@ -161,25 +170,29 @@ func exec(node: Array) -> Variant:
 		Lisper.TType.LIST:
 			var head = node[1][0]
 			var body = (node[1] as Array).slice(1)
+			jumps.push_back(node)
 			var handle = await exec(head)
 			if handle is Callable or handle is Array:
-				return await call_fn_raw(handle, body)
+				var res = await call_fn_raw(handle, body)
+				jumps.pop_back()
+				return res
 			elif handle == null:
-				log_error(node, str("call handle not found: ", head))
+				await log_error(node, str("call handle not found: ", head))
 			else:
-				log_error(node, str("unexpected call handle: ", handle))
+				await log_error(node, str("unexpected call handle: ", handle))
+			jumps.pop_back()
 			return null
 		Lisper.TType.ARRAY:
 			return await execs(node[1])
 		Lisper.TType.MAP:
 			return await exec_map_part(node[1])
-	log_error(node, str("unknown node: ", node))
+	await log_error(node, str("unknown node: ", node))
 	return null
 
 func exec_map_part(pairs: Array) -> Dictionary:
 	var res := {}
 	for i in pairs.size() / 2:
-		var k = exec_as_keyword(pairs[2 * i])
+		var k = await exec_as_keyword(pairs[2 * i])
 		var v = await exec(pairs[2 * i + 1])
 		res[k] = v
 	return res
@@ -200,19 +213,19 @@ func call_fn_raw(handle: Variant, body: Array) -> Variant:
 			var fctx := fork()
 			var args := Lisper.fn_lp_get_args(handle)
 			if args.size() != body.size():
-				push_error("argument list not match expect ", args.size(), " found ", body.size())
-				printerr("argument list not match expect ", args.size(), " found ", body.size())
-				printerr("need: ", args)
-				printerr("provide: ", stringifys(body))
+				await error(str("argument list not match expect ", args.size(), " found ", body.size(), '\n',
+					"need: ", args, '\n',
+					"provide: ", stringifys(body),
+				))
 				return null
 			var vargs := await execs(body)
 			for iarg in args.size():
 				fctx.def_var([], args[iarg], vargs[iarg])
 			return (await fctx.execs(Lisper.fn_lp_get_body(handle)))[-1]
 		_:
-			push_error("unknown call handle type: ", handle)
-			printerr("unknown call handle type: ", handle)
-			printerr("arguments: ", stringifys(body))
+			await error(str("unknown call handle type: ", handle, '\n',
+				"arguments: ", stringifys(body),
+			))
 			return null
 
 func call_fn(handle: Variant, vargs: Array) -> Variant:
@@ -229,29 +242,19 @@ func call_fn(handle: Variant, vargs: Array) -> Variant:
 			var fctx := fork()
 			var args := Lisper.fn_lp_get_args(handle)
 			if args.size() != vargs.size():
-				push_error("argument list not match expect ", args.size(), " found ", vargs.size())
-				printerr("argument list not match expect ", args.size(), " found ", vargs.size())
-				printerr("need: ", args)
-				printerr("provide: ", vargs)
+				await error(str("argument list not match expect ", args.size(), " found ", vargs.size(), '\n',
+					"need: ", args, '\n',
+					"provide: ", stringify_raws(vargs),
+				))
 				return null
 			for iarg in args.size():
 				fctx.def_var([], args[iarg], vargs[iarg])
 			return (await fctx.execs(Lisper.fn_lp_get_body(handle)))[-1]
 		_:
-			push_error("unknown call handle type: ", handle)
-			printerr("unknown call handle type: ", handle)
-			printerr("arguments: ", vargs)
+			await error(str("unknown call handle type: ", handle, '\n',
+				"arguments: ", stringify_raws(vargs),
+			))
 			return null
-
-func call_anyway(handle: Variant, vargs: Array) -> Variant:
-	if handle is Callable:
-		return await handle.callv(vargs)
-	if handle is Array:
-		return await call_fn(handle, vargs)
-	push_error("unknown call handle type: ", handle)
-	printerr("unknown call handle type: ", handle)
-	printerr("arguments: ", vargs)
-	return null
 
 var _flag_comptime := false
 var _flag_pure_rollback := false
@@ -272,7 +275,7 @@ func compile(node: Array) -> Array:
 	var eao := LisperContext.ENABLE_AGGRESSIVE_OPT
 	match node[0]:
 		Lisper.TType.TOKEN:
-			var vname := exec_as_keyword(node) as StringName
+			var vname := await exec_as_keyword(node) as StringName
 			if is_const(vname):
 				return Lisper.Raw(await exec(node))
 			return node
@@ -334,7 +337,7 @@ func compile(node: Array) -> Array:
 			var is_pure := true
 			cdata.resize(pairs.size())
 			for i in pairs.size() / 2:
-				cdata[2 * i] = Lisper.Raw(exec_as_keyword(pairs[2 * i]))
+				cdata[2 * i] = Lisper.Raw(await exec_as_keyword(pairs[2 * i]))
 				var v := await compile(pairs[2 * i + 1])
 				if not Lisper.is_raw(v): is_pure = false
 				cdata[2 * i + 1] = v
@@ -349,98 +352,147 @@ func compile(node: Array) -> Array:
 				return [Lisper.TType.MAP, cdata]
 		Lisper.TType.RAW:
 			return node
-	log_error(node, str("unknown node: ", node))
+	await log_error(node, str("unknown node: ", node))
 	return node
 
 func compiles(body: Array) -> Array:
 	return await Async.array_map(body, func (n): return await compile(n))
 
-func stringify_raw(data: Variant, indent := 0) -> String:
-	if data is Callable or data is Array or data is Dictionary:
+const STRINGIFY_MAX_DEPTH := 32
+
+func stringify_raw(data: Variant, indent := 0, depth := 0, enable_rev_trace := ENABLE_STRINGIFY_REVERSE_TRACE) -> String:
+	if depth > STRINGIFY_MAX_DEPTH: return "..."
+	if enable_rev_trace and (data is Callable or data is Array or data is Dictionary):
 		var vname = find_var(data)
 		if vname != null:
 			return '#' + vname
+	if data is float:
+		return str(floori(data)) if is_zero_approx(fmod(data, 1)) else str(data)
 	if Lisper.is_fn(data):
 		var type = Lisper.FnType.find_key(Lisper.fn_get_type(data))
 		var msg := 'λ:' + type as String
 		match Lisper.fn_get_type(data):
 			Lisper.FnType.LP_CALL, Lisper.FnType.LP_CALL_PURE:
 				indent += msg.length() + 2
-				msg += " ([" + ' '.join(Lisper.fn_lp_get_args(data)) + "]\n" + ''.lpad(indent) + stringifys(Lisper.fn_lp_get_body(data), indent) + ')'
+				msg += " ([" + ' '.join(Lisper.fn_lp_get_args(data)) + "]\n" + ''.lpad(indent) + stringifys(Lisper.fn_lp_get_body(data), indent, depth + 8) + ')'
 		return msg
 	if data is Dictionary:
+		var ks := data.keys() as Array
+		if ks.size() == 0: return "{}"
 		var res := ['{']
-		for k in data.keys():
+		for k in ks:
 			var v = data[k]
-			res.append('\n' + ''.lpad(indent + 2, ' ') + k + ' ' + stringify_raw(v, indent + 2))
-		res.append('\n' + ''.lpad(indent, ' ') + '}')
+			res.append('\n' + ''.lpad(indent + 2) + k + ' ' + stringify_raw(v, indent + 2, depth + 1))
+		res.append('\n' + ''.lpad(indent) + '}')
 		return ''.join(res)
 	if data is Array:
-		var res := '[' + (stringify_raw(data[0], indent + 1) if data.size() > 0 else '')
+		var res := '[' + (stringify_raw(data[0], indent + 1, depth + 1) if data.size() > 0 else '')
 		for n in data.slice(1):
-			res += ' ' + stringify_raw(n, Lisper.count_last_len(res, indent) + 1)
+			var idn := Lisper.count_last_len(res, indent)
+			if idn - indent > 8:
+				res += '\n' + ''.lpad(indent) + ' ' + stringify_raw(n, indent + 1, depth + 1)
+			else:
+				res += ' ' + stringify_raw(n, idn + 1, depth + 1)
 		res += ']'
 		return res
 	if data is String:
 		var slices := (data as String).split('\n')
-		return '"' + slices[0] + ''.join(Array(slices.slice(1)).map(func (s): return '\n' + ''.lpad(indent + 1, ' ') + s)) + '"'
+		return '"' + slices[0] + ''.join(Array(slices.slice(1)).map(func (s): return '\n' + ''.lpad(indent + 1) + s)) + '"'
 	if data is StringName:
 		var slices := String(data).split('\n')
-		return '&' + slices[0] + ''.join(Array(slices.slice(1)).map(func (s): return '\n' + ''.lpad(indent + 1, ' ') + s))
+		return '&' + slices[0] + ''.join(Array(slices.slice(1)).map(func (s): return '\n' + ''.lpad(indent + 1) + s))
 	if data is bool:
 		return "#t" if data else "#f"
+	if data is Object:
+		return "#GDObject"
 	return var_to_str(data)
 
-func stringify(node: Array, indent := 0) -> String:
+func stringify_raws(data_ary: Array, indent := 0, depth := 0, enable_rev_trace := ENABLE_STRINGIFY_REVERSE_TRACE) -> String:
+	return ' '.join(data_ary.map(func (n): return stringify_raw(n, indent, depth, enable_rev_trace)))
+
+func stringify_rich(node: Array, indent := 0, depth := 0) -> Array:
+	if depth > STRINGIFY_MAX_DEPTH: return [node, "..."]
 	match node[0]:
 		Lisper.TType.TOKEN:
-			return str(node[1])
+			return [node, str(node[1])]
 		Lisper.TType.NUMBER:
-			return str(node[1])
+			return [node, str(node[1])]
 		Lisper.TType.BOOL:
-			return "#t" if node[1] else "#f"
+			return [node, "#t" if node[1] else "#f"]
 		Lisper.TType.KEYWORD:
-			return str('&', node[1])
+			return [node, str('&', node[1])]
 		Lisper.TType.STRING:
 			var slices := (node[1] as String).split('\n')
-			return '"' + slices[0] + ''.join(Array(slices.slice(1)).map(func (s): return '\n' + ''.lpad(indent + 1, ' ') + s)) + '"'
+			var res := '"' + slices[0] + ''.join(Array(slices.slice(1)).map(func (s): return '\n' + ''.lpad(indent + 1) + s)) + '"'
+			return [node, res]
 		Lisper.TType.LIST:
-			var head_str := stringify(node[1][0], indent)
+			var head := stringify_rich(node[1][0], indent, depth + 1)
+			var head_str := Lisper.stringify_flatten(head)
+			var tags := [node, head, ' (']
 			indent = Lisper.count_last_len(head_str, indent) + 2
 			var body := node[1].slice(1) as Array
-			if body.size() <= 1:
-				return head_str + ' (' + ' '.join(body.map(func (n): return stringify(n, indent))) + ')'
-			return head_str + ' (' + \
-			stringify(body[0], indent) + \
-			''.join(body.slice(1).map(func (n): return '\n' + ''.lpad(indent, ' ') + stringify(n, indent))) + ')'
+			var strip_first := true
+			for n in body:
+				if strip_first: strip_first = false
+				else:
+					tags.append('\n' + ''.lpad(indent))
+				tags.append(stringify_rich(n, indent, depth + 1))
+			tags.append(')')
+			return tags
 		Lisper.TType.ARRAY:
-			var res := '[' + (stringify(node[1][0], indent + 1) if node[1].size() > 0 else '')
-			for n in node[1].slice(1):
-				res += ' ' + stringify(n, Lisper.count_last_len(res, indent) + 1)
-			res += ']'
-			return res
+			var res := '['
+			var tags := [node, '[']
+			var strip_first := true
+			var body := node[1] as Array
+			for n in body:
+				if strip_first:
+					strip_first = false
+					var t := stringify_rich(n, indent + 1, depth + 1)
+					res += Lisper.stringify_flatten(t)
+					tags.append(t)
+				else:
+					var idn := Lisper.count_last_len(res, indent)
+					if idn - indent > 8:
+						tags.append('\n' + ''.lpad(indent) + ' ')
+						var t := stringify_rich(n, indent + 1, depth + 1)
+						res += tags[-1] + Lisper.stringify_flatten(t)
+						tags.append(t)
+					else:
+						tags.append(' ')
+						var t := stringify_rich(n, idn + 1, depth + 1)
+						res += tags[-1] + Lisper.stringify_flatten(t)
+						tags.append(t)
+			tags.append(']')
+			return tags
 		Lisper.TType.MAP:
-			var res := ['{']
+			if node[1].size() == 0: return [node, "{}"]
+			var tags := [node, '{']
 			var key := true
 			var idn := indent
 			for n in node[1]:
 				if key:
-					var vstr := '\n' + ''.lpad(indent + 2, ' ') + stringify(n, indent + 2)
+					var t := stringify_rich(n, indent + 2, depth + 1)
+					tags.append('\n' + ''.lpad(indent + 2))
+					var vstr := tags[-1] + Lisper.stringify_flatten(t) as String
+					tags.append(t)
 					idn = Lisper.count_last_len(vstr, indent) + 1
-					res.append(vstr)
 				else:
-					res.append(' ' + stringify(n, idn))
+					tags.append(' ')
+					tags.append(stringify_rich(n, idn, depth + 1))
 				key = not key
-			res.append('\n' + ''.lpad(indent, ' ') + '}')
-			return ''.join(res)
+			tags.append('\n' + ''.lpad(indent) + '}')
+			return tags
 		Lisper.TType.RAW:
 			var value = node[1]
-			return '<' + stringify_raw(value, indent + 1) + '>'
+			return [node, '<' + stringify_raw(value, indent + 1, depth + 8) + '>']
 	push_error("unknown typed node: ", node)
-	return "<unknown>"
+	return [node, "<unknown>"]
 
-func stringifys(body: Array, indent := 0) -> String:
-	return ' '.join(body.map(func (n): return stringify(n, indent)))
+func stringify(node: Array, indent := 0, depth := 0) -> String:
+	return Lisper.stringify_flatten(stringify_rich(node, indent, depth))
+
+func stringifys(body: Array, indent := 0, depth := 0) -> String:
+	return ' '.join(body.map(func (n): return stringify(n, indent, depth)))
 
 func strip_flags(body: Array) -> Array:
 	var nbody := []
@@ -451,3 +503,38 @@ func strip_flags(body: Array) -> Array:
 		else:
 			nbody.append(n)
 	return [flags, nbody]
+
+func test(cond: bool, info := "<test>") -> void:
+	@warning_ignore("assert_always_true")
+	assert(true, await _test(cond, info))
+	pass
+
+func _test(cond: bool, info: String) -> String:
+	if not cond:
+		info = "test failed in: " + info
+		push_error("[lisper] " + info)
+		printerr("[lisper] " + info)
+		LisperDebugger.output(info, 0xff660044, " ⚠ : ", "     ")
+		await trigger_break("!::test")
+	return info
+
+func error(info := "<error>") -> void:
+	@warning_ignore("assert_always_true")
+	assert(true, await _error(info))
+	pass
+
+func _error(info: String) -> String:
+	info = "error: " + info
+	push_error("[lisper] " + info)
+	printerr("[lisper] " + info)
+	LisperDebugger.output(info, 0xff660044, "   ⚠ ", "     ")
+	await trigger_break("!::error")
+	return info
+
+func trigger_break(vname := "!::break") -> void:
+	LisperDebugger.sign_context(vname, self)
+	LisperDebugger.break_waiting = true
+	print_rich("[color=green][lisper] interrupted by debugger[/color]")
+	await LisperDebugger.break_passed
+	LisperDebugger.break_waiting = false
+	LisperDebugger.unsign_context(vname, self)

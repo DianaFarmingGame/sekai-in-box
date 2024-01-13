@@ -17,19 +17,19 @@ func gsm(): return ['
 ; 此处为 GSS 环境
 
 ; 从 GD 环境获取函数并在 GSS 内定义
-defunc (hello :gd ', hello ,')
+fn (hello :gd ', hello ,')
 
 ; 对于一般的使用情况, 也可以直接免去包装, 上面的代码可以替换为这种写法
-defvar (hello ', hello ,')
+var (hello ', hello ,')
 
 ; 从 GD 环境获取变量并在 GSS 内定义
-defvar (name ', vname ,')
+var (name ', vname ,')
 
 ; 直接使用 GD 的 Lambda 函数
-func (:gd ', func (pstr): print(gtx.print_head + pstr) ,')(hello(name))
+fn (:gd ', func (pstr): print(gtx.print_head + pstr) ,') (hello (name))
 
 ; 对应的免包装写法
-', func (pstr): print(gtx.print_head + pstr) ,'(hello(name))
+', func (pstr): print(gtx.print_head + pstr) ,' (hello (name))
 
 ; 获取当前模块的路径和父目录
 echo (*mod-path*)
@@ -37,5 +37,24 @@ echo (*mod-dir*)
 
 ; 获取当前模块对应的 Godot 对象 (相当于 GDScript 内的 self)
 echo (self)
+
+; 调用其它模块
+;gsx/exec ("res://lib/lisper/std/math.gsm.gd") ; 绝对路径, 通过 Sekai 调用
+;gsx/exec ("xxx/xxx.gsm.gd") ; 相对路径, 通过 Sekai 调用
+;gsx/exec ("/xxx/xxx.gsm.gd") ; 绝对路径, 从 Sekai 根目录开始, 通过 Sekai 调用
+;exec ("res://lib/lisper/std/math.gsm.gd") ; 绝对路径, 通过 Lisper 调用
+;exec ("xxx/xxx.gsm.gd") ; 相对路径, 通过 Lisper 调用
+
+; 使用 Lisper 调试器对错误进行分析
+var (outer-var :const [1 2 3 4 5 6 7 8 9 0])
+fn (test [arg]
+	switch (arg
+		"yes" echo ("all right!")
+		"oops" block (
+			failed-call (arg)
+		)
+	)
+)
+;test ("oops")
 
 '] # 固定句式
