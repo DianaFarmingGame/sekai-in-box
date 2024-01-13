@@ -143,6 +143,7 @@ func _init_sekai() -> void:
 	for mono in monos: mono._on_init()
 	_inited = true
 	print_rich("[sekai] inited in ", (Time.get_ticks_usec() - stime) / 1000.0, " ms\n")
+	# print(database_static)
 
 func make_lisper_context() -> LisperContext:
 	var context := await LisperCommons.make_common_context("sekai")
@@ -166,9 +167,15 @@ func exec_gsx(path: String) -> void:
 	print_rich("        ", _line_head_end(), "[color=gray]", (Time.get_ticks_usec() - stime) / 1000.0, " ms[/color]")
 	_indent -= 1
 
-func dbs_define(group: StringName, key: StringName, value: Dictionary) -> void:
+func dbs_define(group: StringName, key: StringName, value) -> void:
 	database_static[group] = database_static[group] if database_static.has(group) else {}
 	database_static[group][key] = value
+
+func dbs_get(group: StringName, key: StringName) -> Variant:
+	if database_static.has(group) and database_static[group].has(key):
+		return database_static[group][key]
+	else:
+		return null
 
 func dbs_getp(group: StringName, key: StringName, props: StringName) -> Variant:
 	if database_static.has(group) and database_static[group].has(key):
@@ -624,6 +631,11 @@ defunc (dbs/setp :const :gd ',
 defunc (dbs/pushp :const :gd ',
 	func (body: Array) -> void:
 			dbs_pushp(body[0], body[1], body[2], body[3])
+,')
+
+defunc (dbs/get :const :gd ',
+	func (body: Array) -> Variant:
+			return dbs_get(body[0], body[1])
 ,')
 
 ']

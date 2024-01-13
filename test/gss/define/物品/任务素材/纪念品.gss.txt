@@ -1,7 +1,7 @@
 define(任务素材
 	ref 4300
 	id &物品/任务素材/纪念品
-	prop {
+	props {
 		name "纪念品"
 		description "任务素材，占位用"
 		groups prop/pushs (["任务素材"])

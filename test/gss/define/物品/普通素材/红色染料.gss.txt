@@ -1,7 +1,7 @@
 define(普通素材
 	ref 4202
 	id &物品/普通素材/红色染料
-	prop {
+	props {
 		name "红色染料"
 		description "红色的染料，可以给某些物品染色"
 		groups prop/pushs (["普通素材"])

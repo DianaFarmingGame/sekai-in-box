@@ -1,7 +1,7 @@
 define(自用道具
 	ref 3801
 	id &物品/自用道具/绿茶
-	prop {
+	props {
 		name "绿茶"
 		description "绿茶叶冲泡出的饮品，提神醒脑"
 		groups prop/pushs (["自用道具"])

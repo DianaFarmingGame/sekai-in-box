@@ -1,7 +1,7 @@
 define(角色装饰
 	ref 4100
 	id &物品/角色装饰/铁胸甲
-	prop {
+	props {
 		name "铁胸甲"
 		description "铁制胸甲，一分材一分厚"
 		groups prop/pushs (["自用道具"])

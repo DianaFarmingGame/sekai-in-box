@@ -1,7 +1,7 @@
 define(特殊道具
 	ref 4000
 	id &物品/特殊道具/唱片-不可思议
-	prop {
+	props {
 		name "唱片-不可思议"
 		description "刻录了现实世界歌曲的唱片，似乎是《不可思议》"
 		groups prop/pushs (["特殊道具"])

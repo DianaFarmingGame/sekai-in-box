@@ -1,7 +1,7 @@
 define(自用工具
 	ref 3300
 	id &物品/自用工具/绷带
-	prop {
+	props {
 		name "绷带"
 		description "用来治愈伤口"
 		groups prop/pushs (["自用工具"])

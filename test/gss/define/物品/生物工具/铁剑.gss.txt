@@ -1,7 +1,7 @@
 define(生物工具
 	ref 3200
 	id &物品/生物工具/铁剑
-	prop {
+	props {
 		name "铁剑"
 		description "经常被用来砍僵尸，所幸这里没有"
 		groups prop/pushs (["生物工具"])
