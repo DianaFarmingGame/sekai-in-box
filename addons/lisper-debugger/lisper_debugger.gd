@@ -27,6 +27,13 @@ var contexts := []
 var cur_ctx = null
 var ctx_stack := []
 
+func _ready() -> void:
+	if ProjectSettings.get_setting(&"lisper/debugger_visible"): DebuggerWindow.visible = true
+
+func grab_focus() -> void:
+	DebuggerWindow.visible = true
+	DebuggerWindow.grab_focus()
+
 func sign_context(name: String, ctx: LisperContext) -> void:
 	contexts.append([name, ctx])
 	update_contexts()
@@ -285,3 +292,6 @@ func _on_eval_btn_pressed() -> void:
 		await exec_expr(name, false)
 		cur_ctx.undef_var(name)
 		update_vars()
+
+func _on_debugger_window_close_requested() -> void:
+	DebuggerWindow.visible = false

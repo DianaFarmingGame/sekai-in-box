@@ -534,7 +534,7 @@ func _error(info: String) -> String:
 func trigger_break(vname := "!::break") -> void:
 	LisperDebugger.sign_context(vname, self)
 	LisperDebugger.break_waiting = true
-	LisperDebugger.DebuggerWindow.grab_focus()
+	LisperDebugger.grab_focus()
 	print_rich("[color=green][lisper] interrupted by debugger[/color]")
 	await LisperDebugger.break_passed
 	LisperDebugger.break_waiting = false

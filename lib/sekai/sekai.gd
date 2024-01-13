@@ -371,7 +371,7 @@ defvar (:const Tile ', GTile.new() ,')
 defvar (:const Mono ', Mono ,')
 defvar (:const MonoEntity ', MonoEntity ,')
 
-defunc (delay :const :gd :raw ',
+defunc (delay :const :gd ',
 	func (ptimeout: float) -> void:
 		await get_tree().create_timer(ptimeout).timeout
 ,')
