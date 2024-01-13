@@ -139,6 +139,9 @@ func meval(content: Array) -> Variant:
 	if gss_data != null:
 		gss_data = gss_data.map(func (n): return _gsm_replace(inserts, n))
 		return await execs(gss_data)
+	push_error("failed to tokenize expression")
+	printerr("failed to tokenize expression:")
+	printerr(gss)
 	return null
 
 func _gsm_replace(inserts: Array, node: Array) -> Array:

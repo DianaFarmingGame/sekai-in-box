@@ -165,6 +165,7 @@ func exec_gsx(path: String) -> void:
 	gss_ctx.print_head = "        " + ('' if _indent == 0 else ''.rpad(_indent - 1, "│ ") + '╎  ')
 	await Lisper.exec(gss_ctx, path)
 	print_rich("        ", _line_head_end(), "[color=gray]", (Time.get_ticks_usec() - stime) / 1000.0, " ms[/color]")
+	gss_ctx.print_head = ""
 	_indent -= 1
 
 func dbs_define(group: StringName, key: StringName, value) -> void:
