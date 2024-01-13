@@ -8,5 +8,5 @@ gsx/exec ("/gss/configurator/npc.gsm.gd")
 gsx/exec ("/gss/configurator/plant.gsm.gd")
 gsx/exec ("/gss/configurator/shop.gsm.gd")
 
-;; gsx/exec ("/gss/test/dev-configs/item_test.gss.txt")
+gsx/exec ("/gss/test/dev-configs/item_test.gss.txt")
 gsx/exec ("/gss/test/dev-configs/scene.gss.txt")

@@ -179,6 +179,13 @@ func do_merge(sets: Array[Dictionary]) -> Array[Dictionary]:
 			else:
 				return await sekai.external_fns[&"dialog_choose_single"].call(sekai, this, {}, meta_arg1, arg1),
 		
+		&"check_bag_item": func(_sekai, this: Mono, item: Array) -> bool:
+			var bag := this.getp(&"contains") as Array
+			for i in item:
+				if not bag.has(i):
+					return false
+			return true,
+
 		&"init_state": &"idle",
 		&"state_data": {
 			&"idle": {
@@ -243,6 +250,7 @@ func do_merge(sets: Array[Dictionary]) -> Array[Dictionary]:
 				var vid = args[3]
 				var dialog = ctx.get_var("*sekai*").dbs_get("行为", vid)
 				return await ctx.call_fn(dialog, args.slice(0, 3))),
+			&"check_bag_item": Lisper.FnGDCall(vprops[&"check_bag_item"]),
 		}),
 	})
 	return sets

@@ -1,11 +1,13 @@
 func gsm():
 	return ['
+
+
 defvar(data csv/map-let(+(*config_base* "action.csv")
-	[ID 类型 发起者 文本 跳转表] {
+	[ID 类型 发起者 数据 跳转表 检测物品] {
 		ID ID
 		类型 keyword(类型)
 		发起者 keyword(发起者)
-		文本 文本
+		数据 数据
 		跳转表 =>(跳转表
 				string/split("\n")
 				array/filter(func([l] !=(l "")))
@@ -32,16 +34,18 @@ array/for(data func([i record]
 					array/map(ary func([opt]
 						switch(@(opt &类型)
 							&对话 switch(@(opt &发起者)
-								&主 template(do(src say_to this :eval @(opt &文本)))
-								&宾 template(do(this say_to src :eval @(opt &文本))))
+								&主 template(do(src say_to this :eval @(opt &数据)))
+								&宾 template(do(this say_to src :eval @(opt &数据))))
 							&旁白
-								template(do(src show_aside :eval @(opt &文本)))
+								template(do(src show_aside :eval @(opt &数据)))
 							&选择
 								template
-									(do(src choose_single :eval @(opt &文本)
+									(do(src choose_single :eval @(opt &数据)
 										:expand :raw
 										array/flat(array/map(@(opt &跳转表) func([item]
 											[raw<-(@(item 0)) template(do(this dialog_to src :eval @(item 1)))])))))
+							&背包检测
+								template(do(src check_bag_item item :eval @(opt &数据)))
 							#t
 								template(echo("unsupport dialog type:" :eval @(opt &类型)))
 							))))))
@@ -51,3 +55,6 @@ array/for(data func([i record]
 	))
 
 ']
+
+func item_judge_t(item_ary: String):
+	return item_ary.split(" ")

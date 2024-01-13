@@ -1,43 +1,22 @@
-block
-	(mono(MonoEntity &drop
+block(
+	mono(MonoEntity &drop
 		props {
 			position vec3(2 2 1)
-			contains [mono/make(Mono &wood)]
+			contains [mono/make(Mono &物品/普通素材/石头)]
 		}
 	)
 
 	mono(MonoEntity &drop
 		props {
 			position vec3(2 4 1)
-			contains [mono/make(Mono &wood props {stack_count 9})]
+			contains [mono/make(Mono &物品/普通素材/石头 props {stack_count 9})]
 		}
 	)
 
 	mono(MonoEntity &drop
 		props {
 			position vec3(1 5 1)
-			contains [mono/make(Mono &wood props {stack_count 11})]
-		}
-	)
-	
-	mono(MonoEntity &drop
-		props {
-			position vec3(2 5 1)
-			contains [mono/make(Mono &wood props {stack_count 11})]
-		}
-	)
-
-	mono(MonoEntity &drop
-		props {
-			position vec3(1 6 1)
-			contains [mono/make(Mono &wood props {stack_count 11})]
-		}
-	)
-	
-	mono(MonoEntity &drop
-		props {
-			position vec3(2 6 1)
-			contains [mono/make(Mono &wood props {stack_count 11})]
+			contains [mono/make(Mono &物品/普通素材/棍子 props {stack_count 11})]
 		}
 	)
 )
