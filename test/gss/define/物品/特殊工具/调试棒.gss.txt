@@ -1,7 +1,7 @@
 define(特殊工具
 	ref 3500
 	id &物品/特殊工具/调试棒
-	prop {
+	props {
 		name "调试棒"
 		description "内部调试工具，占位用"
 		groups prop/pushs (["特殊工具"])

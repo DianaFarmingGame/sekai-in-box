@@ -1,7 +1,7 @@
 define(环境工具
 	ref 3100
 	id &物品/环境工具/打火石
-	prop {
+	props {
 		name "打火石"
 		description "又名钻木取火plus"
 		groups prop/pushs (["环境工具"])

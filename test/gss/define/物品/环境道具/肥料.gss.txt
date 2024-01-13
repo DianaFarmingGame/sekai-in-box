@@ -1,7 +1,7 @@
 define(环境道具
 	ref 3601
 	id &物品/环境道具/肥料
-	prop {
+	props {
 		name "肥料"
 		description "用于农作物的催熟，人为的自然循环"
 		groups prop/pushs (["环境道具"])

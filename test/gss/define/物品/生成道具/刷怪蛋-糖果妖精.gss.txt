@@ -1,7 +1,7 @@
 define(生成道具
 	ref 3900
 	id &物品/生成道具/刷怪蛋-糖果妖精
-	prop {
+	props {
 		name "刷怪蛋-糖果妖精"
 		description "糖果妖精的刷怪蛋"
 		groups prop/pushs (["生成道具"])

@@ -1,7 +1,7 @@
 define(环境道具
 	ref 3600
 	id &物品/环境道具/小麦种子
-	prop {
+	props {
 		name "小麦种子"
 		description "小麦的种子，嗯，就这么多"
 		groups prop/pushs (["环境道具"])

@@ -1,7 +1,7 @@
 define(特殊道具
 	ref 4001
 	id &物品/特殊道具/闪烁的飘带
-	prop {
+	props {
 		name "闪烁的飘带"
 		description "具有奇妙力量的罕见道具，能自行漂浮在空中"
 		groups prop/pushs (["特殊道具"])

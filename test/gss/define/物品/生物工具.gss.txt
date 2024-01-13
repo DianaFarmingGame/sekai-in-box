@@ -1,5 +1,5 @@
 defvar(生物工具 define/make (Item
-	prop {
+	props {
 		groups prop/pushs ([&物品])
 		name "生物工具"
 		}

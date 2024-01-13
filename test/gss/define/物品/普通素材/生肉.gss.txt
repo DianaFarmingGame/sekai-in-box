@@ -1,7 +1,7 @@
 define(普通素材
 	ref 4201
 	id &物品/普通素材/生肉
-	prop {
+	props {
 		name "生肉"
 		description "各种生物的肉，可以用来烹饪"
 		groups prop/pushs (["普通素材"])

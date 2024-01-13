@@ -1,7 +1,7 @@
 define(普通素材
 	ref 4200
 	id &物品/普通素材/木头
-	prop {
+	props {
 		name "木头"
 		description "结实可靠的材料，用途广泛"
 		groups prop/pushs (["普通素材"])

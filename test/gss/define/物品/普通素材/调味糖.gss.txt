@@ -1,7 +1,7 @@
 define(普通素材
 	ref 4203
 	id &物品/普通素材/调味糖
-	prop {
+	props {
 		name "调味"
 		description "甜味调味料，可以用来烹饪"
 		groups prop/pushs (["普通素材"])

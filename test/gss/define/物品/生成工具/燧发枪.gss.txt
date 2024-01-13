@@ -1,7 +1,7 @@
 define(生成工具
 	ref 3400
 	id &物品/生成工具/燧发枪
-	prop {
+	props {
 		name "燧发枪"
 		description "七步之外枪快，七步之内枪又准又快"
 		groups prop/pushs (["生成工具"])

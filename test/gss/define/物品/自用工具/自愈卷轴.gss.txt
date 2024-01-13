@@ -1,7 +1,7 @@
 define(自用工具
 	ref 3301
 	id &物品/自用工具/自愈卷轴
-	prop {
+	props {
 		name "自愈卷轴"
 		description "灌注了魔力的卷轴，可以治愈伤口"
 		groups prop/pushs (["自用工具"])

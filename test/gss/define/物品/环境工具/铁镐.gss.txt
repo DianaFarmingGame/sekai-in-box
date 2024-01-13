@@ -1,7 +1,7 @@
 define(环境工具
 	ref 3101
 	id &物品/环境工具/铁镐
-	prop {
+	props {
 		name "铁镐"
 		description "这不是铁镐么"
 		groups prop/pushs (["环境工具"])

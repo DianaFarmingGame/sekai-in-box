@@ -1,5 +1,5 @@
 defvar (道具 define/make (Item
-	prop {
+	props {
 		groups prop/pushs ([&物品])
 		name "道具"
 		}
@@ -10,7 +10,7 @@ defvar (道具 define/make (Item
 define (道具
 	ref 1100
 	id &Item/道具/染料
-	prop {
+	props {
 		name "染料"
 		description "用来染色，不然还能干嘛？"
 		groups prop/pushs (["食物"])
