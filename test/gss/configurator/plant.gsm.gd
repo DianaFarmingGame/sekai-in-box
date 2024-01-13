@@ -1,3 +1,5 @@
+# duration: float,
+# next: 	StringName
 
 
 func gsm():
@@ -8,7 +10,7 @@ csv/map-let(+(*config_base* "plant.csv")
 
 	dbs/define(["种植" keyword(ID) {
 			duration	所需时间
-			next		下一阶段ID
+			next		keyword(下一阶段ID)
 		}
 	])
 )	

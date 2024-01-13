@@ -1,4 +1,4 @@
-# {destoryID: [{itemID: stringName, countList: [int], probability: [float]}, ...]}}
+# {destoryID: [{itemID: stringName, countList: [int], probability: [float]}, ...]}
 
 func gsm():
 	return ["""

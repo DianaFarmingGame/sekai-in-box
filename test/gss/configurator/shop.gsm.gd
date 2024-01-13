@@ -1,4 +1,6 @@
-
+# name： 	String
+# count:	float
+# recover:	bool
 
 func gsm():
 	return ["""
