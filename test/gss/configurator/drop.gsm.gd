@@ -8,15 +8,14 @@ defunc (number_t :gd """, number_t,""")
 defunc (probability_t :gd """, probability_t,""")
 defunc (final :gd """, final,""")
 
-csv/map-let (+ (*config_base* "drop.csv")
+csv/map-let(+(*config_base* "drop.csv")
 	[破坏方块 掉落 数量 概率]
 	produce(*sekai* {
 		destoryID 	keyword(破坏方块)
 		itemID 		keyword(掉落)
 		countList 	number_t(数量)
 		probability probability_t(概率)
-	})
-		
+	})	
 )
 
 final(*sekai*)

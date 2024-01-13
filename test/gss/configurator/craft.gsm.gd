@@ -12,7 +12,7 @@ defunc (need_t :gd """, need_t,""")
 defunc (craft_t :gd """, craft_t,""")
 defunc (fuel_t :gd """, fuel_t,""")
 
-csv/map-let (+ (*config_base* "craft.csv")
+csv/map-let(+(*config_base* "craft.csv")
 	[需求物品 合成物品 描述]
 	dbs/define(["合成" craft2ID(合成物品) {
 			need need_t(需求物品)
@@ -22,7 +22,7 @@ csv/map-let (+ (*config_base* "craft.csv")
 	])
 )
 
-csv/map-let (+ (*config_base* "enhance.csv")
+csv/map-let(+(*config_base* "enhance.csv")
 	[需求物品 合成物品 描述]
 	dbs/define (["附魔" craft2ID(合成物品) {
 			need need_t(需求物品)
@@ -32,7 +32,7 @@ csv/map-let (+ (*config_base* "enhance.csv")
 	])
 )
 
-csv/map-let (+ (*config_base* "cook.csv")
+csv/map-let(+(*config_base* "cook.csv")
 	[需求物品 合成物品 描述 消耗燃料 合成时间]
 	dbs/define (["烹饪" craft2ID(合成物品) {
 			need need_t(需求物品)
@@ -48,8 +48,8 @@ csv/map-let (+ (*config_base* "cook.csv")
 
 """]
 
-func craft2ID(craft: String) -> String:
-	return craft.split(":")[0]
+func craft2ID(craft: String) -> StringName:
+	return StringName(craft.split(":")[0])
 
 func need_t(need: String) -> Dictionary:
 	var item_list := need.split(" ")
