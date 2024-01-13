@@ -179,12 +179,24 @@ func do_merge(sets: Array[Dictionary]) -> Array[Dictionary]:
 			else:
 				return await sekai.external_fns[&"dialog_choose_single"].call(sekai, this, {}, meta_arg1, arg1),
 		
-		&"check_bag_item": func(_sekai, this: Mono, item: Array) -> bool:
+		&"check_bag_item": func(_sekai, this: Mono, item: Dictionary) -> bool:
 			var bag := this.getp(&"contains") as Array
+			var total_item := {}
+			for i in bag:
+				var item_id = i.define.id
+				var count := i.getp(&"stack_count") as int
+				if total_item.has(item_id):
+					total_item[item_id] += count
+				else:
+					total_item[item_id] = count
+			
+			var flag := true
 			for i in item:
-				if not bag.has(i):
-					return false
-			return true,
+				if !total_item.get(i) or item[i] > total_item[i]:
+					flag = false
+				break
+			
+			return flag,
 
 		&"init_state": &"idle",
 		&"state_data": {
