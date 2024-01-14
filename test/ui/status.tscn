@@ -9,10 +9,8 @@
 [ext_resource type="PackedScene" uid="uid://c76fcecjkprlx" path="res://test/ui/WorldTime.tscn" id="7_o2iu0"]
 
 [sub_resource type="LabelSettings" id="LabelSettings_o2wtf"]
-font_size = 10
 
 [sub_resource type="LabelSettings" id="LabelSettings_42c66"]
-font_size = 13
 
 [node name="status" type="Control"]
 layout_mode = 3
@@ -24,8 +22,8 @@ grow_vertical = 2
 script = ExtResource("1_qog5n")
 
 [node name="traveler" type="Control" parent="."]
-visible = false
 layout_mode = 1
+anchors_preset = 0
 offset_left = 17.0
 offset_top = 21.0
 offset_right = 118.0
@@ -117,6 +115,7 @@ metadata/_edit_use_anchors_ = true
 
 [node name="diana" type="Control" parent="."]
 layout_mode = 1
+anchors_preset = 0
 offset_left = 17.0
 offset_top = 21.0
 offset_right = 118.0

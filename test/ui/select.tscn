@@ -1,6 +1,7 @@
-[gd_scene load_steps=3 format=3 uid="uid://c1q8ps5d8htnn"]
+[gd_scene load_steps=5 format=3 uid="uid://c1q8ps5d8htnn"]
 
 [ext_resource type="Texture2D" uid="uid://cicvyy834tigf" path="res://test/asset/ui/选项框.png" id="1_5eb8p"]
+[ext_resource type="SystemFont" uid="uid://bvw54ryufwdfi" path="res://test/asset/new_system_font.tres" id="2_en5d6"]
 
 [sub_resource type="StyleBoxTexture" id="StyleBoxTexture_0gyko"]
 texture = ExtResource("1_5eb8p")
@@ -8,6 +9,9 @@ texture_margin_left = 20.0
 texture_margin_top = 20.0
 texture_margin_right = 20.0
 texture_margin_bottom = 20.0
+
+[sub_resource type="LabelSettings" id="LabelSettings_w2j4q"]
+font = ExtResource("2_en5d6")
 
 [node name="Select" type="Label"]
 anchors_preset = 15
@@ -18,5 +22,6 @@ grow_vertical = 2
 theme_override_styles/normal = SubResource("StyleBoxTexture_0gyko")
 text = "A 选项
 B 选项"
+label_settings = SubResource("LabelSettings_w2j4q")
 visible_characters = 0
 visible_ratio = 0.0

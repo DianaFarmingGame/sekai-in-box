@@ -1,4 +1,4 @@
-[gd_scene load_steps=9 format=3 uid="uid://cy0i20t42382p"]
+[gd_scene load_steps=11 format=3 uid="uid://cy0i20t42382p"]
 
 [ext_resource type="Script" path="res://test/test.gd" id="1_fugfy"]
 [ext_resource type="FontFile" uid="uid://clrrm68hjw5tu" path="res://test/assert/Cubic_11_1.000_R.ttf" id="1_jnnce"]
@@ -6,6 +6,8 @@
 [ext_resource type="PackedScene" uid="uid://b4y7w86wfvetv" path="res://test/ui/dialog.tscn" id="4_8aq0t"]
 [ext_resource type="PackedScene" uid="uid://cwkpc4mqo2hbf" path="res://test/ui/status.tscn" id="5_n5bij"]
 [ext_resource type="PackedScene" uid="uid://c1q8ps5d8htnn" path="res://test/ui/select.tscn" id="6_d64a3"]
+[ext_resource type="PackedScene" uid="uid://d28k0kj4o4c8q" path="res://test/ui/shortcut.tscn" id="7_g1wc2"]
+[ext_resource type="PackedScene" uid="uid://c4g0xtop5122l" path="res://test/ui/menu.tscn" id="8_wjljm"]
 
 [sub_resource type="FontVariation" id="FontVariation_y4onr"]
 base_font = ExtResource("1_jnnce")
@@ -22,7 +24,7 @@ anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 offset_right = 15.0
-offset_bottom = 10.0
+offset_bottom = 8.0
 grow_horizontal = 2
 grow_vertical = 2
 focus_mode = 2
@@ -42,25 +44,6 @@ define_gss = "res://test/gss/define_entry.gss.txt"
 entry_gss = "res://test/gss/test/merge-ui/entry.gss.txt"
 root_dir = "res://test"
 unit_size = Vector3(64, 64, 64)
-
-[node name="VBoxContainer" type="VBoxContainer" parent="."]
-layout_mode = 0
-offset_left = 4.0
-offset_top = 4.0
-offset_right = 50.0
-offset_bottom = 70.0
-
-[node name="SaveBtn" type="Button" parent="VBoxContainer"]
-unique_name_in_owner = true
-layout_mode = 2
-focus_mode = 0
-text = "Save"
-
-[node name="LoadBtn" type="Button" parent="VBoxContainer"]
-unique_name_in_owner = true
-layout_mode = 2
-focus_mode = 0
-text = "Load"
 
 [node name="DialogBox" type="PanelContainer" parent="."]
 unique_name_in_owner = true
@@ -123,3 +106,9 @@ anchor_right = 0.686971
 anchor_bottom = 0.573846
 offset_right = 1.33514e-05
 metadata/_edit_use_anchors_ = true
+
+[node name="shortcut" parent="." instance=ExtResource("7_g1wc2")]
+layout_mode = 1
+
+[node name="Menu" parent="." instance=ExtResource("8_wjljm")]
+layout_mode = 1

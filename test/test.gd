@@ -6,6 +6,7 @@ extends Control
 @onready var item_box := %ItemBox as ItemList
 @onready var dialog = $dialog
 @onready var select = $Select
+@onready var shortcut = $shortcut
 
 var picture_dict = {
 	# ^Lane Sun: 使用 preload 可以用相对路径访问文件
@@ -28,10 +29,12 @@ func _ready() -> void:
 		await tree.process_frame
 		await tree.process_frame
 		tree.quit())
-	%SaveBtn.pressed.connect(func ():
+	$Menu/VBoxContainer/save.pressed.connect(func ():
 		sekai.save_to_path("user://save.sekai"))
-	%LoadBtn.pressed.connect(func ():
-		sekai.load_from_path("user://save.sekai"))
+	$Menu/VBoxContainer/load.pressed.connect(func ():
+		sekai.save_to_path("user://save.sekai"))
+	$Menu/VBoxContainer/exit.pressed.connect(func ():
+		tree.quit())
 	sekai.input_updated.connect(_on_input)
 	
 	sekai.external_fns.merge({
@@ -121,15 +124,7 @@ func _ready() -> void:
 			select.hide()
 			return choose[0],
 		&"itembox_update": func (_sekai, _this, contains: Array) -> void:
-			print("111")
-			item_box.clear()
-			for item in contains:
-				var vname := item.getp(&"name") as String
-				var icon := await item.emitm(&"icon_get_texture") as Texture2D
-				var text := vname
-				if item.getp(&"stackable"):
-					text += " x" + str(item.getp(&"stack_count"))
-				item_box.add_item(text, icon),
+			shortcut.draw_space(contains)
 	})
 
 signal confirmed

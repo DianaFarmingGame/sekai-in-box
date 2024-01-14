@@ -4,9 +4,11 @@
 [ext_resource type="Texture2D" uid="uid://c6wv7noida6eg" path="res://test/asset/ui/水壶.png" id="2_6ynyf"]
 
 [sub_resource type="LabelSettings" id="LabelSettings_2qy1b"]
-font_size = 8
+outline_size = 6
+outline_color = Color(0, 0, 0, 1)
 
 [node name="space_item" type="Control"]
+z_index = 2
 layout_mode = 3
 anchors_preset = 0
 script = ExtResource("1_0pxn2")
@@ -19,9 +21,9 @@ texture = ExtResource("2_6ynyf")
 
 [node name="num" type="Label" parent="."]
 layout_mode = 0
-offset_left = 23.0
-offset_top = 15.0
-offset_right = 28.0
-offset_bottom = 30.0
+offset_left = 22.0
+offset_top = 19.0
+offset_right = 32.0
+offset_bottom = 42.0
 text = "1"
 label_settings = SubResource("LabelSettings_2qy1b")

@@ -9,43 +9,44 @@ signal move_item(from_space,from_index,to_space,to_index)
 signal use_item(from_space,from_index)
 signal select_item(from_space,from_index)
 
-func _input(event):
-	if Input.is_action_pressed("0"):
-		slot_select(9)
-	if Input.is_action_pressed("1"):
-		slot_select(0)
-	if Input.is_action_pressed("2"):
-		slot_select(1)
-	if Input.is_action_pressed("3"):
-		slot_select(2)
-	if Input.is_action_pressed("4"):
-		slot_select(3)
-	if Input.is_action_pressed("5"):
-		slot_select(4)
-	if Input.is_action_pressed("6"):
-		slot_select(5)
-	if Input.is_action_pressed("7"):
-		slot_select(6)
-	if Input.is_action_pressed("8"):
-		slot_select(7)
-	if Input.is_action_pressed("9"):
-		slot_select(8)
+#func _input(event):
+	#if Input.is_action_pressed("0"):
+		#slot_select(9)
+	#if Input.is_action_pressed("1"):
+		#slot_select(0)
+	#if Input.is_action_pressed("2"):
+		#slot_select(1)
+	#if Input.is_action_pressed("3"):
+		#slot_select(2)
+	#if Input.is_action_pressed("4"):
+		#slot_select(3)
+	#if Input.is_action_pressed("5"):
+		#slot_select(4)
+	#if Input.is_action_pressed("6"):
+		#slot_select(5)
+	#if Input.is_action_pressed("7"):
+		#slot_select(6)
+	#if Input.is_action_pressed("8"):
+		#slot_select(7)
+	#if Input.is_action_pressed("9"):
+		#slot_select(8)
 
 func draw_space(item_data: Array):
 	var space = $ItemSpace
 	clear_space()
 	for i in range(item_data.size()):
 		var item = item_data[i]
-		if item == null:
-			continue
-		var picture = item['picture']
-		var num = item['num']
+		var vname := item.getp(&"name") as String
+		var icon := await item.emitm(&"icon_get_texture") as Texture2D
+		var num := 1
+		if item.getp(&"stackable"):
+			num = item.getp(&"stack_count") as int
 		var node = ItemNode.instantiate()
-		node.picture = picture
+		node.picture = icon
 		node.num = num
 		var slot = space.get_child(i)
 		slot.add_child(node)
-		
+				
 func clear_space():
 	var space = $ItemSpace
 	for i in space.get_child_count():

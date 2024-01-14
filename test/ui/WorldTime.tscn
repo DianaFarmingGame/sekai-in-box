@@ -5,7 +5,6 @@
 [ext_resource type="Texture2D" uid="uid://fwthbjhlc7i8" path="res://test/asset/ui/时间栏.png" id="3_0ip18"]
 
 [sub_resource type="LabelSettings" id="LabelSettings_xdu5i"]
-font_size = 10
 
 [node name="WorldTime" type="Control"]
 layout_mode = 3
