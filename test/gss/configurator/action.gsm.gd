@@ -16,7 +16,6 @@ defvar(data csv/map-let(+(*config_base* "action.csv")
 			"背包检测" jump_t_non_dailog(跳转表)
 			#t "")
 	}))
-!debug()
 
 array/for(data func([i record]
 	if(and(!=(@(record &类型) &)
