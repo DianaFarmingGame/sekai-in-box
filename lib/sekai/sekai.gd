@@ -373,13 +373,13 @@ func task_on(task_id: StringName):
 
 func task_off(task_id: StringName):
 	var task = dbs_get("任务", task_id)
-	assert(task == null, "任务不存在")
+	assert(task != null, "任务不存在")
 	assert(task.isOpen, "任务已关闭")
 	task.isOpen = false
 
 func task_desc(task_id: StringName, desc: String):
 	var task = dbs_get("任务", task_id)
-	assert(task == null, "任务不存在")
+	assert(task != null, "任务不存在")
 	task.desc = desc
 
 func gsm(): return ['
@@ -665,7 +665,16 @@ defunc (task/on :const :gd ',
 		return
 ,')
 
-defunc (task/off :const :gd """, task_off,""")
-defunc (task/desc :const :gd """, task_desc,""")
+defunc (task/off :const :gd ',
+	func (task_id: StringName) -> void:
+		task_off(task_id)
+		return
+,')
+
+defunc (task/desc :const :gd ',
+	func (task_id: StringName, desc: String) -> void:
+		task_desc(task_id, desc)
+		return
+,')
 
 ']

@@ -4,13 +4,16 @@ func gsm():
 var(item_judge_t ', item_judge_t,')
 var(jump_t_dailog ', jump_t_dailog,')
 var(jump_t_non_dailog ', jump_t_non_dailog,')
+var(change_desc_data_t ', change_desc_data_t,')
 
 defvar(data csv/map-let(+(*config_base* "action.csv")
 	[ID 类型 发起者 数据 跳转表] {
 		ID ID
 		类型 keyword(类型)
 		发起者 keyword(发起者)
-		数据 数据
+		数据 switch(类型
+			"修改任务描述" change_desc_data_t(数据)
+			#t 数据)
 		跳转表 switch(类型
 			"选择" jump_t_dailog(跳转表)
 			"背包检测" jump_t_non_dailog(跳转表)
@@ -51,6 +54,10 @@ array/for(data func([i record]
 								))
 							&开启任务
 								template(task/on(keyword(:eval @(opt &数据))))
+							&关闭任务
+								template(task/off(keyword(:eval @(opt &数据))))
+							&修改任务描述
+								template(task/desc(:eval keyword(@(@(opt &数据) 0)) :eval @(@(opt &数据) 1)))
 							#t
 								template(echo("unsupport dialog type:" :eval @(opt &类型)))
 							))))))
@@ -87,3 +94,8 @@ func jump_t_non_dailog(table: String) -> Array:
 
 	return res
 
+func change_desc_data_t(data: String):
+	var res = data.split(":")
+	res[0].strip_edges()
+
+	return res
