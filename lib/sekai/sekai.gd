@@ -144,6 +144,11 @@ func _init_sekai() -> void:
 	_inited = true
 	print_rich("[sekai] inited in ", (Time.get_ticks_usec() - stime) / 1000.0, " ms\n")
 
+	# for i in database_static:
+	# 	if i == "行为":
+	# 		continue
+	# 	print(i, ":", database_static[i])
+
 func make_lisper_context() -> LisperContext:
 	var context := await LisperCommons.make_common_context("sekai")
 	await Lisper.exec_gsm(context, self)
@@ -359,6 +364,23 @@ func load_from_path(path: String) -> void:
 	_inited = true
 	print_rich("[sekai] restore in ", (Time.get_ticks_usec() - stime) / 1000.0, " ms")
 	print()
+
+func task_on(task_id: StringName):
+	var task = dbs_get("任务", task_id)
+	assert(task != null, "任务不存在")
+	assert(!task.isOpen, "任务已开启")
+	task.isOpen = true
+
+func task_off(task_id: StringName):
+	var task = dbs_get("任务", task_id)
+	assert(task == null, "任务不存在")
+	assert(task.isOpen, "任务已关闭")
+	task.isOpen = false
+
+func task_desc(task_id: StringName, desc: String):
+	var task = dbs_get("任务", task_id)
+	assert(task == null, "任务不存在")
+	task.desc = desc
 
 func gsm(): return ['
 
@@ -614,27 +636,36 @@ defunc (csv/load :const :gd :pure ',
 
 defunc (dbs/define :const :gd ',
 	func (body: Array) -> void:
-			dbs_define(body[0], body[1], body[2])
+		dbs_define(body[0], body[1], body[2])
 ,')
 
 defunc (dbs/getp :const :gd ',
 	func (body: Array) -> Variant:
-			return dbs_getp(body[0], body[1], body[2])
+		return dbs_getp(body[0], body[1], body[2])
 ,')
 
 defunc (dbs/setp :const :gd ',
 	func (body: Array) -> void:
-			dbs_setp(body[0], body[1], body[2], body[3])
+		dbs_setp(body[0], body[1], body[2], body[3])
 ,')
 
 defunc (dbs/pushp :const :gd ',
 	func (body: Array) -> void:
-			dbs_pushp(body[0], body[1], body[2], body[3])
+		dbs_pushp(body[0], body[1], body[2], body[3])
 ,')
 
 defunc (dbs/get :const :gd ',
 	func (body: Array) -> Variant:
-			return dbs_get(body[0], body[1])
+		return dbs_get(body[0], body[1])
 ,')
+
+defunc (task/on :const :gd ',
+	func (task_id: StringName) -> void:
+		task_on(task_id)
+		return
+,')
+
+defunc (task/off :const :gd """, task_off,""")
+defunc (task/desc :const :gd """, task_desc,""")
 
 ']

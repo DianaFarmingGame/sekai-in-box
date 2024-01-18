@@ -49,6 +49,8 @@ array/for(data func([i record]
 									do(this dialog_to src :eval @(@(opt &跳转表) 0))
 									do(this dialog_to src :eval @(@(opt &跳转表) 1))
 								))
+							&开启任务
+								template(task/on(keyword(:eval @(opt &数据))))
 							#t
 								template(echo("unsupport dialog type:" :eval @(opt &类型)))
 							))))))
