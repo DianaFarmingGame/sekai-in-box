@@ -415,4 +415,15 @@ defunc (color :const :gd :pure ',
 		return Color(r_c, g_a, b, a)
 ,')
 
+defunc (string->raw :const :gd :apply :pure ',
+	func (_ctx: LisperContext, args: Array) -> Variant:
+		var res = Lisper.tokenize(args[0])
+		return Lisper.tokenize(args[0])[0] if res != null else null
+,')
+
+defunc (string->raws :const :gd :apply :pure ',
+	func (_ctx: LisperContext, args: Array) -> Variant:
+		return Lisper.tokenize(args[0])
+,')
+
 ']
