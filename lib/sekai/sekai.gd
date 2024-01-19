@@ -172,17 +172,17 @@ func exec_gsx(path: String) -> void:
 	print_rich("        ", _line_head_end(), "[color=gray]", (Time.get_ticks_usec() - stime) / 1000.0, " ms[/color]")
 	_indent -= 1
 
-func db_define(group: StringName, key: StringName, value, db: Dictionary = database_static) -> void:
+func db_define(group: StringName, key: StringName, value, db: Dictionary) -> void:
 	db[group] = db[group] if db.has(group) else {}
 	db[group][key] = value
 
-func db_get(group: StringName, key: StringName, db: Dictionary = database_static) -> Variant:
+func db_get(group: StringName, key: StringName, db: Dictionary) -> Variant:
 	if db.has(group) and db[group].has(key):
 		return db[group][key]
 	else:
 		return null
 
-func db_getp(group: StringName, key: StringName, props: StringName, db: Dictionary = database_static) -> Variant:
+func db_getp(group: StringName, key: StringName, props: StringName, db: Dictionary) -> Variant:
 	if db.has(group) and db[group].has(key):
 		var data = db[group][key]
 		assert(data is Dictionary)
@@ -190,7 +190,7 @@ func db_getp(group: StringName, key: StringName, props: StringName, db: Dictiona
 	else:
 		return null
 
-func db_setp(group: StringName, key: StringName, props: StringName, value, db: Dictionary = database_static) -> void:
+func db_setp(group: StringName, key: StringName, props: StringName, value, db: Dictionary) -> void:
 	if db.has(group) and db[group].has(key):
 		var data = db[group][key]
 		assert(data is Dictionary)
@@ -200,7 +200,7 @@ func db_setp(group: StringName, key: StringName, props: StringName, value, db: D
 		db[group][key] = {props: value}
 	return
 
-func db_pushp(group: StringName, key: StringName, props: StringName, value, db: Dictionary = database_static) -> void:
+func db_pushp(group: StringName, key: StringName, props: StringName, value, db: Dictionary) -> void:
 	if db.has(group) and db[group].has(key):
 		var data = db[group][key]
 		assert(data is Dictionary)
@@ -209,6 +209,36 @@ func db_pushp(group: StringName, key: StringName, props: StringName, value, db: 
 		db[group] = db[group] if db.has(group) else {}
 		db[group][key] = {props: [value]}
 	return
+
+func dbs_define(group: StringName, key: StringName, value) -> void:
+	db_define(group, key, value, database_static)
+
+func dbs_get(group: StringName, key: StringName) -> Variant:
+	return db_get(group, key, database_static)
+
+func dbs_getp(group: StringName, key: StringName, props: StringName) -> Variant:
+	return db_getp(group, key, props, database_static)
+
+func dbs_setp(group: StringName, key: StringName, props: StringName, value) -> void:
+	db_setp(group, key, props, value, database_static)
+
+func dbs_pushp(group: StringName, key: StringName, props: StringName, value) -> void:
+	db_pushp(group, key, props, value, database_static)
+
+func dbr_define(group: StringName, key: StringName, value) -> void:
+	db_define(group, key, value, database_runtime)
+
+func dbr_get(group: StringName, key: StringName) -> Variant:
+	return db_get(group, key, database_runtime)
+
+func dbr_getp(group: StringName, key: StringName, props: StringName) -> Variant:
+	return db_getp(group, key, props, database_runtime)
+
+func dbr_setp(group: StringName, key: StringName, props: StringName, value) -> void:
+	db_setp(group, key, props, value, database_runtime)
+
+func dbr_pushp(group: StringName, key: StringName, props: StringName, value) -> void:
+	db_pushp(group, key, props, value, database_runtime)
 
 func load_csgv(path: String) -> Array:
 	var content := []
@@ -367,19 +397,19 @@ func load_from_path(path: String) -> void:
 	print()
 
 func task_on(task_id: StringName):
-	var task = db_get("任务", task_id)
+	var task = dbs_get("任务", task_id)
 	assert(task != null, "任务不存在")
 	assert(!task.isOpen, "任务已开启")
 	task.isOpen = true
 
 func task_off(task_id: StringName):
-	var task = db_get("任务", task_id)
+	var task = dbs_get("任务", task_id)
 	assert(task != null, "任务不存在")
 	assert(task.isOpen, "任务已关闭")
 	task.isOpen = false
 
 func task_desc(task_id: StringName, desc: String):
-	var task = db_get("任务", task_id)
+	var task = dbs_get("任务", task_id)
 	assert(task != null, "任务不存在")
 	task.desc = desc
 
@@ -641,27 +671,27 @@ defunc (csv/load :const :gd :pure ',
 
 defunc (dbs/define :const :gd ',
 	func (body: Array) -> void:
-		db_define(body[0], body[1], body[2])
+		dbs_define(body[0], body[1], body[2])
 ,')
 
 defunc (dbs/getp :const :gd ',
 	func (body: Array) -> Variant:
-		return db_getp(body[0], body[1], body[2])
+		return dbs_getp(body[0], body[1], body[2])
 ,')
 
 defunc (dbs/setp :const :gd ',
 	func (body: Array) -> void:
-		db_setp(body[0], body[1], body[2], body[3])
+		dbs_setp(body[0], body[1], body[2], body[3])
 ,')
 
 defunc (dbs/pushp :const :gd ',
 	func (body: Array) -> void:
-		db_pushp(body[0], body[1], body[2], body[3])
+		dbs_pushp(body[0], body[1], body[2], body[3])
 ,')
 
 defunc (dbs/get :const :gd ',
 	func (body: Array) -> Variant:
-		return db_get(body[0], body[1])
+		return dbs_get(body[0], body[1])
 ,')
 
 defunc (task/on :const :gd ',
@@ -690,27 +720,27 @@ defunc (data/set :const :gd ',
 
 defunc (dbr/define :const :gd ',
 	func (body: Array) -> void:
-		db_define(body[0], body[1], body[2], database_runtime)
+		dbr_define(body[0], body[1], body[2])
 ,')
 
 defunc (dbr/getp :const :gd ',
 	func (body: Array) -> Variant:
-		return db_getp(body[0], body[1], body[2], database_runtime)
+		return dbr_getp(body[0], body[1], body[2])
 ,')
 
 defunc (dbr/setp :const :gd ',
 	func (body: Array) -> void:
-		db_setp(body[0], body[1], body[2], body[3], database_runtime)
+		dbr_setp(body[0], body[1], body[2], body[3])
 ,')
 
 defunc (dbr/pushp :const :gd ',
 	func (body: Array) -> void:
-		db_pushp(body[0], body[1], body[2], body[3], database_runtime)
+		dbr_pushp(body[0], body[1], body[2], body[3])
 ,')
 
 defunc (dbr/get :const :gd ',
 	func (body: Array) -> Variant:
-		return db_get(body[0], body[1], database_runtime)
+		return dbr_get(body[0], body[1])
 ,')
 
 ']

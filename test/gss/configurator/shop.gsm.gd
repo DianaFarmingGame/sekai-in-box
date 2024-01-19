@@ -33,7 +33,7 @@ func produce(sekai: Sekai, o: Dictionary):
 
 	if id != "":
 		if res_map.size() > 0:
-			sekai.db_define("商店", res_id, res_map)
+			sekai.dbs_define("商店", res_id, res_map)
 		
 		res_id = id
 		res_map = {}
@@ -43,7 +43,7 @@ func produce(sekai: Sekai, o: Dictionary):
 
 func final(sekai: Sekai):
 	if res_map.size() > 0:
-		sekai.db_define("商店", res_id, res_map)
+		sekai.dbs_define("商店", res_id, res_map)
 
 	
 
