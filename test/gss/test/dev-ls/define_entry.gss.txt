@@ -1,0 +1,2 @@
+gsx/exec("/gss/define_entry.gss.txt")
+exec("scroll.gss.txt")

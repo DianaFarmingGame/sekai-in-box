@@ -87,7 +87,7 @@ static func def_commons(context: LisperContext) -> void:
 			var path := args[0] as String
 			if path.is_relative_path() and mod_dir != null:
 				path = (mod_dir as String).path_join(path)
-			await Lisper.exec_gsm(ctx, load(path))),
+			await Lisper.exec(ctx, path)),
 		&"!break": Lisper.FnGDRaw( func (ctx: LisperContext, body: Array, comptime: bool) -> Variant:
 			if comptime: return await ctx.compiles(body)
 			var vname := "!::" + str(await ctx.exec(body[0])) if body.size() > 0 else "!::break"

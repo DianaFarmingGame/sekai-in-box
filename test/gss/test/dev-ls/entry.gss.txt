@@ -57,7 +57,7 @@ gsx/exec("/gss/test/dev-ls/scene.gss.txt")
 	嘉心糖 嘉然)
 
 ; 测试：掉落物/背包
-block(gsx/exec("/gss/test/dev-ls/scroll.gss.txt")
+block(
 	mono(MonoEntity &drop
 		props {
 			position vec3(2 2 1)
