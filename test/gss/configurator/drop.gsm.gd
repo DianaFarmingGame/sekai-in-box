@@ -35,7 +35,7 @@ func produce(sekai: Sekai, o: Dictionary):
 
 	if o["destoryID"] != "":
 		if drop_map.size() > 0:
-			sekai.dbs_define("掉落", destory_id, drop_map)
+			sekai.db_define("掉落", destory_id, drop_map)
 
 		destory_id = o["destoryID"]
 		drop_map = {}
@@ -67,4 +67,4 @@ func probability_t(prob: String) -> Array:
 
 func final(sekai: Sekai):
 	if drop_map.size() > 0:
-		sekai.dbs_define("掉落", destory_id, drop_map)
+		sekai.db_define("掉落", destory_id, drop_map)

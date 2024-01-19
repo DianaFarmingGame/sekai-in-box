@@ -21,6 +21,7 @@ var control_stack := []
 var external_fns := {}
 
 var database_static := {}
+var database_runtime := {}
 
 func _init() -> void:
 	ProjectSettings.set_setting(&"sekai/debug_draw",
@@ -171,42 +172,42 @@ func exec_gsx(path: String) -> void:
 	print_rich("        ", _line_head_end(), "[color=gray]", (Time.get_ticks_usec() - stime) / 1000.0, " ms[/color]")
 	_indent -= 1
 
-func dbs_define(group: StringName, key: StringName, value) -> void:
-	database_static[group] = database_static[group] if database_static.has(group) else {}
-	database_static[group][key] = value
+func db_define(group: StringName, key: StringName, value, db: Dictionary = database_static) -> void:
+	db[group] = db[group] if db.has(group) else {}
+	db[group][key] = value
 
-func dbs_get(group: StringName, key: StringName) -> Variant:
-	if database_static.has(group) and database_static[group].has(key):
-		return database_static[group][key]
+func db_get(group: StringName, key: StringName, db: Dictionary = database_static) -> Variant:
+	if db.has(group) and db[group].has(key):
+		return db[group][key]
 	else:
 		return null
 
-func dbs_getp(group: StringName, key: StringName, props: StringName) -> Variant:
-	if database_static.has(group) and database_static[group].has(key):
-		var data = database_static[group][key]
+func db_getp(group: StringName, key: StringName, props: StringName, db: Dictionary = database_static) -> Variant:
+	if db.has(group) and db[group].has(key):
+		var data = db[group][key]
 		assert(data is Dictionary)
 		return data[props] if data.has(props) else null
 	else:
 		return null
 
-func dbs_setp(group: StringName, key: StringName, props: StringName, value) -> void:
-	if database_static.has(group) and database_static[group].has(key):
-		var data = database_static[group][key]
+func db_setp(group: StringName, key: StringName, props: StringName, value, db: Dictionary = database_static) -> void:
+	if db.has(group) and db[group].has(key):
+		var data = db[group][key]
 		assert(data is Dictionary)
 		data[props] = value
 	else:
-		database_static[group] = database_static[group] if database_static.has(group) else {}
-		database_static[group][key] = {props: value}
+		db[group] = db[group] if db.has(group) else {}
+		db[group][key] = {props: value}
 	return
 
-func dbs_pushp(group: StringName, key: StringName, props: StringName, value) -> void:
-	if database_static.has(group) and database_static[group].has(key):
-		var data = database_static[group][key]
+func db_pushp(group: StringName, key: StringName, props: StringName, value, db: Dictionary = database_static) -> void:
+	if db.has(group) and db[group].has(key):
+		var data = db[group][key]
 		assert(data is Dictionary)
 		data[props].append(value)
 	else:
-		database_static[group] = database_static[group] if database_static.has(group) else {}
-		database_static[group][key] = {props: [value]}
+		db[group] = db[group] if db.has(group) else {}
+		db[group][key] = {props: [value]}
 	return
 
 func load_csgv(path: String) -> Array:
@@ -366,21 +367,25 @@ func load_from_path(path: String) -> void:
 	print()
 
 func task_on(task_id: StringName):
-	var task = dbs_get("任务", task_id)
+	var task = db_get("任务", task_id)
 	assert(task != null, "任务不存在")
 	assert(!task.isOpen, "任务已开启")
 	task.isOpen = true
 
 func task_off(task_id: StringName):
-	var task = dbs_get("任务", task_id)
+	var task = db_get("任务", task_id)
 	assert(task != null, "任务不存在")
 	assert(task.isOpen, "任务已关闭")
 	task.isOpen = false
 
 func task_desc(task_id: StringName, desc: String):
-	var task = dbs_get("任务", task_id)
+	var task = db_get("任务", task_id)
 	assert(task != null, "任务不存在")
 	task.desc = desc
+
+func data_set(data_id: StringName, value):
+	print("coming soon...: change_vars\nvar: ", data_id," data: ", value)
+
 
 func gsm(): return ['
 
@@ -636,27 +641,27 @@ defunc (csv/load :const :gd :pure ',
 
 defunc (dbs/define :const :gd ',
 	func (body: Array) -> void:
-		dbs_define(body[0], body[1], body[2])
+		db_define(body[0], body[1], body[2])
 ,')
 
 defunc (dbs/getp :const :gd ',
 	func (body: Array) -> Variant:
-		return dbs_getp(body[0], body[1], body[2])
+		return db_getp(body[0], body[1], body[2])
 ,')
 
 defunc (dbs/setp :const :gd ',
 	func (body: Array) -> void:
-		dbs_setp(body[0], body[1], body[2], body[3])
+		db_setp(body[0], body[1], body[2], body[3])
 ,')
 
 defunc (dbs/pushp :const :gd ',
 	func (body: Array) -> void:
-		dbs_pushp(body[0], body[1], body[2], body[3])
+		db_pushp(body[0], body[1], body[2], body[3])
 ,')
 
 defunc (dbs/get :const :gd ',
 	func (body: Array) -> Variant:
-		return dbs_get(body[0], body[1])
+		return db_get(body[0], body[1])
 ,')
 
 defunc (task/on :const :gd ',
@@ -675,6 +680,37 @@ defunc (task/desc :const :gd ',
 	func (task_id: StringName, desc: String) -> void:
 		task_desc(task_id, desc)
 		return
+,')
+
+defunc (data/set :const :gd ',
+	func (data_id: StringName, value) -> void:
+		data_set(data_id, value)
+		return
+,')
+
+defunc (dbr/define :const :gd ',
+	func (body: Array) -> void:
+		db_define(body[0], body[1], body[2], database_runtime)
+,')
+
+defunc (dbr/getp :const :gd ',
+	func (body: Array) -> Variant:
+		return db_getp(body[0], body[1], body[2], database_runtime)
+,')
+
+defunc (dbr/setp :const :gd ',
+	func (body: Array) -> void:
+		db_setp(body[0], body[1], body[2], body[3], database_runtime)
+,')
+
+defunc (dbr/pushp :const :gd ',
+	func (body: Array) -> void:
+		db_pushp(body[0], body[1], body[2], body[3], database_runtime)
+,')
+
+defunc (dbr/get :const :gd ',
+	func (body: Array) -> Variant:
+		return db_get(body[0], body[1], database_runtime)
 ,')
 
 ']
