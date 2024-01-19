@@ -414,7 +414,39 @@ func task_desc(task_id: StringName, desc: String):
 	task.desc = desc
 
 func data_set(data_id: StringName, value):
-	print("coming soon...: change_vars\nvar: ", data_id," data: ", value)
+	dbr_define("data", data_id, value)
+
+func dbr2raw(data: Variant) -> Variant:
+	var entry = data
+	var res := []
+	if 	entry[0] == Lisper.TType.ARRAY or \
+		entry[0] == Lisper.TType.MAP or	\
+		entry[0] == Lisper.TType.LIST:
+		for i in range(entry[1].size()):
+			entry[1][i] = dbr2raw(entry[1][i])
+
+		res = entry
+	elif entry[0] == Lisper.TType.TOKEN:
+		if gss_ctx.get_var(entry[1]) != null:
+			res = entry
+			return res
+		var key = entry[1]
+		var value = dbr_get("data", key)
+		assert(value != null, "data not found: " + key)
+		
+		if value is float:
+			res = Lisper.Number(value)
+		elif value is bool:
+			res = Lisper.Bool(value)
+		elif value is String:
+			res = Lisper.String(value)
+		elif value is Array:
+			res = Lisper.List(value)
+		
+	else:
+		res = entry
+
+	return res
 
 
 func gsm(): return ['
@@ -741,6 +773,11 @@ defunc (dbr/pushp :const :gd ',
 defunc (dbr/get :const :gd ',
 	func (body: Array) -> Variant:
 		return dbr_get(body[0], body[1])
+,')
+
+defunc (dbr/raw :const :gd ',
+	func (data: Variant) -> Variant:
+		return dbr2raw(data)
 ,')
 
 ']

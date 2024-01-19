@@ -260,7 +260,7 @@ func do_merge(sets: Array[Dictionary]) -> Array[Dictionary]:
 				return await ctx.exec(branches[choose])),
 			&"dialog_to": Lisper.FnGDApply( func (ctx: LisperContext, args: Array) -> Variant:
 				var vid = args[3]
-				var dialog = ctx.get_var("*sekai*").db_get("行为", vid)
+				var dialog = ctx.get_var("*sekai*").dbs_get("行为", vid)
 				return await ctx.call_fn(dialog, args.slice(0, 3))),
 			&"check_bag_item": Lisper.FnGDCall(vprops[&"check_bag_item"]),
 		}),
