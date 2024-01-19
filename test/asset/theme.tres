@@ -1,0 +1,7 @@
+[gd_resource type="Theme" format=3 uid="uid://7sswu74m5ax"]
+
+[resource]
+VScrollBar/styles/grabber = null
+VScrollBar/styles/grabber_highlight = null
+VScrollBar/styles/grabber_pressed = null
+VScrollBar/styles/scroll = null

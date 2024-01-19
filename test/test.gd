@@ -7,6 +7,7 @@ extends Control
 @onready var dialog = $dialog
 @onready var select = $Select
 @onready var shortcut = $shortcut
+@onready var text_check = $TextCheck
 
 var picture_dict = {
 	# ^Lane Sun: 使用 preload 可以用相对路径访问文件
@@ -33,8 +34,7 @@ func _ready() -> void:
 		sekai.save_to_path("user://save.sekai"))
 	$Menu/VBoxContainer/load.pressed.connect(func ():
 		sekai.save_to_path("user://save.sekai"))
-	$Menu/VBoxContainer/exit.pressed.connect(func ():
-		tree.quit())
+	$Menu/VBoxContainer/exit.pressed.connect(Callable(self, "_on_exit"))
 	sekai.input_updated.connect(_on_input)
 	
 	sekai.external_fns.merge({
@@ -133,3 +133,12 @@ func _on_input(_all, press: Dictionary, _release) -> void:
 	if press.has(&"dialog_confirm"):
 		skip_dialog = true
 		confirmed.emit()
+		
+func _on_exit():
+	text_check.set_text("确定退出游戏？")
+	text_check.yes_func = func():
+		var tree := get_tree()
+		tree.quit()
+	text_check.no_func = func():
+		pass
+	text_check.show()

@@ -1,17 +1,16 @@
-extends Control
-
-class_name Itema
+extends TextureRect
 
 var picture: Resource : set = picture_change
 var num: int : set = num_change
 
 func _ready():
-	$picture.texture = picture
+	self.texture = picture
 	$num.text = str(num)
+	$Descrip.hide()
 	
 func picture_change(value):
 	picture = value
-	$picture.texture = value
+	self.texture = value
 	
 func num_change(value):
 	num = value
@@ -26,4 +25,14 @@ func _get_drag_data(_position):
 	var drag_preview = TextureRect.new()
 	drag_preview.texture = picture
 	set_drag_preview(drag_preview)
+	
 	return data
+
+func _input(event):
+	if event is InputEventMouseButton:
+		if event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
+			var mouse_position = get_global_mouse_position()
+			if mouse_position.distance_to(global_position) < 50: # 检查鼠标是否在对象附近
+				$Descrip.show()
+			else:
+				$Descrip.hide()

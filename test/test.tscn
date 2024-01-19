@@ -1,4 +1,4 @@
-[gd_scene load_steps=11 format=3 uid="uid://cy0i20t42382p"]
+[gd_scene load_steps=12 format=3 uid="uid://cy0i20t42382p"]
 
 [ext_resource type="Script" path="res://test/test.gd" id="1_fugfy"]
 [ext_resource type="FontFile" uid="uid://clrrm68hjw5tu" path="res://test/assert/Cubic_11_1.000_R.ttf" id="1_jnnce"]
@@ -8,6 +8,7 @@
 [ext_resource type="PackedScene" uid="uid://c1q8ps5d8htnn" path="res://test/ui/select.tscn" id="6_d64a3"]
 [ext_resource type="PackedScene" uid="uid://d28k0kj4o4c8q" path="res://test/ui/shortcut.tscn" id="7_g1wc2"]
 [ext_resource type="PackedScene" uid="uid://c4g0xtop5122l" path="res://test/ui/menu.tscn" id="8_wjljm"]
+[ext_resource type="PackedScene" uid="uid://d1w5qkp5uee6o" path="res://test/ui/text_check.tscn" id="9_abqic"]
 
 [sub_resource type="FontVariation" id="FontVariation_y4onr"]
 base_font = ExtResource("1_jnnce")
@@ -96,6 +97,7 @@ offset_bottom = 0.804678
 
 [node name="status" parent="." instance=ExtResource("5_n5bij")]
 layout_mode = 1
+offset_bottom = -528.0
 
 [node name="Select" parent="." instance=ExtResource("6_d64a3")]
 layout_mode = 1
@@ -112,3 +114,12 @@ layout_mode = 1
 
 [node name="Menu" parent="." instance=ExtResource("8_wjljm")]
 layout_mode = 1
+
+[node name="TextCheck" parent="." instance=ExtResource("9_abqic")]
+layout_mode = 1
+anchor_left = 0.245347
+anchor_top = 0.240741
+anchor_right = 0.732657
+anchor_bottom = 0.660494
+grow_horizontal = 1
+grow_vertical = 1

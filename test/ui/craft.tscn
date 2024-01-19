@@ -1,7 +1,10 @@
-[gd_scene load_steps=3 format=3 uid="uid://gc5ntqubiqig"]
+[gd_scene load_steps=6 format=3 uid="uid://gc5ntqubiqig"]
 
 [ext_resource type="Texture2D" uid="uid://qlkpck7d0goi" path="res://test/asset/ui/合成台.png" id="1_j6bak"]
 [ext_resource type="Texture2D" uid="uid://cune8fx8lftdg" path="res://test/asset/ui/合成台框.png" id="2_u0q3d"]
+[ext_resource type="Texture2D" uid="uid://db45b1dt4ilvn" path="res://test/asset/ui/背包.png" id="3_sp7a0"]
+[ext_resource type="LabelSettings" uid="uid://c2ebung6hqgic" path="res://test/asset/normal_label_settings.tres" id="4_21qvw"]
+[ext_resource type="Texture2D" uid="uid://1em4k3mug127" path="res://test/asset/ui/制作按钮.png" id="5_xd6oo"]
 
 [node name="craft" type="TextureRect"]
 anchors_preset = -1
@@ -15,78 +18,53 @@ expand_mode = 3
 stretch_mode = 4
 metadata/_edit_use_anchors_ = true
 
-[node name="GridContainer" type="GridContainer" parent="."]
+[node name="target" type="TextureRect" parent="."]
 layout_mode = 1
 anchors_preset = -1
-anchor_left = 0.115371
-anchor_top = 0.190789
-anchor_right = 0.4347
-anchor_bottom = 0.700658
-theme_override_constants/h_separation = 10
-theme_override_constants/v_separation = 10
-columns = 3
+anchor_left = 0.55831
+anchor_top = 0.338816
+anchor_right = 0.651019
+anchor_bottom = 0.486843
+texture = ExtResource("2_u0q3d")
 metadata/_edit_use_anchors_ = true
 
-[node name="TextureButton" type="TextureButton" parent="GridContainer"]
-custom_minimum_size = Vector2(45, 45)
-layout_mode = 2
-texture_normal = ExtResource("2_u0q3d")
-stretch_mode = 0
-
-[node name="TextureButton2" type="TextureButton" parent="GridContainer"]
-custom_minimum_size = Vector2(45, 45)
-layout_mode = 2
-texture_normal = ExtResource("2_u0q3d")
-stretch_mode = 0
-
-[node name="TextureButton3" type="TextureButton" parent="GridContainer"]
-custom_minimum_size = Vector2(45, 45)
-layout_mode = 2
-texture_normal = ExtResource("2_u0q3d")
-stretch_mode = 0
-
-[node name="TextureButton4" type="TextureButton" parent="GridContainer"]
-custom_minimum_size = Vector2(45, 45)
-layout_mode = 2
-texture_normal = ExtResource("2_u0q3d")
-stretch_mode = 0
-
-[node name="TextureButton5" type="TextureButton" parent="GridContainer"]
-custom_minimum_size = Vector2(45, 45)
-layout_mode = 2
-texture_normal = ExtResource("2_u0q3d")
-stretch_mode = 0
-
-[node name="TextureButton6" type="TextureButton" parent="GridContainer"]
-custom_minimum_size = Vector2(45, 45)
-layout_mode = 2
-texture_normal = ExtResource("2_u0q3d")
-stretch_mode = 0
-
-[node name="TextureButton7" type="TextureButton" parent="GridContainer"]
-custom_minimum_size = Vector2(45, 45)
-layout_mode = 2
-texture_normal = ExtResource("2_u0q3d")
-stretch_mode = 0
-
-[node name="TextureButton8" type="TextureButton" parent="GridContainer"]
-custom_minimum_size = Vector2(45, 45)
-layout_mode = 2
-texture_normal = ExtResource("2_u0q3d")
-stretch_mode = 0
-
-[node name="TextureButton9" type="TextureButton" parent="GridContainer"]
-custom_minimum_size = Vector2(45, 45)
-layout_mode = 2
-texture_normal = ExtResource("2_u0q3d")
-stretch_mode = 0
-
-[node name="TextureButton" type="TextureButton" parent="."]
+[node name="TextureRect" type="TextureRect" parent="target"]
 layout_mode = 0
-anchor_left = 0.690163
-anchor_top = 0.328947
-anchor_right = 0.782872
-anchor_bottom = 0.476974
-texture_normal = ExtResource("2_u0q3d")
-stretch_mode = 0
+anchor_left = 0.133332
+anchor_top = 0.177777
+anchor_right = 0.822217
+anchor_bottom = 0.822217
+texture = ExtResource("3_sp7a0")
+metadata/_edit_use_anchors_ = true
+
+[node name="describe" type="Label" parent="."]
+layout_mode = 0
+anchor_left = 0.677801
+anchor_top = 0.3125
+anchor_right = 0.89206
+anchor_bottom = 0.503289
+offset_left = 1.33976e-05
+offset_right = -1.07714e-05
+text = "这是一个背包"
+label_settings = ExtResource("4_21qvw")
+horizontal_alignment = 1
+vertical_alignment = 1
+metadata/_edit_use_anchors_ = true
+
+[node name="HBoxContainer" type="HBoxContainer" parent="."]
+layout_mode = 0
+offset_left = 271.0
+offset_top = 184.0
+offset_right = 447.0
+offset_bottom = 224.0
+
+[node name="check" type="TextureButton" parent="."]
+layout_mode = 0
+anchor_left = 0.690162
+anchor_top = 0.782894
+anchor_right = 0.78287
+anchor_bottom = 0.822368
+offset_left = -1.41466e-05
+offset_right = 1.07258e-05
+texture_normal = ExtResource("5_xd6oo")
 metadata/_edit_use_anchors_ = true

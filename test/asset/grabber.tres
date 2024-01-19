@@ -1,0 +1,7 @@
+[gd_resource type="StyleBoxTexture" load_steps=2 format=3 uid="uid://c5c1i848egibp"]
+
+[ext_resource type="Texture2D" uid="uid://b1kj0djvnxx6" path="res://test/asset/ui/拖动闲置.png" id="1_ys02s"]
+
+[resource]
+texture = ExtResource("1_ys02s")
+region_rect = Rect2(-0.269165, -8.68587, 20.4647, 224.546)

@@ -1,0 +1,149 @@
+[gd_scene load_steps=10 format=3 uid="uid://bln75e162nle7"]
+
+[ext_resource type="Texture2D" uid="uid://xcvw8t7i6kd7" path="res://test/asset/ui/任务书.png" id="1_0qeum"]
+[ext_resource type="Script" path="res://test/ui/task.gd" id="2_n5qer"]
+[ext_resource type="Texture2D" uid="uid://cg3v7psiaixmu" path="res://test/asset/ui/拖动条.png" id="3_6co2k"]
+[ext_resource type="Texture2D" uid="uid://b1kj0djvnxx6" path="res://test/asset/ui/拖动闲置.png" id="3_s4b0r"]
+[ext_resource type="Texture2D" uid="uid://x5qi6yxfmgkg" path="res://test/asset/ui/拖动点击.png" id="4_dhttg"]
+[ext_resource type="LabelSettings" uid="uid://c2ebung6hqgic" path="res://test/asset/normal_label_settings.tres" id="4_wp0ws"]
+[ext_resource type="Texture2D" uid="uid://cune8fx8lftdg" path="res://test/asset/ui/合成台框.png" id="5_5ceau"]
+[ext_resource type="PackedScene" uid="uid://c38wud3018v1f" path="res://test/ui/space_item.tscn" id="5_w3jhw"]
+[ext_resource type="Script" path="res://test/ui/scroll.gd" id="6_sn1et"]
+
+[node name="Task" type="TextureRect"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 31.0
+offset_top = 153.0
+offset_right = -28.0
+offset_bottom = -165.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("1_0qeum")
+stretch_mode = 4
+script = ExtResource("2_n5qer")
+
+[node name="scrollBar" type="TextureRect" parent="."]
+layout_mode = 0
+anchor_left = 0.411992
+anchor_top = 0.15528
+anchor_right = 0.4294
+anchor_bottom = 0.835404
+texture = ExtResource("3_6co2k")
+metadata/_edit_use_anchors_ = true
+
+[node name="scroll" type="TextureButton" parent="."]
+layout_mode = 0
+anchor_left = 0.398453
+anchor_top = 0.152174
+anchor_right = 0.437137
+anchor_bottom = 0.220497
+keep_pressed_outside = true
+texture_normal = ExtResource("3_s4b0r")
+texture_pressed = ExtResource("4_dhttg")
+script = ExtResource("6_sn1et")
+y_max = 250
+y_min = 50
+metadata/_edit_use_anchors_ = true
+
+[node name="list" type="ScrollContainer" parent="."]
+layout_mode = 0
+anchor_left = 0.0851064
+anchor_top = 0.149068
+anchor_right = 0.382979
+anchor_bottom = 0.841615
+vertical_scroll_mode = 3
+metadata/_edit_use_anchors_ = true
+
+[node name="VBoxContainer" type="VBoxContainer" parent="list"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="Button" type="Button" parent="list/VBoxContainer"]
+layout_mode = 2
+text = "摸一下呆毛"
+
+[node name="Button2" type="Button" parent="list/VBoxContainer"]
+layout_mode = 2
+text = "揪一下呆毛"
+
+[node name="Button3" type="Button" parent="list/VBoxContainer"]
+layout_mode = 2
+text = "揪一下呆毛"
+
+[node name="Button4" type="Button" parent="list/VBoxContainer"]
+layout_mode = 2
+text = "揪一下呆毛"
+
+[node name="Button5" type="Button" parent="list/VBoxContainer"]
+layout_mode = 2
+text = "揪一下呆毛"
+
+[node name="Button6" type="Button" parent="list/VBoxContainer"]
+layout_mode = 2
+text = "揪一下呆毛"
+
+[node name="Button7" type="Button" parent="list/VBoxContainer"]
+layout_mode = 2
+text = "揪一下呆毛"
+
+[node name="Button8" type="Button" parent="list/VBoxContainer"]
+layout_mode = 2
+text = "揪一下呆毛"
+
+[node name="Button9" type="Button" parent="list/VBoxContainer"]
+layout_mode = 2
+text = "揪一下呆毛"
+
+[node name="title" type="Label" parent="."]
+layout_mode = 0
+anchor_left = 0.539652
+anchor_top = 0.0745342
+anchor_right = 0.70793
+anchor_bottom = 0.145963
+offset_left = 1.36495e-05
+text = "摸一下呆毛"
+label_settings = ExtResource("4_wp0ws")
+metadata/_edit_use_anchors_ = true
+
+[node name="describe" type="Label" parent="."]
+layout_mode = 0
+anchor_left = 0.549323
+anchor_top = 0.186335
+anchor_right = 0.918762
+anchor_bottom = 0.636646
+text = "任务描述：
+触碰一下逆鳞"
+label_settings = ExtResource("4_wp0ws")
+metadata/_edit_use_anchors_ = true
+
+[node name="HBoxContainer" type="HBoxContainer" parent="."]
+layout_mode = 0
+anchor_left = 0.599613
+anchor_top = 0.68323
+anchor_right = 0.847195
+anchor_bottom = 0.807453
+offset_left = 1.17421e-05
+offset_right = -1.50204e-05
+metadata/_edit_use_anchors_ = true
+
+[node name="TextureRect" type="TextureRect" parent="HBoxContainer"]
+layout_mode = 2
+texture = ExtResource("5_5ceau")
+expand_mode = 2
+
+[node name="space_item" parent="HBoxContainer/TextureRect" instance=ExtResource("5_w3jhw")]
+layout_mode = 1
+anchor_right = 0.925
+anchor_bottom = 0.825
+
+[node name="TextureRect2" type="TextureRect" parent="HBoxContainer"]
+layout_mode = 2
+texture = ExtResource("5_5ceau")
+expand_mode = 2
+
+[node name="TextureRect3" type="TextureRect" parent="HBoxContainer"]
+layout_mode = 2
+texture = ExtResource("5_5ceau")
+expand_mode = 2

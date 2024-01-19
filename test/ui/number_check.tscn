@@ -1,0 +1,109 @@
+[gd_scene load_steps=11 format=3 uid="uid://c4xh32md44fvd"]
+
+[ext_resource type="Texture2D" uid="uid://cicvyy834tigf" path="res://test/asset/ui/选项框.png" id="1_dt13t"]
+[ext_resource type="Texture2D" uid="uid://bl2aytv6rlhu4" path="res://test/asset/ui/背包栏框.png" id="2_ybtxd"]
+[ext_resource type="Texture2D" uid="uid://cpoyc8u8mjvrw" path="res://test/asset/ui/斧头.png" id="3_emohi"]
+[ext_resource type="Texture2D" uid="uid://cune8fx8lftdg" path="res://test/asset/ui/合成台框.png" id="4_7qi0u"]
+[ext_resource type="LabelSettings" uid="uid://c2ebung6hqgic" path="res://test/asset/normal_label_settings.tres" id="5_xkcjg"]
+[ext_resource type="Texture2D" uid="uid://dwd65yfdb4yjq" path="res://test/asset/ui/+.png" id="6_ig6h1"]
+[ext_resource type="Texture2D" uid="uid://dc4w5h4a5ncya" path="res://test/asset/ui/-.png" id="7_76joo"]
+[ext_resource type="Texture2D" uid="uid://u3x4j8ggkto2" path="res://test/asset/ui/是.png" id="8_i0xp0"]
+[ext_resource type="Texture2D" uid="uid://b0y1aspwdml0k" path="res://test/asset/ui/否.png" id="9_rtrs7"]
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_q346w"]
+texture = ExtResource("4_7qi0u")
+texture_margin_left = 10.0
+texture_margin_top = 10.0
+texture_margin_right = 10.0
+texture_margin_bottom = 10.0
+
+[node name="Control" type="Control"]
+layout_mode = 3
+anchor_right = 1.00347
+anchor_bottom = 1.00469
+offset_right = -3.05176e-05
+offset_bottom = 3.05176e-05
+metadata/_edit_use_anchors_ = true
+
+[node name="NumberCheck" type="TextureRect" parent="."]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.136678
+anchor_top = 0.217729
+anchor_right = 0.811419
+anchor_bottom = 0.738725
+texture = ExtResource("1_dt13t")
+metadata/_edit_use_anchors_ = true
+
+[node name="TextureRect" type="TextureRect" parent="NumberCheck"]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.35641
+anchor_top = 0.146269
+anchor_right = 0.635897
+anchor_bottom = 0.471642
+texture = ExtResource("2_ybtxd")
+metadata/_edit_use_anchors_ = true
+
+[node name="TextureRect" type="TextureRect" parent="NumberCheck/TextureRect"]
+layout_mode = 0
+anchor_left = 0.192661
+anchor_top = 0.192661
+anchor_right = 0.825688
+anchor_bottom = 0.798165
+texture = ExtResource("3_emohi")
+metadata/_edit_use_anchors_ = true
+
+[node name="Label" type="Label" parent="NumberCheck"]
+layout_mode = 0
+anchor_left = 0.317949
+anchor_top = 0.540299
+anchor_right = 0.671795
+anchor_bottom = 0.659701
+theme_override_styles/normal = SubResource("StyleBoxTexture_q346w")
+text = "1"
+label_settings = ExtResource("5_xkcjg")
+horizontal_alignment = 1
+metadata/_edit_use_anchors_ = true
+
+[node name="increase" type="TextureButton" parent="NumberCheck"]
+layout_mode = 0
+anchor_left = 0.705128
+anchor_top = 0.540299
+anchor_right = 0.807692
+anchor_bottom = 0.659701
+texture_normal = ExtResource("6_ig6h1")
+stretch_mode = 0
+metadata/_edit_use_anchors_ = true
+
+[node name="decrease" type="TextureButton" parent="NumberCheck"]
+layout_mode = 0
+anchor_left = 0.182051
+anchor_top = 0.537313
+anchor_right = 0.284615
+anchor_bottom = 0.656716
+texture_normal = ExtResource("7_76joo")
+stretch_mode = 0
+metadata/_edit_use_anchors_ = true
+
+[node name="yes" type="TextureButton" parent="NumberCheck"]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.253846
+anchor_top = 0.710448
+anchor_right = 0.405128
+anchor_bottom = 0.886567
+texture_normal = ExtResource("8_i0xp0")
+stretch_mode = 0
+metadata/_edit_use_anchors_ = true
+
+[node name="no" type="TextureButton" parent="NumberCheck"]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.615385
+anchor_top = 0.707463
+anchor_right = 0.758974
+anchor_bottom = 0.874627
+texture_normal = ExtResource("9_rtrs7")
+stretch_mode = 0
+metadata/_edit_use_anchors_ = true

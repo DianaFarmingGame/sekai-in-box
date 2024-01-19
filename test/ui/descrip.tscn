@@ -1,0 +1,64 @@
+[gd_scene load_steps=7 format=3 uid="uid://1f2vqwe8f5tr"]
+
+[ext_resource type="Texture2D" uid="uid://pg5yi0jglceh" path="res://test/asset/ui/注解框.png" id="1_hu5yo"]
+[ext_resource type="Script" path="res://test/ui/descrip.gd" id="2_uigpy"]
+[ext_resource type="SystemFont" uid="uid://bvw54ryufwdfi" path="res://test/asset/new_system_font.tres" id="3_lpsx3"]
+
+[sub_resource type="LabelSettings" id="LabelSettings_fd0mb"]
+font = ExtResource("3_lpsx3")
+
+[sub_resource type="LabelSettings" id="LabelSettings_hoi8i"]
+font = ExtResource("3_lpsx3")
+
+[sub_resource type="LabelSettings" id="LabelSettings_hs837"]
+font = ExtResource("3_lpsx3")
+
+[node name="Descrip" type="TextureRect"]
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 5.0
+offset_top = 1.0
+offset_right = 119.0
+offset_bottom = 107.0
+grow_horizontal = 0
+grow_vertical = 0
+texture = ExtResource("1_hu5yo")
+script = ExtResource("2_uigpy")
+metadata/_edit_group_ = true
+
+[node name="name" type="Label" parent="."]
+layout_mode = 0
+anchor_left = 0.0652174
+anchor_top = 0.0849673
+anchor_right = 0.57971
+anchor_bottom = 0.267974
+text = "斧头"
+label_settings = SubResource("LabelSettings_fd0mb")
+vertical_alignment = 1
+metadata/_edit_use_anchors_ = true
+
+[node name="type" type="Label" parent="."]
+layout_mode = 0
+anchor_left = 0.608696
+anchor_top = 0.0718954
+anchor_right = 0.949275
+anchor_bottom = 0.287582
+text = "工具"
+label_settings = SubResource("LabelSettings_hoi8i")
+horizontal_alignment = 1
+vertical_alignment = 1
+metadata/_edit_use_anchors_ = true
+
+[node name="detail" type="Label" parent="."]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.0797101
+anchor_top = 0.359477
+anchor_right = 0.942029
+anchor_bottom = 0.908497
+text = "伐木工具"
+label_settings = SubResource("LabelSettings_hs837")
+metadata/_edit_use_anchors_ = true
