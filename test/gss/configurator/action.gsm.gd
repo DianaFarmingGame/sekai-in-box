@@ -8,6 +8,7 @@ var(change_desc_data_t ', change_desc_data_t,')
 var(change_data_data_t ', change_data_data_t,')
 var(judge_data_data_t ', judge_data_data_t,')
 var(give_item_data_t ', give_item_data_t,')
+var(item2mono ', item2mono,')
 
 
 defvar(data csv/map-let(+(*config_base* "action.csv")
@@ -74,7 +75,7 @@ array/for(data func([i record]
 									do(this dialog_to src :eval @(@(opt &跳转表) 1))
 								))
 							&物品给予
-								template(echo("unsupport dialog type:" :eval @(opt &类型)))
+								template(do(src put_item :eval item2mono(*sekai* @(opt &数据))))
 							&行为覆盖
 								template(do(this change_interact :eval @(opt &数据)))
 							#t
@@ -145,3 +146,12 @@ func give_item_data_t(data: String) -> Array:
 	res[0].strip_edges()
 
 	return res
+
+func item2mono(sekai: Sekai, item: Array):
+	var item_id = item[0]
+	var item_num = float(item[1])
+
+	var item_define = sekai.get_define(item_id)
+	var item_mono = sekai.make_mono_by_define(Mono, item_define, {&"props": {&"stack_count": item_num}})
+
+	return item_mono

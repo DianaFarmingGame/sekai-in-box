@@ -198,6 +198,11 @@ func do_merge(sets: Array[Dictionary]) -> Array[Dictionary]:
 			
 			return flag,
 
+		&"put_item": func(_sekai, this: Mono, item: Mono) -> bool:
+			#TODO: 处理失败情况
+			return await this.callm(&"container_put", item.clone())
+			,
+
 		&"change_interact": func (sekai: Sekai, this: Mono, action_id) -> void:
 			var tmp = this.getp(&"actions")
 			tmp[&"interact"] = sekai.dbs_get("行为", action_id)
@@ -269,6 +274,7 @@ func do_merge(sets: Array[Dictionary]) -> Array[Dictionary]:
 				return await ctx.call_fn(dialog, args.slice(0, 3))),
 			&"check_bag_item": Lisper.FnGDCall(vprops[&"check_bag_item"]),
 			&"change_interact": Lisper.FnGDCall(vprops[&"change_interact"]),
+			&"put_item": Lisper.FnGDCall(vprops[&"put_item"]),
 		}),
 	})
 	return sets
