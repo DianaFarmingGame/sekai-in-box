@@ -7,6 +7,8 @@ var(jump_t_non_dailog ', jump_t_non_dailog,')
 var(change_desc_data_t ', change_desc_data_t,')
 var(change_data_data_t ', change_data_data_t,')
 var(judge_data_data_t ', judge_data_data_t,')
+var(give_item_data_t ', give_item_data_t,')
+
 
 defvar(data csv/map-let(+(*config_base* "action.csv")
 	[ID 类型 发起者 数据 跳转表] {
@@ -17,6 +19,7 @@ defvar(data csv/map-let(+(*config_base* "action.csv")
 			"修改任务描述" change_desc_data_t(数据)
 			"修改变量" change_data_data_t(数据)
 			"变量检测" judge_data_data_t(数据)
+			"物品给予" give_item_data_t(数据)
 			#t 数据)
 		跳转表 switch(类型
 			"选择" jump_t_dailog(跳转表)
@@ -70,6 +73,10 @@ array/for(data func([i record]
 									do(this dialog_to src :eval @(@(opt &跳转表) 0))
 									do(this dialog_to src :eval @(@(opt &跳转表) 1))
 								))
+							&物品给予
+								template(echo("unsupport dialog type:" :eval @(opt &类型)))
+							&行为覆盖
+								template(do(this change_interact :eval @(opt &数据)))
 							#t
 								template(echo("unsupport dialog type:" :eval @(opt &类型)))
 							))))))
@@ -132,3 +139,9 @@ func judge_data_data_t(data: String):
 	untokenize += ")"
 
 	return untokenize
+
+func give_item_data_t(data: String) -> Array:
+	var res := data.split(":")
+	res[0].strip_edges()
+
+	return res
