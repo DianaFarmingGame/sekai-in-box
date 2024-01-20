@@ -139,6 +139,9 @@ func meval(content: Array) -> Variant:
 	if gss_data != null:
 		gss_data = gss_data.map(func (n): return _gsm_replace(inserts, n))
 		return await execs(gss_data)
+	push_error("failed to tokenize expression")
+	printerr("failed to tokenize expression:")
+	printerr(gss)
 	return null
 
 func _gsm_replace(inserts: Array, node: Array) -> Array:
@@ -534,6 +537,7 @@ func _error(info: String) -> String:
 func trigger_break(vname := "!::break") -> void:
 	LisperDebugger.sign_context(vname, self)
 	LisperDebugger.break_waiting = true
+	LisperDebugger.grab_focus()
 	print_rich("[color=green][lisper] interrupted by debugger[/color]")
 	await LisperDebugger.break_passed
 	LisperDebugger.break_waiting = false

@@ -6,6 +6,7 @@ var id := &"container"
 
 var props := {
 	&"contains": [],
+	&"contains_data": [],
 	&"container_capacity": 256,
 	
 	&"container_put": func (_sekai, this: Mono, item: Mono) -> bool:
@@ -63,4 +64,28 @@ var props := {
 			this.setp(&"contains", await this.call_watcher(&"contains", contains, true))
 			return picks
 		return null,
+	&"on_store": Prop.puts({
+		&"99:container": func (_sekai, this: Mono) -> void:
+			var contains := this.getpBD(&"contains", []) as Array
+			var contains_data := await Async.array_map(contains, func (item):
+				await item._on_store()
+				var script = item.get_script().resource_path
+				var vdata = item.to_data()
+				return [script, vdata])
+			this.setp(&"contains_data", contains_data)
+			pass,
+	}),
+	&"on_restore": Prop.puts({
+		&"-99:container": func (sekai: Sekai, this: Mono) -> void:
+			var contains_data := this.getpD(&"contains_data", []) as Array
+			var contains := await Async.array_map(contains_data, func (data):
+				var script = load(data[0])
+				var vdata = data[1]
+				var item = script.new()
+				item.from_data(sekai, vdata)
+				await item._on_restore()
+				return item)
+			this.setp(&"contains", contains)
+			pass,
+	}),
 }

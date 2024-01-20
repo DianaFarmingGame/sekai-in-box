@@ -19,6 +19,7 @@ unique_name_in_owner = true
 title = "Lisper Debugger"
 position = Vector2i(0, 36)
 size = Vector2i(1366, 421)
+visible = false
 wrap_controls = true
 theme = ExtResource("1_erdyy")
 script = SubResource("GDScript_0tbuo")
@@ -254,6 +255,7 @@ size_flags_vertical = 3
 select_mode = 1
 scroll_horizontal_enabled = false
 
+[connection signal="close_requested" from="DebuggerWindow" to="." method="_on_debugger_window_close_requested"]
 [connection signal="item_selected" from="DebuggerWindow/PanelContainer/MarginContainer/TabContainer/Console/HSplitContainer/HBoxContainer/VBoxContainer/ContextList" to="." method="_on_context_list_item_selected"]
 [connection signal="gui_input" from="DebuggerWindow/PanelContainer/MarginContainer/TabContainer/Console/HSplitContainer/HBoxContainer/VBoxContainer2/HBoxContainer/REPLInput" to="." method="_on_repl_input_gui_input"]
 [connection signal="pressed" from="DebuggerWindow/PanelContainer/MarginContainer/TabContainer/Console/HSplitContainer/HBoxContainer/VBoxContainer2/HBoxContainer/PrevBtn" to="." method="_on_prev_btn_pressed"]

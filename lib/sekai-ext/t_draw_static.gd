@@ -9,7 +9,7 @@ var props := {
 		&"99:draw_static": TDrawStatic.update,
 	}),
 	&"on_store": Prop.puts({
-		&"-99:position": func (_sekai, this: Mono) -> void:
+		&"-99:draw_static": func (_sekai, this: Mono) -> void:
 			this.dels(&"on_draw", &"0:draw_static")
 			pass,
 	}),
