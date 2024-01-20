@@ -134,5 +134,9 @@ static func def_commons(context: LisperContext) -> void:
 			var handle := await _parse_func(ctx, body)
 			if comptime: return Lisper.RawOverride(Lisper.Raw(handle))
 			return handle),
+		&"remember": Lisper.FnGDApplyP( func (ctx: LisperContext, args: Array) -> Variant:
+			var target = args[0]
+			ctx.remembers.append(args)
+			return target),
 	})
 	await Lisper.exec(context, "res://lib/lisper/std/commons.gss.txt")

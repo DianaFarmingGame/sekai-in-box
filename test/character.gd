@@ -200,7 +200,7 @@ func do_merge(sets: Array[Dictionary]) -> Array[Dictionary]:
 
 		&"put_item": func(_sekai, this: Mono, item: Mono) -> bool:
 			#TODO: 处理失败情况
-			return await this.callm(&"container_put", item.clone())
+			return await this.callm(&"container_put", item)
 			,
 
 		&"change_interact": func (sekai: Sekai, this: Mono, action_id) -> void:

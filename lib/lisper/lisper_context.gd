@@ -5,6 +5,7 @@ static var ENABLE_STRINGIFY_REVERSE_TRACE := true
 
 var parent = null
 var vars := {}
+var remembers := []
 var source = null
 var print_head := ""
 var dbg_name := ""
@@ -30,6 +31,7 @@ func clone() -> LisperContext:
 	var ctx := LisperContext.new()
 	ctx.parent = parent
 	ctx.vars = vars.duplicate(true)
+	ctx.remembers = remembers.duplicate()
 	ctx.source = source
 	ctx.print_head = print_head
 	return ctx
@@ -289,7 +291,7 @@ func compile(node: Array) -> Array:
 			var body := node[1].slice(1) as Array
 			head = await compile(head)
 			if head[0] == Lisper.TType.RAW:
-				var handle := head[1] as Array
+				var handle = head[1]
 				if Lisper.fn_get_type(handle) == Lisper.FnType.GD_RAW:
 					_flag_comptime = true
 					var res := await Lisper.fn_gd_get_handle(handle).call(self, body, true) as Array
