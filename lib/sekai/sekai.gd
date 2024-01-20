@@ -416,6 +416,16 @@ func task_desc(task_id: StringName, desc: String):
 func data_set(data_id: StringName, value):
 	dbr_define("data", data_id, value)
 
+func data_judge(data: Variant) -> bool:
+	var final = dbr2raw(data)
+	if final == null: 
+		return false
+
+	var res = await gss_ctx.exec(final)
+	if res is bool:
+		return res
+	return false
+
 func dbr2raw(data: Variant) -> Variant:
 	var entry = data
 	var res := []
@@ -423,8 +433,11 @@ func dbr2raw(data: Variant) -> Variant:
 		entry[0] == Lisper.TType.MAP or	\
 		entry[0] == Lisper.TType.LIST:
 		for i in range(entry[1].size()):
-			entry[1][i] = dbr2raw(entry[1][i])
-
+			var r = dbr2raw(entry[1][i])
+			if r == null: 
+				return null
+			entry[1][i] = r
+			
 		res = entry
 	elif entry[0] == Lisper.TType.TOKEN:
 		if gss_ctx.get_var(entry[1]) != null:
@@ -778,6 +791,11 @@ defunc (dbr/get :const :gd ',
 defunc (dbr/raw :const :gd ',
 	func (data: Variant) -> Variant:
 		return dbr2raw(data)
+,')
+
+defunc (data/judge :const :gd ',
+	func (data: Variant) -> bool:
+		return await data_judge(data)
 ,')
 
 ']
