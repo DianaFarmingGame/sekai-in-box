@@ -204,6 +204,35 @@ func do_merge(sets: Array[Dictionary]) -> Array[Dictionary]:
 			var dialog = ctx.get_var("*sekai*").dbs_get("行为", vid)
 			return await ctx.call_fn(dialog, args.slice(0, 3))),
 		
+		&"check_bag_item": func(_sekai, this: Mono, item: Dictionary) -> bool:
+			var bag := this.getp(&"contains") as Array
+			var total_item := {}
+			for i in bag:
+				var item_id = i.define.id
+				var count := i.getp(&"stack_count") as int
+				if total_item.has(item_id):
+					total_item[item_id] += count
+				else:
+					total_item[item_id] = count
+			
+			var flag := true
+			for i in item:
+				if !total_item.get(i) or item[i] > total_item[i]:
+					flag = false
+				break
+			
+			return flag,
+
+		&"put_item": func(_sekai, this: Mono, item: Mono) -> bool:
+			#TODO: 处理失败情况
+			return await this.callm(&"container_put", item)
+			,
+
+		&"change_interact": func (sekai: Sekai, this: Mono, action_id) -> void:
+			var tmp = this.getp(&"actions")
+			tmp[&"interact"] = sekai.dbs_get("行为", action_id)
+			,
+
 		&"init_state": &"idle",
 		&"state_data": {
 			&"idle": {

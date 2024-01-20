@@ -5,6 +5,7 @@ static var ENABLE_STRINGIFY_REVERSE_TRACE := true
 
 var parent = null
 var vars := {}
+var remembers := []
 var source = null
 var print_head := ""
 var dbg_name := ""
@@ -31,6 +32,7 @@ func clone() -> LisperContext:
 	var ctx := LisperContext.new()
 	ctx.parent = parent
 	ctx.vars = vars.duplicate(true)
+	ctx.remembers = remembers.duplicate()
 	ctx.source = source
 	ctx.print_head = print_head
 	return ctx
