@@ -236,18 +236,55 @@ func sign_define(define: MonoDefine) -> void:
 		else:
 			defines_by_id[define.id] = define
 
+func make_mono_by_define(mono_class: Variant, define: MonoDefine, opts: Dictionary) -> Mono:
+	var mono := mono_class.new() as Mono
+	mono.sekai = self
+	mono.define = define
+	for k in opts.keys():
+		match k:
+			&"props":
+				mono.cover(&"base", opts[k])
+			_:
+				mono.set(k, opts[k])
+	return mono
+
+func make_mono(mono_class: Variant, ref_id: Variant, opts: Dictionary) -> Variant:
+	var define = get_define(ref_id)
+	if define == null: return null
+	return make_mono_by_define(mono_class, define, opts)
+
+func make_mono_map(offset: Vector3, cell_size: Vector3, psize: Vector2, data := []) -> MonoMap:
+	var map := MonoMap.new()
+	map.sekai = self
+	map.offset = offset
+	map.cell_size = cell_size
+	map.size = psize
+	map.data = PackedInt32Array(data)
+	return map
+
 func add_mono(mono) -> void:
 	monos.append(mono)
-	mono._into_sekai()
+	await mono._into_sekai()
 	if mono.is_need_collision(): monos_need_collision.append(mono)
 	if mono.is_need_route(): monos_need_route.append(mono)
-	if _inited: mono._on_init()
+	if _inited: await mono._on_init()
 
 func remove_mono(mono) -> void:
 	monos_need_collision.erase(mono)
 	monos_need_route.erase(mono)
 	mono._outof_sekai()
 	monos.erase(mono)
+
+func new_mono(mono_class: Variant, ref_id: Variant, opts: Dictionary) -> Variant:
+	var mono = make_mono(mono_class, ref_id, opts)
+	if mono == null: return null
+	await add_mono(mono)
+	return mono
+
+func new_mono_map(offset: Vector3, cell_size: Vector3, psize: Vector2, data := []) -> MonoMap:
+	var mono := make_mono_map(offset, cell_size, psize, data)
+	await add_mono(mono)
+	return mono
 
 func get_define_by_ref(ref: int) -> Variant:
 	return defines[ref]
@@ -458,7 +495,7 @@ defunc (define/sign :const :gd ',
 
 defunc (mono/add :const :gd ',
 	func (mono: Variant) -> Variant:
-		add_mono(mono)
+		await add_mono(mono)
 		return mono
 ,')
 
@@ -470,19 +507,11 @@ defunc (mono/make :const :gd :raw ',
 			return cdata
 		var mono_class = await ctx.exec(body[0])
 		if mono_class != null:
-			var define = get_define(await ctx.exec(body[1]))
-			if define == null: return null
-			var mono := mono_class.new() as Mono
-			mono.sekai = self
-			mono.define = define
-			var args = await ctx.exec_map_part(body.slice(2))
-			for k in args.keys():
-				match k:
-					&"props":
-						mono.cover(&"base", args[k])
-					_:
-						mono.set(k, args[k])
-			return mono
+			return make_mono(
+				mono_class,
+				await ctx.exec(body[1]),
+				await ctx.exec_map_part(body.slice(2)),
+			)
 		else:
 			await ctx.log_error(body[0], str("mono/make: ", body[0], " is not a valid token"))
 			return null
@@ -570,14 +599,7 @@ defunc (gsx/exec :const :gd ',
 ,')
 
 defunc (mono_map/make :const :gd ',
-	func (offset: Vector3, cell_size: Vector3, psize: Vector2, data := []) -> MonoMap:
-		var map := MonoMap.new()
-		map.sekai = self
-		map.offset = offset
-		map.cell_size = cell_size
-		map.size = psize
-		map.data = PackedInt32Array(data)
-		return map
+	make_mono_map
 ,')
 
 defunc (csgv/map-let :const :gd :macro ',
