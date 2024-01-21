@@ -318,9 +318,10 @@ defunc (eval :const :gd :apply ',
 
 defunc (debug :const :gd :raw ',
 	func (ctx: LisperContext, body: Array, comptime: bool) -> Variant:
+		var val = (await ctx.execs(body))[-1]
 		breakpoint
 		if comptime: return await ctx.compiles(body)
-		return (await ctx.execs(body))[-1]
+		return val
 ,')
 
 defunc (go :const :gd :raw ',

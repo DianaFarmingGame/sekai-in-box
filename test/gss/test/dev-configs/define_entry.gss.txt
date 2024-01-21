@@ -1,0 +1,3 @@
+defvar (*config_base* "gss/configurator/csvs/")
+
+gsx/exec("/gss/define_entry.gss.txt")

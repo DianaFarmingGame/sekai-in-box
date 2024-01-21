@@ -1,6 +1,3 @@
-defvar (*config_base* "gss/test/demo/csvs/")
-
-gsx/exec ("/gss/configurator/item.gsm.gd")
 gsx/exec ("/gss/configurator/craft.gsm.gd")
 gsx/exec ("/gss/configurator/drop.gsm.gd")
 gsx/exec ("/gss/configurator/action.gsm.gd")
