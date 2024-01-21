@@ -1,0 +1,12 @@
+defvar (*config_base* "gss/test/demo/csvs/")
+
+gsx/exec ("/gss/configurator/item.gsm.gd")
+gsx/exec ("/gss/configurator/craft.gsm.gd")
+gsx/exec ("/gss/configurator/drop.gsm.gd")
+gsx/exec ("/gss/configurator/action.gsm.gd")
+gsx/exec ("/gss/configurator/npc.gsm.gd")
+gsx/exec ("/gss/configurator/plant.gsm.gd")
+gsx/exec ("/gss/configurator/shop.gsm.gd")
+gsx/exec ("/gss/configurator/task.gsm.gd")
+
+gsx/exec ("/gss/test/demo/map.gss.txt")

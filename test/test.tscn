@@ -38,8 +38,8 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("2_l2l10")
-define_gss = "res://test/gss/test/dev-ls/define_entry.gss.txt"
-entry_gss = "res://test/gss/test/dev-ls/entry.gss.txt"
+define_gss = "res://test/gss/define_entry.gss.txt"
+entry_gss = "res://test/gss/test/demo/entry.gss.txt"
 root_dir = "res://test"
 unit_size = Vector3(64, 64, 64)
 
@@ -93,6 +93,7 @@ offset_right = 0.0625296
 offset_bottom = 0.804678
 
 [node name="status" parent="." instance=ExtResource("5_n5bij")]
+visible = false
 layout_mode = 1
 
 [node name="Select" parent="." instance=ExtResource("6_d64a3")]
