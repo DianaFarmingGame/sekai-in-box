@@ -1,4 +1,4 @@
-[gd_scene load_steps=10 format=3 uid="uid://bln75e162nle7"]
+[gd_scene load_steps=11 format=3 uid="uid://bln75e162nle7"]
 
 [ext_resource type="Texture2D" uid="uid://xcvw8t7i6kd7" path="res://test/asset/ui/任务书.png" id="1_0qeum"]
 [ext_resource type="Script" path="res://test/ui/task.gd" id="2_n5qer"]
@@ -9,6 +9,7 @@
 [ext_resource type="Texture2D" uid="uid://cune8fx8lftdg" path="res://test/asset/ui/合成台框.png" id="5_5ceau"]
 [ext_resource type="PackedScene" uid="uid://c38wud3018v1f" path="res://test/ui/space_item.tscn" id="5_w3jhw"]
 [ext_resource type="Script" path="res://test/ui/scroll.gd" id="6_sn1et"]
+[ext_resource type="Script" path="res://test/ui/button.gd" id="7_cocp1"]
 
 [node name="Task" type="TextureRect"]
 anchors_preset = 15
@@ -60,41 +61,45 @@ metadata/_edit_use_anchors_ = true
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="Button" type="Button" parent="list/VBoxContainer"]
+[node name="CustomButton" type="Button" parent="list/VBoxContainer"]
 layout_mode = 2
 text = "摸一下呆毛"
+script = ExtResource("7_cocp1")
 
-[node name="Button2" type="Button" parent="list/VBoxContainer"]
+[node name="CustomButton2" type="Button" parent="list/VBoxContainer"]
 layout_mode = 2
-text = "揪一下呆毛"
+text = "摸一下呆毛"
+script = ExtResource("7_cocp1")
 
-[node name="Button3" type="Button" parent="list/VBoxContainer"]
+[node name="CustomButton3" type="Button" parent="list/VBoxContainer"]
 layout_mode = 2
-text = "揪一下呆毛"
+text = "摸一下呆毛"
+script = ExtResource("7_cocp1")
 
-[node name="Button4" type="Button" parent="list/VBoxContainer"]
+[node name="CustomButton4" type="Button" parent="list/VBoxContainer"]
 layout_mode = 2
-text = "揪一下呆毛"
+text = "摸一下呆毛"
+script = ExtResource("7_cocp1")
 
-[node name="Button5" type="Button" parent="list/VBoxContainer"]
+[node name="CustomButton5" type="Button" parent="list/VBoxContainer"]
 layout_mode = 2
-text = "揪一下呆毛"
+text = "摸一下呆毛"
+script = ExtResource("7_cocp1")
 
-[node name="Button6" type="Button" parent="list/VBoxContainer"]
+[node name="CustomButton6" type="Button" parent="list/VBoxContainer"]
 layout_mode = 2
-text = "揪一下呆毛"
+text = "摸一下呆毛"
+script = ExtResource("7_cocp1")
 
-[node name="Button7" type="Button" parent="list/VBoxContainer"]
+[node name="CustomButton7" type="Button" parent="list/VBoxContainer"]
 layout_mode = 2
-text = "揪一下呆毛"
+text = "摸一下呆毛"
+script = ExtResource("7_cocp1")
 
-[node name="Button8" type="Button" parent="list/VBoxContainer"]
+[node name="CustomButton8" type="Button" parent="list/VBoxContainer"]
 layout_mode = 2
-text = "揪一下呆毛"
-
-[node name="Button9" type="Button" parent="list/VBoxContainer"]
-layout_mode = 2
-text = "揪一下呆毛"
+text = "摸一下呆毛"
+script = ExtResource("7_cocp1")
 
 [node name="title" type="Label" parent="."]
 layout_mode = 0
@@ -137,6 +142,8 @@ expand_mode = 2
 layout_mode = 1
 anchor_right = 0.925
 anchor_bottom = 0.825
+offset_right = -18.075
+offset_bottom = -16.175
 
 [node name="TextureRect2" type="TextureRect" parent="HBoxContainer"]
 layout_mode = 2

@@ -32,7 +32,7 @@ func _input(event):
 	if event is InputEventMouseButton:
 		if event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
 			var mouse_position = get_global_mouse_position()
-			if mouse_position.distance_to(global_position) < 50: # 检查鼠标是否在对象附近
+			if mouse_position.distance_to(global_position) < 50 and mouse_position.x > global_position.x and mouse_position.y > global_position.y: # 右下角
 				$Descrip.show()
 			else:
 				$Descrip.hide()
