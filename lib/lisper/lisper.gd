@@ -78,6 +78,15 @@ static func fn_get_type(handle: Variant) -> Variant: return (handle[1] if handle
 
 static func is_fn(handle: Variant) -> bool: return handle is Callable or (handle is Array and handle.size() > 0 and is_same(handle[0], Lisper.SymFunc))
 
+static func is_same_approx(a: Variant, b: Variant) -> bool:
+	return is_same(a, b) \
+	or (typeof(a) == TYPE_INT \
+		and typeof(b) == TYPE_FLOAT \
+		and a == b) \
+	or (typeof(a) == TYPE_FLOAT \
+		and typeof(b) == TYPE_INT \
+		and a == b)
+
 static func count_last_len(pstr: String, indent: int) -> int:
 	var slices := pstr.split('\n')
 	if slices.size() > 1:

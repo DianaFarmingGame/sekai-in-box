@@ -217,7 +217,7 @@ defunc (switch :const :gd :raw ',
 					var caser_trunk := body[2 * i + 2] as Array
 					if Lisper.is_raw(caser_node):
 						var caser = caser_node[1]
-						if is_same(caser, true) or is_same(caser, value):
+						if is_same(caser, true) or Lisper.is_same_approx(caser, value):
 							return Lisper.RawOverride(caser_trunk)
 						else:
 							body.remove_at(2 * i + 2)
@@ -229,7 +229,7 @@ defunc (switch :const :gd :raw ',
 			var value = await ctx.exec(body[0])
 			for i in (body.size() - 1) / 2:
 				var caser = await ctx.exec(body[2 * i + 1])
-				if is_same(caser, true) or is_same(caser, value):
+				if is_same(caser, true) or Lisper.is_same_approx(caser, value):
 					return await ctx.exec(body[2 * i + 2])
 			return null
 ,')
