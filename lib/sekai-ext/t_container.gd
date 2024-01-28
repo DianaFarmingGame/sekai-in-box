@@ -30,12 +30,13 @@ var props := {
 		contains.erase(item)
 		this.setp(&"contains", await this.call_watcher(&"contains", contains, true))
 		return item,
-	&"container_pick_by_ref": func (_sekai, this: Mono, ref: int, count := 1) -> Variant:
+	&"container_pick_by_ref_id": func (sekai: Sekai, this: Mono, ref_id: Variant, count := 1) -> Variant:
+		var type_d = sekai.get_define(ref_id)
 		var contains := this.getpBD(&"contains", []) as Array
 		var try_count := count
 		for mono in contains:
 			if try_count <= 0: break
-			if mono.define.ref == ref:
+			if mono.define.ref == type_d.ref:
 				try_count -= mono.getp(&"stack_count") if mono.getp(&"stackable") else 1
 		if try_count <= 0:
 			var picks := []
@@ -44,7 +45,7 @@ var props := {
 				var mono = contains[-(i + 1)]
 				if count == 0: break
 				var item = null
-				if mono.define.ref == ref:
+				if mono.define.ref == type_d.ref:
 					if mono.getp(&"stackable"):
 						item = await mono.callm(&"stack_try_pick", count)
 						if item != null: count -= item.getp(&"stack_count")
