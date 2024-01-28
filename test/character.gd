@@ -2,6 +2,7 @@ class_name GCharacter extends GEntity
 
 func do_merge(sets: Array[Dictionary]) -> Array[Dictionary]:
 	super.do_merge(sets)
+
 	name = "GCharacter"
 	merge_traits(sets, [TSolid, TInputAction, TProcess, TState, TContainer, TPickable])
 	var vprops := {
@@ -26,7 +27,7 @@ func do_merge(sets: Array[Dictionary]) -> Array[Dictionary]:
 									min_dis = dis
 									mono = m
 						if mono != null and sqrt(min_dis) <= this.getp(&"touch_radius"):
-							var action = mono.getp(&"actions").get(&"interact")
+							var action = sekai.dbs_get("行为", (mono.getp(&"actions").get(&"interact")))
 							if action != null:
 								await sekai.gss_ctx.call_fn(action, [sekai, mono, this])
 					elif press.has(&"combo"):
@@ -228,9 +229,9 @@ func do_merge(sets: Array[Dictionary]) -> Array[Dictionary]:
 			return flag
 			,
 
-		&"change_interact": func (sekai: Sekai, this: Mono, action_id) -> void:
-			var tmp = this.getp(&"actions")
-			tmp[&"interact"] = sekai.dbs_get("行为", action_id)
+		&"change_interact": func (_sekai, this: Mono, action_id) -> void:
+			var act = this.getp(&"actions")
+			act[&"interact"] = action_id
 			,
 
 		&"init_state": &"idle",

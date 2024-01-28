@@ -14,7 +14,7 @@ csv/map-let(+(*config_base* "npc.csv")
 				}
 				
 				actions {
-					interact dbs/get(["行为" 行为])
+					interact 行为
 				}
 			}
 
