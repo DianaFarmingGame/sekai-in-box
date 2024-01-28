@@ -198,9 +198,34 @@ func do_merge(sets: Array[Dictionary]) -> Array[Dictionary]:
 			
 			return flag,
 
-		&"put_item": func(_sekai, this: Mono, item: Mono) -> bool:
-			#TODO: 处理失败情况
-			return await this.callm(&"container_put", item)
+		&"exchange_item": func(_sekai, this: Mono, input_item: Array, output_item: Dictionary) -> int:
+			var flag := 0
+
+			var container = this.getp(&"contains")
+			var container_d = []
+
+			for mono in container:
+				container_d.append(mono.clone())
+
+			while true:
+				for i in output_item:
+					if !await this.applym(&"container_pick_by_ref_id", [i, output_item[i]]):
+						flag = 1
+						break
+				if flag != 0: break
+
+				for i in input_item:
+					if !await this.callm(&"container_put", i):
+						flag = 2
+						break
+				if flag != 0: break
+
+				break
+
+			if flag != 0:
+				this.setp(&"contains", container_d)
+
+			return flag
 			,
 
 		&"change_interact": func (sekai: Sekai, this: Mono, action_id) -> void:
@@ -274,7 +299,7 @@ func do_merge(sets: Array[Dictionary]) -> Array[Dictionary]:
 				return await ctx.call_fn(dialog, args.slice(0, 3))),
 			&"check_bag_item": Lisper.FnGDCall(vprops[&"check_bag_item"]),
 			&"change_interact": Lisper.FnGDCall(vprops[&"change_interact"]),
-			&"put_item": Lisper.FnGDCall(vprops[&"put_item"]),
+			&"exchange_item": Lisper.FnGDCall(vprops[&"exchange_item"]),
 		}),
 	})
 	return sets

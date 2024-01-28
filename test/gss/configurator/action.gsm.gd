@@ -6,15 +6,20 @@ var(jump_t_non_dailog ', jump_t_non_dailog,')
 var(change_desc_data_t ', change_desc_data_t,')
 var(change_data_data_t ', change_data_data_t,')
 var(judge_data_data_t ', judge_data_data_t,')
-var(give_item_data_t ', give_item_data_t,')
-var(item2mono :const ', func (sekai: Sekai, item: Array):
-	var item_id = item[0]
-	var item_num = float(item[1])
+var(exchange_item_data_t ', exchange_item_data_t,')
+var(item2mono :const ', func (sekai: Sekai, items: Dictionary) -> Array:
+	var res = []
 
-	var item_define = sekai.get_define(item_id)
-	var item_mono = sekai.make_mono_by_define(Mono, item_define, {&"props": {&"stack_count": item_num}})
+	for item in items:
+		var item_id = item
+		var item_num = items[item]
 
-	return item_mono
+		var item_define = sekai.get_define(item_id)
+		var item_mono = sekai.make_mono_by_define(Mono, item_define, {&"props": {&"stack_count": item_num}})
+
+		res.append(item_mono)
+
+	return res
 ,')
 
 
@@ -27,12 +32,13 @@ defvar(data csv/map-let(+(*config_base* "action.csv")
 			"修改任务描述" change_desc_data_t(数据)
 			"修改变量" change_data_data_t(数据)
 			"变量检测" judge_data_data_t(数据)
-			"物品给予" give_item_data_t(数据)
+			"物品交换" exchange_item_data_t(数据)
 			#t 数据)
 		跳转表 switch(类型
 			"选择" jump_t_dailog(跳转表)
 			"背包检测" jump_t_non_dailog(跳转表)
 			"变量检测" jump_t_non_dailog(跳转表)
+			"物品交换" jump_t_non_dailog(跳转表)
 			#t "")
 	}))
 
@@ -81,8 +87,11 @@ array/for(data func([i record]
 									do(this dialog_to src :eval @(@(opt &跳转表) 0))
 									do(this dialog_to src :eval @(@(opt &跳转表) 1))
 								))
-							&物品给予
-								template(do(src put_item item2mono(*sekai* :eval @(opt &数据))))
+							&物品交换
+								template(switch(do(src exchange_item item2mono(*sekai* :eval @(@(opt &数据) 0)) :eval @(@(opt &数据) 1))
+										1 do(this dialog_to src :eval @(@(opt &跳转表) 0))
+										2 do(this dialog_to src :eval @(@(opt &跳转表) 1))
+								))
 							&行为覆盖
 								template(do(this change_interact :eval @(opt &数据)))
 							#t
@@ -148,8 +157,21 @@ func judge_data_data_t(data: String):
 
 	return untokenize
 
-func give_item_data_t(data: String) -> Array:
-	var res := data.split(":")
-	res[0].strip_edges()
+func exchange_item_data_t(data: String) -> Array:
+	var this_item_input = {}
+	var this_item_output = {}
+
+	var data_ary = data.split("\n", false)
+	var items = data_ary[0].split(" ", false)
+
+	for item in items:
+		var item_ary = item.split(":")
+
+		if item_ary[0] == "+":
+			this_item_input[item_ary[1]] = int(item_ary[2])
+		elif item_ary[0] == "-":
+			this_item_output[item_ary[1]] = int(item_ary[2])
+
+	var res = [this_item_input, this_item_output]
 
 	return res
