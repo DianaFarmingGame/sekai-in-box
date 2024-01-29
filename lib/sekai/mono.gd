@@ -61,7 +61,7 @@ func _from_data(data: Dictionary) -> void:
 
 func remove() -> Mono:
 	if root != null:
-		root.callm(&"container_pick", self)
+		root.callm(&"container/pick", self)
 	return self
 
 func cover(layer_name: StringName, layer: Dictionary) -> void:
@@ -182,6 +182,7 @@ func getpRD(key: StringName, default: Variant) -> Variant:
 ## set property methods
 ## [codeblock]
 ## D -> Direct: set without trigger watchers
+## F -> Force:  set with watchers triggered forced
 ## L -> Layer:  only set on certain layer
 ## B -> Base:   only set on base layer
 ## R -> Raw:    only set on define (Direct)
@@ -204,6 +205,15 @@ func setpD(key: StringName, value: Variant) -> void:
 			return
 	setpBD(key, value)
 
+func setpF(key: StringName, value: Variant) -> void:
+	for l in layers:
+		var v = l[1].get(key)
+		if v != null:
+			if v != value:
+				l[1][key] = await call_watcher(key, value, true)
+			return
+	setpBF(key, value)
+
 func setpL(layer_name: StringName, key: StringName, value: Variant) -> void:
 	for l in layers:
 		if l[0] == layer_name:
@@ -216,6 +226,12 @@ func setpLD(layer_name: StringName, key: StringName, value: Variant) -> void:
 			l[1][key] = value
 			return
 
+func setpLF(layer_name: StringName, key: StringName, value: Variant) -> void:
+	for l in layers:
+		if l[0] == layer_name:
+			l[1][key] = await call_watcher(key, value, true)
+			return
+
 func setpB(key: StringName, value: Variant) -> void:
 	value = await call_watcher(key, value)
 	if layers.size() > 0:
@@ -224,6 +240,13 @@ func setpB(key: StringName, value: Variant) -> void:
 	cover(&"base", {key: value})
 
 func setpBD(key: StringName, value: Variant) -> void:
+	if layers.size() > 0:
+		layers[-1][1][key] = value
+		return
+	cover(&"base", {key: value})
+
+func setpBF(key: StringName, value: Variant) -> void:
+	value = await call_watcher(key, value, true)
 	if layers.size() > 0:
 		layers[-1][1][key] = value
 		return
