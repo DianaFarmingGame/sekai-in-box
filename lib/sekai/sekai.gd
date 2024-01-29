@@ -95,7 +95,7 @@ func get_define(ref_id: Variant) -> Variant:
 		push_error("unable to parse define pointer: ", ref_id); return null
 	return define
 
-func make_mono_by_define(mono_class: Variant, define: MonoDefine, opts: Dictionary) -> Mono:
+func make_mono_by_define(mono_class: Variant, define: MonoDefine, opts: Dictionary = {}) -> Mono:
 	var mono := mono_class.new() as Mono
 	mono.define = define
 	for k in opts.keys():
@@ -106,7 +106,7 @@ func make_mono_by_define(mono_class: Variant, define: MonoDefine, opts: Dictiona
 				mono.set(k, opts[k])
 	return mono
 
-func make_mono(mono_class: Variant, ref_id: Variant, opts: Dictionary) -> Variant:
+func make_mono(mono_class: Variant, ref_id: Variant, opts: Dictionary = {}) -> Variant:
 	var define = get_define(ref_id)
 	if define == null: return null
 	return make_mono_by_define(mono_class, define, opts)
