@@ -402,6 +402,24 @@ func emitmS(key: StringName) -> Variant:
 		lidx -= 1
 	return value
 
+func emitmR(key: StringName) -> Variant:
+	var value = null
+	var data = define._props.get(key)
+	if data is Callable:
+		value = await data.call(sekai, self)
+	elif data is Array:
+		for entry in data:
+			value = await entry[1].call(sekai, self)
+	return value
+
+func emitmRS(key: StringName) -> Variant:
+	var handle = define._props.get(key)
+	if handle != null: return await handle.call(sekai, self)
+	return null
+
+func emitmRSU(key: StringName) -> Variant:
+	return await define._props[key].call(sekai, self)
+
 func callm(key: StringName, arg: Variant) -> Variant:
 	var value = null
 	var data = define._props.get(key)
@@ -431,6 +449,24 @@ func callmS(key: StringName, arg: Variant) -> Variant:
 		if handle != null: value = await handle.call(sekai, self, arg)
 		lidx -= 1
 	return value
+
+func callmR(key: StringName, arg: Variant) -> Variant:
+	var value = null
+	var data = define._props.get(key)
+	if data is Callable:
+		value = await data.call(sekai, self, arg)
+	elif data is Array:
+		for entry in data:
+			value = await entry[1].call(sekai, self, arg)
+	return value
+
+func callmRS(key: StringName, arg: Variant) -> Variant:
+	var handle = define._props.get(key)
+	if handle != null: return await handle.call(sekai, self, arg)
+	return null
+
+func callmRSU(key: StringName, arg: Variant) -> Variant:
+	return await define._props[key].call(sekai, self, arg)
 
 func applym(key: StringName, argv: Array) -> Variant:
 	var vargv := [sekai, self]
@@ -466,42 +502,6 @@ func applymS(key: StringName, argv: Array) -> Variant:
 		lidx -= 1
 	return value
 
-func emitmR(key: StringName) -> Variant:
-	var value = null
-	var data = define._props.get(key)
-	if data is Callable:
-		value = await data.call(sekai, self)
-	elif data is Array:
-		for entry in data:
-			value = await entry[1].call(sekai, self)
-	return value
-
-func emitmRS(key: StringName) -> Variant:
-	var handle = define._props.get(key)
-	if handle != null: return await handle.call(sekai, self)
-	return null
-
-func emitmRSU(key: StringName) -> Variant:
-	return await define._props[key].call(sekai, self)
-
-func callmR(key: StringName, arg: Variant) -> Variant:
-	var value = null
-	var data = define._props.get(key)
-	if data is Callable:
-		value = await data.call(sekai, self, arg)
-	elif data is Array:
-		for entry in data:
-			value = await entry[1].call(sekai, self, arg)
-	return value
-
-func callmRS(key: StringName, arg: Variant) -> Variant:
-	var handle = define._props.get(key)
-	if handle != null: return await handle.call(sekai, self, arg)
-	return null
-
-func callmRSU(key: StringName, arg: Variant) -> Variant:
-	return await define._props[key].call(sekai, self, arg)
-
 func applymR(key: StringName, argv: Array) -> Variant:
 	var vargv := [sekai, self]
 	vargv.append_array(argv)
@@ -525,6 +525,136 @@ func applymRSU(key: StringName, argv: Array) -> Variant:
 	var vargv := [sekai, self]
 	vargv.append_array(argv)
 	return await define._props[key].callv(vargv)
+
+## call lisper function methods
+## [codeblock]
+## R -> Raw:    only call on define
+## S -> Single: not batch call stacks
+## U -> Usafe:  fail when handle not found
+## [/codeblock]
+
+func applyv(key: StringName, ctx: LisperContext, argv: Array) -> Variant:
+	var vargv := [sekai, self]
+	vargv.append_array(argv)
+	var value = null
+	var data = define._props.get(key)
+	if Lisper.is_fn(data):
+		value = await ctx.call_fn(data, vargv)
+	elif data is Array:
+		for entry in data:
+			value = await ctx.call_fn(entry[1], vargv)
+	var lidx = layers.size() - 1
+	while lidx >= 0:
+		data = layers[lidx][1].get(key)
+		if Lisper.is_fn(data):
+			value = await ctx.call_fn(data, vargv)
+		elif data is Array:
+			for entry in data:
+				value = await ctx.call_fn(entry[1], vargv)
+		lidx -= 1
+	return value
+
+func applyvS(key: StringName, ctx: LisperContext, argv: Array) -> Variant:
+	var vargv := [sekai, self]
+	vargv.append_array(argv)
+	var value = null
+	var handle = define._props.get(key)
+	if handle != null: value = await ctx.call_fn(handle, vargv)
+	var lidx = layers.size() - 1
+	while lidx >= 0:
+		handle = layers[lidx][1].get(key)
+		if handle != null: value = await ctx.call_fn(handle, vargv)
+		lidx -= 1
+	return value
+
+func applyvR(key: StringName, ctx: LisperContext, argv: Array) -> Variant:
+	var vargv := [sekai, self]
+	vargv.append_array(argv)
+	var value = null
+	var data = define._props.get(key)
+	if Lisper.is_fn(data):
+		value = await ctx.call_fn(data, vargv)
+	elif data is Array:
+		for entry in data:
+			value = await ctx.call_fn(entry[1], vargv)
+	return value
+
+func applyvRS(key: StringName, ctx: LisperContext, argv: Array) -> Variant:
+	var vargv := [sekai, self]
+	vargv.append_array(argv)
+	var handle = define._props.get(key)
+	if handle != null: return await ctx.call_fn(handle, vargv)
+	return null
+
+func applyvRSU(key: StringName, ctx: LisperContext, argv: Array) -> Variant:
+	var vargv := [sekai, self]
+	vargv.append_array(argv)
+	return await ctx.call_fn(define._props[key], vargv)
+
+## call lisper raw function methods
+## [codeblock]
+## R -> Raw:    only call on define
+## S -> Single: not batch call stacks
+## U -> Usafe:  fail when handle not found
+## [/codeblock]
+
+func applyr(key: StringName, ctx: LisperContext, body: Array) -> Variant:
+	var vargv := [Lisper.Raw(sekai), Lisper.Raw(self)]
+	vargv.append_array(body)
+	var value = null
+	var data = define._props.get(key)
+	if Lisper.is_fn(data):
+		value = await ctx.call_fn_raw(data, vargv)
+	elif data is Array:
+		for entry in data:
+			value = await ctx.call_fn_raw(entry[1], vargv)
+	var lidx = layers.size() - 1
+	while lidx >= 0:
+		data = layers[lidx][1].get(key)
+		if Lisper.is_fn(data):
+			value = await ctx.call_fn_raw(data, vargv)
+		elif data is Array:
+			for entry in data:
+				value = await ctx.call_fn_raw(entry[1], vargv)
+		lidx -= 1
+	return value
+
+func applyrS(key: StringName, ctx: LisperContext, body: Array) -> Variant:
+	var vargv := [Lisper.Raw(sekai), Lisper.Raw(self)]
+	vargv.append_array(body)
+	var value = null
+	var handle = define._props.get(key)
+	if handle != null: value = await ctx.call_fn_raw(handle, vargv)
+	var lidx = layers.size() - 1
+	while lidx >= 0:
+		handle = layers[lidx][1].get(key)
+		if handle != null: value = await ctx.call_fn_raw(handle, vargv)
+		lidx -= 1
+	return value
+
+func applyrR(key: StringName, ctx: LisperContext, body: Array) -> Variant:
+	var vargv := [Lisper.Raw(sekai), Lisper.Raw(self)]
+	vargv.append_array(body)
+	var value = null
+	var data = define._props.get(key)
+	if Lisper.is_fn(data):
+		value = await ctx.call_fn_raw(data, vargv)
+	elif data is Array:
+		for entry in data:
+			value = await ctx.call_fn_raw(entry[1], vargv)
+	return value
+
+func applyrRS(key: StringName, ctx: LisperContext, body: Array) -> Variant:
+	var vargv := [Lisper.Raw(sekai), Lisper.Raw(self)]
+	vargv.append_array(body)
+	var handle = define._props.get(key)
+	if handle != null: return await ctx.call_fn_raw(handle, vargv)
+	return null
+
+func applyrRSU(key: StringName, ctx: LisperContext, body: Array) -> Variant:
+	var vargv := [Lisper.Raw(sekai), Lisper.Raw(self)]
+	vargv.append_array(body)
+	return await ctx.call_fn_raw(define._props[key], vargv)
 
 # accelerator methods
 

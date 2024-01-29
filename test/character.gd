@@ -4,7 +4,7 @@ func do_merge(sets: Array[Dictionary]) -> Array[Dictionary]:
 	super.do_merge(sets)
 	name = "GCharacter"
 	merge_traits(sets, [TSolid, TInputAction, TProcess, TState, TContainer, TPickable])
-	var vprops := {
+	merge_props(sets, {
 		&"name": "unnamed",
 		&"max_speed": 3,
 		&"touch_radius": 1,
@@ -173,11 +173,36 @@ func do_merge(sets: Array[Dictionary]) -> Array[Dictionary]:
 			else:
 				await sekai.external_fns[&"dialog_show_aside"].call(sekai, this, {}, meta_text),
 		
-		&"choose_single": func (sekai: Sekai, this: Mono, meta_arg1, arg1, arg2 = null) -> int:
-			if arg2 != null:
-				return await sekai.external_fns[&"dialog_choose_single"].call(sekai, this, meta_arg1, arg1, arg2)
+		&"choose_single": Lisper.FnGDRaw( func (ctx: LisperContext, body: Array, comptime: bool) -> Variant:
+			if comptime: return await ctx.compiles(body)
+			var sekai := await ctx.exec(body[0]) as Sekai
+			var this := await ctx.exec(body[1]) as Mono
+			var meta = {}
+			var title = null
+			var patterns = null
+			var meta_title = await ctx.exec(body[2])
+			if meta_title is Dictionary:
+				meta = meta_title
+				title = await ctx.exec(body[3])
+				patterns = body.slice(4)
 			else:
-				return await sekai.external_fns[&"dialog_choose_single"].call(sekai, this, {}, meta_arg1, arg1),
+				title = meta_title
+				patterns = body.slice(3)
+			var count := patterns.size() / 2 as int
+			var choices := Array()
+			choices.resize(count)
+			var branches := Array()
+			branches.resize(count)
+			for i in count:
+				choices[i] = ctx.exec_as_string(patterns[2 * i]) as String
+				branches[i] = patterns[2 * i + 1] as Array
+			var choose := await sekai.external_fns[&"dialog_choose_single"].call(sekai, this, meta, title, choices) as int
+			return await ctx.exec(branches[choose])),
+		
+		&"dialog_to": Lisper.FnGDApply( func (ctx: LisperContext, args: Array) -> Variant:
+			var vid = args[3]
+			var dialog = ctx.get_var("*sekai*").dbs_get("行为", vid)
+			return await ctx.call_fn(dialog, args.slice(0, 3))),
 		
 		&"init_state": &"idle",
 		&"state_data": {
@@ -202,47 +227,6 @@ func do_merge(sets: Array[Dictionary]) -> Array[Dictionary]:
 				&"on_enter": func (_sekai, this: Mono, _pres) -> void:
 					await this.emitm(&"draw_reset"),
 			},
-		}
-	}
-	merge_props(sets, vprops)
-	merge_props(sets, {
-		&"actions": Prop.mergep({
-			&"face_to": Lisper.FnGDCall(vprops[&"face_to"]),
-			&"move_by": Lisper.FnGDCall(vprops[&"move_by"]),
-			&"move_by_at_speed": Lisper.FnGDCall(vprops[&"move_by_at_speed"]),
-			&"move_to": Lisper.FnGDCall(vprops[&"move_to"]),
-			&"move_to_at_speed": Lisper.FnGDCall(vprops[&"move_to_at_speed"]),
-			&"say_to": Lisper.FnGDCall(vprops[&"say_to"]),
-			&"show_aside": Lisper.FnGDCall(vprops[&"show_aside"]),
-			&"choose_single": Lisper.FnGDRaw( func (ctx: LisperContext, body: Array, comptime: bool) -> Variant:
-				if comptime: return await ctx.compiles(body)
-				var sekai := await ctx.exec(body[0]) as Sekai
-				var this := await ctx.exec(body[1]) as Mono
-				var meta = {}
-				var title = null
-				var patterns = null
-				var meta_title = await ctx.exec(body[2])
-				if meta_title is Dictionary:
-					meta = meta_title
-					title = await ctx.exec(body[3])
-					patterns = body.slice(4)
-				else:
-					title = meta_title
-					patterns = body.slice(3)
-				var count := patterns.size() / 2 as int
-				var choices := Array()
-				choices.resize(count)
-				var branches := Array()
-				branches.resize(count)
-				for i in count:
-					choices[i] = ctx.exec_as_string(patterns[2 * i]) as String
-					branches[i] = patterns[2 * i + 1] as Array
-				var choose := await vprops[&"choose_single"].call(sekai, this, meta, title, choices) as int
-				return await ctx.exec(branches[choose])),
-			&"dialog_to": Lisper.FnGDApply( func (ctx: LisperContext, args: Array) -> Variant:
-				var vid = args[3]
-				var dialog = ctx.get_var("*sekai*").dbs_get("行为", vid)
-				return await ctx.call_fn(dialog, args.slice(0, 3))),
-		}),
+		},
 	})
 	return sets

@@ -420,11 +420,7 @@ defunc (do :const :gd :raw ',
 		else:
 			var this := await ctx.exec(body[0]) as Mono
 			var act_name := await ctx.exec_as_keyword(body[1]) as StringName
-			var action = this.getp(&"actions").get(act_name)
-			if action == null: action = this.getpR(&"actions").get(act_name) # FIXME
-			var argv := [Lisper.Raw(this.sekai), Lisper.Raw(this)]
-			argv.append_array(body.slice(2))
-			return await ctx.call_fn_raw(action, argv)
+			return await this.applyr(act_name, ctx, body.slice(2))
 ,')
 
 defunc (callm :const :gd :raw ',

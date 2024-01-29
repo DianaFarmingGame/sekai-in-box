@@ -50,33 +50,38 @@ static func make_func(args: Array[StringName], body: Array) -> Array:
 	vbody.append_array(body)
 	return Lisper.apply(&"func", vbody)
 
-static var SymFunc := RefCounted.new()
+class Function:
+	var type: FnType
+	var data: Variant
+	func _init(ptype: FnType = FnType.GD_CALL, pdata: Variant = null) -> void:
+		type = ptype
+		data = pdata
 
-static func FnGDRaw(handle: Callable) -> Array: return [Lisper.SymFunc, FnType.GD_RAW, handle]
+static func FnGDRaw(handle: Callable) -> Function: return Function.new(FnType.GD_RAW, handle)
 
-static func FnGDMacro(handle: Callable) -> Array: return [Lisper.SymFunc, FnType.GD_MACRO, handle]
+static func FnGDMacro(handle: Callable) -> Function: return Function.new(FnType.GD_MACRO, handle)
 
-static func FnGDCall(handle: Callable) -> Array: return [Lisper.SymFunc, FnType.GD_CALL, handle]
+static func FnGDCall(handle: Callable) -> Function: return Function.new(FnType.GD_CALL, handle)
 
-static func FnGDCallP(handle: Callable) -> Array: return [Lisper.SymFunc, FnType.GD_CALL_PURE, handle]
+static func FnGDCallP(handle: Callable) -> Function: return Function.new(FnType.GD_CALL_PURE, handle)
 
-static func FnGDApply(handle: Callable) -> Array: return [Lisper.SymFunc, FnType.GD_APPLY, handle]
+static func FnGDApply(handle: Callable) -> Function: return Function.new(FnType.GD_APPLY, handle)
 
-static func FnGDApplyP(handle: Callable) -> Array: return [Lisper.SymFunc, FnType.GD_APPLY_PURE, handle]
+static func FnGDApplyP(handle: Callable) -> Function: return Function.new(FnType.GD_APPLY_PURE, handle)
 
-static func fn_gd_get_handle(handle: Variant) -> Callable: return handle[2] if handle is Array else handle
+static func fn_gd_get_handle(handle: Variant) -> Callable: return handle.data if handle is Function else handle
 
-static func FnLPCall(args: Array, body: Array) -> Array: return [Lisper.SymFunc, FnType.LP_CALL, args, body]
+static func FnLPCall(args: Array, body: Array) -> Function: return Function.new(FnType.LP_CALL, [args, body])
 
-static func FnLPCallP(args: Array, body: Array) -> Array: return [Lisper.SymFunc, FnType.LP_CALL_PURE, args, body]
+static func FnLPCallP(args: Array, body: Array) -> Function: return Function.new(FnType.LP_CALL_PURE, [args, body])
 
-static func fn_lp_get_args(handle: Array) -> Array: return handle[2]
+static func fn_lp_get_args(handle: Function) -> Array: return handle.data[0]
 
-static func fn_lp_get_body(handle: Array) -> Array: return handle[3]
+static func fn_lp_get_body(handle: Function) -> Array: return handle.data[1]
 
-static func fn_get_type(handle: Variant) -> Variant: return (handle[1] if handle.size() > 1 else null) if handle is Array else FnType.GD_CALL
+static func fn_get_type(handle: Variant) -> Variant: return FnType.GD_CALL if handle is Callable else handle.type if handle is Function else null
 
-static func is_fn(handle: Variant) -> bool: return handle is Callable or (handle is Array and handle.size() > 0 and is_same(handle[0], Lisper.SymFunc))
+static func is_fn(handle: Variant) -> bool: return handle is Callable or handle is Function
 
 static func is_same_approx(a: Variant, b: Variant) -> bool:
 	return is_same(a, b) \

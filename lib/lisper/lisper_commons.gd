@@ -46,7 +46,7 @@ static func compile_keyword_mask_01(ctx: LisperContext, body: Array) -> Array:
 		cid += 1
 	return cdata
 
-static func _parse_func(ctx: LisperContext, body: Array) -> Array:
+static func _parse_func(ctx: LisperContext, body: Array) -> Lisper.Function:
 	var res := ctx.strip_flags(body)
 	var flags := res[0] as Array
 	body = res[1]
@@ -72,7 +72,7 @@ static func _parse_func(ctx: LisperContext, body: Array) -> Array:
 			printerr("failed to get handle")
 			printerr("node: ", ctx.stringify(node))
 			printerr("@: ", ctx.stringifys(body))
-			return []
+			return Lisper.Function.new()
 	else:
 		var args := await Async.array_map(body[0][1], ctx.exec_as_keyword)
 		var tbody := await ctx.compiles(body.slice(1))

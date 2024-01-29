@@ -175,7 +175,7 @@ func exec(node: Array) -> Variant:
 			var body = (node[1] as Array).slice(1)
 			jumps.push_back(node)
 			var handle = await exec(head)
-			if handle is Callable or handle is Array:
+			if Lisper.is_fn(handle):
 				var res = await call_fn_raw(handle, body)
 				jumps.pop_back()
 				return res
@@ -262,7 +262,7 @@ func call_fn(handle: Variant, vargs: Array) -> Variant:
 var _flag_comptime := false
 var _flag_pure_rollback := false
 
-func check_valid_handle(handle: Array) -> bool:
+func check_valid_handle(handle: Variant) -> bool:
 	if _flag_comptime:
 		match Lisper.fn_get_type(handle):
 			Lisper.FnType.GD_CALL_PURE, \
@@ -289,7 +289,7 @@ func compile(node: Array) -> Array:
 			var body := node[1].slice(1) as Array
 			head = await compile(head)
 			if head[0] == Lisper.TType.RAW:
-				var handle := head[1] as Array
+				var handle = head[1]
 				if Lisper.fn_get_type(handle) == Lisper.FnType.GD_RAW:
 					_flag_comptime = true
 					var res := await Lisper.fn_gd_get_handle(handle).call(self, body, true) as Array
