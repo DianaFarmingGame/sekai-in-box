@@ -17,18 +17,19 @@ var props := {
 				if mono.define.ref == item.define.ref and mono.getp(&"stackable") and await mono.callm(&"stack_put", item):
 					putted = true
 					break
-			this.setp(&"contains", await this.call_watcher(&"contains", contains, true))
-			if putted: return true
+			if putted:
+				this.setpD(&"contains", await this.call_watcher(&"contains", contains, true))
+				return true
 		if contains.size() < this.getp(&"container_capacity"):
 			contains.append(item)
-			this.setp(&"contains", await this.call_watcher(&"contains", contains, true))
+			this.setpD(&"contains", await this.call_watcher(&"contains", contains, true))
 			return true
-		this.setp(&"contains", await this.call_watcher(&"contains", contains, true))
+		this.setpD(&"contains", await this.call_watcher(&"contains", contains, true))
 		return false,
 	&"container_pick": func (_sekai, this: Mono, item: Mono) -> Mono:
 		var contains := this.getpBD(&"contains", []) as Array
 		contains.erase(item)
-		this.setp(&"contains", await this.call_watcher(&"contains", contains, true))
+		this.setpD(&"contains", await this.call_watcher(&"contains", contains, true))
 		return item,
 	&"container_pick_by_ref_id": func (sekai: Sekai, this: Mono, ref_id: Variant, count := 1) -> Variant:
 		var type_d = sekai.get_define(ref_id)
@@ -62,7 +63,7 @@ var props := {
 					if putted: continue
 				picks.append(item)
 			for mono in removes: contains.erase(mono)
-			this.setp(&"contains", await this.call_watcher(&"contains", contains, true))
+			this.setpD(&"contains", await this.call_watcher(&"contains", contains, true))
 			return picks
 		return null,
 	&"on_store": Prop.puts({
