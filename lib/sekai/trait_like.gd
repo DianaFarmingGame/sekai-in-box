@@ -56,7 +56,7 @@ func merge_props(sets: Array[Dictionary], props: Dictionary) -> Array[Dictionary
 	sets[0] = Prop.do_mergep(sets[0], props)
 	return sets
 
-func merge_trait(sets: Array[Dictionary], t, uids: Array, requires := []) -> Array[Dictionary]:
+func merge_trait(sets: Array[Dictionary], t: Variant, uids: Array, requires := []) -> Array[Dictionary]:
 	if not t is MonoTrait: t = t.new()
 	sets = t.merge(sets, uids, requires)
 	return sets

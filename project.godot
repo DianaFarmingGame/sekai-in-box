@@ -19,6 +19,7 @@ config/icon="res://icon.svg"
 
 DebugMenu="*res://addons/debug_menu/debug_menu.tscn"
 LisperDebugger="*res://addons/lisper-debugger/lisper_debugger.tscn"
+sekai="*res://lib/sekai/sekai.gd"
 
 [debug]
 
@@ -36,7 +37,7 @@ window/defaults/default_clear_color=Color(0, 0, 0, 1)
 
 [editor_plugins]
 
-enabled=PackedStringArray("res://addons/debug_menu/plugin.cfg", "res://addons/lisper-debugger/plugin.cfg")
+enabled=PackedStringArray("res://addons/debug_menu/plugin.cfg", "res://addons/lisper-debugger/plugin.cfg", "res://addons/sekai/plugin.cfg")
 
 [filesystem]
 
@@ -83,3 +84,7 @@ debug_draw_routable=false
 debug_draw_solid=false
 debug_draw_contactable=false
 debug_draw_pickable=false
+define_entry=""
+render_extra_sight=4
+min_inits_per_frame=8
+gikou_store_dir="user://gikous"

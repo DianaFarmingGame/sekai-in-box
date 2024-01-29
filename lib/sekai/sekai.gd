@@ -7,9 +7,9 @@ class_name Sekai extends Node
 #
 
 var define_entry: String = ProjectSettings.get_setting("sekai/define_entry")
+var gikou_store_dir: String = ProjectSettings.get_setting("sekai/gikou_store_dir")
 var render_extra_sight: int = ProjectSettings.get_setting("sekai/render_extra_sight")
 var min_inits_per_frame: int = ProjectSettings.get_setting("sekai/min_inits_per_frame")
-var gikou_store_dir: String = ProjectSettings.get_setting("sekai/gikou_store_dir")
 
 
 
@@ -97,7 +97,6 @@ func get_define(ref_id: Variant) -> Variant:
 
 func make_mono_by_define(mono_class: Variant, define: MonoDefine, opts: Dictionary) -> Mono:
 	var mono := mono_class.new() as Mono
-	mono.sekai = self
 	mono.define = define
 	for k in opts.keys():
 		match k:
