@@ -10,7 +10,7 @@ var props := {
 	
 	&"atile_cache": null,
 	&"compilers": Prop.puts({
-		&"0:atile": func (_sekai, this: Mono) -> void:
+		&"0:atile": func (this: Mono) -> void:
 			var atile_size := this.getp(&"atile_size") as Vector3
 			if atile_size != Vector3(0, 0, 0):
 				var atile_matches := this.getp(&"atile_matches") as Array
@@ -41,7 +41,7 @@ var props := {
 	}),
 }
 
-static func update(sekai: Sekai, this: Mono) -> void:
+static func update(this: Mono) -> void:
 	var cache = this.getpR(&"atile_cache")
 	if cache != null:
 		var pos := this.position

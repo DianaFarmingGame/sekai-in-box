@@ -7,16 +7,13 @@ var inited := false
 var position := Vector3(0, 0, 0)
 var layers := []
 
-static func to_data(mono: Mono) -> Array:
+static func to_data(mono: Mono) -> Variant:
 	await mono.store()
-	return [
-		mono.get_script().resource_path,
-		mono._to_data(),
-	]
+	return mono._to_data()
 
-static func from_data(data: Array) -> Mono:
-	var mono = load(data[0]).new()
-	mono._from_data(data[1])
+static func from_data(data: Variant) -> Mono:
+	var mono := Mono.new()
+	mono._from_data(data)
 	await mono.restore()
 	return mono
 
@@ -407,7 +404,6 @@ func delsB(key: StringName, head: Variant) -> Variant:
 ## S -> Single: not batch call stacks
 ## U -> Usafe:  fail when handle not found
 ## [/codeblock]
-
 func emitm(key: StringName) -> Variant:
 	var value = null
 	var data = define._props.get(key)
@@ -568,7 +564,6 @@ func applymRSU(key: StringName, argv: Array) -> Variant:
 ## S -> Single: not batch call stacks
 ## U -> Usafe:  fail when handle not found
 ## [/codeblock]
-
 func applyv(key: StringName, ctx: LisperContext, argv: Array) -> Variant:
 	var vargv := [self]
 	vargv.append_array(argv)
@@ -633,7 +628,6 @@ func applyvRSU(key: StringName, ctx: LisperContext, argv: Array) -> Variant:
 ## S -> Single: not batch call stacks
 ## U -> Usafe:  fail when handle not found
 ## [/codeblock]
-
 func applyr(key: StringName, ctx: LisperContext, body: Array) -> Variant:
 	var vargv := [Lisper.Raw(self)]
 	vargv.append_array(body)

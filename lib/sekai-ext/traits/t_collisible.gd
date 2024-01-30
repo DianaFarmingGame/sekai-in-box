@@ -8,7 +8,7 @@ var props := {
 	&"collisible": true,
 	&"collision_boxes": [Rect2(-0.5, -0.5, 1, 1)],
 	
-	&"collide_test": func (_sekai, this: Mono, region: Rect2, z_pos: int) -> bool:
+	&"collide_test": func (this: Mono, region: Rect2, z_pos: int) -> bool:
 		var position := this.position
 		if floori(position.z) == z_pos:
 			if this.getp(&"collisible"):
@@ -24,7 +24,7 @@ var props := {
 	} if ProjectSettings.get_setting(&"sekai/debug_draw_collisible") else {})
 }
 
-static func draw_debug(sekai: Sekai, this: Mono, item: SekaiItem) -> void:
+static func draw_debug(this: Mono, item: SekaiItem) -> void:
 	var tar := sekai.control_target as Mono
 	if tar != null:
 		if this.getp(&"collisible") and floori(this.position.z) == floori(tar.position.z):

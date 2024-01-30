@@ -68,7 +68,7 @@ buffering/agile_event_flushing=true
 [lisper]
 
 enable_aggressive_opt=true
-debugger_visible=false
+debugger_visible=true
 
 [rendering]
 

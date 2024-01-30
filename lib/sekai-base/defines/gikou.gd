@@ -10,7 +10,7 @@ func do_merge(sets: Array[Dictionary]) -> Array[Dictionary]:
 		&"id": null,
 		
 		&"add_hako": func (this: Mono, pid: StringName):
-			this.applym(&"container/add", [Mono, &"hako", {
+			this.applym(&"container/add", [&"hako", {
 				&"id": pid,
 			}]),
 		&"on_init": Prop.puts({

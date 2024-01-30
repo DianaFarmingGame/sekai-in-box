@@ -1,4 +1,4 @@
-class_name Sekai extends Node
+extends Node
 
 
 
@@ -8,8 +8,6 @@ class_name Sekai extends Node
 
 var define_entry: String = ProjectSettings.get_setting("sekai/define_entry")
 var gikou_store_dir: String = ProjectSettings.get_setting("sekai/gikou_store_dir")
-var render_extra_sight: int = ProjectSettings.get_setting("sekai/render_extra_sight")
-var min_inits_per_frame: int = ProjectSettings.get_setting("sekai/min_inits_per_frame")
 
 
 
@@ -18,15 +16,15 @@ var min_inits_per_frame: int = ProjectSettings.get_setting("sekai/min_inits_per_
 #
 
 var defines: Array[MonoDefine]
-var runtime: LisperContext = null
 var gikou: Mono = null
+@onready
+var context: LisperContext = await LisperCommons.make_common_context("sekai")
 
 # 初始化全局数据
 func init_globals() -> void:
 	sign_define(Gikou)
 	sign_define(Hako)
-	runtime = await LisperCommons.make_common_context("sekai")
-	await exec_gsx(define_entry)
+	if define_entry: await exec_gsx(define_entry)
 	_build_caches()
 
 
@@ -41,16 +39,16 @@ func exec_gsx(path: String) -> void:
 	print_rich("[sekai] ", _line_head_body(), "[color=green][b]exec: ", path, "[/b][/color]")
 	_indent += 1
 	var stime := Time.get_ticks_usec()
-	runtime.print_head = "        " + ('' if _indent == 0 else ''.rpad(_indent - 1, "│ ") + '╎  ')
-	await Lisper.exec(runtime, path)
+	context.print_head = "        " + ('' if _indent == 0 else ''.rpad(_indent - 1, "│ ") + '╎  ')
+	await Lisper.exec(context, path)
 	print_rich("        ", _line_head_end(), "[color=gray]", (Time.get_ticks_usec() - stime) / 1000.0, " ms[/color]")
-	runtime.print_head = ""
+	context.print_head = ""
 	_indent -= 1
 
 # 游戏实例/存档相关
 
 func start_gikou(id: String, entry: String) -> void:
-	gikou = make_mono(Mono, &"gikou", {id: id})
+	gikou = make_mono(&"gikou", {id: id})
 	await exec_gsx(entry)
 
 func into_gikou(id: String) -> void:
@@ -95,8 +93,8 @@ func get_define(ref_id: Variant) -> Variant:
 		push_error("unable to parse define pointer: ", ref_id); return null
 	return define
 
-func make_mono_by_define(mono_class: Variant, define: MonoDefine, opts: Dictionary = {}) -> Mono:
-	var mono := mono_class.new() as Mono
+func make_mono_by_define(define: MonoDefine, opts: Dictionary = {}) -> Mono:
+	var mono := Mono.new()
 	mono.define = define
 	for k in opts.keys():
 		match k:
@@ -106,10 +104,10 @@ func make_mono_by_define(mono_class: Variant, define: MonoDefine, opts: Dictiona
 				mono.set(k, opts[k])
 	return mono
 
-func make_mono(mono_class: Variant, ref_id: Variant, opts: Dictionary = {}) -> Variant:
+func make_mono(ref_id: Variant, opts: Dictionary = {}) -> Variant:
 	var define = get_define(ref_id)
 	if define == null: return null
-	return make_mono_by_define(mono_class, define, opts)
+	return make_mono_by_define(define, opts)
 
 # 资源相关
 

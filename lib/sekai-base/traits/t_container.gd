@@ -1,7 +1,5 @@
 class_name TContainer extends MonoTrait
 
-# 注意: 对于实体 (GEntity), 移入容器前需要先令其退出 Sekai
-
 var id := &"container"
 
 var props := {
@@ -9,8 +7,8 @@ var props := {
 	&"contains_data": [],
 	&"container_capacity": INF,
 	
-	&"container/add": func (this: Mono, mono_class: Variant, ref_id: Variant, opts: Dictionary = {}):
-		this.callm(&"container_put", sekai.make_mono(mono_class, ref_id, opts)),
+	&"container/add": func (this: Mono, ref_id: Variant, opts: Dictionary = {}):
+		this.callm(&"container_put", sekai.make_mono(ref_id, opts)),
 	&"container/put": func (this: Mono, item: Mono) -> bool:
 		var contains := this.getpBD(&"contains", []) as Array
 		if item.getp(&"stackable"):
@@ -24,6 +22,7 @@ var props := {
 				return true
 		if contains.size() < this.getp(&"container_capacity"):
 			contains.append(item)
+			item.remove()
 			item._into_container(this)
 			this.setpF(&"contains", contains)
 			return true
@@ -71,6 +70,7 @@ var props := {
 			for mono in picks: mono._outof_container()
 			return picks
 		return null,
+	
 	&"on_store": Prop.puts({
 		&"99:container": func (this: Mono) -> void:
 			var contains := this.getpBD(&"contains", []) as Array
