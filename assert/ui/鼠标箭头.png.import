@@ -3,15 +3,15 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://cyfcodau1fuo6"
-path="res://.godot/imported/鼠标箭头.png-1c48d68150c2fed43827268ef09726c6.ctex"
+path="res://.godot/imported/鼠标箭头.png-3d68f788b7f4c87860cb9f2e59b8e12e.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://test/assert/ui/鼠标箭头.png"
-dest_files=["res://.godot/imported/鼠标箭头.png-1c48d68150c2fed43827268ef09726c6.ctex"]
+source_file="res://assert/ui/鼠标箭头.png"
+dest_files=["res://.godot/imported/鼠标箭头.png-3d68f788b7f4c87860cb9f2e59b8e12e.ctex"]
 
 [params]
 

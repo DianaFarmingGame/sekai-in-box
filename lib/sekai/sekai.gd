@@ -1,4 +1,5 @@
-extends Node
+class_name Sekai extends Node
+## 全局唯一的 Sekai 管理对象，用于游戏的创建和保存等、Define 的管理、Mono 的创建
 
 
 
@@ -6,7 +7,10 @@ extends Node
 # 配置项
 #
 
+## 全局 Define 生成周期的程序入口
 var define_entry: String = ProjectSettings.get_setting("sekai/define_entry")
+
+## Gikou 存档的存储位置
 var gikou_store_dir: String = ProjectSettings.get_setting("sekai/gikou_store_dir")
 
 
@@ -15,17 +19,15 @@ var gikou_store_dir: String = ProjectSettings.get_setting("sekai/gikou_store_dir
 # 全局共享数据
 #
 
+## 全局 Define 存储
 var defines: Array[MonoDefine]
-var gikou: Mono = null
-@onready
-var context: LisperContext = await LisperCommons.make_common_context("sekai")
 
-# 初始化全局数据
-func init_globals() -> void:
-	sign_define(Gikou)
-	sign_define(Hako)
-	if define_entry: await exec_gsx(define_entry)
-	_build_caches()
+## 当前进入的 Gikou 实例
+var gikou: Mono = null
+
+## 全局的执行环境（原则上不应该被 Sekai 以外的对象使用）
+@onready
+var context: LisperContext = await _make_context()
 
 
 
@@ -35,6 +37,7 @@ func init_globals() -> void:
 
 # 全局修改
 
+## 请求 Sekai 执行全局代码
 func exec_gsx(path: String) -> void:
 	print_rich("[sekai] ", _line_head_body(), "[color=green][b]exec: ", path, "[/b][/color]")
 	_indent += 1
@@ -47,70 +50,46 @@ func exec_gsx(path: String) -> void:
 
 # 游戏实例/存档相关
 
+## 建立一个新游戏（不会立即存档）
 func start_gikou(id: String, entry: String) -> void:
 	gikou = make_mono(&"gikou", {id: id})
 	await exec_gsx(entry)
 
+## 进入一个已有游戏的存档
 func into_gikou(id: String) -> void:
 	var file := FileAccess.open(gikou_store_dir.path_join(id + ".gikou"), FileAccess.READ)
 	gikou = await Mono.from_data(file.get_var(false))
 
+## 触发当前游戏保存存档
 func record_gikou() -> void:
 	DirAccess.make_dir_recursive_absolute(gikou_store_dir)
 	var file := FileAccess.open(gikou_store_dir.path_join(gikou.getp(&"id") + ".gikou"), FileAccess.WRITE)
 	file.store_var(await Mono.to_data(gikou), false)
 	await gikou.restore()
 
+## 退出当前游戏
 func outof_gikou() -> void:
 	await gikou.store()
 	gikou = null
 
 # Mono/Define 相关
 
+## 注册一个 Define
 func sign_define(define: Variant) -> void:
 	if not define is MonoDefine: define = define.new()
 	define.finalize()
 	if define.ref >= defines.size(): defines.resize(define.ref + 1)
 	defines[define.ref] = define
 
-func get_define_by_ref(ref: int) -> Variant:
-	return defines[ref]
-
-func get_define_by_id(id: StringName) -> Variant:
-	return _defines_by_id.get(id)
-
-func get_define(ref_id: Variant) -> Variant:
-	var define: MonoDefine
-	if ref_id is int:
-		define = get_define_by_ref(ref_id) as MonoDefine
-		if define == null:
-			push_error("not found define ref: ", ref_id); return null
-	elif ref_id is StringName or ref_id is String:
-		define = get_define_by_id(ref_id) as MonoDefine
-		if define == null:
-			push_error("not found define id: ", ref_id); return null
-	else:
-		push_error("unable to parse define pointer: ", ref_id); return null
-	return define
-
-func make_mono_by_define(define: MonoDefine, opts: Dictionary = {}) -> Mono:
-	var mono := Mono.new()
-	mono.define = define
-	for k in opts.keys():
-		match k:
-			&"props":
-				mono.cover(&"base", opts[k])
-			_:
-				mono.set(k, opts[k])
-	return mono
-
+## 创建一个 Mono
 func make_mono(ref_id: Variant, opts: Dictionary = {}) -> Variant:
-	var define = get_define(ref_id)
+	var define = _get_define(ref_id)
 	if define == null: return null
-	return make_mono_by_define(define, opts)
+	return _make_mono_by_define(define, opts)
 
 # 资源相关
 
+## 获取一个资源（相当于 load, 但是受控/带缓存的）
 func get_assert(path: String) -> Variant:
 	var res = _assert_cache.get(path)
 	if res != null: return res
@@ -131,7 +110,14 @@ func _init() -> void:
 	Input.use_accumulated_input = false
 
 func _ready() -> void:
-	await init_globals()
+	await _init_globals()
+
+## 初始化全局数据
+func _init_globals() -> void:
+	sign_define(Gikou)
+	sign_define(Hako)
+	if define_entry: await exec_gsx(define_entry)
+	_build_caches()
 
 
 
@@ -159,6 +145,42 @@ func _build_caches() -> void:
 #
 # 工具函数
 #
+
+func _make_context() -> LisperContext:
+	var ctx := await LisperCommons.make_common_context("sekai")
+	ctx.def_const(&"sekai", self)
+	return ctx
+
+func _get_define(ref_id: Variant) -> Variant:
+	var define: MonoDefine
+	if ref_id is int:
+		define = _get_define_by_ref(ref_id) as MonoDefine
+		if define == null:
+			push_error("not found define ref: ", ref_id); return null
+	elif ref_id is StringName or ref_id is String:
+		define = _get_define_by_id(ref_id) as MonoDefine
+		if define == null:
+			push_error("not found define id: ", ref_id); return null
+	else:
+		push_error("unable to parse define pointer: ", ref_id); return null
+	return define
+
+func _get_define_by_ref(ref: int) -> Variant:
+	return defines[ref]
+
+func _get_define_by_id(id: StringName) -> Variant:
+	return _defines_by_id.get(id)
+
+func _make_mono_by_define(define: MonoDefine, opts: Dictionary = {}) -> Mono:
+	var mono := Mono.new()
+	mono.define = define
+	for k in opts.keys():
+		match k:
+			&"props":
+				mono.cover(&"base", opts[k])
+			_:
+				mono.set(k, opts[k])
+	return mono
 
 func _update_debug_draw() -> void:
 	ProjectSettings.set_setting(&"sekai/debug_draw",
