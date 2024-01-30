@@ -19,7 +19,7 @@ config/icon="res://icon.svg"
 
 DebugMenu="*res://addons/debug_menu/debug_menu.tscn"
 LisperDebugger="*res://addons/lisper-debugger/lisper_debugger.tscn"
-sekai="*res://lib/sekai/sekai.gd"
+sekai="*res://lib/sekai/sekai.gsm.gd"
 
 [debug]
 

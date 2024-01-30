@@ -1,4 +1,4 @@
-class_name Lisper extends Object
+class_name Lisper
 
 const ENABLE_DEBUGGER := true
 
@@ -92,6 +92,11 @@ static func is_same_approx(a: Variant, b: Variant) -> bool:
 		and typeof(b) == TYPE_INT \
 		and a == b)
 
+static func resolve_path(mod_dir: Variant, path: String) -> String:
+	if path.is_relative_path() and mod_dir != null:
+		path = (mod_dir as String).path_join(path)
+	return path
+
 static func count_last_len(pstr: String, indent: int) -> int:
 	var slices := pstr.split('\n')
 	if slices.size() > 1:
@@ -155,28 +160,18 @@ static func exec(ctx: LisperContext, path: String) -> void:
 		printerr("unknown gsx file: ", path)
 
 static func exec_gss(ctx: LisperContext, gss: String, path: String) -> void:
-	var pmod_path = ctx.get_var(&"*mod-path*")
-	var pmod_dir = ctx.get_var(&"*mod-dir*")
-	var pself = ctx.get_var(&"self")
-	ctx.def_consts({
+	ctx.push_module_meta({
 		&"*mod-path*": path,
 		&"*mod-dir*": path.get_base_dir(),
 		&"self": null,
 	})
 	await ctx.eval(gss)
-	ctx.def_vars([], {
-		&"*mod-path*": pmod_path,
-		&"*mod-dir*": pmod_dir,
-		&"self": pself,
-	})
+	ctx.pop_module_meta()
 
 static func exec_gsm(ctx: LisperContext, gsm: Object) -> void:
 	if gsm.has_method(&"new"): gsm = gsm.new()
 	var path = gsm.get_script().resource_path
-	var pmod_path = ctx.get_var(&"*mod-path*")
-	var pmod_dir = ctx.get_var(&"*mod-dir*")
-	var pself = ctx.get_var(&"self")
-	ctx.def_consts({
+	ctx.push_module_meta({
 		&"*mod-path*": path,
 		&"*mod-dir*": path.get_base_dir(),
 		&"self": gsm,
@@ -184,14 +179,11 @@ static func exec_gsm(ctx: LisperContext, gsm: Object) -> void:
 	var need_gtx := gsm.get_property_list().any(func (opt): return opt[&"name"] == &"gtx")
 	if need_gtx == true: gsm.gtx = ctx
 	if gsm.has_method(&"gsm_init"): await gsm.gsm_init(ctx)
-	var content := await gsm.gsm() as Array
-	await ctx.meval(content)
+	if gsm.has_method(&"gsm"): 
+		var content := await gsm.gsm() as Array
+		await ctx.meval(content)
 	if gsm.has_method(&"gsm_inited"): await gsm.gsm_inited(ctx)
-	ctx.def_vars([], {
-		&"*mod-path*": pmod_path,
-		&"*mod-dir*": pmod_dir,
-		&"self": pself,
-	})
+	ctx.pop_module_meta()
 
 static func test_parser() -> void:
 	print(Lisper.tokenize("1 0 .5 10 204.2 3.30"))

@@ -1,5 +1,4 @@
 class_name SekaiControl extends Control
-
 ## 用于渲染 Sekai 的节点，通过设置一个目标对象来渲染其视野内的地图，也可以接收输入来驱动目标对象
 
 
@@ -76,7 +75,7 @@ func _unhandled_input(event: InputEvent) -> void:
 ## 从 Sekai 创建执行上下文
 func _make_context() -> LisperContext:
 	var ctx := sekai.context.fork() as LisperContext
-	ctx.def_const(&"*control*", self)
+	ctx.def_const(&"control", self)
 	return ctx
 
 ## 每次 target 变更时调用，释放之前的区域，获取新的区域

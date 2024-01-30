@@ -4,7 +4,7 @@ var id := &"compile"
 
 var props := {
 	&"compiled": false,
-	&"compilers": Prop.Stack([]),
+	&"compilers": Prop.Stack(),
 	
 	&"on_init": Prop.puts({
 		&"-999:compile": TCompile.update,

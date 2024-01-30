@@ -15,7 +15,7 @@ static func mergep(data: Variant) -> Action:
 static func StackEntry(head: StringName, body: Variant) -> Array:
 	return [[head, body]]
 
-static func Stack(data: Variant) -> Array:
+static func Stack(data: Variant = []) -> Array:
 	assert(data is Dictionary or data is Array)
 	if data is Dictionary:
 		data = do_puts([], data)
@@ -93,3 +93,15 @@ static func do_mergep(tar: Dictionary, src: Variant) -> Dictionary:
 		else:
 			tar[key] = do_setp(tarp, srcp)
 	return tar
+
+
+
+func gsm(): return ['
+
+defunc (prop/setp :const :gd :pure ', Prop.setp ,')
+defunc (prop/pushs :const :gd :pure ', Prop.pushs ,')
+defunc (prop/puts :const :gd :pure ', Prop.puts ,')
+defunc (prop/mergep :const :gd :pure ', Prop.mergep ,')
+defunc (prop/stack :const :gd :pure ', Prop.Stack ,')
+
+']

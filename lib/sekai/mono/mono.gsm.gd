@@ -685,3 +685,51 @@ func applyrRSU(key: StringName, ctx: LisperContext, body: Array) -> Variant:
 	var vargv := [Lisper.Raw(self)]
 	vargv.append_array(body)
 	return await ctx.call_fn_raw(define._props[key], vargv)
+
+
+
+func gsm(): return ['
+
+defunc (do :const :gd :raw ',
+	func (ctx: LisperContext, body: Array, comptime: bool) -> Variant:
+		if comptime: return await LisperCommons.compile_keyword_mask_01(ctx, body)
+		else:
+			var this := await ctx.exec(body[0]) as Mono
+			var act_name := await ctx.exec_as_keyword(body[1]) as StringName
+			return await this.applyr(act_name, ctx, body.slice(2))
+,')
+
+defunc (callm :const :gd :raw ',
+	func (ctx: LisperContext, body: Array, comptime: bool) -> Variant:
+		if comptime: return await LisperCommons.compile_keyword_mask_01(ctx, body)
+		else:
+			var this := await ctx.exec(body[0]) as Mono
+			var method := await ctx.exec_as_keyword(body[1]) as StringName
+			var argv := await ctx.execs(body.slice(2)) as Array
+			return await this.applym(method, argv)
+,')
+
+defunc (getp :const :gd :raw ',
+	func (ctx: LisperContext, body: Array, comptime: bool) -> Variant:
+		if comptime: return await LisperCommons.compile_keyword_mask_01(ctx, body)
+		else:
+			var this := await ctx.exec(body[0]) as Mono
+			var key := await ctx.exec_as_keyword(body[1]) as StringName
+			return this.getp(key)
+,')
+
+defunc (setp :const :gd :raw ',
+	func (ctx: LisperContext, body: Array, comptime: bool) -> Variant:
+		if comptime: return await LisperCommons.compile_keyword_mask_01(ctx, body)
+		else:
+			var this := await ctx.exec(body[0]) as Mono
+			var key := await ctx.exec_as_keyword(body[1]) as StringName
+			var value = await ctx.exec(body[2])
+			this.setp(key, value)
+			return null
+,')
+
+defunc (remove :const :gd ', func (this: Mono): this.remove() ,')
+defunc (queue_remove :const :gd ', func (this: Mono): this.remove.call_deferred() ,')
+
+']

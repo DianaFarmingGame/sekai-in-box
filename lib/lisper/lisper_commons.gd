@@ -81,7 +81,7 @@ static func _parse_func(ctx: LisperContext, body: Array) -> Lisper.Function:
 		return Lisper.FnLPCall(args, tbody)
 
 static func def_commons(context: LisperContext) -> void:
-	context.def_vars([Lisper.VarFlag.CONST, Lisper.VarFlag.FIX], {
+	context.def_consts({
 		&"exec": Lisper.FnGDApply( func (ctx: LisperContext, args: Array) -> void:
 			var mod_dir = ctx.get_var(&"*mod-dir*")
 			var path := args[0] as String

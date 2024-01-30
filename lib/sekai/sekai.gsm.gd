@@ -13,6 +13,9 @@ var define_entry: String = ProjectSettings.get_setting("sekai/define_entry")
 ## Gikou 存档的存储位置
 var gikou_store_dir: String = ProjectSettings.get_setting("sekai/gikou_store_dir")
 
+## 向终端打印时的头部
+const print_head: String = "[sekai] "
+
 
 
 #
@@ -26,8 +29,7 @@ var defines: Array[MonoDefine]
 var gikou: Mono = null
 
 ## 全局的执行环境（原则上不应该被 Sekai 以外的对象使用）
-@onready
-var context: LisperContext = await _make_context()
+var context: LisperContext = null
 
 
 
@@ -39,21 +41,21 @@ var context: LisperContext = await _make_context()
 
 ## 请求 Sekai 执行全局代码
 func exec_gsx(path: String) -> void:
-	print_rich("[sekai] ", _line_head_body(), "[color=green][b]exec: ", path, "[/b][/color]")
+	print_rich(print_head, _line_head_body(), "[b]exec: ", path, "[/b]")
 	_indent += 1
 	var stime := Time.get_ticks_usec()
-	context.print_head = "        " + ('' if _indent == 0 else ''.rpad(_indent - 1, "│ ") + '╎  ')
+	context.print_head = print_head + ('' if _indent == 0 else ''.rpad(_indent - 1, "│ ") + '╎  ')
 	await Lisper.exec(context, path)
-	print_rich("        ", _line_head_end(), "[color=gray]", (Time.get_ticks_usec() - stime) / 1000.0, " ms[/color]")
+	print_rich(print_head, _line_head_end(), "[color=gray]", (Time.get_ticks_usec() - stime) / 1000.0, " ms[/color]")
 	context.print_head = ""
 	_indent -= 1
 
 # 游戏实例/存档相关
 
 ## 建立一个新游戏（不会立即存档）
-func start_gikou(id: String, entry: String) -> void:
+func start_gikou(id: String, entry := "") -> void:
 	gikou = make_mono(&"gikou", {id: id})
-	await exec_gsx(entry)
+	if entry != "": await exec_gsx(entry)
 
 ## 进入一个已有游戏的存档
 func into_gikou(id: String) -> void:
@@ -76,7 +78,7 @@ func outof_gikou() -> void:
 
 ## 注册一个 Define
 func sign_define(define: Variant) -> void:
-	if not define is MonoDefine: define = define.new()
+	define = MonoDefine.get_define(define)
 	define.finalize()
 	if define.ref >= defines.size(): defines.resize(define.ref + 1)
 	defines[define.ref] = define
@@ -93,6 +95,7 @@ func make_mono(ref_id: Variant, opts: Dictionary = {}) -> Variant:
 func get_assert(path: String) -> Variant:
 	var res = _assert_cache.get(path)
 	if res != null: return res
+	print_rich(print_head, _line_head_body(), "[color=gray]load: ", path, "[/color]")
 	res = load(path)
 	if res != null:
 		_assert_cache[path] = res
@@ -110,14 +113,70 @@ func _init() -> void:
 	Input.use_accumulated_input = false
 
 func _ready() -> void:
+	await _init_context()
 	await _init_globals()
+	# 封闭执行环境以防止非预测的更改
+	context.seal()
+	_build_caches()
 
 ## 初始化全局数据
 func _init_globals() -> void:
-	sign_define(Gikou)
-	sign_define(Hako)
 	if define_entry: await exec_gsx(define_entry)
-	_build_caches()
+
+## 初始化执行环境
+func _init_context() -> void:
+	context = await LisperCommons.make_common_context("sekai")
+	await Lisper.exec_gsm(context, self)
+
+
+
+# GSM
+
+func gsm(): return ['
+
+defunc (sekai/exec :const :gd :apply ',
+	func (ctx: LisperContext, args: Array) -> void:
+		var mod_dir = ctx.get_var(&"*mod-dir*")
+		var path := args[0] as String
+		await exec_gsx(Lisper.resolve_path(mod_dir, path))
+,')
+
+defunc (gikou/start :const :gd :apply ',
+	func (ctx: LisperContext, args: Array) -> void:
+		var mod_dir = ctx.get_var(&"*mod-dir*")
+		var id := args[0] as String
+		var path := args[1] as String
+		await start_gikou(id, Lisper.resolve_path(mod_dir, path))
+,')
+
+defunc (gikou/into :const :gd ', into_gikou ,')
+
+defunc (gikou/record :const :gd ', outof_gikou ,')
+
+defunc (gikou/outof :const :gd ', record_gikou ,')
+
+defunc (define/sign :const :gd ', sign_define ,')
+
+defunc (mono/make :const :gd ', make_mono ,')
+
+defunc (load :const :gd :apply :pure ',
+	func (ctx: LisperContext, args: Array) -> Variant:
+		var mod_dir = ctx.get_var(&"*mod-dir*")
+		var path := args[0] as String
+		return get_assert(Lisper.resolve_path(mod_dir, path))
+,')
+
+sekai/exec ("mono/mono.gsm.gd")
+sekai/exec ("mono/trait_like.gsm.gd")
+sekai/exec ("mono/mono_trait.gsm.gd")
+sekai/exec ("mono/mono_define.gsm.gd")
+sekai/exec ("mono/prop.gsm.gd")
+sekai/exec ("utils/base.gsm.gd")
+
+define/sign (load ("defines/gikou.gd"))
+define/sign (load ("defines/hako.gd"))
+
+']
 
 
 
@@ -146,11 +205,6 @@ func _build_caches() -> void:
 # 工具函数
 #
 
-func _make_context() -> LisperContext:
-	var ctx := await LisperCommons.make_common_context("sekai")
-	ctx.def_const(&"sekai", self)
-	return ctx
-
 func _get_define(ref_id: Variant) -> Variant:
 	var define: MonoDefine
 	if ref_id is int:
@@ -172,6 +226,7 @@ func _get_define_by_id(id: StringName) -> Variant:
 	return _defines_by_id.get(id)
 
 func _make_mono_by_define(define: MonoDefine, opts: Dictionary = {}) -> Mono:
+	opts = opts.duplicate(true)
 	var mono := Mono.new()
 	mono.define = define
 	for k in opts.keys():

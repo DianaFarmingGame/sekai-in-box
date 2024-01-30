@@ -9,6 +9,7 @@ var source = null
 var print_head := ""
 var dbg_name := ""
 var jumps := []
+var sealed := false
 
 static func extend(ctx: LisperContext) -> LisperContext:
 	var nctx := LisperContext.new()
@@ -43,11 +44,21 @@ func fork() -> LisperContext:
 func destroy() -> void:
 	LisperDebugger.unsign_context(dbg_name, self)
 
+func seal() -> void:
+	sealed = true
+
+func unseal() -> void:
+	sealed = false
+
 func get_var(name: StringName) -> Variant:
 	var res = vars.get(name)
 	return res[1] if res != null else parent.get_var(name) if parent != null else null
 
 func set_var(name: StringName, data: Variant) -> void:
+	if sealed:
+		push_error("error modify sealed context")
+		printerr("error modify sealed context:")
+		printerr("set ", name, ": ", data)
 	var pdata = vars.get(name)
 	if pdata != null:
 		vars[name][1] = data
@@ -55,26 +66,73 @@ func set_var(name: StringName, data: Variant) -> void:
 		parent.set_var(name, data) if parent != null else null
 
 func def_var(flags: Array, name: StringName, data: Variant) -> void:
+	if sealed:
+		push_error("error modify sealed context")
+		printerr("error modify sealed context:")
+		printerr("def ", name, ": ", data)
 	vars[name] = [flags, data]
 
 func undef_var(name: StringName) -> void:
+	if sealed:
+		push_error("error modify sealed context")
+		printerr("error modify sealed context:")
+		printerr("undef ", name)
 	vars.erase(name)
 
 func def_const(name: StringName, data: Variant) -> void:
+	if sealed:
+		push_error("error modify sealed context")
+		printerr("error modify sealed context:")
+		printerr("def ", name, ": ", data)
 	vars[name] = [[Lisper.VarFlag.CONST], data]
 
+var _module_meta_stack := []
+
+func push_module_meta(meta: Dictionary) -> void:
+	var pmeta := {}
+	for k in meta.keys():
+		pmeta[k] = vars.get(k)
+		vars[k] = [[Lisper.VarFlag.CONST], meta[k]]
+	_module_meta_stack.push_back(pmeta)
+
+func pop_module_meta() -> void:
+	if _module_meta_stack.size() > 0:
+		var pmeta := _module_meta_stack.pop_back() as Dictionary
+		vars.merge(pmeta, true)
+		for k in pmeta.keys():
+			if pmeta[k] != null:
+				vars[k] = pmeta[k]
+			else:
+				vars.erase(k)
+
 func def_vars(flags: Array, data_map: Dictionary) -> void:
+	if sealed:
+		push_error("error modify sealed context")
+		printerr("error modify sealed context:")
+		printerr("def ", data_map)
 	for k in data_map.keys():
 		vars[k] = [flags, data_map[k]]
 
 func def_consts(data_map: Dictionary) -> void:
+	if sealed:
+		push_error("error modify sealed context")
+		printerr("error modify sealed context:")
+		printerr("def ", data_map)
 	for k in data_map.keys():
 		vars[k] = [[Lisper.VarFlag.CONST], data_map[k]]
 
 func def_fn(flags: Array, type: Lisper.FnType, name: StringName, handle: Variant) -> void:
+	if sealed:
+		push_error("error modify sealed context")
+		printerr("error modify sealed context:")
+		printerr("defunc ", name, handle)
 	vars[name] = [flags, [type, handle]]
 
 func def_fns(flags: Array, type: Lisper.FnType, handle_map: Dictionary) -> void:
+	if sealed:
+		push_error("error modify sealed context")
+		printerr("error modify sealed context:")
+		printerr("defunc ", handle_map)
 	for k in handle_map.keys():
 		vars[k] = [flags, [type, handle_map[k]]]
 
