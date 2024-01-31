@@ -435,7 +435,7 @@ func stringify_raw_prop_dict(data: Dictionary, indent := 0, depth := 0) -> Strin
 
 func stringify_raw(data: Variant, indent := 0, depth := 0, enable_rev_trace := ENABLE_STRINGIFY_REVERSE_TRACE) -> String:
 	if depth > STRINGIFY_MAX_DEPTH: return "..."
-	if enable_rev_trace and (data is Callable or data is Array or data is Dictionary or Lisper.is_fn(data)):
+	if enable_rev_trace and (data is Array or data is Dictionary or Lisper.is_fn(data) or data is Mono):
 		var vname = find_var(data)
 		if vname != null:
 			return '#' + vname
@@ -491,13 +491,17 @@ func stringify_raw(data: Variant, indent := 0, depth := 0, enable_rev_trace := E
 		return "#t" if data else "#f"
 	if data is Object:
 		if data is Mono:
-			if data.layers.size() == 0: return "#Mono {}"
-			var tags := ["#Mono " + (data.define.id if data.define.id != &"" else data.define.ref) + ': ']
-			indent += 2
-			for l in data.layers:
-				tags.append('\n' + ''.lpad(indent) + l[0] + ': ')
-				tags.append(stringify_raw_prop_dict(l[1], indent, depth + 1))
-			return ''.join(tags)
+			var ref := str('@', data.define.id if data.define.id != &"" else data.define.ref)
+			if enable_rev_trace:
+				return "#Mono" + ref
+			else:
+				if data.layers.size() == 0: return "#Mono" + ref + " {}"
+				var tags := ["#Mono" + ref + ': ']
+				indent += 2
+				for l in data.layers:
+					tags.append('\n' + ''.lpad(indent) + l[0] + ': ')
+					tags.append(stringify_raw_prop_dict(l[1], indent, depth + 1))
+				return ''.join(tags)
 		return "#GDObject"
 	return var_to_str(data)
 

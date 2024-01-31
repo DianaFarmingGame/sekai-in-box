@@ -111,7 +111,7 @@ func get_define(ref_id: Variant) -> Variant:
 	return define
 
 ## 创建一个 Mono
-func make_mono(ref_id: Variant, opts: Dictionary = {}) -> Variant:
+func make_mono(ref_id: Variant, opts: Dictionary = {}) -> Mono:
 	var define = get_define(ref_id)
 	if define == null: return null
 	return _make_mono_by_define(define, opts)
@@ -128,6 +128,11 @@ func get_assert(path: String) -> Variant:
 		_assert_cache[path] = res
 		return res
 	return null
+
+## 获取一个游戏期间基本唯一的 index
+func get_uidx() -> int:
+	_uidx += 1
+	return _uidx
 
 
 
@@ -231,6 +236,8 @@ func _build_caches() -> void:
 #
 # 工具函数
 #
+
+var _uidx := 0
 
 func _get_define_by_ref(ref: int) -> Variant:
 	return defines[ref]

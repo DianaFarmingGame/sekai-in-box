@@ -29,6 +29,10 @@ static func Array(nodes: Array) -> Array: return [TType.ARRAY, nodes]
 
 static func is_array(node: Variant) -> bool: return is_node(node) and TType.ARRAY == node[0]
 
+static func Map(nodes: Array) -> Array: return [TType.MAP, nodes]
+
+static func is_map(node: Variant) -> bool: return is_node(node) and TType.MAP == node[0]
+
 static func Raw(value: Variant) -> Array: return [TType.RAW, value]
 
 static func is_raw(node: Variant) -> bool: return is_node(node) and TType.RAW == node[0]

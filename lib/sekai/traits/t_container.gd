@@ -7,8 +7,8 @@ var props := {
 	&"contains_data": [],
 	&"container_capacity": INF,
 	
-	&"container/add": func (this: Mono, ref_id: Variant, opts: Dictionary = {}) -> void:
-		this.callm(&"container/put", sekai.make_mono(ref_id, opts)),
+	&"container/add": func (this: Mono, ref_id: Variant, opts: Dictionary = {}) -> bool:
+		return await this.callm(&"container/put", sekai.make_mono(ref_id, opts)),
 	&"container/put": func (this: Mono, item: Mono) -> bool:
 		var contains := this.getpBD(&"contains", []) as Array
 		if item.getp(&"stackable"):

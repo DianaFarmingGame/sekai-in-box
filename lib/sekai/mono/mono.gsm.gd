@@ -418,13 +418,13 @@ func emitm(key: StringName) -> Variant:
 	if data is Callable:
 		value = await data.call(self)
 	elif data is Array:
-		for entry in data:
+		for entry in data.duplicate():
 			value = await entry[1].call(self)
 	var lidx = layers.size() - 1
 	while lidx >= 0:
 		data = layers[lidx][1].get(key)
 		if data is Array:
-			for entry in data:
+			for entry in data.duplicate():
 				value = await entry[1].call(self)
 		elif data is Callable:
 			value = await data.call(self)
@@ -448,7 +448,7 @@ func emitmR(key: StringName) -> Variant:
 	if data is Callable:
 		value = await data.call(self)
 	elif data is Array:
-		for entry in data:
+		for entry in data.duplicate():
 			value = await entry[1].call(self)
 	return value
 
@@ -466,13 +466,13 @@ func callm(key: StringName, arg: Variant) -> Variant:
 	if data is Callable:
 		value = await data.call(self, arg)
 	elif data is Array:
-		for entry in data:
+		for entry in data.duplicate():
 			value = await entry[1].call(self, arg)
 	var lidx = layers.size() - 1
 	while lidx >= 0:
 		data = layers[lidx][1].get(key)
 		if data is Array:
-			for entry in data:
+			for entry in data.duplicate():
 				value = await entry[1].call(self, arg)
 		elif data is Callable:
 			value = await data.call(self, arg)
@@ -496,7 +496,7 @@ func callmR(key: StringName, arg: Variant) -> Variant:
 	if data is Callable:
 		value = await data.call(self, arg)
 	elif data is Array:
-		for entry in data:
+		for entry in data.duplicate():
 			value = await entry[1].call(self, arg)
 	return value
 
@@ -516,13 +516,13 @@ func applym(key: StringName, argv: Array) -> Variant:
 	if data is Callable:
 		value = await data.callv(vargv)
 	elif data is Array:
-		for entry in data:
+		for entry in data.duplicate():
 			value = await entry[1].callv(vargv)
 	var lidx = layers.size() - 1
 	while lidx >= 0:
 		data = layers[lidx][1].get(key)
 		if data is Array:
-			for entry in data:
+			for entry in data.duplicate():
 				value = await entry[1].callv(vargv)
 		elif data is Callable:
 			value = await data.callv(vargv)
@@ -550,7 +550,7 @@ func applymR(key: StringName, argv: Array) -> Variant:
 	if data is Callable:
 		value = await data.callv(vargv)
 	elif data is Array:
-		for entry in data:
+		for entry in data.duplicate():
 			value = await entry[1].callv(vargv)
 	return value
 
@@ -578,7 +578,7 @@ func emitc(key: StringName, ctx: LisperContext) -> Variant:
 	if Lisper.is_fn(data):
 		value = await ctx.call_fn(data, [self])
 	elif data is Array:
-		for entry in data:
+		for entry in data.duplicate():
 			value = await ctx.call_fn(entry[1], [self])
 	var lidx = layers.size() - 1
 	while lidx >= 0:
@@ -586,7 +586,7 @@ func emitc(key: StringName, ctx: LisperContext) -> Variant:
 		if Lisper.is_fn(data):
 			value = await ctx.call_fn(data, [self])
 		elif data is Array:
-			for entry in data:
+			for entry in data.duplicate():
 				value = await ctx.call_fn(entry[1], [self])
 		lidx -= 1
 	return value
@@ -608,7 +608,7 @@ func emitcR(key: StringName, ctx: LisperContext) -> Variant:
 	if Lisper.is_fn(data):
 		value = await ctx.call_fn(data, [self])
 	elif data is Array:
-		for entry in data:
+		for entry in data.duplicate():
 			value = await ctx.call_fn(entry[1], [self])
 	return value
 
@@ -626,7 +626,7 @@ func callc(key: StringName, ctx: LisperContext, arg: Variant) -> Variant:
 	if Lisper.is_fn(data):
 		value = await ctx.call_fn(data, [self, arg])
 	elif data is Array:
-		for entry in data:
+		for entry in data.duplicate():
 			value = await ctx.call_fn(entry[1], [self, arg])
 	var lidx = layers.size() - 1
 	while lidx >= 0:
@@ -634,7 +634,7 @@ func callc(key: StringName, ctx: LisperContext, arg: Variant) -> Variant:
 		if Lisper.is_fn(data):
 			value = await ctx.call_fn(data, [self, arg])
 		elif data is Array:
-			for entry in data:
+			for entry in data.duplicate():
 				value = await ctx.call_fn(entry[1], [self, arg])
 		lidx -= 1
 	return value
@@ -656,7 +656,7 @@ func callcR(key: StringName, ctx: LisperContext, arg: Variant) -> Variant:
 	if Lisper.is_fn(data):
 		value = await ctx.call_fn(data, [self, arg])
 	elif data is Array:
-		for entry in data:
+		for entry in data.duplicate():
 			value = await ctx.call_fn(entry[1], [self, arg])
 	return value
 
@@ -676,7 +676,7 @@ func applyc(key: StringName, ctx: LisperContext, argv: Array) -> Variant:
 	if Lisper.is_fn(data):
 		value = await ctx.call_fn(data, vargv)
 	elif data is Array:
-		for entry in data:
+		for entry in data.duplicate():
 			value = await ctx.call_fn(entry[1], vargv)
 	var lidx = layers.size() - 1
 	while lidx >= 0:
@@ -684,7 +684,7 @@ func applyc(key: StringName, ctx: LisperContext, argv: Array) -> Variant:
 		if Lisper.is_fn(data):
 			value = await ctx.call_fn(data, vargv)
 		elif data is Array:
-			for entry in data:
+			for entry in data.duplicate():
 				value = await ctx.call_fn(entry[1], vargv)
 		lidx -= 1
 	return value
@@ -710,7 +710,7 @@ func applycR(key: StringName, ctx: LisperContext, argv: Array) -> Variant:
 	if Lisper.is_fn(data):
 		value = await ctx.call_fn(data, vargv)
 	elif data is Array:
-		for entry in data:
+		for entry in data.duplicate():
 			value = await ctx.call_fn(entry[1], vargv)
 	return value
 
@@ -740,7 +740,7 @@ func applyr(key: StringName, ctx: LisperContext, body: Array) -> Variant:
 	if Lisper.is_fn(data):
 		value = await ctx.call_fn_raw(data, vargv)
 	elif data is Array:
-		for entry in data:
+		for entry in data.duplicate():
 			value = await ctx.call_fn_raw(entry[1], vargv)
 	var lidx = layers.size() - 1
 	while lidx >= 0:
@@ -748,7 +748,7 @@ func applyr(key: StringName, ctx: LisperContext, body: Array) -> Variant:
 		if Lisper.is_fn(data):
 			value = await ctx.call_fn_raw(data, vargv)
 		elif data is Array:
-			for entry in data:
+			for entry in data.duplicate():
 				value = await ctx.call_fn_raw(entry[1], vargv)
 		lidx -= 1
 	return value
@@ -774,7 +774,7 @@ func applyrR(key: StringName, ctx: LisperContext, body: Array) -> Variant:
 	if Lisper.is_fn(data):
 		value = await ctx.call_fn_raw(data, vargv)
 	elif data is Array:
-		for entry in data:
+		for entry in data.duplicate():
 			value = await ctx.call_fn_raw(entry[1], vargv)
 	return value
 
@@ -830,7 +830,7 @@ defunc (setp :const :gd :raw ',
 			var key := await ctx.exec_as_keyword(body[1]) as StringName
 			var value = await ctx.exec(body[2])
 			this.setp(key, value)
-			return null
+			return this
 ,')
 
 defunc (puts :const :gd :raw ',
@@ -844,7 +844,55 @@ defunc (puts :const :gd :raw ',
 				var k := await ctx.exec_as_keyword(pairs[2 * i]) as StringName
 				var v = await ctx.exec(pairs[2 * i + 1])
 				this.puts(key, [k, v])
-			return null
+			return this
+,')
+
+defunc (dels :const :gd :raw ',
+	func (ctx: LisperContext, body: Array, comptime: bool) -> Variant:
+		if comptime: return await LisperCommons.compile_keyword_mask_01(ctx, body)
+		else:
+			var this := await ctx.exec(body[0]) as Mono
+			var key := await ctx.exec_as_keyword(body[1]) as StringName
+			var head = await ctx.exec(body[2])
+			this.dels(key, head)
+			return this
+,')
+
+defunc (listen :const :gd :macro ',
+	func (_ctx, body: Array) -> Array:
+		var this = body[0]
+		var key = body[1]
+		var head = body[2]
+		var args = body[3]
+		var chunk = body.slice(4)
+		return Lisper.apply(&"puts", [[this, key, Lisper.Map([
+			head, Lisper.apply(&"func", [[args], chunk])
+		])]])
+,')
+
+defunc (unlisten :const :gd :raw ',
+	func (ctx: LisperContext, body: Array, comptime: bool) -> Variant:
+		if comptime: return await LisperCommons.compile_keyword_mask_01(ctx, body)
+		else:
+			var this := await ctx.exec(body[0]) as Mono
+			var key := await ctx.exec_as_keyword(body[1]) as StringName
+			var head = await ctx.exec(body[2])
+			this.dels(key, head)
+			return this
+,')
+
+defunc (wait :const :gd :macro ',
+	func (_ctx, body: Array) -> Array:
+		var this = body[0]
+		var key = body[1]
+		var args = body[2]
+		var head = Lisper.String(str(sekai.get_uidx()))
+		var chunk = body.slice(3)
+		return Lisper.apply(&"puts", [[this, key, Lisper.Map([
+			head, Lisper.apply(&"func", [[args,
+				Lisper.apply(&"unlisten", [[this, key, head]])
+			], chunk])
+		])]])
 ,')
 
 defunc (remove :const :gd ', func (this: Mono): this.remove() ,')

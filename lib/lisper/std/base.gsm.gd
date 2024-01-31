@@ -290,7 +290,7 @@ defunc (echo :const :gd :apply ',
 
 defunc (echo_val :const :gd :apply ',
 	func (ctx: LisperContext, args: Array) -> Variant:
-		var msg := ' '.join(args.map(func (e): return ctx.stringify_raw(e)))
+		var msg := ' '.join(args.map(func (e): return ctx.stringify_raw(e, 0, 0, false)))
 		LisperDebugger.output(msg, null, "   ⁋ ", "     ")
 		var lines := msg.split('\n')
 		print('\n'.join(Array(lines).map(func (l): return ctx.print_head + l)))
