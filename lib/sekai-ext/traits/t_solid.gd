@@ -13,23 +13,23 @@ var props := {
 	
 	&"solid_test_to": TSolid.test_pos,
 	&"solid_test_move": func (this: Mono, offset: Vector3) -> bool:
-		return await TSolid.test_pos(sekai, this, this.position + offset),
+		return await TSolid.test_pos(this, this.position + offset),
 	&"solid_to": func (this: Mono, pos: Vector3) -> void:
-		if await TSolid.test_pos(sekai, this, pos):
+		if await TSolid.test_pos(this, pos):
 			await this.callm(&"position_set", pos),
 	&"solid_move": func (this: Mono, offset: Vector3) -> void:
-		if await TSolid.test_pos(sekai, this, this.position + offset):
+		if await TSolid.test_pos(this, this.position + offset):
 			await this.callm(&"position_move", offset),
 	&"solid_collide_all_by": func (this: Mono, offset := Vector3()) -> Array:
-		return await TSolid.collide_pos(sekai, this, this.position + offset),
+		return await TSolid.collide_pos(this, this.position + offset),
 	&"solid_collide_all_at": func (this: Mono, pos: Vector3) -> Array:
-		return await TSolid.collide_pos(sekai, this, pos),
+		return await TSolid.collide_pos(this, pos),
 	&"solid_collide_by": func (this: Mono, offset := Vector3()) -> Array:
 		var collide_group := this.getp(&"solid_collide_group") as Array
-		return await Async.array_filter(await TSolid.collide_pos(sekai, this, this.position + offset), func (m): return m != this and await m.callm(&"group_intersects", collide_group)),
+		return await Async.array_filter(await TSolid.collide_pos(this, this.position + offset), func (m): return m != this and await m.callm(&"group_intersects", collide_group)),
 	&"solid_collide_at": func (this: Mono, pos: Vector3) -> Array:
 		var collide_group := this.getp(&"solid_collide_group") as Array
-		return await Async.array_filter(await TSolid.collide_pos(sekai, this, pos), func (m): return m != this and await m.callm(&"group_intersects", collide_group)),
+		return await Async.array_filter(await TSolid.collide_pos(this, pos), func (m): return m != this and await m.callm(&"group_intersects", collide_group)),
 	
 	&"on_draw_debug": Prop.puts({
 		&"99:solid_box": TSolid.draw_debug,

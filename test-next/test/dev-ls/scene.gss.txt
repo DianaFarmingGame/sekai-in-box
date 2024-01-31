@@ -1,0 +1,18 @@
+#;listen (gikou on_init "1:entry" [this]
+	var (hako do (gikou get_hako))
+	echo_val (hako)
+	var (嘉然 mono/make (&实体/角色/嘉然 {
+		position vec3(5 9 1)
+	}))
+)
+
+puts (gikou on_init {
+	"0:entry" func ([this]
+		echo_val (this)
+		var (hako do (this get_hako))
+		echo_val (hako)
+		var (嘉然 mono/make (&实体/角色/嘉然 {
+			position vec3(5 9 1)
+		}))
+	)
+})

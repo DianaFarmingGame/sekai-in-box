@@ -1,3 +1,3 @@
 #!/bin/sh
 
-godot test/test.tscn
+godot test-next/test.tscn

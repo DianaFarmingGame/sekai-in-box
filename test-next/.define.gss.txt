@@ -1,0 +1,1 @@
+sekai/exec ("define/实体/角色/嘉然.gss.txt")

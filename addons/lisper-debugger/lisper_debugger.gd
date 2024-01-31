@@ -194,7 +194,9 @@ func exec_expr(expr: String, revt := false) -> void:
 		if TToggle.button_pressed: output(cur_ctx.stringifys(tokens), 0x0088ff22, " T ┌ ", "   │ ", "   └ ", " T [ ")
 		var compiles := cur_ctx.compiles(tokens) as Array
 		if CToggle.button_pressed: output(cur_ctx.stringifys(compiles), 0x0088ff22, " C ┌ ", "   │ ", "   └ ", " C [ ")
+		var psealed = cur_ctx.sealed; cur_ctx.sealed = false
 		var results := await (cur_ctx as LisperContext).execs(compiles)
+		cur_ctx.sealed = psealed
 		for res in results:
 			output(cur_ctx.stringify_raw(res, 0, 0, revt), 0x0088ff22, ">>>> ", "     ")
 		_last_eval_end = REPLOutput.get_line_count()
@@ -274,23 +276,29 @@ func _on_sd_raw_btn_pressed() -> void:
 	if _decomp_sel != null:
 		var name := str("temp", _sd_count)
 		_sd_count += 1
+		var psealed = cur_ctx.sealed; cur_ctx.sealed = false
 		cur_ctx.def_var([], name, _decomp_sel)
 		await exec_expr(name, true)
+		cur_ctx.sealed = psealed
 
 func _on_sd_val_btn_pressed() -> void:
 	if _decomp_sel != null:
 		var name := str("temp", _sd_count)
 		_sd_count += 1
+		var psealed = cur_ctx.sealed; cur_ctx.sealed = false
 		cur_ctx.def_var([], name, await cur_ctx.exec(_decomp_sel))
 		await exec_expr(name, false)
+		cur_ctx.sealed = psealed
 
 func _on_eval_btn_pressed() -> void:
 	if _decomp_sel != null:
 		var name := ":eval"
 		_sd_count += 1
+		var psealed = cur_ctx.sealed; cur_ctx.sealed = false
 		cur_ctx.def_var([], name, await cur_ctx.exec(_decomp_sel))
 		await exec_expr(name, false)
 		cur_ctx.undef_var(name)
+		cur_ctx.sealed = psealed
 		update_vars()
 
 func _on_debugger_window_close_requested() -> void:

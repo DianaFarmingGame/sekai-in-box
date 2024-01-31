@@ -137,12 +137,10 @@ func def_fns(flags: Array, type: Lisper.FnType, handle_map: Dictionary) -> void:
 		vars[k] = [flags, [type, handle_map[k]]]
 
 func find_var(value: Variant) -> Variant:
-	var res = null
 	for k in vars:
 		if is_same(value, vars[k][1]):
-			res = k
-			break
-	return res if res != null else parent.find_var(value) if parent != null else null
+			return k
+	return parent.find_var(value) if parent != null else null
 
 func is_const(name: StringName) -> Variant:
 	var res = vars.get(name)
@@ -421,9 +419,23 @@ func compiles(body: Array) -> Array:
 
 const STRINGIFY_MAX_DEPTH := 32
 
+func stringify_raw_prop_dict(data: Dictionary, indent := 0, depth := 0) -> String:
+	if depth > STRINGIFY_MAX_DEPTH: return "..."
+	if data.size() == 0: return ""
+	var tags := []
+	indent += 2
+	for k in data.keys():
+		tags.append('\n' + ''.lpad(indent) + k + ': ')
+		var value = data[k]
+		if value is Dictionary:
+			tags.append(stringify_raw_prop_dict(value, indent, depth + 1))
+		else:
+			tags.append(stringify_raw(data[k], indent + k.length() + 2, depth + 1))
+	return ''.join(tags)
+
 func stringify_raw(data: Variant, indent := 0, depth := 0, enable_rev_trace := ENABLE_STRINGIFY_REVERSE_TRACE) -> String:
 	if depth > STRINGIFY_MAX_DEPTH: return "..."
-	if enable_rev_trace and (data is Callable or data is Array or data is Dictionary):
+	if enable_rev_trace and (data is Callable or data is Array or data is Dictionary or Lisper.is_fn(data)):
 		var vname = find_var(data)
 		if vname != null:
 			return '#' + vname
@@ -434,26 +446,39 @@ func stringify_raw(data: Variant, indent := 0, depth := 0, enable_rev_trace := E
 		var msg := 'λ:' + type as String
 		match Lisper.fn_get_type(data):
 			Lisper.FnType.LP_CALL, Lisper.FnType.LP_CALL_PURE:
-				indent += msg.length() + 2
-				msg += " ([" + ' '.join(Lisper.fn_lp_get_args(data)) + "]\n" + ''.lpad(indent) + stringifys(Lisper.fn_lp_get_body(data), indent, depth + 8) + ')'
+				var tags := [" [" + ' '.join(Lisper.fn_lp_get_args(data)) + "]: "]
+				indent += 2
+				for node in Lisper.fn_lp_get_body(data):
+					tags.append('\n' + ''.lpad(indent) + stringify(node, indent, depth + 8))
+				msg += ''.join(tags)
 		return msg
 	if data is Dictionary:
-		var ks := data.keys() as Array
-		if ks.size() == 0: return "{}"
-		var res := ['{']
-		for k in ks:
-			var v = data[k]
-			res.append('\n' + ''.lpad(indent + 2) + k + ' ' + stringify_raw(v, indent + 2, depth + 1))
-		res.append('\n' + ''.lpad(indent) + '}')
-		return ''.join(res)
-	if data is Array:
-		var res := '[' + (stringify_raw(data[0], indent + 1, depth + 1) if data.size() > 0 else '')
-		for n in data.slice(1):
-			var idn := Lisper.count_last_len(res, indent)
-			if idn - indent > 8:
-				res += '\n' + ''.lpad(indent) + ' ' + stringify_raw(n, indent + 1, depth + 1)
+		if data.size() == 0: return "{}"
+		var tags := ['{']
+		indent += 2
+		for k in data.keys():
+			tags.append('\n' + ''.lpad(indent) + k + ': ')
+			var value = data[k]
+			if value is Dictionary:
+				tags.append(stringify_raw_prop_dict(value, indent, depth + 1))
 			else:
-				res += ' ' + stringify_raw(n, idn + 1, depth + 1)
+				tags.append(stringify_raw(data[k], indent + k.length() + 2, depth + 1))
+		tags.append('\n' + ''.lpad(indent - 2) + '}')
+		return ''.join(tags)
+	if data is Array:
+		var res := '['
+		var strip_first := true
+		var body := data as Array
+		for n in body:
+			if strip_first:
+				strip_first = false
+				res += stringify_raw(n, indent + 1, depth + 1)
+			else:
+				var idn := Lisper.count_last_len(res, indent)
+				if idn - indent > 8:
+					res += ('\n' + ''.lpad(indent) + ' ') + stringify_raw(n, indent + 1, depth + 1)
+				else:
+					res += ' ' + stringify_raw(n, idn + 1, depth + 1)
 		res += ']'
 		return res
 	if data is String:
@@ -465,6 +490,14 @@ func stringify_raw(data: Variant, indent := 0, depth := 0, enable_rev_trace := E
 	if data is bool:
 		return "#t" if data else "#f"
 	if data is Object:
+		if data is Mono:
+			if data.layers.size() == 0: return "#Mono {}"
+			var tags := ["#Mono " + (data.define.id if data.define.id != &"" else data.define.ref) + ': ']
+			indent += 2
+			for l in data.layers:
+				tags.append('\n' + ''.lpad(indent) + l[0] + ': ')
+				tags.append(stringify_raw_prop_dict(l[1], indent, depth + 1))
+			return ''.join(tags)
 		return "#GDObject"
 	return var_to_str(data)
 

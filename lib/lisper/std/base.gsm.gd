@@ -282,6 +282,7 @@ defunc (num :const :gd :pure ',
 defunc (echo :const :gd :apply ',
 	func (ctx: LisperContext, args: Array) -> Variant:
 		var msg := ' '.join(args.map(func (e): return str(e)))
+		LisperDebugger.output(msg, null, "   ⁋ ", "     ")
 		var lines := msg.split('\n')
 		print('\n'.join(Array(lines).map(func (l): return ctx.print_head + l)))
 		return args[-1] if args.size() > 0 else null
@@ -290,6 +291,7 @@ defunc (echo :const :gd :apply ',
 defunc (echo_val :const :gd :apply ',
 	func (ctx: LisperContext, args: Array) -> Variant:
 		var msg := ' '.join(args.map(func (e): return ctx.stringify_raw(e)))
+		LisperDebugger.output(msg, null, "   ⁋ ", "     ")
 		var lines := msg.split('\n')
 		print('\n'.join(Array(lines).map(func (l): return ctx.print_head + l)))
 		return args[-1] if args.size() > 0 else null
@@ -298,6 +300,7 @@ defunc (echo_val :const :gd :apply ',
 defunc (echo_raw :const :gd :apply ',
 	func (ctx: LisperContext, args: Array) -> Variant:
 		var msg := ' '.join(args.map(func (e): return ctx.stringify(e)))
+		LisperDebugger.output(msg, null, "   ⁋ ", "     ")
 		var lines := msg.split('\n')
 		print('\n'.join(Array(lines).map(func (l): return ctx.print_head + l)))
 		return args[-1] if args.size() > 0 else null
@@ -306,6 +309,7 @@ defunc (echo_raw :const :gd :apply ',
 defunc (echo_rich :const :gd :apply ',
 	func (ctx: LisperContext, args: Array) -> Variant:
 		var msg := ' '.join(args.map(func (e): return str(e)))
+		LisperDebugger.output(msg, null, "   ⁋ ", "     ")
 		var lines := msg.split('\n')
 		print_rich('\n'.join(Array(lines).map(func (l): return ctx.print_head + l)))
 		return args[-1] if args.size() > 0 else null
@@ -316,11 +320,10 @@ defunc (eval :const :gd :apply ',
 		return (await ctx.execs(args))[-1]
 ,')
 
-defunc (debug :const :gd :raw ',
-	func (ctx: LisperContext, body: Array, comptime: bool) -> Variant:
+defunc (debug :const :gd :apply ',
+	func (_ctx: LisperContext, args: Array) -> Variant:
 		breakpoint
-		if comptime: return await ctx.compiles(body)
-		return (await ctx.execs(body))[-1]
+		return args[-1] if args.size() > 0 else null
 ,')
 
 defunc (go :const :gd :raw ',

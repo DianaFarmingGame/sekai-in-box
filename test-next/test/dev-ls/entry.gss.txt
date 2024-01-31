@@ -1,0 +1,1 @@
+sekai/exec ("scene.gss.txt")

@@ -7,8 +7,8 @@ var props := {
 	&"contains_data": [],
 	&"container_capacity": INF,
 	
-	&"container/add": func (this: Mono, ref_id: Variant, opts: Dictionary = {}):
-		this.callm(&"container_put", sekai.make_mono(ref_id, opts)),
+	&"container/add": func (this: Mono, ref_id: Variant, opts: Dictionary = {}) -> void:
+		this.callm(&"container/put", sekai.make_mono(ref_id, opts)),
 	&"container/put": func (this: Mono, item: Mono) -> bool:
 		var contains := this.getpBD(&"contains", []) as Array
 		if item.getp(&"stackable"):
@@ -71,17 +71,23 @@ var props := {
 			return picks
 		return null,
 	
+	&"on_init": Prop.puts({
+		&"0:container": func (this: Mono) -> void:
+			var contains := this.getpBD(&"contains", []) as Array
+			for mono in contains: mono.init()
+			pass,
+	}),
 	&"on_store": Prop.puts({
 		&"99:container": func (this: Mono) -> void:
 			var contains := this.getpBD(&"contains", []) as Array
-			var contains_data := await Async.array_map(contains, Mono.to_data)
+			var contains_data := await Async.array_map(contains, Mono.store_to_data)
 			this.setp(&"contains_data", contains_data)
 			pass,
 	}),
 	&"on_restore": Prop.puts({
 		&"-99:container": func (this: Mono) -> void:
 			var contains_data := this.getpD(&"contains_data", []) as Array
-			var contains := await Async.array_map(contains_data, Mono.from_data)
+			var contains := await Async.array_map(contains_data, Mono.restore_from_data)
 			this.setp(&"contains", contains)
 			pass,
 	}),

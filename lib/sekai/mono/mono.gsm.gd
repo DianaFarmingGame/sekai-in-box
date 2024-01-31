@@ -8,26 +8,34 @@ var position := Vector3(0, 0, 0)
 var layers := []
 
 static func to_data(mono: Mono) -> Variant:
-	await mono.store()
 	return mono._to_data()
+
+static func store_to_data(mono: Mono) -> Variant:
+	await mono.store()
+	return to_data(mono)
 
 static func from_data(data: Variant) -> Mono:
 	var mono := Mono.new()
 	mono._from_data(data)
+	return mono
+
+static func restore_from_data(data: Variant) -> Mono:
+	var mono := from_data(data)
 	await mono.restore()
 	return mono
 
 func _into_container(cont: Mono) -> void:
 	root = cont
+	if root.inited: init()
 
 func _outof_container() -> void:
 	root = null
 
-func _on_init() -> void:
+func init() -> void:
 	if not inited:
 		inited = true
-		await emitm(&"on_init")
-		await emitm(&"on_inited")
+		await emitc(&"on_init", sekai.context)
+		await emitc(&"on_inited", sekai.context)
 
 func store() -> void:
 	await emitm(&"on_store")
@@ -52,7 +60,7 @@ func _to_data() -> Dictionary:
 
 func _from_data(data: Dictionary) -> void:
 	var ref = data[&"ref"]
-	define = sekai.get_define_by_ref(ref)
+	define = sekai.get_define(ref)
 	inited = data[&"inited"]
 	layers = data[&"layers"]
 
@@ -564,7 +572,103 @@ func applymRSU(key: StringName, argv: Array) -> Variant:
 ## S -> Single: not batch call stacks
 ## U -> Usafe:  fail when handle not found
 ## [/codeblock]
-func applyv(key: StringName, ctx: LisperContext, argv: Array) -> Variant:
+func emitc(key: StringName, ctx: LisperContext) -> Variant:
+	var value = null
+	var data = define._props.get(key)
+	if Lisper.is_fn(data):
+		value = await ctx.call_fn(data, [self])
+	elif data is Array:
+		for entry in data:
+			value = await ctx.call_fn(entry[1], [self])
+	var lidx = layers.size() - 1
+	while lidx >= 0:
+		data = layers[lidx][1].get(key)
+		if Lisper.is_fn(data):
+			value = await ctx.call_fn(data, [self])
+		elif data is Array:
+			for entry in data:
+				value = await ctx.call_fn(entry[1], [self])
+		lidx -= 1
+	return value
+
+func emitcS(key: StringName, ctx: LisperContext) -> Variant:
+	var value = null
+	var handle = define._props.get(key)
+	if handle != null: value = await ctx.call_fn(handle, [self])
+	var lidx = layers.size() - 1
+	while lidx >= 0:
+		handle = layers[lidx][1].get(key)
+		if handle != null: value = await ctx.call_fn(handle, [self])
+		lidx -= 1
+	return value
+
+func emitcR(key: StringName, ctx: LisperContext) -> Variant:
+	var value = null
+	var data = define._props.get(key)
+	if Lisper.is_fn(data):
+		value = await ctx.call_fn(data, [self])
+	elif data is Array:
+		for entry in data:
+			value = await ctx.call_fn(entry[1], [self])
+	return value
+
+func emitcRS(key: StringName, ctx: LisperContext) -> Variant:
+	var handle = define._props.get(key)
+	if handle != null: return await ctx.call_fn(handle, [self])
+	return null
+
+func emitcRSU(key: StringName, ctx: LisperContext) -> Variant:
+	return await ctx.call_fn(define._props[key], [self])
+
+func callc(key: StringName, ctx: LisperContext, arg: Variant) -> Variant:
+	var value = null
+	var data = define._props.get(key)
+	if Lisper.is_fn(data):
+		value = await ctx.call_fn(data, [self, arg])
+	elif data is Array:
+		for entry in data:
+			value = await ctx.call_fn(entry[1], [self, arg])
+	var lidx = layers.size() - 1
+	while lidx >= 0:
+		data = layers[lidx][1].get(key)
+		if Lisper.is_fn(data):
+			value = await ctx.call_fn(data, [self, arg])
+		elif data is Array:
+			for entry in data:
+				value = await ctx.call_fn(entry[1], [self, arg])
+		lidx -= 1
+	return value
+
+func callcS(key: StringName, ctx: LisperContext, arg: Variant) -> Variant:
+	var value = null
+	var handle = define._props.get(key)
+	if handle != null: value = await ctx.call_fn(handle, [self, arg])
+	var lidx = layers.size() - 1
+	while lidx >= 0:
+		handle = layers[lidx][1].get(key)
+		if handle != null: value = await ctx.call_fn(handle, [self, arg])
+		lidx -= 1
+	return value
+
+func callcR(key: StringName, ctx: LisperContext, arg: Variant) -> Variant:
+	var value = null
+	var data = define._props.get(key)
+	if Lisper.is_fn(data):
+		value = await ctx.call_fn(data, [self, arg])
+	elif data is Array:
+		for entry in data:
+			value = await ctx.call_fn(entry[1], [self, arg])
+	return value
+
+func callcRS(key: StringName, ctx: LisperContext, arg: Variant) -> Variant:
+	var handle = define._props.get(key)
+	if handle != null: return await ctx.call_fn(handle, [self, arg])
+	return null
+
+func callcRSU(key: StringName, ctx: LisperContext, arg: Variant) -> Variant:
+	return await ctx.call_fn(define._props[key], [self, arg])
+
+func applyc(key: StringName, ctx: LisperContext, argv: Array) -> Variant:
 	var vargv := [self]
 	vargv.append_array(argv)
 	var value = null
@@ -585,7 +689,7 @@ func applyv(key: StringName, ctx: LisperContext, argv: Array) -> Variant:
 		lidx -= 1
 	return value
 
-func applyvS(key: StringName, ctx: LisperContext, argv: Array) -> Variant:
+func applycS(key: StringName, ctx: LisperContext, argv: Array) -> Variant:
 	var vargv := [self]
 	vargv.append_array(argv)
 	var value = null
@@ -598,7 +702,7 @@ func applyvS(key: StringName, ctx: LisperContext, argv: Array) -> Variant:
 		lidx -= 1
 	return value
 
-func applyvR(key: StringName, ctx: LisperContext, argv: Array) -> Variant:
+func applycR(key: StringName, ctx: LisperContext, argv: Array) -> Variant:
 	var vargv := [self]
 	vargv.append_array(argv)
 	var value = null
@@ -610,14 +714,14 @@ func applyvR(key: StringName, ctx: LisperContext, argv: Array) -> Variant:
 			value = await ctx.call_fn(entry[1], vargv)
 	return value
 
-func applyvRS(key: StringName, ctx: LisperContext, argv: Array) -> Variant:
+func applycRS(key: StringName, ctx: LisperContext, argv: Array) -> Variant:
 	var vargv := [self]
 	vargv.append_array(argv)
 	var handle = define._props.get(key)
 	if handle != null: return await ctx.call_fn(handle, vargv)
 	return null
 
-func applyvRSU(key: StringName, ctx: LisperContext, argv: Array) -> Variant:
+func applycRSU(key: StringName, ctx: LisperContext, argv: Array) -> Variant:
 	var vargv := [self]
 	vargv.append_array(argv)
 	return await ctx.call_fn(define._props[key], vargv)
@@ -726,6 +830,20 @@ defunc (setp :const :gd :raw ',
 			var key := await ctx.exec_as_keyword(body[1]) as StringName
 			var value = await ctx.exec(body[2])
 			this.setp(key, value)
+			return null
+,')
+
+defunc (puts :const :gd :raw ',
+	func (ctx: LisperContext, body: Array, comptime: bool) -> Variant:
+		if comptime: return await LisperCommons.compile_keyword_mask_01(ctx, body)
+		else:
+			var this := await ctx.exec(body[0]) as Mono
+			var key := await ctx.exec_as_keyword(body[1]) as StringName
+			var pairs := body[2][1] as Array
+			for i in pairs.size() / 2:
+				var k := await ctx.exec_as_keyword(pairs[2 * i]) as StringName
+				var v = await ctx.exec(pairs[2 * i + 1])
+				this.puts(key, [k, v])
 			return null
 ,')
 

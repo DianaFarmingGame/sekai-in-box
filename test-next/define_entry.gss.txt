@@ -1,0 +1,2 @@
+sekai/exec ("utils/utils.gss.txt")
+sekai/exec (".define.gss.txt")

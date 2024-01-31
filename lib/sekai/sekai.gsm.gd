@@ -54,25 +54,37 @@ func exec_gsx(path: String) -> void:
 
 ## 建立一个新游戏（不会立即存档）
 func start_gikou(id: String, entry := "") -> void:
-	gikou = make_mono(&"gikou", {id: id})
+	if gikou != null: await outof_gikou()
+	gikou = make_mono(&"gikou", {&"id": id})
+	context.push_module_meta({
+		&"gikou": gikou,
+	})
 	if entry != "": await exec_gsx(entry)
+	await gikou.init()
 
 ## 进入一个已有游戏的存档
 func into_gikou(id: String) -> void:
+	if gikou != null: await outof_gikou()
 	var file := FileAccess.open(gikou_store_dir.path_join(id + ".gikou"), FileAccess.READ)
-	gikou = await Mono.from_data(file.get_var(false))
+	gikou = Mono.from_data(file.get_var(false))
+	context.push_module_meta({
+		&"gikou": gikou,
+	})
+	await gikou.restore()
 
 ## 触发当前游戏保存存档
 func record_gikou() -> void:
+	await gikou.store()
 	DirAccess.make_dir_recursive_absolute(gikou_store_dir)
 	var file := FileAccess.open(gikou_store_dir.path_join(gikou.getp(&"id") + ".gikou"), FileAccess.WRITE)
-	file.store_var(await Mono.to_data(gikou), false)
+	file.store_var(Mono.to_data(gikou), false)
 	await gikou.restore()
 
 ## 退出当前游戏
 func outof_gikou() -> void:
 	await gikou.store()
 	gikou = null
+	context.pop_module_meta()
 
 # Mono/Define 相关
 
@@ -83,9 +95,24 @@ func sign_define(define: Variant) -> void:
 	if define.ref >= defines.size(): defines.resize(define.ref + 1)
 	defines[define.ref] = define
 
+## 获取一个 Define
+func get_define(ref_id: Variant) -> Variant:
+	var define: MonoDefine
+	if ref_id is int:
+		define = _get_define_by_ref(ref_id) as MonoDefine
+		if define == null:
+			push_error("not found define ref: ", ref_id); return null
+	elif ref_id is StringName or ref_id is String:
+		define = _get_define_by_id(ref_id) as MonoDefine
+		if define == null:
+			push_error("not found define id: ", ref_id); return null
+	else:
+		push_error("unable to parse define pointer: ", ref_id); return null
+	return define
+
 ## 创建一个 Mono
 func make_mono(ref_id: Variant, opts: Dictionary = {}) -> Variant:
-	var define = _get_define(ref_id)
+	var define = get_define(ref_id)
 	if define == null: return null
 	return _make_mono_by_define(define, opts)
 
@@ -151,9 +178,9 @@ defunc (gikou/start :const :gd :apply ',
 
 defunc (gikou/into :const :gd ', into_gikou ,')
 
-defunc (gikou/record :const :gd ', outof_gikou ,')
+defunc (gikou/record :const :gd ', record_gikou ,')
 
-defunc (gikou/outof :const :gd ', record_gikou ,')
+defunc (gikou/outof :const :gd ', outof_gikou ,')
 
 defunc (define/sign :const :gd ', sign_define ,')
 
@@ -192,7 +219,7 @@ var _assert_cache := {}
 func _build_caches() -> void:
 	# build _defines_by_id
 	for define in defines:
-		if define.id != null and define.id != &"":
+		if define != null and define.id != null and define.id != &"":
 			if _defines_by_id.has(define.id):
 				var pd := _defines_by_id[define.id] as MonoDefine
 				push_error("duplicated define id: ", pd.name, "(", pd.id, ") and ", define.name, "(", define.id, ")")
@@ -205,20 +232,6 @@ func _build_caches() -> void:
 # 工具函数
 #
 
-func _get_define(ref_id: Variant) -> Variant:
-	var define: MonoDefine
-	if ref_id is int:
-		define = _get_define_by_ref(ref_id) as MonoDefine
-		if define == null:
-			push_error("not found define ref: ", ref_id); return null
-	elif ref_id is StringName or ref_id is String:
-		define = _get_define_by_id(ref_id) as MonoDefine
-		if define == null:
-			push_error("not found define id: ", ref_id); return null
-	else:
-		push_error("unable to parse define pointer: ", ref_id); return null
-	return define
-
 func _get_define_by_ref(ref: int) -> Variant:
 	return defines[ref]
 
@@ -229,12 +242,7 @@ func _make_mono_by_define(define: MonoDefine, opts: Dictionary = {}) -> Mono:
 	opts = opts.duplicate(true)
 	var mono := Mono.new()
 	mono.define = define
-	for k in opts.keys():
-		match k:
-			&"props":
-				mono.cover(&"base", opts[k])
-			_:
-				mono.set(k, opts[k])
+	mono.cover(&"base", opts)
 	return mono
 
 func _update_debug_draw() -> void:
