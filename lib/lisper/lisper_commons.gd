@@ -93,6 +93,11 @@ static func def_commons(context: LisperContext) -> void:
 			var vname := "!::" + str(await ctx.exec(body[0])) if body.size() > 0 else "!::break"
 			await ctx.trigger_break(vname)
 			return null),
+		&"!debug": Lisper.FnGDRaw( func (ctx: LisperContext, body: Array, comptime: bool) -> Variant:
+			if comptime: return await ctx.compiles(body)
+			var vname := "!::debug"
+			await ctx.trigger_break(vname)
+			return await ctx.exec(body[0])),
 		&"defvar": Lisper.FnGDRaw( func (ctx: LisperContext, body: Array, comptime: bool) -> Variant:
 			if comptime: return await compile_keyword_mask_1(ctx, body)
 			var res := ctx.strip_flags(body)
