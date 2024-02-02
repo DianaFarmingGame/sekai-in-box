@@ -7,12 +7,12 @@ var props := {
 	&"pick_box": Rect2(-0.5, -0.5, 1, 1),
 	&"picker_hovered": false,
 	
-	&"pick_test": func (_sekai, this: Mono, cursor: Vector2) -> Variant:
+	&"click_check": func (_sekai, this: Mono, cursor: Vector2) -> Variant:
 		var pos := Vector2(this.position.x, this.position.y - this.position.z * this.item.ratio_yz)
 		var box := this.getp(&"pick_box") as Rect2
 		box.position += pos
 		if box.has_point(cursor):
-			return (box.get_center() - cursor).length()
+			return (box.position.x - cursor.x) ** 2 + (box.position.y - cursor.y) ** 2
 		return null,
 	
 	&"on_picker_in": Prop.Stack({
