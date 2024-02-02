@@ -7,6 +7,9 @@ class_name SekaiControl extends Control
 # 配置项
 #
 
+## 默认进入的 Hako ID
+@export var hako_id: StringName = &"base"
+
 ## 超出渲染裁剪框的额外视野大小
 @export var render_extra_sight: int = ProjectSettings.get_setting("sekai/render_extra_sight")
 

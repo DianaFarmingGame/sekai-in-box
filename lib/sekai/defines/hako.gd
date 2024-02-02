@@ -9,9 +9,9 @@ func do_merge(sets: Array[Dictionary]) -> Array[Dictionary]:
 	merge_props(sets, {
 		&"id": null,
 		
-		&"add_mono": func (this: Mono, ref_id: Variant, opts := {}) -> Mono:
+		&"add_mono": func (ctx: LisperContext, this: Mono, ref_id: Variant, opts := {}) -> Mono:
 			var mono := sekai.make_mono(ref_id, opts)
-			this.callm(&"container/put", mono)
+			this.callm(ctx, &"container/put", mono)
 			return mono,
 	})
 	return sets

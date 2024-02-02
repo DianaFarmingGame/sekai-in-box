@@ -7,14 +7,14 @@ var props := {
 	&"contains_data": [],
 	&"container_capacity": INF,
 	
-	&"container/add": func (this: Mono, ref_id: Variant, opts: Dictionary = {}) -> bool:
-		return await this.callm(&"container/put", sekai.make_mono(ref_id, opts)),
-	&"container/put": func (this: Mono, item: Mono) -> bool:
+	&"container/add": func (ctx: LisperContext, this: Mono, ref_id: Variant, opts: Dictionary = {}) -> bool:
+		return await this.callm(ctx, &"container/put", sekai.make_mono(ref_id, opts)),
+	&"container/put": func (ctx: LisperContext, this: Mono, item: Mono) -> bool:
 		var contains := this.getpBD(&"contains", []) as Array
 		if item.getp(&"stackable"):
 			var putted := false
 			for mono in contains:
-				if mono.define.ref == item.define.ref and mono.getp(&"stackable") and await mono.callm(&"stack/put", item):
+				if mono.define.ref == item.define.ref and mono.getp(&"stackable") and await mono.callm(ctx, &"stack/put", item):
 					putted = true
 					break
 			if putted:
@@ -23,18 +23,18 @@ var props := {
 		if contains.size() < this.getp(&"container_capacity"):
 			contains.append(item)
 			item.remove()
-			item._into_container(this)
+			item._into_container(ctx, this)
 			this.setpF(&"contains", contains)
 			return true
 		this.setpF(&"contains", contains)
 		return false,
-	&"container/pick": func (this: Mono, item: Mono) -> Mono:
+	&"container/pick": func (ctx: LisperContext, this: Mono, item: Mono) -> Mono:
 		var contains := this.getpBD(&"contains", []) as Array
 		item._outof_container()
 		contains.erase(item)
 		this.setpF(&"contains", contains)
 		return item,
-	&"container/pick_by_ref_id": func (this: Mono, ref_id: Variant, count := 1) -> Variant:
+	&"container/pick_by_ref_id": func (ctx: LisperContext, this: Mono, ref_id: Variant, count := 1) -> Variant:
 		var type_d = sekai.get_define(ref_id)
 		var contains := this.getpBD(&"contains", []) as Array
 		var try_count := count
@@ -51,7 +51,7 @@ var props := {
 				var item = null
 				if mono.define.ref == type_d.ref:
 					if mono.getp(&"stackable"):
-						item = await mono.callm(&"stack/try_pick", count)
+						item = await mono.callm(ctx, &"stack/try_pick", count)
 						if item != null: count -= item.getp(&"stack/count")
 					else:
 						item = mono
@@ -60,7 +60,7 @@ var props := {
 				if item.getp(&"stackable"):
 					var putted := false
 					for m in picks:
-						if m.define.ref == item.define.ref and m.getp(&"stackable") and await m.callm(&"stack/put", item):
+						if m.define.ref == item.define.ref and m.getp(&"stackable") and await m.callm(ctx, &"stack/put", item):
 							putted = true
 							break
 					if putted: continue
@@ -72,23 +72,25 @@ var props := {
 		return null,
 	
 	&"on_init": Prop.puts({
-		&"0:container": func (this: Mono) -> void:
+		&"0:container": func (ctx: LisperContext, this: Mono) -> void:
 			var contains := this.getpBD(&"contains", []) as Array
-			for mono in contains: mono.init()
+			for mono in contains: mono.init(ctx)
 			pass,
 	}),
 	&"on_store": Prop.puts({
-		&"99:container": func (this: Mono) -> void:
+		&"99:container": func (ctx: LisperContext, this: Mono) -> void:
 			var contains := this.getpBD(&"contains", []) as Array
-			var contains_data := await Async.array_map(contains, Mono.store_to_data)
+			await Async.array_map(contains, func (item): await item.store(ctx))
+			var contains_data := contains.map(Mono.to_data)
 			this.setp(&"contains_data", contains_data)
 			pass,
 	}),
 	&"on_restore": Prop.puts({
-		&"-99:container": func (this: Mono) -> void:
+		&"-99:container": func (ctx: LisperContext, this: Mono) -> void:
 			var contains_data := this.getpD(&"contains_data", []) as Array
-			var contains := await Async.array_map(contains_data, Mono.restore_from_data)
+			var contains := contains_data.map(Mono.from_data)
 			this.setp(&"contains", contains)
+			await Async.array_map(contains, func (item): await item.restore(ctx))
 			pass,
 	}),
 }

@@ -19,6 +19,13 @@ const print_head: String = "[sekai] "
 
 
 #
+# 信号
+#
+signal gikou_changed
+
+
+
+#
 # 全局共享数据
 #
 
@@ -26,7 +33,10 @@ const print_head: String = "[sekai] "
 var defines: Array[MonoDefine]
 
 ## 当前进入的 Gikou 实例
-var gikou: Mono = null
+var gikou: Mono = null:
+	set(v):
+		gikou = v
+		gikou_changed.emit()
 
 ## 全局的执行环境（原则上不应该被 Sekai 以外的对象使用）
 var context: LisperContext = null
@@ -60,7 +70,7 @@ func start_gikou(id: String, entry := "") -> void:
 		&"gikou": gikou,
 	})
 	if entry != "": await exec_gsx(entry)
-	await gikou.init()
+	await gikou.init(context)
 
 ## 进入一个已有游戏的存档
 func into_gikou(id: String) -> void:
@@ -70,19 +80,19 @@ func into_gikou(id: String) -> void:
 	context.push_module_meta({
 		&"gikou": gikou,
 	})
-	await gikou.restore()
+	await gikou.restore(context)
 
 ## 触发当前游戏保存存档
 func record_gikou() -> void:
-	await gikou.store()
+	await gikou.store(context)
 	DirAccess.make_dir_recursive_absolute(gikou_store_dir)
 	var file := FileAccess.open(gikou_store_dir.path_join(gikou.getp(&"id") + ".gikou"), FileAccess.WRITE)
 	file.store_var(Mono.to_data(gikou), false)
-	await gikou.restore()
+	await gikou.restore(context)
 
 ## 退出当前游戏
 func outof_gikou() -> void:
-	await gikou.store()
+	await gikou.store(context)
 	gikou = null
 	context.pop_module_meta()
 

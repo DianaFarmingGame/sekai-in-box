@@ -1,7 +1,7 @@
-wait (gikou on_inited [this]
+wait (gikou on_inited []
 	var (hako do (gikou get_hako))
 	var (嘉然 do (hako add_mono &实体/角色/嘉然 {
 		position vec3(5 9 1)
 	}))
-	echo_val (hako)
+	!debug (hako)
 )

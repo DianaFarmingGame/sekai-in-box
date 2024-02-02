@@ -258,7 +258,7 @@ func exec_map_part(pairs: Array) -> Dictionary:
 		res[k] = v
 	return res
 
-func call_fn_raw(handle: Variant, body: Array) -> Variant:
+func call_fn_raw(handle: Variant, body: Array = []) -> Variant:
 	match Lisper.fn_get_type(handle):
 		Lisper.FnType.GD_RAW:
 			return await Lisper.fn_gd_get_handle(handle).call(self, body, false)
@@ -289,7 +289,7 @@ func call_fn_raw(handle: Variant, body: Array) -> Variant:
 			))
 			return null
 
-func call_fn(handle: Variant, vargs: Array) -> Variant:
+func call_fn(handle: Variant, vargs: Array = []) -> Variant:
 	match Lisper.fn_get_type(handle):
 		Lisper.FnType.GD_RAW:
 			return await Lisper.fn_gd_get_handle(handle).call(self, vargs.map(Lisper.Raw), false)
@@ -308,6 +308,70 @@ func call_fn(handle: Variant, vargs: Array) -> Variant:
 					"provide: ", stringify_raws(vargs),
 				))
 				return null
+			for iarg in args.size():
+				fctx.def_var([], args[iarg], vargs[iarg])
+			return (await fctx.execs(Lisper.fn_lp_get_body(handle)))[-1]
+		_:
+			await error(str("unknown call handle type: ", handle, '\n',
+				"arguments: ", stringify_raws(vargs),
+			))
+			return null
+
+func call_method_raw(this: Variant, handle: Variant, body: Array = []) -> Variant:
+	match Lisper.fn_get_type(handle):
+		Lisper.FnType.GD_RAW:
+			return await Lisper.fn_gd_get_handle(handle).call(self, this, body, false)
+		Lisper.FnType.GD_MACRO:
+			return await exec(await Lisper.fn_gd_get_handle(handle).call(self, body))
+		Lisper.FnType.GD_CALL, Lisper.FnType.GD_CALL_PURE:
+			var rargs := [self, this]
+			rargs.append_array(await execs(body))
+			return await Lisper.fn_gd_get_handle(handle).callv(rargs)
+		Lisper.FnType.GD_APPLY, Lisper.FnType.GD_APPLY_PURE:
+			var vargs := await execs(body)
+			return await Lisper.fn_gd_get_handle(handle).call(self, this, vargs)
+		Lisper.FnType.LP_CALL, Lisper.FnType.LP_CALL_PURE:
+			var fctx := fork()
+			var args := Lisper.fn_lp_get_args(handle)
+			if args.size() != body.size():
+				await error(str("argument list not match expect ", args.size(), " found ", body.size(), '\n',
+					"need: ", args, '\n',
+					"provide: ", stringifys(body),
+				))
+				return null
+			var vargs := await execs(body)
+			fctx.def_const(&"this", this)
+			for iarg in args.size():
+				fctx.def_var([], args[iarg], vargs[iarg])
+			return (await fctx.execs(Lisper.fn_lp_get_body(handle)))[-1]
+		_:
+			await error(str("unknown call handle type: ", handle, '\n',
+				"arguments: ", stringifys(body),
+			))
+			return null
+
+func call_method(this: Variant, handle: Variant, vargs: Array = []) -> Variant:
+	match Lisper.fn_get_type(handle):
+		Lisper.FnType.GD_RAW:
+			return await Lisper.fn_gd_get_handle(handle).call(self, this, vargs.map(Lisper.Raw), false)
+		Lisper.FnType.GD_MACRO:
+			return await exec(await Lisper.fn_gd_get_handle(handle).call(self, vargs.map(Lisper.Raw)))
+		Lisper.FnType.GD_CALL, Lisper.FnType.GD_CALL_PURE:
+			var rargs := [self, this]
+			rargs.append_array(vargs)
+			return await Lisper.fn_gd_get_handle(handle).callv(rargs)
+		Lisper.FnType.GD_APPLY, Lisper.FnType.GD_APPLY_PURE:
+			return await Lisper.fn_gd_get_handle(handle).call(self, this, vargs)
+		Lisper.FnType.LP_CALL, Lisper.FnType.LP_CALL_PURE:
+			var fctx := fork()
+			var args := Lisper.fn_lp_get_args(handle)
+			if args.size() != vargs.size():
+				await error(str("argument list not match expect ", args.size(), " found ", vargs.size(), '\n',
+					"need: ", args, '\n',
+					"provide: ", stringify_raws(vargs),
+				))
+				return null
+			fctx.def_const(&"this", this)
 			for iarg in args.size():
 				fctx.def_var([], args[iarg], vargs[iarg])
 			return (await fctx.execs(Lisper.fn_lp_get_body(handle)))[-1]

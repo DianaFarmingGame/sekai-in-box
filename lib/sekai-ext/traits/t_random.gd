@@ -4,12 +4,12 @@ var id := &"random"
 var requires := [&"compile"]
 
 var props := {
-	&"random_rules": Prop.Stack([]),
+	&"random_rules": Prop.Stack(),
 	&"random_cur": 0,
 	
 	&"random_cache": null,
 	&"compilers": Prop.puts({
-		&"0:random": func (this: Mono) -> void:
+		&"0:random": func (ctx: LisperContext, this: Mono) -> void:
 			var random_rules := this.getp(&"random_rules") as Array
 			if random_rules.size() > 0:
 				var wtotal := 0.0
@@ -28,7 +28,7 @@ var props := {
 	}),
 }
 
-static func update(this: Mono) -> void:
+static func update(ctx: LisperContext, this: Mono) -> void:
 	var cache = this.getpR(&"random_cache")
 	if cache != null:
 		var rules := cache[0] as Array
@@ -42,13 +42,13 @@ static func update(this: Mono) -> void:
 				var cover = rule[1].get(&"cover")
 				if cover != null: this.cover(&"random", cover)
 				var vupdate = rule[1].get(&"update")
-				if vupdate != null: await sekai.gss_ctx.call_fn(vupdate, [sekai, this])
+				if vupdate != null: await ctx.call_method(this, vupdate)
 				break
 	pass
 
-static func updated(this: Mono) -> void:
+static func updated(ctx: LisperContext, this: Mono) -> void:
 	var rule = this.getpB(&"random_cache")
 	if rule != null:
 		var vupdated = rule[1].get(&"updated")
-		if vupdated != null: await sekai.gss_ctx.call_fn(vupdated, [sekai, this])
+		if vupdated != null: await ctx.call_method(this, vupdated)
 	pass

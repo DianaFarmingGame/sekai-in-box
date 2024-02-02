@@ -4,14 +4,15 @@ var root = null
 var define: MonoDefine
 
 var inited := false
+var ready := false
 var position := Vector3(0, 0, 0)
 var layers := []
 
 static func to_data(mono: Mono) -> Variant:
 	return mono._to_data()
 
-static func store_to_data(mono: Mono) -> Variant:
-	await mono.store()
+static func store_to_data(ctx: LisperContext, mono: Mono) -> Variant:
+	await mono.store(ctx)
 	return to_data(mono)
 
 static func from_data(data: Variant) -> Mono:
@@ -19,29 +20,31 @@ static func from_data(data: Variant) -> Mono:
 	mono._from_data(data)
 	return mono
 
-static func restore_from_data(data: Variant) -> Mono:
+static func restore_from_data(ctx: LisperContext, data: Variant) -> Mono:
 	var mono := from_data(data)
-	await mono.restore()
+	await mono.restore(ctx)
 	return mono
 
-func _into_container(cont: Mono) -> void:
+func _into_container(ctx: LisperContext, cont: Mono) -> void:
 	root = cont
-	if root.inited: init()
+	if root.inited: init.call_deferred(ctx)
 
 func _outof_container() -> void:
 	root = null
 
-func init() -> void:
+func init(ctx: LisperContext) -> void:
 	if not inited:
 		inited = true
-		await emitc(&"on_init", sekai.context)
-		await emitc(&"on_inited", sekai.context)
+		await emitc(ctx, &"on_init")
+		await emitc(ctx, &"on_inited")
+		await emitc(ctx, &"on_ready")
 
-func store() -> void:
-	await emitm(&"on_store")
+func store(ctx: LisperContext) -> void:
+	await emitc(ctx, &"on_store")
 
-func restore() -> void:
-	await emitm(&"on_restore")
+func restore(ctx: LisperContext) -> void:
+	await emitc(ctx, &"on_restore")
+	await emitc(ctx, &"on_ready")
 
 func clone() -> Mono:
 	var mono := get_script().new() as Mono
@@ -412,104 +415,104 @@ func delsB(key: StringName, head: Variant) -> Variant:
 ## S -> Single: not batch call stacks
 ## U -> Usafe:  fail when handle not found
 ## [/codeblock]
-func emitm(key: StringName) -> Variant:
+func emitm(ctx: LisperContext, key: StringName) -> Variant:
 	var value = null
 	var data = define._props.get(key)
 	if data is Callable:
-		value = await data.call(self)
+		value = await data.call(ctx, self)
 	elif data is Array:
 		for entry in data.duplicate():
-			value = await entry[1].call(self)
+			value = await entry[1].call(ctx, self)
 	var lidx = layers.size() - 1
 	while lidx >= 0:
 		data = layers[lidx][1].get(key)
 		if data is Array:
 			for entry in data.duplicate():
-				value = await entry[1].call(self)
+				value = await entry[1].call(ctx, self)
 		elif data is Callable:
-			value = await data.call(self)
+			value = await data.call(ctx, self)
 		lidx -= 1
 	return value
 
-func emitmS(key: StringName) -> Variant:
+func emitmS(ctx: LisperContext, key: StringName) -> Variant:
 	var value = null
 	var handle = define._props.get(key)
-	if handle != null: value = await handle.call(self)
+	if handle != null: value = await handle.call(ctx, self)
 	var lidx = layers.size() - 1
 	while lidx >= 0:
 		handle = layers[lidx][1].get(key)
-		if handle != null: value = await handle.call(self)
+		if handle != null: value = await handle.call(ctx, self)
 		lidx -= 1
 	return value
 
-func emitmR(key: StringName) -> Variant:
+func emitmR(ctx: LisperContext, key: StringName) -> Variant:
 	var value = null
 	var data = define._props.get(key)
 	if data is Callable:
-		value = await data.call(self)
+		value = await data.call(ctx, self)
 	elif data is Array:
 		for entry in data.duplicate():
-			value = await entry[1].call(self)
+			value = await entry[1].call(ctx, self)
 	return value
 
-func emitmRS(key: StringName) -> Variant:
+func emitmRS(ctx: LisperContext, key: StringName) -> Variant:
 	var handle = define._props.get(key)
-	if handle != null: return await handle.call(self)
+	if handle != null: return await handle.call(ctx, self)
 	return null
 
-func emitmRSU(key: StringName) -> Variant:
-	return await define._props[key].call(self)
+func emitmRSU(ctx: LisperContext, key: StringName) -> Variant:
+	return await define._props[key].call(ctx, self)
 
-func callm(key: StringName, arg: Variant) -> Variant:
+func callm(ctx: LisperContext, key: StringName, arg: Variant) -> Variant:
 	var value = null
 	var data = define._props.get(key)
 	if data is Callable:
-		value = await data.call(self, arg)
+		value = await data.call(ctx, self, arg)
 	elif data is Array:
 		for entry in data.duplicate():
-			value = await entry[1].call(self, arg)
+			value = await entry[1].call(ctx, self, arg)
 	var lidx = layers.size() - 1
 	while lidx >= 0:
 		data = layers[lidx][1].get(key)
 		if data is Array:
 			for entry in data.duplicate():
-				value = await entry[1].call(self, arg)
+				value = await entry[1].call(ctx, self, arg)
 		elif data is Callable:
-			value = await data.call(self, arg)
+			value = await data.call(ctx, self, arg)
 		lidx -= 1
 	return value
 
-func callmS(key: StringName, arg: Variant) -> Variant:
+func callmS(ctx: LisperContext, key: StringName, arg: Variant) -> Variant:
 	var value = null
 	var handle = define._props.get(key)
-	if handle != null: value = await handle.call(self, arg)
+	if handle != null: value = await handle.call(ctx, self, arg)
 	var lidx = layers.size() - 1
 	while lidx >= 0:
 		handle = layers[lidx][1].get(key)
-		if handle != null: value = await handle.call(self, arg)
+		if handle != null: value = await handle.call(ctx, self, arg)
 		lidx -= 1
 	return value
 
-func callmR(key: StringName, arg: Variant) -> Variant:
+func callmR(ctx: LisperContext, key: StringName, arg: Variant) -> Variant:
 	var value = null
 	var data = define._props.get(key)
 	if data is Callable:
-		value = await data.call(self, arg)
+		value = await data.call(ctx, self, arg)
 	elif data is Array:
 		for entry in data.duplicate():
-			value = await entry[1].call(self, arg)
+			value = await entry[1].call(ctx, self, arg)
 	return value
 
-func callmRS(key: StringName, arg: Variant) -> Variant:
+func callmRS(ctx: LisperContext, key: StringName, arg: Variant) -> Variant:
 	var handle = define._props.get(key)
-	if handle != null: return await handle.call(self, arg)
+	if handle != null: return await handle.call(ctx, self, arg)
 	return null
 
-func callmRSU(key: StringName, arg: Variant) -> Variant:
-	return await define._props[key].call(self, arg)
+func callmRSU(ctx: LisperContext, key: StringName, arg: Variant) -> Variant:
+	return await define._props[key].call(ctx, self, arg)
 
-func applym(key: StringName, argv: Array) -> Variant:
-	var vargv := [self]
+func applym(ctx: LisperContext, key: StringName, argv: Array) -> Variant:
+	var vargv := [ctx, self]
 	vargv.append_array(argv)
 	var value = null
 	var data = define._props.get(key)
@@ -529,8 +532,8 @@ func applym(key: StringName, argv: Array) -> Variant:
 		lidx -= 1
 	return value
 
-func applymS(key: StringName, argv: Array) -> Variant:
-	var vargv := [self]
+func applymS(ctx: LisperContext, key: StringName, argv: Array) -> Variant:
+	var vargv := [ctx, self]
 	vargv.append_array(argv)
 	var value = null
 	var handle = define._props.get(key)
@@ -542,8 +545,8 @@ func applymS(key: StringName, argv: Array) -> Variant:
 		lidx -= 1
 	return value
 
-func applymR(key: StringName, argv: Array) -> Variant:
-	var vargv := [self]
+func applymR(ctx: LisperContext, key: StringName, argv: Array) -> Variant:
+	var vargv := [ctx, self]
 	vargv.append_array(argv)
 	var value = null
 	var data = define._props.get(key)
@@ -554,15 +557,15 @@ func applymR(key: StringName, argv: Array) -> Variant:
 			value = await entry[1].callv(vargv)
 	return value
 
-func applymRS(key: StringName, argv: Array) -> Variant:
-	var vargv := [self]
+func applymRS(ctx: LisperContext, key: StringName, argv: Array) -> Variant:
+	var vargv := [ctx, self]
 	vargv.append_array(argv)
 	var handle = define._props.get(key)
 	if handle != null: return await handle.callv(vargv)
 	return null
 
-func applymRSU(key: StringName, argv: Array) -> Variant:
-	var vargv := [self]
+func applymRSU(ctx: LisperContext, key: StringName, argv: Array) -> Variant:
+	var vargv := [ctx, self]
 	vargv.append_array(argv)
 	return await define._props[key].callv(vargv)
 
@@ -572,159 +575,149 @@ func applymRSU(key: StringName, argv: Array) -> Variant:
 ## S -> Single: not batch call stacks
 ## U -> Usafe:  fail when handle not found
 ## [/codeblock]
-func emitc(key: StringName, ctx: LisperContext) -> Variant:
+func emitc(ctx: LisperContext, key: StringName) -> Variant:
 	var value = null
 	var data = define._props.get(key)
 	if Lisper.is_fn(data):
-		value = await ctx.call_fn(data, [self])
+		value = await ctx.call_method(self, data)
 	elif data is Array:
 		for entry in data.duplicate():
-			value = await ctx.call_fn(entry[1], [self])
+			value = await ctx.call_method(self, entry[1])
 	var lidx = layers.size() - 1
 	while lidx >= 0:
 		data = layers[lidx][1].get(key)
 		if Lisper.is_fn(data):
-			value = await ctx.call_fn(data, [self])
+			value = await ctx.call_method(self, data)
 		elif data is Array:
 			for entry in data.duplicate():
-				value = await ctx.call_fn(entry[1], [self])
+				value = await ctx.call_method(self, entry[1])
 		lidx -= 1
 	return value
 
-func emitcS(key: StringName, ctx: LisperContext) -> Variant:
+func emitcS(ctx: LisperContext, key: StringName) -> Variant:
 	var value = null
 	var handle = define._props.get(key)
-	if handle != null: value = await ctx.call_fn(handle, [self])
+	if handle != null: value = await ctx.call_method(self, handle)
 	var lidx = layers.size() - 1
 	while lidx >= 0:
 		handle = layers[lidx][1].get(key)
-		if handle != null: value = await ctx.call_fn(handle, [self])
+		if handle != null: value = await ctx.call_method(self, handle)
 		lidx -= 1
 	return value
 
-func emitcR(key: StringName, ctx: LisperContext) -> Variant:
+func emitcR(ctx: LisperContext, key: StringName) -> Variant:
 	var value = null
 	var data = define._props.get(key)
 	if Lisper.is_fn(data):
-		value = await ctx.call_fn(data, [self])
+		value = await ctx.call_method(self, data)
 	elif data is Array:
 		for entry in data.duplicate():
-			value = await ctx.call_fn(entry[1], [self])
+			value = await ctx.call_method(self, entry[1])
 	return value
 
-func emitcRS(key: StringName, ctx: LisperContext) -> Variant:
+func emitcRS(ctx: LisperContext, key: StringName) -> Variant:
 	var handle = define._props.get(key)
-	if handle != null: return await ctx.call_fn(handle, [self])
+	if handle != null: return await ctx.call_method(self, handle)
 	return null
 
-func emitcRSU(key: StringName, ctx: LisperContext) -> Variant:
-	return await ctx.call_fn(define._props[key], [self])
+func emitcRSU(ctx: LisperContext, key: StringName) -> Variant:
+	return await ctx.call_method(self, define._props[key])
 
-func callc(key: StringName, ctx: LisperContext, arg: Variant) -> Variant:
+func callc(ctx: LisperContext, key: StringName, arg: Variant) -> Variant:
 	var value = null
 	var data = define._props.get(key)
 	if Lisper.is_fn(data):
-		value = await ctx.call_fn(data, [self, arg])
+		value = await ctx.call_method(self, data, [arg])
 	elif data is Array:
 		for entry in data.duplicate():
-			value = await ctx.call_fn(entry[1], [self, arg])
+			value = await ctx.call_method(self, entry[1], [arg])
 	var lidx = layers.size() - 1
 	while lidx >= 0:
 		data = layers[lidx][1].get(key)
 		if Lisper.is_fn(data):
-			value = await ctx.call_fn(data, [self, arg])
+			value = await ctx.call_method(self, data, [arg])
 		elif data is Array:
 			for entry in data.duplicate():
-				value = await ctx.call_fn(entry[1], [self, arg])
+				value = await ctx.call_method(self, entry[1], [arg])
 		lidx -= 1
 	return value
 
-func callcS(key: StringName, ctx: LisperContext, arg: Variant) -> Variant:
+func callcS(ctx: LisperContext, key: StringName, arg: Variant) -> Variant:
 	var value = null
 	var handle = define._props.get(key)
-	if handle != null: value = await ctx.call_fn(handle, [self, arg])
+	if handle != null: value = await ctx.call_method(self, handle, [arg])
 	var lidx = layers.size() - 1
 	while lidx >= 0:
 		handle = layers[lidx][1].get(key)
-		if handle != null: value = await ctx.call_fn(handle, [self, arg])
+		if handle != null: value = await ctx.call_method(self, handle, [arg])
 		lidx -= 1
 	return value
 
-func callcR(key: StringName, ctx: LisperContext, arg: Variant) -> Variant:
+func callcR(ctx: LisperContext, key: StringName, arg: Variant) -> Variant:
 	var value = null
 	var data = define._props.get(key)
 	if Lisper.is_fn(data):
-		value = await ctx.call_fn(data, [self, arg])
+		value = await ctx.call_method(self, data, [arg])
 	elif data is Array:
 		for entry in data.duplicate():
-			value = await ctx.call_fn(entry[1], [self, arg])
+			value = await ctx.call_method(self, entry[1], [arg])
 	return value
 
-func callcRS(key: StringName, ctx: LisperContext, arg: Variant) -> Variant:
+func callcRS(ctx: LisperContext, key: StringName, arg: Variant) -> Variant:
 	var handle = define._props.get(key)
-	if handle != null: return await ctx.call_fn(handle, [self, arg])
+	if handle != null: return await ctx.call_method(self, handle, [arg])
 	return null
 
-func callcRSU(key: StringName, ctx: LisperContext, arg: Variant) -> Variant:
-	return await ctx.call_fn(define._props[key], [self, arg])
+func callcRSU(ctx: LisperContext, key: StringName, arg: Variant) -> Variant:
+	return await ctx.call_method(self, define._props[key], [arg])
 
-func applyc(key: StringName, ctx: LisperContext, argv: Array) -> Variant:
-	var vargv := [self]
-	vargv.append_array(argv)
+func applyc(ctx: LisperContext, key: StringName, argv: Array) -> Variant:
 	var value = null
 	var data = define._props.get(key)
 	if Lisper.is_fn(data):
-		value = await ctx.call_fn(data, vargv)
+		value = await ctx.call_method(self, data, argv)
 	elif data is Array:
 		for entry in data.duplicate():
-			value = await ctx.call_fn(entry[1], vargv)
+			value = await ctx.call_method(self, entry[1], argv)
 	var lidx = layers.size() - 1
 	while lidx >= 0:
 		data = layers[lidx][1].get(key)
 		if Lisper.is_fn(data):
-			value = await ctx.call_fn(data, vargv)
+			value = await ctx.call_method(self, data, argv)
 		elif data is Array:
 			for entry in data.duplicate():
-				value = await ctx.call_fn(entry[1], vargv)
+				value = await ctx.call_method(self, entry[1], argv)
 		lidx -= 1
 	return value
 
-func applycS(key: StringName, ctx: LisperContext, argv: Array) -> Variant:
-	var vargv := [self]
-	vargv.append_array(argv)
+func applycS(ctx: LisperContext, key: StringName, argv: Array) -> Variant:
 	var value = null
 	var handle = define._props.get(key)
-	if handle != null: value = await ctx.call_fn(handle, vargv)
+	if handle != null: value = await ctx.call_method(self, handle, argv)
 	var lidx = layers.size() - 1
 	while lidx >= 0:
 		handle = layers[lidx][1].get(key)
-		if handle != null: value = await ctx.call_fn(handle, vargv)
+		if handle != null: value = await ctx.call_method(self, handle, argv)
 		lidx -= 1
 	return value
 
-func applycR(key: StringName, ctx: LisperContext, argv: Array) -> Variant:
-	var vargv := [self]
-	vargv.append_array(argv)
+func applycR(ctx: LisperContext, key: StringName, argv: Array) -> Variant:
 	var value = null
 	var data = define._props.get(key)
 	if Lisper.is_fn(data):
-		value = await ctx.call_fn(data, vargv)
+		value = await ctx.call_method(self, data, argv)
 	elif data is Array:
 		for entry in data.duplicate():
-			value = await ctx.call_fn(entry[1], vargv)
+			value = await ctx.call_method(self, entry[1], argv)
 	return value
 
-func applycRS(key: StringName, ctx: LisperContext, argv: Array) -> Variant:
-	var vargv := [self]
-	vargv.append_array(argv)
+func applycRS(ctx: LisperContext, key: StringName, argv: Array) -> Variant:
 	var handle = define._props.get(key)
-	if handle != null: return await ctx.call_fn(handle, vargv)
+	if handle != null: return await ctx.call_method(self, handle, argv)
 	return null
 
-func applycRSU(key: StringName, ctx: LisperContext, argv: Array) -> Variant:
-	var vargv := [self]
-	vargv.append_array(argv)
-	return await ctx.call_fn(define._props[key], vargv)
+func applycRSU(ctx: LisperContext, key: StringName, argv: Array) -> Variant:
+	return await ctx.call_method(self, define._props[key], argv)
 
 ## call lisper raw function methods
 ## [codeblock]
@@ -732,63 +725,53 @@ func applycRSU(key: StringName, ctx: LisperContext, argv: Array) -> Variant:
 ## S -> Single: not batch call stacks
 ## U -> Usafe:  fail when handle not found
 ## [/codeblock]
-func applyr(key: StringName, ctx: LisperContext, body: Array) -> Variant:
-	var vargv := [Lisper.Raw(self)]
-	vargv.append_array(body)
+func applyr(ctx: LisperContext, key: StringName, body: Array) -> Variant:
 	var value = null
 	var data = define._props.get(key)
 	if Lisper.is_fn(data):
-		value = await ctx.call_fn_raw(data, vargv)
+		value = await ctx.call_method_raw(self, data, body)
 	elif data is Array:
 		for entry in data.duplicate():
-			value = await ctx.call_fn_raw(entry[1], vargv)
+			value = await ctx.call_method_raw(self, entry[1], body)
 	var lidx = layers.size() - 1
 	while lidx >= 0:
 		data = layers[lidx][1].get(key)
 		if Lisper.is_fn(data):
-			value = await ctx.call_fn_raw(data, vargv)
+			value = await ctx.call_method_raw(self, data, body)
 		elif data is Array:
 			for entry in data.duplicate():
-				value = await ctx.call_fn_raw(entry[1], vargv)
+				value = await ctx.call_method_raw(self, entry[1], body)
 		lidx -= 1
 	return value
 
-func applyrS(key: StringName, ctx: LisperContext, body: Array) -> Variant:
-	var vargv := [Lisper.Raw(self)]
-	vargv.append_array(body)
+func applyrS(ctx: LisperContext, key: StringName, body: Array) -> Variant:
 	var value = null
 	var handle = define._props.get(key)
-	if handle != null: value = await ctx.call_fn_raw(handle, vargv)
+	if handle != null: value = await ctx.call_method_raw(self, handle, body)
 	var lidx = layers.size() - 1
 	while lidx >= 0:
 		handle = layers[lidx][1].get(key)
-		if handle != null: value = await ctx.call_fn_raw(handle, vargv)
+		if handle != null: value = await ctx.call_method_raw(self, handle, body)
 		lidx -= 1
 	return value
 
-func applyrR(key: StringName, ctx: LisperContext, body: Array) -> Variant:
-	var vargv := [Lisper.Raw(self)]
-	vargv.append_array(body)
+func applyrR(ctx: LisperContext, key: StringName, body: Array) -> Variant:
 	var value = null
 	var data = define._props.get(key)
 	if Lisper.is_fn(data):
-		value = await ctx.call_fn_raw(data, vargv)
+		value = await ctx.call_method_raw(self, data, body)
 	elif data is Array:
 		for entry in data.duplicate():
-			value = await ctx.call_fn_raw(entry[1], vargv)
+			value = await ctx.call_method_raw(self, entry[1], body)
 	return value
 
-func applyrRS(key: StringName, ctx: LisperContext, body: Array) -> Variant:
-	var vargv := [Lisper.Raw(self)]
-	vargv.append_array(body)
+func applyrRS(ctx: LisperContext, key: StringName, body: Array) -> Variant:
 	var handle = define._props.get(key)
-	if handle != null: return await ctx.call_fn_raw(handle, vargv)
+	if handle != null: return await ctx.call_method_raw(self, handle, body)
 	return null
 
-func applyrRSU(key: StringName, ctx: LisperContext, body: Array) -> Variant:
-	var vargv := [Lisper.Raw(self)]
-	vargv.append_array(body)
-	return await ctx.call_fn_raw(define._props[key], vargv)
+func applyrRSU(ctx: LisperContext, key: StringName, body: Array) -> Variant:
+	return await ctx.call_method_raw(self, define._props[key], body)
 
 
 
@@ -800,7 +783,7 @@ defunc (do :const :gd :raw ',
 		else:
 			var this := await ctx.exec(body[0]) as Mono
 			var act_name := await ctx.exec_as_keyword(body[1]) as StringName
-			return await this.applyr(act_name, ctx, body.slice(2))
+			return await this.applyr(ctx, act_name, body.slice(2))
 ,')
 
 defunc (callm :const :gd :raw ',
@@ -810,7 +793,7 @@ defunc (callm :const :gd :raw ',
 			var this := await ctx.exec(body[0]) as Mono
 			var method := await ctx.exec_as_keyword(body[1]) as StringName
 			var argv := await ctx.execs(body.slice(2)) as Array
-			return await this.applym(method, argv)
+			return await this.applym(ctx, method, argv)
 ,')
 
 defunc (getp :const :gd :raw ',

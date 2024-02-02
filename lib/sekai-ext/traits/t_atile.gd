@@ -10,7 +10,7 @@ var props := {
 	
 	&"atile_cache": null,
 	&"compilers": Prop.puts({
-		&"0:atile": func (this: Mono) -> void:
+		&"0:atile": func (ctx: LisperContext, this: Mono) -> void:
 			var atile_size := this.getp(&"atile_size") as Vector3
 			if atile_size != Vector3(0, 0, 0):
 				var atile_matches := this.getp(&"atile_matches") as Array
@@ -41,7 +41,7 @@ var props := {
 	}),
 }
 
-static func update(this: Mono) -> void:
+static func update(ctx: LisperContext, this: Mono) -> void:
 	var cache = this.getpR(&"atile_cache")
 	if cache != null:
 		var pos := this.position
@@ -63,7 +63,7 @@ static func update(this: Mono) -> void:
 					var monos := sekai.get_monos_by_pos(pos + Vector3(dx - rx, dy - ry, dz - rz) * size)
 					for idx in atile_matches.size():
 						for mono in monos:
-							if mono != this and await mono.callmRS(&"group_intersects", atile_matches[idx]):
+							if mono != this and await mono.callmRS(ctx, &"group_intersects", atile_matches[idx]):
 								base[(sz - 1 - dz) * sy * sx + dy * sx + dx].append(idx + 1)
 								break
 		for rule in atile_data:
@@ -82,6 +82,6 @@ static func update(this: Mono) -> void:
 				var cover = cfg.get(&"cover")
 				if cover != null: this.cover(&"atile", cover)
 				var vupdate = cfg.get(&"update")
-				if vupdate != null: await sekai.gss_ctx.call_fn(vupdate, [sekai, this])
+				if vupdate != null: await ctx.call_method(this, vupdate)
 				break
 	pass

@@ -10,14 +10,14 @@ var props := {
 	&"jump_time": 0,
 	&"on_jump": false,
 	&"on_input_action": Prop.puts({
-		&"1:jump": func (this: Mono, _all, press: Dictionary, _release) -> void:
+		&"1:jump": func (ctx: LisperContext, this: Mono, _all, press: Dictionary, _release) -> void:
 			if press.has(&"dialog_confirm"):
 				this.setp(&"init_z", this.position.z)
 				this.setp(&"on_jump", true)
 				this.setp(&"jump_time", 0),
 	}),
 	&"on_process": Prop.puts({
-		&"1:jump": func (this: Mono) -> void:
+		&"1:jump": func (ctx: LisperContext, this: Mono) -> void:
 			if this.getp(&"on_jump"):
 				var v = this.getp(&"initial_velocity")
 				var g = this.getp(&"gravity")

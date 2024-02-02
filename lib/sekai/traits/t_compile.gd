@@ -14,7 +14,7 @@ var props := {
 	}),
 }
 
-static func update(this: Mono) -> void:
+static func update(ctx: LisperContext, this: Mono) -> void:
 	if not this.getp(&"compiled"):
-		await this.emitm(&"compilers")
+		await this.emitm(ctx, &"compilers")
 		this.setpR(&"compiled", true)
