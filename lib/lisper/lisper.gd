@@ -190,7 +190,7 @@ static func exec_gsm(ctx: LisperContext, gsm: Object) -> void:
 	ctx.pop_module_meta()
 
 static func test_parser() -> void:
-	print(Lisper.tokenize("1 0 .5 10 204.2 3.30"))
+	print(Lisper.tokenize("1 0 10 204.2 3.30"))
 	print(Lisper.tokenize("#t #f#t"))
 	print(Lisper.tokenize("\"string\" \"quote\\\"ed\"\"nested\""))
 	print(Lisper.tokenize("&keyword &+1 &&"))

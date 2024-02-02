@@ -246,18 +246,28 @@ impl GispParser {
     }
 
     fn r_number(&mut self) -> bool {
-        let mut chars = Vec::<char>::new();
-        while let Some(c) = self.rpick() && _CS_NUMBER.contains(c) {
-            chars.push(c);
-            self.offset += 1;
-        }
-        if chars.len() > 0 {
-            let s = chars.into_iter().collect::<String>();
-            if s == "-" {
-                self.push(TType::NUMBER, (-1.0).to_variant());
-            } else {
-                self.push(TType::NUMBER, s.parse::<f64>().unwrap_or(0.0).to_variant());
+        if let Some(c) = self.rpick() && _CS_NUMBER_HEAD.contains(c) {
+            if c == '-' {
+                if let Some(nc) = self.rpick_offset(1) {
+                    if !_CS_NUMBER_BODY.contains(nc) {
+                        return false;
+                    }
+                } else {
+                    return false;
+                }
             }
+            let mut chars = vec![c];
+            self.offset += 1;
+            while let Some(c) = self.rpick() && _CS_NUMBER_BODY.contains(c) {
+                chars.push(c);
+                self.offset += 1;
+            }
+            if let Some(c) = self.rpick() && !_CS_N_TOKEN_BODY.contains(c) {
+                self.offset -= chars.len();
+                return false;
+            }
+            let s = chars.into_iter().collect::<String>();
+            self.push(TType::NUMBER, s.parse::<f64>().unwrap_or(0.0).to_variant());
             true
         } else {
             false
@@ -370,8 +380,9 @@ impl GispParser {
 }
 
 const _CS_BLANK: &str = "\u{0020}\u{0009}\u{000A}\u{000B}\u{000C}\u{00A0}\u{000D}\u{2028}\u{2029}";
-const _CS_NUMBER: &str = "-0123456789.";
-const _CS_N_TOKEN_HEAD: &str = concat!("&()[]{}\"$#'", "-0123456789.");
+const _CS_NUMBER_HEAD: &str = "-0123456789";
+const _CS_NUMBER_BODY: &str = "0123456789.";
+const _CS_N_TOKEN_HEAD: &str = concat!("&()[]{}\"$#'");
 const _CS_N_TOKEN_BODY: &str = concat!("()[]{}\"'", "\u{0020}\u{0009}\u{000A}\u{000B}\u{000C}\u{00A0}\u{000D}\u{2028}\u{2029}");
 
 impl GispParser {

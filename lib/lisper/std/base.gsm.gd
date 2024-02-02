@@ -333,7 +333,7 @@ defunc (go :const :gd :raw ',
 ,')
 
 defunc (+ :const :gd :pure ', func (a, b): return a + b ,')
-defunc (,- :const :gd :pure ', func (a, b): return a - b ,')
+defunc (- :const :gd :pure ', func (a, b): return a - b ,')
 defunc (* :const :gd :pure ', func (a, b): return a * b ,')
 defunc (/ :const :gd :pure ', func (a, b): return a / b ,')
 
@@ -388,7 +388,7 @@ defunc (or :const :gd :raw ',
 			return res
 ,')
 
-defunc (+1 :const :gd :raw ',
+defunc (++ :const :gd :raw ',
 	func (ctx: LisperContext, body: Array, comptime: bool) -> Variant:
 		if comptime: return await LisperCommons.compile_keyword_mask_1(ctx, body)
 		else:
@@ -397,7 +397,7 @@ defunc (+1 :const :gd :raw ',
 			return null
 ,')
 
-defunc (,-1 :const :gd :raw ',
+defunc (-- :const :gd :raw ',
 	func (ctx: LisperContext, body: Array, comptime: bool) -> Variant:
 		if comptime: return await LisperCommons.compile_keyword_mask_1(ctx, body)
 		else:
