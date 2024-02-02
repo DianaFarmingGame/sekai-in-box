@@ -83,15 +83,19 @@ func _make_context() -> LisperContext:
 
 ## 每次 target 变更时调用，释放之前的区域，获取新的区域
 func _update_target() -> void:
-	pass
+	if target != null:
+		var hako := target.get_hako()
+		print(hako)
+	else:
+		pass # TODO
 
 ## 将 Action 的输入事件传输至目标对象
 func _pass_action(triggered: Dictionary, pressings: Dictionary, releasings: Dictionary) -> void:
-	if target: target.applyv(&"on_input_action", context, [triggered, pressings, releasings])
+	if target: target.applyc(context, &"on_input_action", [triggered, pressings, releasings])
 
 ## 将 Direction 的输入事件传输至目标对象
 func _pass_direction(triggered: Dictionary, direction: Vector3) -> void:
-	if target: target.applyv(&"on_input_direction", context, [triggered, direction])
+	if target: target.applyc(context, &"on_input_direction", [triggered, direction])
 
 
 

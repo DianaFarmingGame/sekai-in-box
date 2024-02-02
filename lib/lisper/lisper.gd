@@ -11,34 +11,26 @@ static func tokenize(expr: String) -> Variant:
 
 static func is_node(node: Variant) -> bool: return node is Array and node.size() > 0 and node[0] is TType
 
-static func List(nodes: Array) -> Array: return [TType.LIST, nodes]
-
 static func Token(name: StringName) -> Array: return [TType.TOKEN, name]
-
 static func is_flag(node: Variant) -> bool: return is_node(node) and TType.TOKEN == node[0] and node[1].begins_with(':')
 
 static func Keyword(name: StringName) -> Array: return [TType.KEYWORD, name]
-
 static func String(content: String) -> Array: return [TType.STRING, content]
-
 static func Bool(value: bool) -> Array: return [TType.BOOL, value]
-
 static func Number(value: float) -> Array: return [TType.NUMBER, value]
 
-static func Array(nodes: Array) -> Array: return [TType.ARRAY, nodes]
+static func List(nodes: Array) -> Array: return [TType.LIST, nodes]
 
+static func Array(nodes: Array) -> Array: return [TType.ARRAY, nodes]
 static func is_array(node: Variant) -> bool: return is_node(node) and TType.ARRAY == node[0]
 
 static func Map(nodes: Array) -> Array: return [TType.MAP, nodes]
-
 static func is_map(node: Variant) -> bool: return is_node(node) and TType.MAP == node[0]
 
 static func Raw(value: Variant) -> Array: return [TType.RAW, value]
-
 static func is_raw(node: Variant) -> bool: return is_node(node) and TType.RAW == node[0]
 
 static func RawOverride(value: Variant) -> Array: return [TType.RAW_OVERRIDE, value]
-
 static func is_raw_override(node: Variant) -> bool: return is_node(node) and TType.RAW_OVERRIDE == node[0]
 
 static func apply(name: StringName, tails = null) -> Array:

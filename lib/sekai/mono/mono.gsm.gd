@@ -1,6 +1,6 @@
 class_name Mono
 
-var root = null
+var root: Mono = null
 var define: MonoDefine
 
 var inited := false
@@ -67,10 +67,18 @@ func _from_data(data: Dictionary) -> void:
 	inited = data[&"inited"]
 	layers = data[&"layers"]
 
-func remove() -> Mono:
+func remove(ctx: LisperContext) -> Mono:
 	if root != null:
-		root.callm(&"container/pick", self)
+		root.callm(ctx, &"container/pick", self)
 	return self
+
+func get_hako() -> Mono:
+	if root != null:
+		if root.define.id == &"hako":
+			return root
+		else:
+			return root.get_hako()
+	return null
 
 func cover(layer_name: StringName, layer: Dictionary) -> void:
 	if layers.size() == 0 and layer_name != &"base": cover(&"base", {})
@@ -878,7 +886,7 @@ defunc (wait :const :gd :macro ',
 		])]])
 ,')
 
-defunc (remove :const :gd ', func (this: Mono): this.remove() ,')
+defunc (remove :const :gd :apply ', func (ctx: LisperContext, args: Array): args[0].remove(ctx) ,')
 defunc (queue_remove :const :gd ', func (this: Mono): this.remove.call_deferred() ,')
 
 ']

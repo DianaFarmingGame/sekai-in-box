@@ -22,7 +22,7 @@ var props := {
 				return true
 		if contains.size() < this.getp(&"container_capacity"):
 			contains.append(item)
-			item.remove()
+			item.remove(ctx)
 			item._into_container(ctx, this)
 			this.setpF(&"contains", contains)
 			return true
