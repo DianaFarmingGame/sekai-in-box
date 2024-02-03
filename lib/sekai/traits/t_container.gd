@@ -4,6 +4,7 @@ var id := &"container"
 
 var props := {
 	&"contains": [],
+	&"on_contains": null,
 	&"contains_data": [],
 	&"container_capacity": INF,
 	
@@ -18,21 +19,21 @@ var props := {
 					putted = true
 					break
 			if putted:
-				this.setpF(&"contains", contains)
+				this.setpF(ctx, &"contains", contains)
 				return true
 		if contains.size() < this.getp(&"container_capacity"):
 			contains.append(item)
 			item.remove(ctx)
 			item._into_container(ctx, this)
-			this.setpF(&"contains", contains)
+			this.setpF(ctx, &"contains", contains)
 			return true
-		this.setpF(&"contains", contains)
+		this.setpF(ctx, &"contains", contains)
 		return false,
 	&"container/pick": func (ctx: LisperContext, this: Mono, item: Mono) -> Mono:
 		var contains := this.getpBD(&"contains", []) as Array
 		item._outof_container()
 		contains.erase(item)
-		this.setpF(&"contains", contains)
+		this.setpF(ctx, &"contains", contains)
 		return item,
 	&"container/pick_by_ref_id": func (ctx: LisperContext, this: Mono, ref_id: Variant, count := 1) -> Variant:
 		var type_d = sekai.get_define(ref_id)
@@ -66,7 +67,7 @@ var props := {
 					if putted: continue
 				picks.append(item)
 			for mono in removes: contains.erase(mono)
-			this.setpF(&"contains", contains)
+			this.setpF(ctx, &"contains", contains)
 			for mono in picks: mono._outof_container()
 			return picks
 		return null,

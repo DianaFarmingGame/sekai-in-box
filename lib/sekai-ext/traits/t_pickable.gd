@@ -17,11 +17,11 @@ var props := {
 	
 	&"on_picker_in": Prop.Stack({
 		&"0:pickable": func (ctx: LisperContext, this: Mono) -> void:
-			await this.setp(&"picker_hovered", true),
+			this.setp(&"picker_hovered", true),
 	}),
 	&"on_picker_out": Prop.Stack({
 		&"0:pickable": func (ctx: LisperContext, this: Mono) -> void:
-			await this.setp(&"picker_hovered", false),
+			this.setp(&"picker_hovered", false),
 	}),
 	&"on_draw_debug": Prop.puts({
 		&"99:pick_box": TPickable.draw_debug,

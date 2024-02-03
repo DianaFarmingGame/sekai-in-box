@@ -38,7 +38,7 @@ func do_merge(sets: Array[Dictionary]) -> Array[Dictionary]:
 						if all.has(&"ui_left"): dir += Vector2(-1, 0)
 						if all.has(&"ui_right"): dir += Vector2(1, 0)
 						var speed := dir.normalized() * 3
-						this.setp(&"cur_speed", speed)
+						this.setpF(ctx, &"cur_speed", speed)
 						if speed == Vector2(0, 0):
 							await this.callm(ctx, &"state/to", &"idle")
 						else:
@@ -64,9 +64,9 @@ func do_merge(sets: Array[Dictionary]) -> Array[Dictionary]:
 		
 		&"on_cur_speed": func (ctx: LisperContext, this: Mono, speed: Vector2) -> Vector2:
 			if speed.x < 0:
-				this.setp(&"cur_dir", -1)
+				this.setpW(ctx, &"cur_dir", -1)
 			if speed.x > 0:
-				this.setp(&"cur_dir", 1)
+				this.setpW(ctx, &"cur_dir", 1)
 			return speed,
 		
 		&"on_cur_dir": func (ctx: LisperContext, this: Mono, dir: float) -> float:
@@ -80,9 +80,9 @@ func do_merge(sets: Array[Dictionary]) -> Array[Dictionary]:
 			var pos: Vector2 = target if target is Vector2 else Vector2(target.position.x, target.position.y)
 			var dx := pos.x - this.position.x
 			if dx < 0:
-				this.setp(&"cur_dir", -1)
+				this.setpW(ctx, &"cur_dir", -1)
 			if dx > 0:
-				this.setp(&"cur_dir", 1),
+				this.setpW(ctx, &"cur_dir", 1),
 		
 		&"move_by": func (ctx: LisperContext, this: Mono, delta: Vector2) -> bool:
 			return await this.applym(ctx, &"move_by_at_speed", [delta, this.getp(&"max_speed")]),
@@ -98,7 +98,7 @@ func do_merge(sets: Array[Dictionary]) -> Array[Dictionary]:
 				var speedv := delta / dt
 				var speed := speedv.length()
 				if speed > max_speed: speedv *= max_speed / speed
-				this.setp(&"cur_speed", speedv)
+				this.setpF(ctx, &"cur_speed", speedv)
 				await sekai.before_process
 				delta = target - Vector2(this.position.x, this.position.y)
 				if (this.position - ppos).length() < (max_speed * dt) * 0.1:
@@ -108,7 +108,7 @@ func do_merge(sets: Array[Dictionary]) -> Array[Dictionary]:
 						break
 				else:
 					block_cnt = 0
-			this.setp(&"cur_speed", Vector2(0, 0))
+			this.setpF(ctx, &"cur_speed", Vector2(0, 0))
 			await this.callm(ctx, &"state/to", &"idle")
 			return not blocked,
 		
@@ -128,7 +128,7 @@ func do_merge(sets: Array[Dictionary]) -> Array[Dictionary]:
 					var speedv := delta / dt
 					var speed := speedv.length()
 					if speed > max_speed: speedv *= max_speed / speed
-					this.setp(&"cur_speed", speedv)
+					this.setpF(ctx, &"cur_speed", speedv)
 					await sekai.before_process
 					delta = target - Vector2(this.position.x, this.position.y)
 					if (this.position - ppos).length() < (max_speed * dt) * 0.1:
@@ -147,7 +147,7 @@ func do_merge(sets: Array[Dictionary]) -> Array[Dictionary]:
 					var speedv := delta / dt
 					var speed := speedv.length()
 					if speed > max_speed: speedv *= max_speed / speed
-					this.setp(&"cur_speed", speedv)
+					this.setpF(ctx, &"cur_speed", speedv)
 					await sekai.before_process
 					delta = Vector2(target.position.x, target.position.y) - Vector2(this.position.x, this.position.y)
 					if (this.position - ppos).length() < (max_speed * dt) * 0.1:
@@ -157,7 +157,7 @@ func do_merge(sets: Array[Dictionary]) -> Array[Dictionary]:
 							break
 					else:
 						block_cnt = 0
-			this.setp(&"cur_speed", Vector2(0, 0))
+			this.setpF(ctx, &"cur_speed", Vector2(0, 0))
 			await this.callm(ctx, &"state/to", &"idle")
 			return not blocked,
 		

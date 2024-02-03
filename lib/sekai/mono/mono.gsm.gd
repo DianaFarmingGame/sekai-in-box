@@ -105,11 +105,11 @@ func uncover(layer_name: StringName) -> void:
 			layers.remove_at(lidx)
 			return
 
-func call_watcher(key: StringName, value: Variant, force := false) -> Variant:
+func call_watcher(ctx: LisperContext, key: StringName, value: Variant, force := false) -> Variant:
 	if force or getp(key) != value:
 		var hkey = StringName("on_" + key)
 		var handle = define._props.get(hkey)
-		if handle != null: value = await handle.call(self, value)
+		if handle != null: value = await handle.call(ctx, self, value)
 		#var lidx = layers.size() - 1
 		#while lidx >= 0:
 			#handle = layers[lidx][1].get(hkey)
@@ -197,7 +197,7 @@ func getpRD(key: StringName, default: Variant) -> Variant:
 
 ## set property methods
 ## [codeblock]
-## D -> Direct: set without trigger watchers
+## W -> Watcher:set with watchers triggered
 ## F -> Force:  set with watchers triggered forced
 ## L -> Layer:  only set on certain layer
 ## B -> Base:   only set on base layer
@@ -208,61 +208,61 @@ func setp(key: StringName, value: Variant) -> void:
 		var v = l[1].get(key)
 		if v != null:
 			if v != value:
-				l[1][key] = await call_watcher(key, value)
+				l[1][key] = value
 			return
 	setpB(key, value)
 
-func setpD(key: StringName, value: Variant) -> void:
+func setpW(ctx: LisperContext, key: StringName, value: Variant) -> void:
 	for l in layers:
 		var v = l[1].get(key)
 		if v != null:
 			if v != value:
-				l[1][key] = value
+				l[1][key] = await call_watcher(ctx, key, value)
 			return
-	setpBD(key, value)
+	setpBW(ctx, key, value)
 
-func setpF(key: StringName, value: Variant) -> void:
+func setpF(ctx: LisperContext, key: StringName, value: Variant) -> void:
 	for l in layers:
 		var v = l[1].get(key)
 		if v != null:
 			if v != value:
-				l[1][key] = await call_watcher(key, value, true)
+				l[1][key] = await call_watcher(ctx, key, value, true)
 			return
-	setpBF(key, value)
+	setpBF(ctx, key, value)
 
 func setpL(layer_name: StringName, key: StringName, value: Variant) -> void:
-	for l in layers:
-		if l[0] == layer_name:
-			l[1][key] = await call_watcher(key, value)
-			return
-
-func setpLD(layer_name: StringName, key: StringName, value: Variant) -> void:
 	for l in layers:
 		if l[0] == layer_name:
 			l[1][key] = value
 			return
 
-func setpLF(layer_name: StringName, key: StringName, value: Variant) -> void:
+func setpLW(ctx: LisperContext, layer_name: StringName, key: StringName, value: Variant) -> void:
 	for l in layers:
 		if l[0] == layer_name:
-			l[1][key] = await call_watcher(key, value, true)
+			l[1][key] = await call_watcher(ctx, key, value)
+			return
+
+func setpLF(ctx: LisperContext, layer_name: StringName, key: StringName, value: Variant) -> void:
+	for l in layers:
+		if l[0] == layer_name:
+			l[1][key] = await call_watcher(ctx, key, value, true)
 			return
 
 func setpB(key: StringName, value: Variant) -> void:
-	value = await call_watcher(key, value)
 	if layers.size() > 0:
 		layers[-1][1][key] = value
 		return
 	cover(&"base", {key: value})
 
-func setpBD(key: StringName, value: Variant) -> void:
+func setpBW(ctx: LisperContext, key: StringName, value: Variant) -> void:
+	value = await call_watcher(ctx, key, value)
 	if layers.size() > 0:
 		layers[-1][1][key] = value
 		return
 	cover(&"base", {key: value})
 
-func setpBF(key: StringName, value: Variant) -> void:
-	value = await call_watcher(key, value, true)
+func setpBF(ctx: LisperContext, key: StringName, value: Variant) -> void:
+	value = await call_watcher(ctx, key, value, true)
 	if layers.size() > 0:
 		layers[-1][1][key] = value
 		return
