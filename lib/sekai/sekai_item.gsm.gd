@@ -25,8 +25,17 @@ func _process(delta: float) -> void:
 
 signal on_draw
 
+var _parent: SekaiControl = null
+
+func _enter_tree() -> void:
+	_parent = get_parent()
+	unit_size = _parent.unit_size
+
+func _exit_tree() -> void:
+	_parent = null
+
 func _draw() -> void:
-	set_offset(get_parent().get_item_offset())
+	offset_transform = Transform2D(0, Vector2(1, 1), 0, _parent._item_offset)
 	pen_clear_transform()
 	on_draw.emit()
 

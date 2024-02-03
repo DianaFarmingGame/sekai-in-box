@@ -1,7 +1,7 @@
 class_name TDrawConst extends MonoTrait
 
 var id := &"draw_const"
-var requires := [&"draw"]
+var requires := [&"drawable", &"draw"]
 
 var props := {
 	&"on_draw": TDrawConst.on_draw,

@@ -5,8 +5,8 @@ define (load ("character.gd")
 		name "嘉然"
 		solid_box rect2(-0.3 -0.1 0.6 0.2)
 		asserts {
-			idle "assert/人物/嘉然/魔女帽站立.png"
-			walk "assert/人物/嘉然/魔女帽行走.png"
+			idle load ("魔女帽站立.png")
+			walk load ("魔女帽行走.png")
 		}
 		draw_data {
 			idle [&fixed &idle 0.6 anim_char(4)]

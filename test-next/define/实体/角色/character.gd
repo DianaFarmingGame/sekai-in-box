@@ -30,7 +30,7 @@ func do_merge(sets: Array[Dictionary]) -> Array[Dictionary]:
 							if action != null:
 								await ctx.call_method(this, action, [mono, this])
 					elif press.has(&"combo"):
-						await this.callm(ctx, &"state_to", &"combo")
+						await this.callm(ctx, &"state/to", &"combo")
 					else:
 						var dir := Vector2(0, 0)
 						if all.has(&"ui_up"): dir += Vector2(0, -1)
@@ -40,9 +40,9 @@ func do_merge(sets: Array[Dictionary]) -> Array[Dictionary]:
 						var speed := dir.normalized() * 3
 						this.setp(&"cur_speed", speed)
 						if speed == Vector2(0, 0):
-							await this.callm(ctx, &"state_to", &"idle")
+							await this.callm(ctx, &"state/to", &"idle")
 						else:
-							await this.callm(ctx, &"state_to", &"walk")
+							await this.callm(ctx, &"state/to", &"walk")
 				pass,
 		}),
 		
@@ -51,8 +51,8 @@ func do_merge(sets: Array[Dictionary]) -> Array[Dictionary]:
 			var drops := await Async.array_filter(collides, func (m): return await m.callm(ctx, &"group_in", &"drop"))
 			for drop in drops:
 				for item in drop.getp("contains"):
-					if await this.callm(ctx, &"container_put", item):
-						await drop.callm(ctx, &"container_pick", item)
+					if await this.callm(ctx, &"container/put", item):
+						await drop.callm(ctx, &"container/pick", item)
 				if drop.getp("contains").size() == 0:
 					drop.destroy()
 					
@@ -88,7 +88,7 @@ func do_merge(sets: Array[Dictionary]) -> Array[Dictionary]:
 			return await this.applym(ctx, &"move_by_at_speed", [delta, this.getp(&"max_speed")]),
 		
 		&"move_by_at_speed": func (ctx: LisperContext, this: Mono, delta: Vector2, max_speed: float) -> bool:
-			await this.callm(ctx, &"state_to", &"walk")
+			await this.callm(ctx, &"state/to", &"walk")
 			var target := Vector2(this.position.x, this.position.y) + delta
 			var blocked := false
 			var block_cnt := 0
@@ -109,7 +109,7 @@ func do_merge(sets: Array[Dictionary]) -> Array[Dictionary]:
 				else:
 					block_cnt = 0
 			this.setp(&"cur_speed", Vector2(0, 0))
-			await this.callm(ctx, &"state_to", &"idle")
+			await this.callm(ctx, &"state/to", &"idle")
 			return not blocked,
 		
 		&"move_to": func (ctx: LisperContext, this: Mono, target: Variant) -> bool:
@@ -119,7 +119,7 @@ func do_merge(sets: Array[Dictionary]) -> Array[Dictionary]:
 			var delta: Vector2
 			var blocked := false
 			var block_cnt := 0
-			await this.callm(ctx, &"state_to", &"walk")
+			await this.callm(ctx, &"state/to", &"walk")
 			if target is Vector2:
 				delta = target - Vector2(this.position.x, this.position.y)
 				while delta.length() > 0.1:
@@ -158,7 +158,7 @@ func do_merge(sets: Array[Dictionary]) -> Array[Dictionary]:
 					else:
 						block_cnt = 0
 			this.setp(&"cur_speed", Vector2(0, 0))
-			await this.callm(ctx, &"state_to", &"idle")
+			await this.callm(ctx, &"state/to", &"idle")
 			return not blocked,
 		
 		&"say_to": func (ctx: LisperContext, this: Mono, _target: Mono, meta_text, text = null) -> void:
@@ -225,7 +225,7 @@ func do_merge(sets: Array[Dictionary]) -> Array[Dictionary]:
 
 		&"put_item": func(ctx: LisperContext, this: Mono, item: Mono) -> bool:
 			#TODO: 处理失败情况
-			return await this.callm(ctx, &"container_put", item)
+			return await this.callm(ctx, &"container/put", item)
 			,
 
 		&"change_interact": func (ctx: LisperContext, this: Mono, action_id) -> void:
@@ -240,7 +240,7 @@ func do_merge(sets: Array[Dictionary]) -> Array[Dictionary]:
 					&"cur_draw": &"idle",
 				},
 				&"on_enter": func (ctx: LisperContext, this: Mono, _pres) -> void:
-					await this.emitm(ctx, &"draw_reset"),
+					await this.emitm(ctx, &"draw/reset"),
 			},
 			&"walk": {
 				&"cover": {
@@ -254,7 +254,7 @@ func do_merge(sets: Array[Dictionary]) -> Array[Dictionary]:
 							await this.callm(ctx, &"solid_move", Vector3(0, dpos.y, 0)),
 				},
 				&"on_enter": func (ctx: LisperContext, this: Mono, _pres) -> void:
-					await this.emitm(ctx, &"draw_reset"),
+					await this.emitm(ctx, &"draw/reset"),
 			},
 		},
 	})

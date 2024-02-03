@@ -1,7 +1,7 @@
 class_name TDraw extends MonoTrait
 
 var id := &"draw"
-var requires := [&"assert", &"position"]
+var requires := [&"drawable", &"assert", &"position"]
 
 var props := {
 	&"draw_data": {},
@@ -9,19 +9,21 @@ var props := {
 	&"cur_draw_variant": 0,
 	&"draw_timer": 0.0,
 	&"flip_h": false,
-	
-	&"on_draw": Prop.Stack({&"0:draw": TDraw.on_draw}),
-	&"on_draw_debug": Prop.Stack(),
-	&"draw_reset": func (ctx: LisperContext, this: Mono) -> void:
-		this.setp(&"draw_timer", this.item.get_time()),
-	&"draw_to": func (ctx: LisperContext, this: Mono, draw_id: StringName) -> void:
-		this.setp(&"cur_draw", draw_id),
-	&"draw_reset_to": func (ctx: LisperContext, this: Mono, draw_id: StringName) -> void:
-		if draw_id != this.getp(&"cur_draw"):
-			this.setp(&"cur_draw", draw_id)
-			this.setp(&"draw_timer", this.item.get_time()),
-	
 	&"on_draw_end": Prop.Stack(), # TODO
+	
+	&"draw/reset": func (ctx: LisperContext, this: Mono) -> void:
+		var item := this.getpB(&"sekai_item") as SekaiItem
+		if item != null:
+			this.setp(&"draw_timer", item.get_time()),
+	&"draw/to": func (ctx: LisperContext, this: Mono, draw_id: StringName) -> void:
+		this.setp(&"cur_draw", draw_id),
+	&"draw/reset_to": func (ctx: LisperContext, this: Mono, draw_id: StringName) -> void:
+		if draw_id != this.getp(&"cur_draw"):
+			this.callmRSU(ctx, &"draw/to", draw_id)
+			this.emitmRSU(ctx, &"draw/reset"),
+	
+	&"on_draw": Prop.puts({&"0:draw": TDraw.on_draw}),
+	&"on_draw_debug": Prop.Stack(),
 }
 
 static func on_draw(ctx: LisperContext, this: Mono, item: SekaiItem) -> void:

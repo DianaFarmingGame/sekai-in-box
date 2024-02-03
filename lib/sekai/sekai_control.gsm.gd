@@ -16,7 +16,7 @@ class_name SekaiControl extends Control
 ## 每帧至少处理的最低图块加载数量
 @export var min_inits_per_frame: int = ProjectSettings.get_setting("sekai/min_inits_per_frame")
 
-## 是否允许在 Sekai 的请求下变更 target
+## 是否允许在 Sekai 的请求下变更 target TODO
 @export var allow_transfer_target: bool = true
 
 ## 是否允许主动监听用户输入
@@ -56,6 +56,7 @@ var context: LisperContext = _make_context()
 
 func _init() -> void:
 	y_sort_enabled = true
+	texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST_WITH_MIPMAPS
 	_input_mapper.updated.connect(_on_mapper_input)
 
 
@@ -65,6 +66,10 @@ func _init() -> void:
 #
 func _process(delta: float) -> void:
 	await _update_sight()
+	queue_redraw()
+
+func _draw() -> void:
+	_update_draw_caches()
 
 
 
@@ -115,6 +120,22 @@ func _update_items() -> void:
 		await (mono as Mono).callm(context, &"on_control_exit", self)
 	_prev_monos_in_sight = _monos_in_sight
 
+## 更新和 SekaiItem 交互和绘制需要的变量
+func _update_draw_caches() -> void:
+	_cur_nearest = _next_nearest
+	_next_nearest = INF
+	_min_count = min_inits_per_frame
+	var cpos := Vector3()
+	var usize2 := Vector2(unit_size.x, unit_size.y)
+	if target is Mono: cpos = target.position
+	var pos := Vector2(cpos.x, cpos.y - (cpos.z * unit_size.y) / unit_size.z)
+	var offset := -pos + (Vector2(size) * 0.5).floor() / usize2
+	var box := Rect2(-offset, size / usize2).grow(render_extra_sight)
+	_cam_position = pos
+	_item_offset = offset
+	_render_box = box
+	_frame_time = Time.get_ticks_usec()
+
 ## 将 Action 的输入事件传输至目标对象
 func _pass_action(triggered: Dictionary, pressings: Dictionary, releasings: Dictionary) -> void:
 	if target: target.applyc(context, &"on_input_action", [triggered, pressings, releasings])
@@ -141,3 +162,11 @@ var _hako: Mono = null
 var _input_mapper := InputMapper.new()
 var _monos_in_sight := []
 var _prev_monos_in_sight := []
+
+var _item_offset := Vector2()
+var _cam_position := Vector2()
+var _render_box := Rect2()
+var _frame_time := 0.0
+var _min_count := 0
+var _cur_nearest: float = INF
+var _next_nearest: float = INF

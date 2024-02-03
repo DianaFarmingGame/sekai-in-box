@@ -110,11 +110,11 @@ func call_watcher(key: StringName, value: Variant, force := false) -> Variant:
 		var hkey = StringName("on_" + key)
 		var handle = define._props.get(hkey)
 		if handle != null: value = await handle.call(self, value)
-		var lidx = layers.size() - 1
-		while lidx >= 0:
-			handle = layers[lidx][1].get(hkey)
-			if handle != null: value = await handle.call(self, value)
-			lidx -= 1
+		#var lidx = layers.size() - 1
+		#while lidx >= 0:
+			#handle = layers[lidx][1].get(hkey)
+			#if handle != null: value = await handle.call(self, value)
+			#lidx -= 1
 	return value
 
 ## get property methods
