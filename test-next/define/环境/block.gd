@@ -1,4 +1,4 @@
-class_name GBlock extends GTile
+class_name GBlock extends GEntity
 
 func do_merge(sets: Array[Dictionary]) -> Array[Dictionary]:
 	super.do_merge(sets)
