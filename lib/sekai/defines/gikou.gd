@@ -8,6 +8,7 @@ func do_merge(sets: Array[Dictionary]) -> Array[Dictionary]:
 	merge_traits(sets, [TContainer])
 	merge_props(sets, {
 		&"id": null,
+		&"def_target": null,
 		
 		&"add_hako": func (ctx: LisperContext, this: Mono, pid: StringName) -> void:
 			this.applym(ctx, &"container/add", [&"hako", {
@@ -19,9 +20,10 @@ func do_merge(sets: Array[Dictionary]) -> Array[Dictionary]:
 				if hako.getp(&"id") == pid:
 					return hako
 			return null,
+		
 		&"on_init": Prop.puts({
 			&"-99:add_base_hako": func (ctx: LisperContext, this: Mono) -> void:
-				this.callm(ctx, &"add_hako", &"base"),
+				await this.callm(ctx, &"add_hako", &"base"),
 		}),
 	})
 	return sets

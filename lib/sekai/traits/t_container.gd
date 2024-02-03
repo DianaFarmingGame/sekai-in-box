@@ -24,7 +24,7 @@ var props := {
 		if contains.size() < this.getp(&"container_capacity"):
 			contains.append(item)
 			item.remove(ctx)
-			item._into_container(ctx, this)
+			await item._into_container(ctx, this)
 			this.setpF(ctx, &"contains", contains)
 			return true
 		this.setpF(ctx, &"contains", contains)
@@ -92,6 +92,7 @@ var props := {
 		&"99:container": func (ctx: LisperContext, this: Mono) -> void:
 			var contains := this.getpBD(&"contains", []) as Array
 			await Async.array_map(contains, func (item): await item.store(ctx))
+			contains.map(func (item): item._outof_container())
 			var contains_data := contains.map(Mono.to_data)
 			this.setp(&"contains_data", contains_data)
 			pass,
@@ -102,6 +103,7 @@ var props := {
 			var contains := contains_data.map(Mono.from_data)
 			this.setp(&"contains", contains)
 			await Async.array_map(contains, func (item): await item.restore(ctx))
+			await Async.array_map(contains, func (item): await item._into_container(ctx, this))
 			pass,
 	}),
 }

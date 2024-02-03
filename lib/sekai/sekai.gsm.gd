@@ -33,10 +33,7 @@ signal gikou_changed
 var defines: Array[MonoDefine]
 
 ## 当前进入的 Gikou 实例
-var gikou: Mono = null:
-	set(v):
-		gikou = v
-		gikou_changed.emit()
+var gikou: Mono = null
 
 ## 全局的执行环境（原则上不应该被 Sekai 以外的对象使用）
 var context: LisperContext = null
@@ -64,23 +61,25 @@ func exec_gsx(path: String) -> void:
 
 ## 建立一个新游戏（不会立即存档）
 func start_gikou(id: String, entry := "") -> void:
-	if gikou != null: await outof_gikou()
+	if gikou != null: await exit_gikou()
 	gikou = make_mono(&"gikou", {&"id": id})
 	context.push_module_meta({
 		&"gikou": gikou,
 	})
 	if entry != "": await exec_gsx(entry)
 	await gikou.init(context)
+	gikou_changed.emit()
 
 ## 进入一个已有游戏的存档
-func into_gikou(id: String) -> void:
-	if gikou != null: await outof_gikou()
+func enter_gikou(id: String) -> void:
+	if gikou != null: await exit_gikou()
 	var file := FileAccess.open(gikou_store_dir.path_join(id + ".gikou"), FileAccess.READ)
 	gikou = Mono.from_data(file.get_var(false))
 	context.push_module_meta({
 		&"gikou": gikou,
 	})
 	await gikou.restore(context)
+	gikou_changed.emit()
 
 ## 触发当前游戏保存存档
 func record_gikou() -> void:
@@ -91,10 +90,11 @@ func record_gikou() -> void:
 	await gikou.restore(context)
 
 ## 退出当前游戏
-func outof_gikou() -> void:
+func exit_gikou() -> void:
 	await gikou.store(context)
 	gikou = null
 	context.pop_module_meta()
+	gikou_changed.emit()
 
 # Mono/Define 相关
 
@@ -191,11 +191,11 @@ defunc (gikou/start :const :gd :apply ',
 		await start_gikou(id, Lisper.resolve_path(mod_dir, path))
 ,')
 
-defunc (gikou/into :const :gd ', into_gikou ,')
+defunc (gikou/enter :const :gd ', enter_gikou ,')
 
 defunc (gikou/record :const :gd ', record_gikou ,')
 
-defunc (gikou/outof :const :gd ', outof_gikou ,')
+defunc (gikou/exit :const :gd ', exit_gikou ,')
 
 defunc (define/sign :const :gd ', sign_define ,')
 

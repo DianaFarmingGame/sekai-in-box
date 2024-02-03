@@ -32,14 +32,15 @@ func do_merge(sets: Array[Dictionary]) -> Array[Dictionary]:
 		&"on_inited": Prop.Stack(),
 		&"on_store": Prop.Stack(),
 		&"on_restore": Prop.Stack(),
+		&"on_ready": Prop.Stack(),
 		
 		&"on_control_enter": Prop.Stack({
-			&"0:base": func (ctx: LisperContext, this: Mono, ctrl: SekaiControl) -> void:
-				prints(this, "entered", ctrl),
+			#&"0:base": func (ctx: LisperContext, this: Mono, ctrl: SekaiControl) -> void:
+				#prints(this, "entered", ctrl),
 		}),
 		&"on_control_exit": Prop.Stack({
-			&"0:base": func (ctx: LisperContext, this: Mono, ctrl: SekaiControl) -> void:
-				prints(this, "exited", ctrl),
+			#&"0:base": func (ctx: LisperContext, this: Mono, ctrl: SekaiControl) -> void:
+				#prints(this, "exited", ctrl),
 		}),
 	})
 	return sets

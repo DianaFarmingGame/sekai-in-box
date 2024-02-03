@@ -27,7 +27,7 @@ static func restore_from_data(ctx: LisperContext, data: Variant) -> Mono:
 
 func _into_container(ctx: LisperContext, cont: Mono) -> void:
 	root = cont
-	if root.inited: init.call_deferred(ctx)
+	if root.inited: await init(ctx)
 
 func _outof_container() -> void:
 	root = null

@@ -3,5 +3,4 @@ wait (gikou on_inited []
 	var (嘉然 do (hako add_mono &实体/角色/嘉然 {
 		position vec3(5 9 1)
 	}))
-	setp(gikou player 嘉然)
 )

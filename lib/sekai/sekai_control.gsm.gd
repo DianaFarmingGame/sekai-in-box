@@ -51,12 +51,22 @@ var context: LisperContext = _make_context()
 
 
 #
+# 方法
+#
+func set_target(ptarget: Mono) -> void:
+	if allow_transfer_target:
+		target = ptarget
+
+
+
+#
 # 初始化
 #
 
 func _init() -> void:
 	y_sort_enabled = true
 	texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST_WITH_MIPMAPS
+	sekai.gikou_changed.connect(_update_gikou)
 	_input_mapper.updated.connect(_on_mapper_input)
 
 
@@ -82,6 +92,16 @@ func _unhandled_input(event: InputEvent) -> void:
 
 
 
+# GSM
+
+func gsm(): return ['
+
+defunc (target/set :const :gd ', set_target ,')
+
+']
+
+
+
 #------------------------------------------------------------------------------#
 
 #
@@ -93,6 +113,13 @@ func _make_context() -> LisperContext:
 	var ctx := sekai.context.fork() as LisperContext
 	ctx.def_const(&"control", self)
 	return ctx
+
+func _update_gikou() -> void:
+	var gikou := sekai.gikou
+	if gikou != null:
+		target = gikou.getp(&"def_target")
+	else:
+		target = null
 
 ## 每次 target 变更时调用，释放之前的区域，获取新的区域
 func _update_target() -> void:
