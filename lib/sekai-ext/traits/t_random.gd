@@ -18,13 +18,9 @@ var props := {
 				this.setpR(&"random_cache", [random_rules, wtotal]),
 	}),
 	
-	&"on_init": Prop.puts({
+	&"on_ready": Prop.puts({
 		&"-99:random": TRandom.update,
 		&"98:random": TRandom.updated,
-	}),
-	&"on_restore": Prop.puts({
-		&"-99:random": TRandom.update,
-		&"99:random": TRandom.updated,
 	}),
 }
 

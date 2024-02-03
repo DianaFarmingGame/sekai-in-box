@@ -109,8 +109,8 @@ func sign_define(define: Variant) -> void:
 ## 获取一个 Define
 func get_define(ref_id: Variant) -> Variant:
 	var define: MonoDefine
-	if ref_id is int:
-		define = _get_define_by_ref(ref_id) as MonoDefine
+	if ref_id is int or ref_id is float:
+		define = _get_define_by_ref(ref_id as int) as MonoDefine
 		if define == null:
 			push_error("not found define ref: ", ref_id); return null
 	elif ref_id is StringName or ref_id is String:
@@ -122,7 +122,7 @@ func get_define(ref_id: Variant) -> Variant:
 	return define
 
 ## 创建一个 Mono
-func make_mono(ref_id: Variant, opts: Dictionary = {}) -> Mono:
+func make_mono(ref_id: Variant, opts = null) -> Mono:
 	var define = get_define(ref_id)
 	if define == null: return null
 	return _make_mono_by_define(define, opts)
@@ -218,6 +218,7 @@ sekai/exec ("utils/base.gsm.gd")
 
 define/sign (load ("defines/gikou.gd"))
 define/sign (load ("defines/hako.gd"))
+define/sign (load ("defines/chunk.gd"))
 
 ']
 
@@ -256,11 +257,11 @@ func _get_define_by_ref(ref: int) -> Variant:
 func _get_define_by_id(id: StringName) -> Variant:
 	return _defines_by_id.get(id)
 
-func _make_mono_by_define(define: MonoDefine, opts: Dictionary = {}) -> Mono:
-	opts = opts.duplicate(true)
+func _make_mono_by_define(define: MonoDefine, opts = null) -> Mono:
 	var mono := Mono.new()
 	mono.define = define
-	mono.cover(&"base", opts)
+	if opts != null:
+		mono.cover(&"base", opts.duplicate(true))
 	return mono
 
 func _update_debug_draw() -> void:

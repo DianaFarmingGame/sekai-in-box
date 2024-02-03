@@ -1,5 +1,12 @@
 wait (gikou on_inited []
 	var (hako do (gikou get_hako))
+	
+	do (hako add_mono &chunk {
+		position vec3(4 8 0)
+		chunk_size vec2(8 8)
+		chunk_data [2101]
+	})
+	
 	var (嘉然 do (hako add_mono &实体/角色/嘉然 {
 		position vec3(5 9 1)
 	}))

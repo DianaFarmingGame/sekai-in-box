@@ -26,18 +26,13 @@ var props := {
 			if enter != null: await ctx.call_method(this, enter, [prev])
 		this.setp(&"cur_state", dist),
 	
-	&"on_init": Prop.puts({
-		&"0:state": func (ctx: LisperContext, this: Mono):
-			var init_state = this.getp(&"init_state")
-			await this.callm(ctx, &"state/to", init_state),
-	}),
 	&"on_store": Prop.puts({
 		&"0:state": func (ctx: LisperContext, this: Mono):
 			var cur_state = this.getp(&"cur_state")
 			this.setp(&"init_state", cur_state)
 			await this.callm(ctx, &"state/to", null),
 	}),
-	&"on_restore": Prop.puts({
+	&"on_ready": Prop.puts({
 		&"0:state": func (ctx: LisperContext, this: Mono):
 			var init_state = this.getp(&"init_state")
 			await this.callm(ctx, &"state/to", init_state),

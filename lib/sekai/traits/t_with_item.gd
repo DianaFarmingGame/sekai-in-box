@@ -16,6 +16,6 @@ var props := {
 			var item := this.getpB(&"sekai_item") as SekaiItem
 			this.setpB(&"sekai_item", null)
 			ctrl.remove_child(item)
-			item.queue_free(),
+			item.free(),
 	}),
 }

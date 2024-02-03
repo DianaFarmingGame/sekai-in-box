@@ -3,7 +3,7 @@ class_name TPosition extends MonoTrait
 var id := &"position"
 
 var props := {
-	&"position": Vector3(0, 0, 0),
+	&"position": null,
 	&"size": Vector3(1, 1, 1),
 	&"on_move": Prop.Stack(),
 	
@@ -22,7 +22,9 @@ var props := {
 	
 	&"on_init": Prop.puts({
 		&"-99:position": func (ctx: LisperContext, this: Mono) -> void:
-			this.position = this.getp(&"position")
+			var pos = this.getp(&"position")
+			if pos is Vector3:
+				this.position = pos
 			pass,
 	}),
 	&"on_store": Prop.puts({
@@ -33,7 +35,9 @@ var props := {
 	}),
 	&"on_restore": Prop.puts({
 		&"-99:position": func (ctx: LisperContext, this: Mono) -> void:
-			this.position = this.getp(&"position")
+			var pos = this.getp(&"position")
+			if pos is Vector3:
+				this.position = pos
 			pass,
 	}),
 }

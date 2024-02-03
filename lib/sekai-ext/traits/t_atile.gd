@@ -33,10 +33,7 @@ var props := {
 				]),
 	}),
 	
-	&"on_init": Prop.puts({
-		&"-9:atile": TATile.update,
-	}),
-	&"on_restore": Prop.puts({
+	&"on_ready": Prop.puts({
 		&"-9:atile": TATile.update,
 	}),
 }
@@ -44,6 +41,7 @@ var props := {
 static func update(ctx: LisperContext, this: Mono) -> void:
 	var cache = this.getpR(&"atile_cache")
 	if cache != null:
+		var hako := this.get_hako()
 		var pos := this.position
 		var atile_matches := cache[0] as Array
 		var atile_data := cache[1] as Array
@@ -60,7 +58,7 @@ static func update(ctx: LisperContext, this: Mono) -> void:
 		for dz in sz:
 			for dy in sy:
 				for dx in sx:
-					var monos = sekai.get_monos_by_pos(pos + Vector3(dx - rx, dy - ry, dz - rz) * size)
+					var monos = await hako.callm(ctx, &"collect_by_pos", pos + Vector3(dx - rx, dy - ry, dz - rz) * size)
 					for idx in atile_matches.size():
 						for mono in monos:
 							if mono != this and await mono.callmRS(ctx, &"group_intersects", atile_matches[idx]):
