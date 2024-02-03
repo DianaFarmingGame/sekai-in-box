@@ -15,6 +15,10 @@ func do_merge(sets: Array[Dictionary]) -> Array[Dictionary]:
 			return mono,
 		&"collect_by_pos": func (ctx: LisperContext, this: Mono, pos: Vector3) -> Array:
 			return await this.applymRSU(ctx, &"container/collect_applyc", [&"collect_by_pos", [pos]]),
+		&"collect_collide": func (ctx: LisperContext, this: Mono, region: Rect2, z_pos: int) -> Array:
+			return await this.applymRSU(ctx, &"container/collect_applyc", [&"collect_collide", [region, z_pos]]),
+		&"collect_route": func (ctx: LisperContext, this: Mono, point: Vector2, z_pos: int) -> Array:
+			return await this.applymRSU(ctx, &"container/collect_applyc", [&"collect_route", [point, z_pos]]),
 		
 		&"on_process": func (ctx: LisperContext, this: Mono, delta: float) -> void:
 			var contains := this.getpB(&"contains") as Array

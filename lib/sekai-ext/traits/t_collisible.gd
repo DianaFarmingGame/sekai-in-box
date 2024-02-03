@@ -8,7 +8,7 @@ var props := {
 	&"collisible": true,
 	&"collision_boxes": [Rect2(-0.5, -0.5, 1, 1)],
 	
-	&"collide_test": func (ctx: LisperContext, this: Mono, region: Rect2, z_pos: int) -> bool:
+	&"collect_collide": func (ctx: LisperContext, this: Mono, region: Rect2, z_pos: int) -> Mono:
 		var position := this.position
 		if floori(position.z) == z_pos:
 			if this.getp(&"collisible"):
@@ -16,8 +16,8 @@ var props := {
 				for box in boxes:
 					box.position += Vector2(position.x, position.y)
 					if box.intersects(region):
-						return true
-		return false,
+						return this
+		return null,
 	
 	&"on_draw_debug": Prop.puts({
 		&"99:collision_boxes": TCollisible.draw_debug,

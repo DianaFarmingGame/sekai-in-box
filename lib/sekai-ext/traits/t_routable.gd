@@ -8,7 +8,7 @@ var props := {
 	&"routable": true,
 	&"route_boxes": [Rect2(-0.5, -0.5, 1, 1)],
 	
-	&"route_test": func (ctx: LisperContext, this: Mono, point: Vector2, z_pos: int) -> bool:
+	&"collect_route": func (ctx: LisperContext, this: Mono, point: Vector2, z_pos: int) -> Mono:
 		var position := this.position
 		if floori(position.z) == z_pos:
 			if this.getp(&"routable"):
@@ -16,8 +16,8 @@ var props := {
 				for box in boxes:
 					box.position += Vector2(position.x, position.y)
 					if box.has_point(point):
-						return true
-		return false,
+						return this
+		return null,
 	
 	&"on_draw_debug": Prop.puts({
 		&"99:route_boxes": TRoutable.draw_debug,

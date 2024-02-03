@@ -34,6 +34,10 @@ func do_merge(sets: Array[Dictionary]) -> Array[Dictionary]:
 				else:
 					return null
 			return null,
+		&"collect_collide": func (ctx: LisperContext, this: Mono, region: Rect2, z_pos: int) -> Array:
+			return await this.applymRSU(ctx, &"container/collect_applyc", [&"collect_collide", [region, z_pos]]),
+		&"collect_route": func (ctx: LisperContext, this: Mono, point: Vector2, z_pos: int) -> Array:
+			return await this.applymRSU(ctx, &"container/collect_applyc", [&"collect_route", [point, z_pos]]),
 		
 		&"on_control_enter": Prop.puts({
 			&"0:chunk": func (ctx: LisperContext, this: Mono, ctrl: SekaiControl) -> void:
