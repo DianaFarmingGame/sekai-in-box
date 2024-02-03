@@ -46,16 +46,18 @@ func do_merge(sets: Array[Dictionary]) -> Array[Dictionary]:
 				pass,
 		}),
 		
-		&"on_move": func (ctx: LisperContext, this: Mono) -> void:
-			var collides := await this.emitm(ctx, &"solid_collide_all_by") as Array
-			var drops := await Async.array_filter(collides, func (m): return await m.callm(ctx, &"group_in", &"drop"))
-			for drop in drops:
-				for item in drop.getp("contains"):
-					if await this.callm(ctx, &"container/put", item):
-						await drop.callm(ctx, &"container/pick", item)
-				if drop.getp("contains").size() == 0:
-					drop.destroy()
-			pass,
+		&"on_move": Prop.puts({
+			&"0:character": func (ctx: LisperContext, this: Mono) -> void:
+				var collides := await this.emitm(ctx, &"solid_collide_all_by") as Array
+				var drops := await Async.array_filter(collides, func (m): return await m.callm(ctx, &"group_in", &"drop"))
+				for drop in drops:
+					for item in drop.getp("contains"):
+						if await this.callm(ctx, &"container/put", item):
+							await drop.callm(ctx, &"container/pick", item)
+					if drop.getp("contains").size() == 0:
+						drop.destroy()
+				pass,
+		}),
 		
 		&"on_contains": func (ctx: LisperContext, this: Mono, contains: Array) -> Array:
 			sekai.external_fns[&"itembox_update"].call(sekai, this, contains)
