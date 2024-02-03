@@ -95,6 +95,7 @@ var props := {
 			contains.map(func (item): item._outof_container())
 			var contains_data := contains.map(Mono.to_data)
 			this.setp(&"contains_data", contains_data)
+			this.setp(&"contains", [])
 			pass,
 	}),
 	&"on_restore": Prop.puts({
@@ -102,6 +103,7 @@ var props := {
 			var contains_data := this.getpD(&"contains_data", []) as Array
 			var contains := contains_data.map(Mono.from_data)
 			this.setp(&"contains", contains)
+			this.setp(&"contains_data", [])
 			await Async.array_map(contains, func (item): await item.restore(ctx))
 			await Async.array_map(contains, func (item): await item._into_container(ctx, this))
 			pass,

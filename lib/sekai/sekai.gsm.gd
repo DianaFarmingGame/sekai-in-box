@@ -88,6 +88,7 @@ func record_gikou() -> void:
 	var file := FileAccess.open(gikou_store_dir.path_join(gikou.getp(&"id") + ".gikou"), FileAccess.WRITE)
 	file.store_var(Mono.to_data(gikou), false)
 	await gikou.restore(context)
+	gikou_changed.emit()
 
 ## 退出当前游戏
 func exit_gikou() -> void:

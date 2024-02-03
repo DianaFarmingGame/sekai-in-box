@@ -58,7 +58,7 @@ func _to_data() -> Dictionary:
 	return {
 		&"ref": define.ref,
 		&"inited": inited,
-		&"layers": layers,
+		&"layers": layers.duplicate(true),
 	}
 
 func _from_data(data: Dictionary) -> void:

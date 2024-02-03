@@ -131,10 +131,11 @@ func _update_target() -> void:
 ## 更新代表视野内 Mono 的数组
 func _update_sight() -> void:
 	if target != null and _hako != null:
+		# 注意 不要复用之前的 _monos_in_sight
 		# TODO: 添加视野裁剪
 		_monos_in_sight = _hako.getpB(&"contains")
 	else:
-		_monos_in_sight.clear()
+		_monos_in_sight = []
 	await _update_items()
 
 ## 触发离开和进入视野 Mono 的事件
