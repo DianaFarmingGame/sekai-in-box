@@ -1,0 +1,31 @@
+define (load ("../block_static_ext.gd")
+	ref 2401
+	props {
+		need_route #f
+		routable #f
+		need_collision #f
+		collisible #f
+		asserts {
+			main load ("../地形.png")
+		}
+		cur_draw &
+		draw_data {
+			corner_nw [&static &main clip_ground(3 10)]
+			corner_ne [&static &main clip_ground(5 10)]
+			corner_se [&static &main clip_ground(5 12)]
+			corner_sw [&static &main clip_ground(3 12)]
+			side_n [&static &main clip_ground(4 10)]
+			side_e [&static &main clip_ground(5 11)]
+			side_s [&static &main clip_ground(4 12)]
+			side_w [&static &main clip_ground(3 11)]
+			center [&static &main clip_ground(4 11)]
+			concave_nw [&static &main clip_ground(3 13)]
+			concave_ne [&static &main clip_ground(4 13)]
+			concave_se [&static &main clip_ground(4 14)]
+			concave_sw [&static &main clip_ground(3 14)]
+		}
+		atile_size vec3(3 3 1)
+		groups prop/pushs([2401])
+		atile_matches [[2401]]
+		atile_rules *atile_rules_3x3x1*
+	})

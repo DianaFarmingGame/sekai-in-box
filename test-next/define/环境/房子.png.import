@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://c7fhmfbqieqnu"
-path="res://.godot/imported/植物装饰.png-7eae7654bf49d75d292858b3dc70ecc8.ctex"
+uid="uid://byhc332grx12t"
+path="res://.godot/imported/房子.png-d0dafb482c8579846a87e31adbc085a5.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://test-next/assert/植物装饰.png"
-dest_files=["res://.godot/imported/植物装饰.png-7eae7654bf49d75d292858b3dc70ecc8.ctex"]
+source_file="res://test-next/define/环境/房子.png"
+dest_files=["res://.godot/imported/房子.png-d0dafb482c8579846a87e31adbc085a5.ctex"]
 
 [params]
 

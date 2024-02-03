@@ -60,7 +60,7 @@ static func update(ctx: LisperContext, this: Mono) -> void:
 		for dz in sz:
 			for dy in sy:
 				for dx in sx:
-					var monos := sekai.get_monos_by_pos(pos + Vector3(dx - rx, dy - ry, dz - rz) * size)
+					var monos = sekai.get_monos_by_pos(pos + Vector3(dx - rx, dy - ry, dz - rz) * size)
 					for idx in atile_matches.size():
 						for mono in monos:
 							if mono != this and await mono.callmRS(ctx, &"group_intersects", atile_matches[idx]):

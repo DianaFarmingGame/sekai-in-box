@@ -1,0 +1,52 @@
+defvar (road/make func([ref x_offset diverse]
+	define/make (load ("../block_static_ext.gd")
+		ref ref
+		props {
+			need_route #f
+			routable #f
+			need_collision #f
+			collisible #f
+			asserts {
+				main load ("../路.png")
+			}
+			cur_draw &
+			draw_data {
+				corner_nw [&static &main clip_ground(+(x_offset 0) 0)]
+				corner_ne [&static &main clip_ground(+(x_offset 2) 0)]
+				corner_se [&static &main clip_ground(+(x_offset 2) 2)]
+				corner_sw [&static &main clip_ground(+(x_offset 0) 2)]
+				side_n [&static &main clip_ground(+(x_offset 1) 0)]
+				side_e [&static &main clip_ground(+(x_offset 2) 1)]
+				side_s [&static &main clip_ground(+(x_offset 1) 2)]
+				side_w [&static &main clip_ground(+(x_offset 0) 1)]
+				center if(diverse
+					[&diverse [
+						[&static &main clip_ground(+(x_offset 1) 1)]
+						[&static &main clip_ground(+(x_offset 0) 5)]
+						[&static &main clip_ground(+(x_offset 1) 5)]
+					]]
+					[&static &main clip_ground(+(x_offset 1) 1)])
+				concave_nw [&static &main clip_ground(+(x_offset 0) 3)]
+				concave_ne [&static &main clip_ground(+(x_offset 1) 3)]
+				concave_se [&static &main clip_ground(+(x_offset 1) 4)]
+				concave_sw [&static &main clip_ground(+(x_offset 0) 4)]
+				concaves_nw_se [&static &main clip_ground(+(x_offset 2) 4)]
+				concaves_ne_sw [&static &main clip_ground(+(x_offset 2) 3)]
+			}
+			random_rules if(diverse
+				[
+					[1 { cover { cur_draw_variant 1 }}]
+					[1 { cover { cur_draw_variant 2 }}]
+					[3 {}]
+				]
+				[])
+			atile_size vec3(3 3 1)
+			groups prop/pushs([ref])
+			atile_matches [[ref]]
+			atile_rules *atile_rules_3x3x1_crossed*
+		})))
+
+define/sign(road/make(2402 0 #f))
+define/sign(road/make(2403 3 #t))
+define/sign(road/make(2404 6 #f))
+define/sign(road/make(2405 9 #t))

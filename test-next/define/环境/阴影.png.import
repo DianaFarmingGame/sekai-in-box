@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://byhc332grx12t"
-path="res://.godot/imported/房子.png-23bf4f1d397f31cb28b37514139eb0f7.ctex"
+uid="uid://btxlcfvoov1px"
+path="res://.godot/imported/阴影.png-a20aed5fc7a97576fe4c8b670d1632c7.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://test-next/assert/房子.png"
-dest_files=["res://.godot/imported/房子.png-23bf4f1d397f31cb28b37514139eb0f7.ctex"]
+source_file="res://test-next/define/环境/阴影.png"
+dest_files=["res://.godot/imported/阴影.png-a20aed5fc7a97576fe4c8b670d1632c7.ctex"]
 
 [params]
 

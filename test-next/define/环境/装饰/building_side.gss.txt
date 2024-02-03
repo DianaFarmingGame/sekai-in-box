@@ -1,0 +1,41 @@
+defvar (building_side/make func([ref x y id]
+	define/make (load ("entity_block.gd")
+		ref ref
+		id id
+		props {
+			need_route 	#f
+			routable 	#f
+			collision_boxes [rect2(-1.5 -1.5 3 2)]
+			asserts {
+				main load ("../房子.png")
+			}
+			cur_draw &building_side
+			draw_data {
+				building_side [&static &main clip3x3_build(x y)]
+			}
+		}
+		groups prop/pushs([2415])
+	)
+))
+
+define/sign(building_side/make(2415 2 0 &环境/装饰/房子侧红))
+define/sign(building_side/make(2416 2 1 &环境/装饰/房子侧黑))
+define/sign(building_side/make(2417 2 2 &环境/装饰/房子侧架))
+
+define (load ("entity_block.gd")
+	ref 2418
+	id &环境/装饰/房子侧门
+	props {
+		need_route 	#f
+		routable 	#f
+		collision_boxes [rect2(-1.5 -1.5 3 1.5)]
+		asserts {
+			main load ("../房子.png")
+		}
+		cur_draw &building_side
+		draw_data {
+			building_side [&static &main clip3x4_build(3 1)]
+		}
+		groups prop/pushs([2415])
+	}
+)

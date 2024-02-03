@@ -37,8 +37,8 @@ defunc (clip_item [x y]
 
 defvar(*atile_rules_3x3x1* [[
 	[
-		0	-	0
-		-	0	1
+		0	-1	0
+		-1	0	1
 		0	1	1
 	] {
 		cover {
@@ -47,8 +47,8 @@ defvar(*atile_rules_3x3x1* [[
 	}
 ][
 	[
-		0	-	0
-		1	0	-
+		0	-1	0
+		1	0	-1
 		1	1	0
 	] {
 		cover {
@@ -58,8 +58,8 @@ defvar(*atile_rules_3x3x1* [[
 ][
 	[
 		1	1	0
-		1	0	-
-		0	-	0
+		1	0	-1
+		0	-1	0
 	] {
 		cover {
 			cur_draw &corner_se
@@ -68,8 +68,8 @@ defvar(*atile_rules_3x3x1* [[
 ][
 	[
 		0	1	1
-		-	0	1
-		0	-	0
+		-1	0	1
+		0	-1	0
 	] {
 		cover {
 			cur_draw &corner_sw
@@ -77,7 +77,7 @@ defvar(*atile_rules_3x3x1* [[
 	}
 ][
 	[
-		0	-	0
+		0	-1	0
 		1	0	1
 		1	1	1
 	] {
@@ -88,7 +88,7 @@ defvar(*atile_rules_3x3x1* [[
 ][
 	[
 		1	1	0
-		1	0	-
+		1	0	-1
 		1	1	0
 	] {
 		cover {
@@ -99,7 +99,7 @@ defvar(*atile_rules_3x3x1* [[
 	[
 		1	1	1
 		1	0	1
-		0	-	0
+		0	-1	0
 	] {
 		cover {
 			cur_draw &side_s
@@ -108,7 +108,7 @@ defvar(*atile_rules_3x3x1* [[
 ][
 	[
 		0	1	1
-		-	0	1
+		-1	0	1
 		0	1	1
 	] {
 		cover {
@@ -127,7 +127,7 @@ defvar(*atile_rules_3x3x1* [[
 	}
 ][
 	[
-		-	1	1
+		-1	1	1
 		1	0	1
 		1	1	1
 	] {
@@ -137,7 +137,7 @@ defvar(*atile_rules_3x3x1* [[
 	}
 ][
 	[
-		1	1	-
+		1	1	-1
 		1	0	1
 		1	1	1
 	] {
@@ -149,7 +149,7 @@ defvar(*atile_rules_3x3x1* [[
 	[
 		1	1	1
 		1	0	1
-		1	1	-
+		1	1	-1
 	] {
 		cover {
 			cur_draw &concave_se
@@ -159,7 +159,7 @@ defvar(*atile_rules_3x3x1* [[
 	[
 		1	1	1
 		1	0	1
-		-	1	1
+		-1	1	1
 	] {
 		cover {
 			cur_draw &concave_sw
@@ -169,9 +169,9 @@ defvar(*atile_rules_3x3x1* [[
 
 defvar(*atile_rules_3x3x1_crossed* array/concat(*atile_rules_3x3x1* [[
 	[
-		-	1	1
+		-1	1	1
 		1	0	1
-		1	1	-
+		1	1	-1
 	] {
 		cover {
 			cur_draw &concaves_nw_se
@@ -179,9 +179,9 @@ defvar(*atile_rules_3x3x1_crossed* array/concat(*atile_rules_3x3x1* [[
 	}
 ][
 	[
-		1	1	-
+		1	1	-1
 		1	0	1
-		-	1	1
+		-1	1	1
 	] {
 		cover {
 			cur_draw &concaves_ne_sw
@@ -192,8 +192,8 @@ defvar(*atile_rules_3x3x1_crossed* array/concat(*atile_rules_3x3x1* [[
 defvar(*atile_wall_rules_3x3x1* [[
 	[
 		0	0	0
-		-	0	0
-		0	-	0
+		-1	0	0
+		0	-1	0
 	] {
 		cover {
 			cur_draw &bottom_left
@@ -202,8 +202,8 @@ defvar(*atile_wall_rules_3x3x1* [[
 ] [
 	[
 		0	0	0
-		0	0	-
-		0	-	0
+		0	0	-1
+		0	-1	0
 	] {
 		cover {
 			cur_draw &bottom_right
@@ -213,7 +213,7 @@ defvar(*atile_wall_rules_3x3x1* [[
 	[
 		0	0	0
 		0	0	0
-		0	-	0
+		0	-1	0
 	] {
 		cover {
 			cur_draw &bottom_centre
@@ -221,8 +221,8 @@ defvar(*atile_wall_rules_3x3x1* [[
 	}
 ] [
 	[
-		0	-	0
-		-	0	0
+		0	-1	0
+		-1	0	0
 		0	0	0
 	] {
 		cover {
@@ -231,8 +231,8 @@ defvar(*atile_wall_rules_3x3x1* [[
 	}
 ] [
 	[
-		0	-	0
-		0	0	-
+		0	-1	0
+		0	0	-1
 		0	0	0
 	] {
 		cover {
@@ -241,7 +241,7 @@ defvar(*atile_wall_rules_3x3x1* [[
 	}
 ] [
 	[
-		0	-	0
+		0	-1	0
 		0	0	0
 		0	0	0
 	] {
@@ -252,7 +252,7 @@ defvar(*atile_wall_rules_3x3x1* [[
 ] [
 	[
 		0	0	0
-		-	0	0
+		-1	0	0
 		0	1	0
 	] {
 		cover {
@@ -262,7 +262,7 @@ defvar(*atile_wall_rules_3x3x1* [[
 ] [
 	[
 		0	0	0
-		0	0	-
+		0	0	-1
 		0	1	0
 	] {
 		cover {
@@ -283,8 +283,8 @@ defvar(*atile_wall_rules_3x3x1* [[
 
 defvar(*atile_top_rules_3x3x1* [[
 	[
-		0	-	0
-		-	0	1
+		0	-1	0
+		-1	0	1
 		0	1	1
 	] {
 		cover {
@@ -293,8 +293,8 @@ defvar(*atile_top_rules_3x3x1* [[
 	}
 ][
 	[
-		0	-	0
-		1	0	-
+		0	-1	0
+		1	0	-1
 		1	1	0
 	] {
 		cover {
@@ -304,8 +304,8 @@ defvar(*atile_top_rules_3x3x1* [[
 ][
 	[
 		1	1	0
-		1	0	-
-		0	-	0
+		1	0	-1
+		0	-1	0
 	] {
 		cover {
 			cur_draw &corner_se
@@ -314,8 +314,8 @@ defvar(*atile_top_rules_3x3x1* [[
 ][
 	[
 		0	1	1
-		-	0	1
-		0	-	0
+		-1	0	1
+		0	-1	0
 	] {
 		cover {
 			cur_draw &corner_sw
@@ -323,9 +323,9 @@ defvar(*atile_top_rules_3x3x1* [[
 	}
 ][
 	[
-		0	-	0
+		0	-1	0
 		1	0	1
-		0 	-	0
+		0 	-1	0
 	] {
 		cover {
 			cur_draw &side_n
@@ -334,7 +334,7 @@ defvar(*atile_top_rules_3x3x1* [[
 ][
 	[
 		0	1	0
-		-	0	-
+		-1	0	-1
 		0	1	0
 	] {
 		cover {
@@ -343,9 +343,9 @@ defvar(*atile_top_rules_3x3x1* [[
 	}
 ][
 	[
-		0	-	0
+		0	-1	0
 		1	0	1
-		0	-	0
+		0	-1	0
 	] {
 		cover {
 			cur_draw &side_s
@@ -354,7 +354,7 @@ defvar(*atile_top_rules_3x3x1* [[
 ][
 	[
 		0	1	0
-		-	0	-
+		-1	0	-1
 		0	1	0
 	] {
 		cover {
@@ -363,7 +363,7 @@ defvar(*atile_top_rules_3x3x1* [[
 	}
 ][
 	[
-		-	1	1
+		-1	1	1
 		1	0	1
 		1	1	1
 	] {
@@ -373,7 +373,7 @@ defvar(*atile_top_rules_3x3x1* [[
 	}
 ][
 	[
-		1	1	-
+		1	1	-1
 		1	0	1
 		1	1	1
 	] {
@@ -385,7 +385,7 @@ defvar(*atile_top_rules_3x3x1* [[
 	[
 		1	1	1
 		1	0	1
-		1	1	-
+		1	1	-1
 	] {
 		cover {
 			cur_draw &concave_se
@@ -395,7 +395,7 @@ defvar(*atile_top_rules_3x3x1* [[
 	[
 		1	1	1
 		1	0	1
-		-	1	1
+		-1	1	1
 	] {
 		cover {
 			cur_draw &concave_sw

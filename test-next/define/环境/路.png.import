@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://btxlcfvoov1px"
-path="res://.godot/imported/阴影.png-ad55eb6a8904920ccf6c0d622af28264.ctex"
+uid="uid://cifbkttkdgvvb"
+path="res://.godot/imported/路.png-59579c7a9e6771ff98c0423a09694ef6.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://test-next/assert/阴影.png"
-dest_files=["res://.godot/imported/阴影.png-ad55eb6a8904920ccf6c0d622af28264.ctex"]
+source_file="res://test-next/define/环境/路.png"
+dest_files=["res://.godot/imported/路.png-59579c7a9e6771ff98c0423a09694ef6.ctex"]
 
 [params]
 
