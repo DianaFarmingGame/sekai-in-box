@@ -77,6 +77,8 @@ func _init() -> void:
 func _process(delta: float) -> void:
 	await _update_sight()
 	queue_redraw()
+	if _hako != null:
+		await _hako.callc(context, &"on_process", delta)
 
 func _draw() -> void:
 	_update_draw_caches()

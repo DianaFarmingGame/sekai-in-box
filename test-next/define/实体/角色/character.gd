@@ -55,7 +55,6 @@ func do_merge(sets: Array[Dictionary]) -> Array[Dictionary]:
 						await drop.callm(ctx, &"container/pick", item)
 				if drop.getp("contains").size() == 0:
 					drop.destroy()
-					
 			pass,
 		
 		&"on_contains": func (ctx: LisperContext, this: Mono, contains: Array) -> Array:
@@ -245,10 +244,9 @@ func do_merge(sets: Array[Dictionary]) -> Array[Dictionary]:
 			&"walk": {
 				&"cover": {
 					&"cur_draw": &"walk",
-					&"on_process": func (ctx: LisperContext, this: Mono) -> void:
+					&"on_process": func (ctx: LisperContext, this: Mono, delta: float) -> void:
 						var cur_speed := this.getp(&"cur_speed") as Vector2
 						if cur_speed != Vector2(0, 0):
-							var delta := this.item.get_delta_time() as float
 							var dpos := cur_speed * delta as Vector2
 							await this.callm(ctx, &"solid_move", Vector3(dpos.x, 0, 0))
 							await this.callm(ctx, &"solid_move", Vector3(0, dpos.y, 0)),

@@ -15,5 +15,10 @@ func do_merge(sets: Array[Dictionary]) -> Array[Dictionary]:
 			return mono,
 		&"collect_by_pos": func (ctx: LisperContext, this: Mono, pos: Vector3) -> Array:
 			return await this.applymRSU(ctx, &"container/collect_applyc", [&"collect_by_pos", [pos]]),
+		
+		&"on_process": func (ctx: LisperContext, this: Mono, delta: float) -> void:
+			var contains := this.getpB(&"contains") as Array
+			for mono in contains:
+				await (mono as Mono).callc(ctx, &"on_process", delta)
 	})
 	return sets
