@@ -34,7 +34,7 @@ static func update(ctx: LisperContext, this: Mono) -> void:
 			var rule = rules[idx]
 			rd -= rule[0]
 			if rd <= 0:
-				this.setpBD(&"random_cache", rule)
+				this.setpB(&"random_cache", rule)
 				var cover = rule[1].get(&"cover")
 				if cover != null: this.cover(&"random", cover)
 				var vupdate = rule[1].get(&"update")

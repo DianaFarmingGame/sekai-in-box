@@ -20,7 +20,7 @@ func do_merge(sets: Array[Dictionary]) -> Array[Dictionary]:
 				var posi = Vector3i((pos - offset) / cell)
 				var size := this.getp(&"chunk_size") as Vector2
 				if 0 <= posi.x and posi.x < size.x and 0 <= posi.y and posi.y < size.y:
-					var mat := this.getp(&"chunk_mat") as Array
+					var mat = this.getp(&"chunk_mat")
 					if mat != null:
 						return mat[posi.y][posi.x]
 					else:
