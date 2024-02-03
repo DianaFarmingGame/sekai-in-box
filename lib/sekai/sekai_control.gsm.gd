@@ -61,6 +61,14 @@ func _init() -> void:
 
 
 #
+# 循环
+#
+func _process(delta: float) -> void:
+	await _update_sight()
+
+
+
+#
 # 输入
 #
 
@@ -84,10 +92,28 @@ func _make_context() -> LisperContext:
 ## 每次 target 变更时调用，释放之前的区域，获取新的区域
 func _update_target() -> void:
 	if target != null:
-		var hako := target.get_hako()
-		print(hako)
+		_hako = target.get_hako()
 	else:
-		pass # TODO
+		_hako = null
+
+## 更新代表视野内 Mono 的数组
+func _update_sight() -> void:
+	if target != null and _hako != null:
+		# TODO: 添加视野裁剪
+		_monos_in_sight = _hako.getpB(&"contains")
+	else:
+		_monos_in_sight.clear()
+	await _update_items()
+
+## 触发离开和进入视野 Mono 的事件
+func _update_items() -> void:
+	var enters := _monos_in_sight.filter(func (m: Mono): return not _prev_monos_in_sight.has(m))
+	var exits := _prev_monos_in_sight.filter(func (m: Mono): return not _monos_in_sight.has(m))
+	for mono in enters:
+		await (mono as Mono).callm(context, &"on_control_enter", self)
+	for mono in exits:
+		await (mono as Mono).callm(context, &"on_control_exit", self)
+	_prev_monos_in_sight = _monos_in_sight
 
 ## 将 Action 的输入事件传输至目标对象
 func _pass_action(triggered: Dictionary, pressings: Dictionary, releasings: Dictionary) -> void:
@@ -96,7 +122,6 @@ func _pass_action(triggered: Dictionary, pressings: Dictionary, releasings: Dict
 ## 将 Direction 的输入事件传输至目标对象
 func _pass_direction(triggered: Dictionary, direction: Vector3) -> void:
 	if target: target.applyc(context, &"on_input_direction", [triggered, direction])
-
 
 
 #
@@ -112,4 +137,7 @@ func _on_mapper_input(triggered: Dictionary, pressings: Dictionary, releasings: 
 # 内部变量
 #
 
+var _hako: Mono = null
 var _input_mapper := InputMapper.new()
+var _monos_in_sight := []
+var _prev_monos_in_sight := []

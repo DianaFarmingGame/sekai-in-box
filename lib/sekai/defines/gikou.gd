@@ -14,7 +14,7 @@ func do_merge(sets: Array[Dictionary]) -> Array[Dictionary]:
 				&"id": pid,
 			}]),
 		&"get_hako": func (ctx: LisperContext, this: Mono, pid := &"base") -> Mono:
-			var contains := this.getp(&"contains") as Array
+			var contains := this.getpB(&"contains") as Array
 			for hako in contains:
 				if hako.getp(&"id") == pid:
 					return hako

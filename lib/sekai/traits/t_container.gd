@@ -70,6 +70,16 @@ var props := {
 			for mono in picks: mono._outof_container()
 			return picks
 		return null,
+	&"container/collect_applyc": func (ctx: LisperContext, this: Mono, key: StringName, argv: Array) -> Array:
+		var contains := this.getpBD(&"contains", []) as Array
+		var results := []
+		for mono in contains:
+			var res = await (mono as Mono).applyc(ctx, key, argv)
+			if res is Array:
+				results.append_array(res)
+			elif res != null:
+				results.append(res)
+		return results,
 	
 	&"on_init": Prop.puts({
 		&"0:container": func (ctx: LisperContext, this: Mono) -> void:
