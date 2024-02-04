@@ -2,9 +2,9 @@ define (load ("../block_static_ext.gd")
 	ref 2401
 	props {
 		need_route #f
-		routable #f
+		can_route #f
 		need_collision #f
-		collisible #f
+		can_collide #f
 		asserts {
 			main load ("../地形.png")
 		}

@@ -3,9 +3,9 @@ defvar (road/make func([ref x_offset diverse]
 		ref ref
 		props {
 			need_route #f
-			routable #f
+			can_route #f
 			need_collision #f
-			collisible #f
+			can_collide #f
 			asserts {
 				main load ("../路.png")
 			}

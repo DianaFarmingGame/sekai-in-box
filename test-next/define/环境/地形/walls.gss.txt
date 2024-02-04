@@ -2,7 +2,7 @@ define (load ("../block_static_ext.gd")
 	ref 304
 	props {
 		need_route	#f
-		routable	#f
+		can_route	#f
 		asserts {
 			main load ("../房间.png")
 		}
@@ -31,7 +31,7 @@ define (load ("../block_static_ext.gd")
 	ref 305
 	props {
 		need_route	#f
-		routable	#f
+		can_route	#f
 		asserts {
 			main load ("../房间.png")
 		}
@@ -48,7 +48,7 @@ define (load ("../block_static_ext.gd")
 	ref 306
 	props {
 		need_route	#f
-		routable	#f
+		can_route	#f
 		asserts {
 			main load ("../房间.png")
 		}
@@ -65,7 +65,7 @@ define (load ("../block_static_ext.gd")
 	ref 307
 	props {
 		need_route	#f
-		routable	#f
+		can_route	#f
 		asserts {
 			main load ("../房间.png")
 		}
@@ -82,7 +82,7 @@ define (load ("../block_static_ext.gd")
 	ref 308
 	props {
 		need_route	#f
-		routable	#f
+		can_route	#f
 		asserts {
 			main load ("../房间.png")
 		}

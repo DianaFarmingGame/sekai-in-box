@@ -2,7 +2,7 @@ define (load ("../block_static_ext.gd")
 	ref 309
 	props {
 		need_route		#f
-		routable      	#f
+		can_route      	#f
 		collision_boxes	[rect2(-0.5 -1.5 1 1)]
 		asserts {
 			main load ("../房间.png")
@@ -35,9 +35,9 @@ define (load ("../block_static_ext.gd")
 	ref 399
 	props {
 		need_collision  #f
-		collisible      #f
+		can_collide      #f
 		need_route		#f
-		routable		#f
+		can_route		#f
 		cur_draw &
 		groups prop/pushs([399])
 	}

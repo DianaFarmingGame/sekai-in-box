@@ -2,7 +2,7 @@ define (load ("../block_static_ext.gd")
 	ref 301
 	props {
 		need_collision  #f
-		collisible      #f
+		can_collide      #f
 		asserts {
 			main load ("../房间.png")
 		}

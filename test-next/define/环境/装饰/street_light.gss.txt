@@ -2,7 +2,7 @@
 ;; 	ref 2419
 ;; 	props {
 ;; 		need_route #f
-;; 		routable #f
+;; 		can_route #f
 ;; 		asserts {
 ;; 			main load ("../?.png")
 ;; 		}

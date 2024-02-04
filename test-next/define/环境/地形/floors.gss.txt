@@ -3,7 +3,7 @@ define (load ("../block_static_ext.gd")
 	ref 302
 	props {
 		need_collision  #f
-		collisible      #f
+		can_collide      #f
 		asserts {
 			main load ("../房间.png")
 		}
@@ -19,7 +19,7 @@ define (load ("../block_static_ext.gd")
 	ref 303
 	props {
 		need_collision  #f
-		collisible      #f
+		can_collide      #f
 		asserts {
 			main load ("../房间.png")
 		}

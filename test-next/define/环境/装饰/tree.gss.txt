@@ -1,7 +1,7 @@
 Define (Tree load ("../block_static_ext.gd")
 	props {
 		need_route 	#f
-		routable 	#f
+		can_route 	#f
 		collision_boxes [rect2(-0.2 -0.5 0.4 0.5)]
 		asserts {
 			main load ("../树.png")
@@ -38,9 +38,9 @@ define (load ("../block_static_ext.gd")
 	ref 2407
 	props {
 		need_route 		#f
-		routable 		#f
+		can_route 		#f
 		need_collision 	#f
-		collisible		#f
+		can_collide		#f
 		asserts {
 			main load ("../树.png")
 		}

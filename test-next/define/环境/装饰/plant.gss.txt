@@ -2,9 +2,9 @@ define (load ("../block_static_ext.gd")
 	ref 2410
 	props {
 		need_route #f
-		routable #f
+		can_route #f
 		need_collision #f
-		collisible #f
+		can_collide #f
 		size vec3(0.5 0.5 1)
 		asserts {
 			main load ("../植物装饰.png")

@@ -4,7 +4,7 @@ defvar (building_side/make func([ref x y id]
 		id id
 		props {
 			need_route 	#f
-			routable 	#f
+			can_route 	#f
 			collision_boxes [rect2(-1.5 -1.5 3 2)]
 			asserts {
 				main load ("../房子.png")
@@ -27,7 +27,7 @@ define (load ("entity_block.gd")
 	id &环境/装饰/房子侧门
 	props {
 		need_route 	#f
-		routable 	#f
+		can_route 	#f
 		collision_boxes [rect2(-1.5 -1.5 3 1.5)]
 		asserts {
 			main load ("../房子.png")

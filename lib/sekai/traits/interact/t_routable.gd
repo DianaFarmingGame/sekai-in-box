@@ -13,7 +13,7 @@ var props := {
 	&"need_route": true,
 	
 	# 当前是否可导航
-	&"routable": true,
+	&"can_route": true,
 	
 	# 导航检测的盒子 (数组)，默认是一个以 Mono 为中心 1x1 的矩形
 	&"route_boxes": [Rect2(-0.5, -0.5, 1, 1)],
@@ -29,7 +29,7 @@ var props := {
 	&"collect_route": func (ctx: LisperContext, this: Mono, point: Vector2, z_pos: int) -> Mono:
 		var position := this.position
 		if floori(position.z) == z_pos:
-			if this.getp(&"routable"):
+			if this.getp(&"can_route"):
 				var boxes = this.getp(&"route_boxes")
 				for box in boxes:
 					box.position += Vector2(position.x, position.y)
@@ -48,7 +48,7 @@ var props := {
 static func draw_debug(ctx: LisperContext, this: Mono, item: SekaiItem) -> void:
 	var tar := sekai.control_target as Mono
 	if tar != null:
-		if this.getp(&"routable") and floori(this.position.z) == floori(tar.position.z + tar.getp(&"solid_route_zoffset")):
+		if this.getp(&"can_route") and floori(this.position.z) == floori(tar.position.z + tar.getp(&"solid_route_zoffset")):
 			var pos := Vector2(this.position.x, this.position.y - this.position.z * item.ratio_yz + tar.getp(&"solid_route_zoffset") * item.ratio_yz)
 			var rboxes = this.getp(&"route_boxes")
 			for rbox in rboxes:

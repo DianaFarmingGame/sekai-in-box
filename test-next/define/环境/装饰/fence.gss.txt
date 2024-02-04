@@ -2,7 +2,7 @@ define (load ("../block_static_ext.gd")
 	ref 2420
 	props {
 		need_route #f
-		routable #f
+		can_route #f
 		asserts {
 			main load ("../房子.png")
 		}
@@ -175,9 +175,9 @@ define (load ("../block_static_ext.gd")
 	ref 2421
 	props {
 		need_route #f
-		routable #f
+		can_route #f
 		need_collision #f
-		collisible #f
+		can_collide #f
 		cur_draw &
 		groups prop/pushs([2420])
 	}
