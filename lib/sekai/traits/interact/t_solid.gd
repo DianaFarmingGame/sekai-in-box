@@ -26,28 +26,64 @@ var props := {
 	# 当检测导航时，将检测点的 Z 轴偏移多少，主要用来确定导航的 Z 层使用而非用于细微偏移
 	&"solid_route_zoffset": 0,
 	
+	
+	
+	#
+	# 方法
+	#
+	
+	# 测试是否可移动到某个位置
 	&"solid_test_to": TSolid.test_pos,
+	
+	# 测试是否可移动到某个位置，按偏移计
 	&"solid_test_move": func (ctx: LisperContext, this: Mono, offset: Vector3) -> bool:
 		return await TSolid.test_pos(ctx, this, this.position + offset),
-	&"solid_collide_all_by": func (ctx: LisperContext, this: Mono, offset := Vector3()) -> Array:
-		return await TSolid.collide_pos(ctx, this, this.position + offset),
-	&"solid_collide_all_at": func (ctx: LisperContext, this: Mono, pos: Vector3) -> Array:
-		return await TSolid.collide_pos(ctx, this, pos),
-	&"solid_collide_by": func (ctx: LisperContext, this: Mono, offset := Vector3()) -> Array:
-		var collide_group := this.getp(&"solid_collide_group") as Array
-		return await Async.array_filter(await TSolid.collide_pos(ctx, this, this.position + offset), func (m): return m != this and await m.callm(ctx, &"group_intersects", collide_group)),
-	&"solid_collide_at": func (ctx: LisperContext, this: Mono, pos: Vector3) -> Array:
-		var collide_group := this.getp(&"solid_collide_group") as Array
-		return await Async.array_filter(await TSolid.collide_pos(ctx, this, pos), func (m): return m != this and await m.callm(ctx, &"group_intersects", collide_group)),
+	
+	
+	
+	#
+	# 信号
+	#
+	
+	# 当检测到任何碰撞 Mono 时触发
+	# @params: Mono[]: 检测到的所有 Mono
+	&"on_solid_collide_all": Prop.Stack(),
+	
+	# 当检测到组内的碰撞 Mono 时触发
+	# @params: Mono[]: 检测到的所有 Mono
+	&"on_solid_collide": Prop.Stack(),
+	
+	# 当检测到任何可导航 Mono 时触发
+	# @params: Mono[]: 检测到的所有 Mono
+	&"on_solid_route_all": Prop.Stack(),
+	
+	# 当检测到组内的可导航 Mono 时触发
+	# @params: Mono[]: 检测到的所有 Mono
+	&"on_solid_route": Prop.Stack(),
 	
 	
 	
 	#----------------------------------------------------------------------------------------------#
 	&"on_position": Prop.puts({
 		&"-99:solid": func (ctx: LisperContext, this: Mono, pos: Vector3) -> Vector3:
-			if await TSolid.test_pos(ctx, this, pos):
+			var box := this.getp(&"solid_box") as Rect2
+			var route_zoffset := this.getp(&"solid_route_zoffset") as float
+			box.position += Vector2(pos.x, pos.y)
+			var route_group := this.getp(&"solid_route_group") as Array
+			var collide_group := this.getp(&"solid_collide_group") as Array
+			var hako := this.get_hako()
+			var routes := await TSolid.do_route(ctx, this, hako, box.get_center(), int(pos.z + route_zoffset))
+			var collides := await TSolid.do_collide(ctx, this, hako, box, int(pos.z))
+			var groutes := routes.filter(func (m: Mono): return m.callmRSUY(ctx, &"group_intersects", route_group))
+			var gcollides := collides.filter(func (m: Mono): return m.callmRSUY(ctx, &"group_intersects", collide_group))
+			if (not this.getp(&"solid_will_route") or groutes.size() > 0) \
+			and (not this.getp(&"solid_will_collide") or gcollides.size() == 0):
+				this.callc(ctx, &"on_solid_route_all", routes)
+				this.callc(ctx, &"on_solid_route", groutes)
+				if collides.size() > 0: this.callc(ctx, &"on_solid_collide_all", collides)
 				return pos
 			else:
+				if gcollides.size() > 0: this.callc(ctx, &"on_solid_collide", gcollides)
 				return this.position,
 	}),
 	&"on_draw_debug": Prop.puts({
@@ -64,23 +100,29 @@ static func test_pos(ctx: LisperContext, this: Mono, pos: Vector3) -> bool:
 	var hako := this.get_hako()
 	return \
 		(not this.getp(&"solid_will_route") or \
-			(await Async.array_any(
-				await hako.applymRSU(ctx, &"collect_route", [box.get_center(), int(pos.z + route_zoffset)]),
-				func (m): return await m.callm(ctx, &"group_intersects", route_group),
-			))
+			(await do_route_with_group(ctx, this, hako, box.get_center(), int(pos.z + route_zoffset), route_group))
+			.size() > 0
 		) and \
 		(not this.getp(&"solid_will_collide") or \
-			(await Async.array_filter(
-				await hako.applymRSU(ctx, &"collect_collide", [box, int(pos.z)]),
-				func (m): return m != this and await m.callm(ctx, &"group_intersects", collide_group),
-			)).size() == 0
+			(await do_collide_with_group(ctx, this, hako, box, int(pos.z), collide_group))
+			.size() == 0
 		)
 
-static func collide_pos(ctx: LisperContext, this: Mono, pos: Vector3) -> Array:
-	var box := this.getp(&"solid_box") as Rect2
-	box.position += Vector2(pos.x, pos.y)
-	var hako := this.get_hako()
-	return await hako.applymRSU(ctx, &"collect_collide", [box, int(pos.z)])
+static func do_route(ctx: LisperContext, this: Mono, hako: Mono, pos: Vector2, z_pos: int) -> Array:
+	return (await hako.applymRSU(ctx, &"collect_route", [pos, z_pos])) \
+				.filter(func (m: Mono): return m != this)
+
+static func do_route_with_group(ctx: LisperContext, this: Mono, hako: Mono, pos: Vector2, z_pos: int, group: Array) -> Array:
+	return (await hako.applymRSU(ctx, &"collect_route", [pos, z_pos])) \
+				.filter(func (m: Mono): return m != this and m.callmRSUY(ctx, &"group_intersects", group))
+
+static func do_collide(ctx: LisperContext, this: Mono, hako: Mono, box: Rect2, z_pos: int) -> Array:
+	return (await hako.applymRSU(ctx, &"collect_collide", [box, z_pos])) \
+				.filter(func (m: Mono): return m != this)
+
+static func do_collide_with_group(ctx: LisperContext, this: Mono, hako: Mono, box: Rect2, z_pos: int, group: Array) -> Array:
+	return (await hako.applymRSU(ctx, &"collect_collide", [box, z_pos])) \
+				.filter(func (m: Mono): return m != this and m.callmRSUY(ctx, &"group_intersects", group))
 
 static func draw_debug(ctx: LisperContext, this: Mono, item: SekaiItem) -> void:
 	var pos := Vector2(this.position.x, this.position.y - this.position.z * item.ratio_yz)

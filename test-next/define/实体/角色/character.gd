@@ -51,9 +51,8 @@ func do_merge(sets: Array[Dictionary]) -> Array[Dictionary]:
 				pass,
 		}),
 		
-		&"on_position_mod": Prop.puts({
-			&"0:character": func (ctx: LisperContext, this: Mono) -> void:
-				var collides := await this.emitm(ctx, &"solid_collide_all_by") as Array
+		&"on_solid_collide_all": Prop.puts({
+			&"0:character": func (ctx: LisperContext, this: Mono, collides: Array) -> void:
 				var drops := await Async.array_filter(collides, func (m): return await m.callm(ctx, &"group_in", &"drop"))
 				for drop in drops:
 					for item in drop.getp("contains"):

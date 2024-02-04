@@ -421,6 +421,7 @@ func delsB(key: StringName, head: Variant) -> Variant:
 ## R -> Raw:    only call on define
 ## S -> Single: not batch call stacks
 ## U -> Usafe:  fail when handle not found
+## Y -> Sync:   call without async
 ## [/codeblock]
 func emitm(ctx: LisperContext, key: StringName) -> Variant:
 	var value = null
@@ -470,6 +471,9 @@ func emitmRS(ctx: LisperContext, key: StringName) -> Variant:
 func emitmRSU(ctx: LisperContext, key: StringName) -> Variant:
 	return await define._props[key].call(ctx, self)
 
+func emitmRSUY(ctx: LisperContext, key: StringName) -> Variant:
+	return define._props[key].call(ctx, self)
+
 func callm(ctx: LisperContext, key: StringName, arg: Variant) -> Variant:
 	var value = null
 	var data = define._props.get(key)
@@ -517,6 +521,9 @@ func callmRS(ctx: LisperContext, key: StringName, arg: Variant) -> Variant:
 
 func callmRSU(ctx: LisperContext, key: StringName, arg: Variant) -> Variant:
 	return await define._props[key].call(ctx, self, arg)
+
+func callmRSUY(ctx: LisperContext, key: StringName, arg: Variant) -> Variant:
+	return define._props[key].call(ctx, self, arg)
 
 func applym(ctx: LisperContext, key: StringName, argv: Array) -> Variant:
 	var vargv := [ctx, self]
@@ -575,6 +582,11 @@ func applymRSU(ctx: LisperContext, key: StringName, argv: Array) -> Variant:
 	var vargv := [ctx, self]
 	vargv.append_array(argv)
 	return await define._props[key].callv(vargv)
+
+func applymRSUY(ctx: LisperContext, key: StringName, argv: Array) -> Variant:
+	var vargv := [ctx, self]
+	vargv.append_array(argv)
+	return define._props[key].callv(vargv)
 
 ## call lisper function methods
 ## [codeblock]
