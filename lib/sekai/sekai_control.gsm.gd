@@ -175,7 +175,7 @@ func _update_draw_caches() -> void:
 
 ## 将输入事件传输至目标对象
 func _pass_input(sets: InputSet) -> void:
-	if target: target.callc(context, &"on_input", sets)
+	if target: target.applyc(context, &"on_input", [self, sets])
 
 
 #

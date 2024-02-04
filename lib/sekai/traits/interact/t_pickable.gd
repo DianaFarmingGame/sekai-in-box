@@ -25,14 +25,14 @@ var props := {
 	#
 	
 	# 检测对应位置是否在当前 Mono 拾取范围
-	# @params: cursor: 拾取的光标位置 (假设 Z 为 0)
+	# @params: ctrl: 驱动检测的节点, cursor: 拾取的光标位置 (假设 Z 为 0)
 	# @return: null: 当不在范围内时 | float: 当在范围内时，离检测盒中心的距离
-	&"pick_test": func (ctx: LisperContext, this: Mono, cursor: Vector2) -> Variant:
-		var pos := Vector2(this.position.x, this.position.y - this.position.z * this.item.ratio_yz)
+	&"collect_pick": func (ctx: LisperContext, this: Mono, ctrl: SekaiControl, cursor: Vector2) -> Variant:
+		var pos := Vector2(this.position.x, this.position.y - this.position.z * ctrl.unit_size.y / ctrl.unit_size.z)
 		var box := this.getp(&"pick_box") as Rect2
 		box.position += pos
 		if box.has_point(cursor):
-			return (box.get_center() - cursor).length()
+			return [[(box.get_center() - cursor).length(), this]]
 		return null,
 	
 	

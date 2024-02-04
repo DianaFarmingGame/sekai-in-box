@@ -61,7 +61,7 @@ var props := {
 	
 	#--------------------------------------------------------------------------#
 	&"on_input": Prop.puts({
-		&"0:move_by_input": func (ctx: LisperContext, this: Mono, sets: InputSet) -> void:
+		&"0:move_by_input": func (ctx: LisperContext, this: Mono, ctrl: SekaiControl, sets: InputSet) -> void:
 			if this.getp(&"can_move"):
 				var all := sets.triggered
 				var dir := Vector2(0, 0)

@@ -9,6 +9,6 @@ var props := {
 	#
 	
 	# 当有输入时触发
-	# @params: InputSet: 代表当前输入的对象，具体看对应 Class
+	# @params: SekaiControl: 触发输入的节点, InputSet: 代表当前输入的对象 (具体信息看对应 Class)
 	&"on_input": Prop.Stack(),
 }
