@@ -173,21 +173,17 @@ func _update_draw_caches() -> void:
 	_render_box = box
 	_frame_time = Time.get_ticks_usec()
 
-## 将 Action 的输入事件传输至目标对象
-func _pass_action(triggered: Dictionary, pressings: Dictionary, releasings: Dictionary) -> void:
-	if target: target.applyc(context, &"on_input_action", [triggered, pressings, releasings])
-
-## 将 Direction 的输入事件传输至目标对象
-func _pass_direction(triggered: Dictionary, direction: Vector3) -> void:
-	if target: target.applyc(context, &"on_input_direction", [triggered, direction])
+## 将输入事件传输至目标对象
+func _pass_input(sets: InputSet) -> void:
+	if target: target.callc(context, &"on_input", sets)
 
 
 #
 # 回调函数
 #
 
-func _on_mapper_input(triggered: Dictionary, pressings: Dictionary, releasings: Dictionary) -> void:
-	if allow_input_action: _pass_action(triggered, pressings, releasings)
+func _on_mapper_input(sets: InputSet) -> void:
+	if allow_input_action: _pass_input(sets)
 
 
 

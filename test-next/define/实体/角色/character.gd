@@ -3,7 +3,7 @@ class_name GCharacter extends GEntity
 func do_merge(sets: Array[Dictionary]) -> Array[Dictionary]:
 	super.do_merge(sets)
 	name = "GCharacter"
-	merge_traits(sets, [TDefTarget, TSolid, TInputAction, TProcess, TMoveByInput, TState, TContainer, TPickable])
+	merge_traits(sets, [TDefTarget, TSolid, TInput, TProcess, TMoveByInput, TState, TContainer, TPickable])
 	merge_props(sets, {
 		&"name": "unnamed",
 		&"touch_radius": 1,
@@ -30,9 +30,10 @@ func do_merge(sets: Array[Dictionary]) -> Array[Dictionary]:
 				return speed,
 		}),
 		
-		&"on_input_action": Prop.puts({
-			&"0:character": func (ctx: LisperContext, this: Mono, all: Dictionary, press: Dictionary, _release) -> void:
+		&"on_input": Prop.puts({
+			&"0:character": func (ctx: LisperContext, this: Mono, sets: InputSet) -> void:
 				if this.getp(&"cur_state") != &"combo":
+					var press := sets.pressings
 					if press.has(&"dialog_confirm"):
 						var mono = null
 						var min_dis = INF

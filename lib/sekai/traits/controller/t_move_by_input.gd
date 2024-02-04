@@ -2,7 +2,7 @@ class_name TMoveByInput extends MonoTrait
 ## 这个 Trait 可以把 TInput 的输入转换为角色的移动行为
 
 var id := &"move_by_input"
-var requires := [&"position", &"input_action", &"process"]
+var requires := [&"position", &"input", &"process"]
 
 var props := {
 	#
@@ -60,9 +60,10 @@ var props := {
 	
 	
 	#--------------------------------------------------------------------------#
-	&"on_input_action": Prop.puts({
-		&"0:move_by_input": func (ctx: LisperContext, this: Mono, all: Dictionary, _press, _release) -> void:
+	&"on_input": Prop.puts({
+		&"0:move_by_input": func (ctx: LisperContext, this: Mono, sets: InputSet) -> void:
 			if this.getp(&"can_move"):
+				var all := sets.triggered
 				var dir := Vector2(0, 0)
 				if all.has(&"move_up"): dir += Vector2(0, -1)
 				if all.has(&"move_down"): dir += Vector2(0, 1)
