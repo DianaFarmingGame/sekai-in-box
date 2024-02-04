@@ -1,7 +1,8 @@
 class_name TSolid extends MonoTrait
+## 这个 Trait 可以使 Mono 的移动受到碰撞和导航的规则限制
 
 var id := &"solid"
-var requires := [&"position"]
+var requires := [&"position", &"group"]
 
 var props := {
 	#
@@ -63,7 +64,7 @@ var props := {
 	
 	
 	
-	#----------------------------------------------------------------------------------------------#
+	#--------------------------------------------------------------------------#
 	&"on_position": Prop.puts({
 		&"-99:solid": func (ctx: LisperContext, this: Mono, pos: Vector3) -> Vector3:
 			var box := this.getp(&"solid_box") as Rect2

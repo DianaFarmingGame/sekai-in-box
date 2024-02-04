@@ -1,13 +1,31 @@
 class_name TRoutable extends MonoTrait
+## 为当前 Mono 可导航性，和 TSolid 一起使用
 
 var id := &"routable"
 var requires := [&"position", &"group"]
 
 var props := {
+	#
+	# 配置
+	#
+	
+	# 当前 Mono 是否会用到导航特性，性能优化用
 	&"need_route": true,
+	
+	# 当前是否可导航
 	&"routable": true,
+	
+	# 导航检测的盒子 (数组)，默认是一个以 Mono 为中心 1x1 的矩形
 	&"route_boxes": [Rect2(-0.5, -0.5, 1, 1)],
 	
+	
+	
+	#
+	# 方法
+	#
+	
+	# 检测对应位置是否在当前 Mono 导航范围
+	# @params: point: 检测点的二维位置, z_pos: 检测的 Z 轴位置
 	&"collect_route": func (ctx: LisperContext, this: Mono, point: Vector2, z_pos: int) -> Mono:
 		var position := this.position
 		if floori(position.z) == z_pos:
@@ -19,6 +37,9 @@ var props := {
 						return this
 		return null,
 	
+	
+	
+	#--------------------------------------------------------------------------#
 	&"on_draw_debug": Prop.puts({
 		&"99:route_boxes": TRoutable.draw_debug,
 	} if ProjectSettings.get_setting(&"sekai/debug_draw_routable") else {})
