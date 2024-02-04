@@ -10,6 +10,7 @@ func do_merge(sets: Array[Dictionary]) -> Array[Dictionary]:
 		&"chunk_size": Vector2(0, 0),
 		&"chunk_cell": Vector3(1, 1, 1),
 		&"chunk_data": [-1],
+		
 		&"chunk_mat": null,
 		&"chunk_items": [],
 		
