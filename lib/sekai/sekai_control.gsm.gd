@@ -89,6 +89,13 @@ func _draw() -> void:
 # 输入
 #
 
+func _gui_input(event: InputEvent) -> void:
+	var dir = null
+	if event is InputEventMouse:
+		var pos := event.position as Vector2
+		dir = (pos - size / 2) / Vector2(unit_size.x, unit_size.y)
+	if allow_input: _input_mapper.update(event, dir)
+
 func _unhandled_input(event: InputEvent) -> void:
 	if allow_input: _input_mapper.update(event)
 
@@ -159,7 +166,7 @@ func _update_draw_caches() -> void:
 	var usize2 := Vector2(unit_size.x, unit_size.y)
 	if target is Mono: cpos = target.position
 	var pos := Vector2(cpos.x, cpos.y - (cpos.z * unit_size.y) / unit_size.z)
-	var offset := -pos + (Vector2(size) * 0.5).floor() / usize2
+	var offset := -pos + (size * 0.5).floor() / usize2
 	var box := Rect2(-offset, size / usize2).grow(render_extra_sight)
 	_cam_position = pos
 	_item_offset = offset

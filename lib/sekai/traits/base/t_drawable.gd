@@ -14,8 +14,8 @@ var props := {
 				this.callmR(ctx, &"on_draw", item)
 			),
 	}),
-	&"on_move": Prop.puts({
-		&"99:drawable": func (ctx: LisperContext, this: Mono) -> void:
+	&"on_position_mod": Prop.puts({
+		&"0:drawable": func (ctx: LisperContext, this: Mono) -> void:
 			var item := this.getpB(&"sekai_item") as SekaiItem
 			item.set_y(this.position.y + floorf(this.position.z) * 64),
 	}),

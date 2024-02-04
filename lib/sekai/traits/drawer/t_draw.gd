@@ -8,7 +8,7 @@ var props := {
 	&"cur_draw": &"",
 	&"cur_draw_variant": 0,
 	&"draw_timer": 0.0,
-	&"flip_h": false,
+	&"draw_flip_h": false,
 	&"on_draw_end": Prop.Stack(), # TODO
 	
 	&"draw/reset": func (ctx: LisperContext, this: Mono) -> void:
@@ -37,7 +37,7 @@ static func on_draw(ctx: LisperContext, this: Mono, item: SekaiItem) -> void:
 		&"static":
 			var texture = this.getp(&"asserts")[draw[1]]
 			var clip = draw[2]
-			if this.getp(&"flip_h"):
+			if this.getp(&"draw_flip_h"):
 				item.pen_set_transform(Transform2D(0, Vector2(-1, 1), 0, pos + clip[0].position + clip[0].size / 2))
 				item.pen_draw_texture_region(texture, Rect2(-clip[0].size / 2, clip[0].size), clip[1])
 				item.pen_clear_transform()
@@ -50,7 +50,7 @@ static func on_draw(ctx: LisperContext, this: Mono, item: SekaiItem) -> void:
 			var frames := draw[3] as Array
 			var frame_idx := lerpf(0.0, (frames.size() as float), fmod(t, timeout) / timeout) as int
 			var frame = frames[frame_idx]
-			if this.getp(&"flip_h"):
+			if this.getp(&"draw_flip_h"):
 				item.pen_set_transform(Transform2D(0, Vector2(-1, 1), 0, pos + frame[0].position + frame[0].size / 2))
 				item.pen_draw_texture_region(texture, Rect2(-frame[0].size / 2, frame[0].size), frame[1])
 				item.pen_clear_transform()

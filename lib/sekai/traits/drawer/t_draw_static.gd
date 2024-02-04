@@ -27,7 +27,7 @@ static func update(ctx: LisperContext, this: Mono) -> void:
 		&"static":
 			var texture = this.getp(&"asserts")[draw[1]]
 			var clip = draw[2]
-			if this.getp(&"flip_h"):
+			if this.getp(&"draw_flip_h"):
 				this.puts(&"on_draw", [
 					&"0:draw_static", func (ctx: LisperContext, this: Mono, item: SekaiItem) -> void:
 						var pos := Vector2(this.position.x, this.position.y - this.position.z * item.ratio_yz)
@@ -48,7 +48,7 @@ static func update(ctx: LisperContext, this: Mono) -> void:
 			var timeout := draw[2] as float
 			var frames := draw[3] as Array
 			var timer := this.getp(&"draw_timer") as float
-			if this.getp(&"flip_h"):
+			if this.getp(&"draw_flip_h"):
 				this.puts(&"on_draw", [
 					&"0:draw_static", func (ctx: LisperContext, this: Mono, item: SekaiItem) -> void:
 						var pos := Vector2(this.position.x, this.position.y - this.position.z * item.ratio_yz)

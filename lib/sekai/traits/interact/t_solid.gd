@@ -4,22 +4,31 @@ var id := &"solid"
 var requires := [&"position"]
 
 var props := {
+	#
+	# 配置
+	#
+	
+	# 是否需要检测导航
 	&"solid_will_route": true,
+	
+	# 是否需要检测碰撞
 	&"solid_will_collide": true,
+	
+	# 当检测导航时，哪些被视为有效组别
 	&"solid_route_group": [&""],
+	
+	# 当检测碰撞时，哪些被视为有效组别
 	&"solid_collide_group": [&""],
+	
+	# 当检测碰撞时，使用什么矩形，同时利用这个矩形的中心作为导航的检测点
 	&"solid_box": Rect2(-0.5, -0.5, 1, 1),
+	
+	# 当检测导航时，将检测点的 Z 轴偏移多少，主要用来确定导航的 Z 层使用而非用于细微偏移
 	&"solid_route_zoffset": 0,
 	
 	&"solid_test_to": TSolid.test_pos,
 	&"solid_test_move": func (ctx: LisperContext, this: Mono, offset: Vector3) -> bool:
 		return await TSolid.test_pos(ctx, this, this.position + offset),
-	&"solid_to": func (ctx: LisperContext, this: Mono, pos: Vector3) -> void:
-		if await TSolid.test_pos(ctx, this, pos):
-			await this.callm(ctx, &"position/set", pos),
-	&"solid_move": func (ctx: LisperContext, this: Mono, offset: Vector3) -> void:
-		if await TSolid.test_pos(ctx, this, this.position + offset):
-			await this.callm(ctx, &"position/move", offset),
 	&"solid_collide_all_by": func (ctx: LisperContext, this: Mono, offset := Vector3()) -> Array:
 		return await TSolid.collide_pos(ctx, this, this.position + offset),
 	&"solid_collide_all_at": func (ctx: LisperContext, this: Mono, pos: Vector3) -> Array:
@@ -31,6 +40,16 @@ var props := {
 		var collide_group := this.getp(&"solid_collide_group") as Array
 		return await Async.array_filter(await TSolid.collide_pos(ctx, this, pos), func (m): return m != this and await m.callm(ctx, &"group_intersects", collide_group)),
 	
+	
+	
+	#----------------------------------------------------------------------------------------------#
+	&"on_position": Prop.puts({
+		&"-99:solid": func (ctx: LisperContext, this: Mono, pos: Vector3) -> Vector3:
+			if await TSolid.test_pos(ctx, this, pos):
+				return pos
+			else:
+				return this.position,
+	}),
 	&"on_draw_debug": Prop.puts({
 		&"99:solid_box": TSolid.draw_debug,
 	} if ProjectSettings.get_setting(&"sekai/debug_draw_solid") else {})

@@ -108,13 +108,12 @@ func uncover(layer_name: StringName) -> void:
 func call_watcher(ctx: LisperContext, key: StringName, value: Variant, force := false) -> Variant:
 	if force or getp(key) != value:
 		var hkey = StringName("on_" + key)
-		var handle = define._props.get(hkey)
-		if handle != null: value = await handle.call(ctx, self, value)
-		#var lidx = layers.size() - 1
-		#while lidx >= 0:
-			#handle = layers[lidx][1].get(hkey)
-			#if handle != null: value = await handle.call(self, value)
-			#lidx -= 1
+		var data = define._props.get(hkey)
+		if data is Callable:
+			value = await data.call(ctx, self, value)
+		elif data is Array:
+			for entry in data.duplicate():
+				value = await entry[1].call(ctx, self, value)
 	return value
 
 ## get property methods

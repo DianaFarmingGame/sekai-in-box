@@ -3,15 +3,32 @@ class_name GCharacter extends GEntity
 func do_merge(sets: Array[Dictionary]) -> Array[Dictionary]:
 	super.do_merge(sets)
 	name = "GCharacter"
-	merge_traits(sets, [TDefTarget, TSolid, TInputAction, TProcess, TState, TContainer, TPickable])
+	merge_traits(sets, [TDefTarget, TSolid, TInputAction, TProcess, TMoveByInput, TState, TContainer, TPickable])
 	merge_props(sets, {
 		&"name": "unnamed",
-		&"max_speed": 3,
 		&"touch_radius": 1,
 		&"solid_route_zoffset": -1,
 		
-		&"cur_speed": Vector2(0, 0),
 		&"cur_dir": -1,
+		
+		&"on_move_start": Prop.puts({
+			&"0:character": func (ctx: LisperContext, this: Mono) -> void:
+				await this.callm(ctx, &"state/to", &"walk"),
+		}),
+		
+		&"on_move_end": Prop.puts({
+			&"0:character": func (ctx: LisperContext, this: Mono) -> void:
+				await this.callm(ctx, &"state/to", &"idle"),
+		}),
+		
+		&"on_move_cur_speed": Prop.puts({
+			&"0:character": func (ctx: LisperContext, this: Mono, speed: Vector2) -> Vector2:
+				if speed.x < 0:
+					this.setpW(ctx, &"cur_dir", -1)
+				if speed.x > 0:
+					this.setpW(ctx, &"cur_dir", 1)
+				return speed,
+		}),
 		
 		&"on_input_action": Prop.puts({
 			&"0:character": func (ctx: LisperContext, this: Mono, all: Dictionary, press: Dictionary, _release) -> void:
@@ -31,22 +48,10 @@ func do_merge(sets: Array[Dictionary]) -> Array[Dictionary]:
 								await ctx.call_method(this, action, [mono, this])
 					elif press.has(&"combo"):
 						await this.callm(ctx, &"state/to", &"combo")
-					else:
-						var dir := Vector2(0, 0)
-						if all.has(&"ui_up"): dir += Vector2(0, -1)
-						if all.has(&"ui_down"): dir += Vector2(0, 1)
-						if all.has(&"ui_left"): dir += Vector2(-1, 0)
-						if all.has(&"ui_right"): dir += Vector2(1, 0)
-						var speed := dir.normalized() * 3
-						this.setpF(ctx, &"cur_speed", speed)
-						if speed == Vector2(0, 0):
-							await this.callm(ctx, &"state/to", &"idle")
-						else:
-							await this.callm(ctx, &"state/to", &"walk")
 				pass,
 		}),
 		
-		&"on_move": Prop.puts({
+		&"on_position_mod": Prop.puts({
 			&"0:character": func (ctx: LisperContext, this: Mono) -> void:
 				var collides := await this.emitm(ctx, &"solid_collide_all_by") as Array
 				var drops := await Async.array_filter(collides, func (m): return await m.callm(ctx, &"group_in", &"drop"))
@@ -63,18 +68,11 @@ func do_merge(sets: Array[Dictionary]) -> Array[Dictionary]:
 			sekai.external_fns[&"itembox_update"].call(sekai, this, contains)
 			return contains,
 		
-		&"on_cur_speed": func (ctx: LisperContext, this: Mono, speed: Vector2) -> Vector2:
-			if speed.x < 0:
-				this.setpW(ctx, &"cur_dir", -1)
-			if speed.x > 0:
-				this.setpW(ctx, &"cur_dir", 1)
-			return speed,
-		
 		&"on_cur_dir": func (ctx: LisperContext, this: Mono, dir: float) -> float:
 			if dir < 0:
-				this.setp(&"flip_h", false)
+				this.setp(&"draw_flip_h", false)
 			if dir > 0:
-				this.setp(&"flip_h", true)
+				this.setp(&"draw_flip_h", true)
 			return dir,
 		
 		&"face_to": func (ctx: LisperContext, this: Mono, target: Variant) -> void:
@@ -99,7 +97,7 @@ func do_merge(sets: Array[Dictionary]) -> Array[Dictionary]:
 				var speedv := delta / dt
 				var speed := speedv.length()
 				if speed > max_speed: speedv *= max_speed / speed
-				this.setpF(ctx, &"cur_speed", speedv)
+				this.setpF(ctx, &"move_cur_speed", speedv)
 				await sekai.before_process
 				delta = target - Vector2(this.position.x, this.position.y)
 				if (this.position - ppos).length() < (max_speed * dt) * 0.1:
@@ -109,7 +107,7 @@ func do_merge(sets: Array[Dictionary]) -> Array[Dictionary]:
 						break
 				else:
 					block_cnt = 0
-			this.setpF(ctx, &"cur_speed", Vector2(0, 0))
+			this.setpF(ctx, &"move_cur_speed", Vector2(0, 0))
 			await this.callm(ctx, &"state/to", &"idle")
 			return not blocked,
 		
@@ -129,7 +127,7 @@ func do_merge(sets: Array[Dictionary]) -> Array[Dictionary]:
 					var speedv := delta / dt
 					var speed := speedv.length()
 					if speed > max_speed: speedv *= max_speed / speed
-					this.setpF(ctx, &"cur_speed", speedv)
+					this.setpF(ctx, &"move_cur_speed", speedv)
 					await sekai.before_process
 					delta = target - Vector2(this.position.x, this.position.y)
 					if (this.position - ppos).length() < (max_speed * dt) * 0.1:
@@ -148,7 +146,7 @@ func do_merge(sets: Array[Dictionary]) -> Array[Dictionary]:
 					var speedv := delta / dt
 					var speed := speedv.length()
 					if speed > max_speed: speedv *= max_speed / speed
-					this.setpF(ctx, &"cur_speed", speedv)
+					this.setpF(ctx, &"move_cur_speed", speedv)
 					await sekai.before_process
 					delta = Vector2(target.position.x, target.position.y) - Vector2(this.position.x, this.position.y)
 					if (this.position - ppos).length() < (max_speed * dt) * 0.1:
@@ -158,7 +156,7 @@ func do_merge(sets: Array[Dictionary]) -> Array[Dictionary]:
 							break
 					else:
 						block_cnt = 0
-			this.setpF(ctx, &"cur_speed", Vector2(0, 0))
+			this.setpF(ctx, &"move_cur_speed", Vector2(0, 0))
 			await this.callm(ctx, &"state/to", &"idle")
 			return not blocked,
 		
@@ -246,12 +244,6 @@ func do_merge(sets: Array[Dictionary]) -> Array[Dictionary]:
 			&"walk": {
 				&"cover": {
 					&"cur_draw": &"walk",
-					&"on_process": func (ctx: LisperContext, this: Mono, delta: float) -> void:
-						var cur_speed := this.getp(&"cur_speed") as Vector2
-						if cur_speed != Vector2(0, 0):
-							var dpos := cur_speed * delta as Vector2
-							await this.callm(ctx, &"solid_move", Vector3(dpos.x, 0, 0))
-							await this.callm(ctx, &"solid_move", Vector3(0, dpos.y, 0)),
 				},
 				&"on_enter": func (ctx: LisperContext, this: Mono, _pres) -> void:
 					await this.emitm(ctx, &"draw/reset"),

@@ -4,7 +4,7 @@ signal updated(triggered: Dictionary, pressings: Dictionary, releasings: Diction
 
 var triggered_actions := {}
 
-func update(event: InputEvent) -> void:
+func update(event: InputEvent, dir = null) -> void:
 	var pressings := {}
 	var releasings := {}
 	for action in InputMap.get_actions():
@@ -21,3 +21,14 @@ func update(event: InputEvent) -> void:
 			else:
 				triggered_actions.erase(action)
 	updated.emit(triggered_actions, pressings, releasings)
+
+class InputSet:
+	var direction: Vector3
+	var triggered: Dictionary
+	var pressings: Dictionary
+	var releasings: Dictionary
+	func _init(pdirection: Vector3, ptriggered: Dictionary, ppressings: Dictionary, preleasings: Dictionary) -> void:
+		direction = pdirection
+		triggered = ptriggered
+		pressings = ppressings
+		releasings = preleasings

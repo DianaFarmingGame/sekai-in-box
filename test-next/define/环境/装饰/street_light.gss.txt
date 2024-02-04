@@ -22,7 +22,7 @@
 ;; 			0	0	0
 ;; 		] {
 ;; 			cover {
-;; 				flip_h #t
+;; 				draw_flip_h #t
 ;; 			}
 ;; 		}
 ;; 	]]
