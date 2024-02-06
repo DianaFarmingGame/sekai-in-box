@@ -86,9 +86,10 @@ func enter_gikou(id: String) -> void:
 ## 触发当前游戏保存存档
 func record_gikou() -> void:
 	await gikou.store(context)
+	var cgikou := gikou.clone_data()
 	DirAccess.make_dir_recursive_absolute(gikou_store_dir)
 	var file := FileAccess.open(gikou_store_dir.path_join(gikou.getp(&"id") + ".gikou"), FileAccess.WRITE)
-	file.store_var(Mono.to_data(gikou), false)
+	file.store_var(Mono.to_data(cgikou), false)
 	await gikou.restore(context)
 	gikou_changed.emit()
 

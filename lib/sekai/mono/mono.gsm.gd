@@ -26,6 +26,22 @@ static func restore_from_data(ctx: LisperContext, data: Variant) -> Mono:
 	await mono.restore(ctx)
 	return mono
 
+static func clone_val(value: Variant) -> Variant:
+	if value is Object:
+		return null
+	if Lisper.is_fn(value):
+		return null
+	if value is Array:
+		return value.map(Mono.clone_val).filter(func (v): return v != null)
+	if value is Dictionary:
+		var res := {}
+		for k in value.keys():
+			var v = clone_val(value[k])
+			if v != null:
+				res[k] = v
+		return res
+	return value
+
 func _into_container(ctx: LisperContext, cont: Mono) -> void:
 	root = cont
 	if root.inited: await init(ctx)
@@ -53,6 +69,14 @@ func clone() -> Mono:
 	mono.inited = inited
 	mono.position = position
 	mono.layers = layers.duplicate(true)
+	return mono
+
+func clone_data() -> Mono:
+	var mono := get_script().new() as Mono
+	mono.define = define
+	mono.inited = inited
+	mono.position = position
+	mono.layers = Mono.clone_val(layers)
 	return mono
 
 func _to_data() -> Dictionary:
