@@ -26,18 +26,28 @@ static func restore_from_data(ctx: LisperContext, data: Variant) -> Mono:
 	await mono.restore(ctx)
 	return mono
 
+class FnVal: pass
+
 static func clone_val(value: Variant) -> Variant:
+	if Lisper.is_fn(value):
+		return FnVal.new()
 	if value is Object:
 		return null
-	if Lisper.is_fn(value):
-		return null
 	if value is Array:
-		return value.map(Mono.clone_val).filter(func (v): return v != null)
+		var res := []
+		for rv in value:
+			var v = clone_val(rv)
+			if v is FnVal:
+				return null
+			if v == null:
+				continue
+			res.append(v)
+		return res
 	if value is Dictionary:
 		var res := {}
 		for k in value.keys():
 			var v = clone_val(value[k])
-			if v != null:
+			if v != null and not v is FnVal:
 				res[k] = v
 		return res
 	return value
@@ -139,6 +149,7 @@ func call_watcher(ctx: LisperContext, key: StringName, value: Variant, force := 
 		elif data is Array:
 			for entry in data.duplicate():
 				value = await entry[1].call(ctx, self, value)
+		await applym(ctx, &"on_mod", [key, value])
 	return value
 
 ## get property methods
