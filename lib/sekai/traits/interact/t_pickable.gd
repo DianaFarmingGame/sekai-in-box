@@ -10,10 +10,10 @@ var props := {
 	#
 	
 	# 当前 Mono 是否会用到拾取特性，性能优化用
-	&"need_pick": true,
+	&"need_picked": true,
 	
 	# 当前是否可拾取
-	&"can_pick": true,
+	&"can_picked": true,
 	
 	# 拾取检测的盒子，默认是一个以 Mono 为中心 1x1 的矩形
 	&"pick_box": Rect2(-0.5, -0.5, 1, 1),
