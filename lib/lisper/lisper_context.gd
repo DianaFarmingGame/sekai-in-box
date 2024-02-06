@@ -43,6 +43,14 @@ func fork() -> LisperContext:
 	ctx.print_head = print_head
 	return ctx
 
+func fork_sign(pname = null) -> LisperContext:
+	if pname == null: pname = str("root::", _root_idx)
+	var ctx := fork()
+	ctx.dbg_name = pname
+	LisperDebugger.sign_context(ctx.dbg_name, ctx)
+	_root_idx += 1
+	return ctx
+
 func destroy() -> void:
 	LisperDebugger.unsign_context(dbg_name, self)
 

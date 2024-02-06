@@ -44,11 +44,11 @@ var target: Mono = null:
 			if target is Mono:
 				await target.callm(context, &"on_target_unset", self)
 			target = v
+			context.def_const(&"target", target)
 			_update_target()
 
 ## 执行上下文
-@onready
-var context: LisperContext = _make_context()
+var context: LisperContext = null
 
 
 
@@ -68,8 +68,17 @@ func set_target(ptarget: Mono) -> void:
 func _init() -> void:
 	y_sort_enabled = true
 	texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST_WITH_MIPMAPS
+	context = _make_context()
+
+func _ready() -> void:
 	sekai.gikou_changed.connect(_update_gikou)
 	_input_mapper.updated.connect(_on_mapper_input)
+
+func _enter_tree() -> void:
+	LisperDebugger.sign_context("SekaiControl", context)
+
+func _exit_tree() -> void:
+	LisperDebugger.unsign_context("SekaiControl", context)
 
 
 
@@ -123,6 +132,8 @@ defunc (target/set :const :gd ', set_target ,')
 func _make_context() -> LisperContext:
 	var ctx := sekai.context.fork() as LisperContext
 	ctx.def_const(&"control", self)
+	ctx.def_const(&"target", target)
+	ctx.def_const(&"hako", _hako)
 	return ctx
 
 func _update_gikou() -> void:
@@ -139,6 +150,7 @@ func _update_target() -> void:
 		await target.callm(context, &"on_target_set", self)
 	else:
 		_hako = null
+	context.def_const(&"hako", _hako)
 
 ## 更新代表视野内 Mono 的数组
 func _update_sight() -> void:

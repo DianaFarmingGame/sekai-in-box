@@ -157,6 +157,7 @@ func get_uidx() -> int:
 func _init() -> void:
 	_update_debug_draw()
 	Input.use_accumulated_input = false
+	context = await LisperCommons.make_common_context("Sekai")
 
 func _ready() -> void:
 	await _init_context()
@@ -171,7 +172,6 @@ func _init_globals() -> void:
 
 ## 初始化执行环境
 func _init_context() -> void:
-	context = await LisperCommons.make_common_context("sekai")
 	await Lisper.exec_gsm(context, self)
 
 

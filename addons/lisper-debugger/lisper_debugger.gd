@@ -29,16 +29,24 @@ var ctx_stack := []
 
 func _ready() -> void:
 	if ProjectSettings.get_setting(&"lisper/debugger_visible"): DebuggerWindow.visible = true
+	update_contexts()
+	if contexts.size() > 0:
+		ContextList.select(contexts.size() - 1)
+	update_ctx_sel()
 
 func grab_focus() -> void:
-	DebuggerWindow.visible = true
+	DebuggerWindow.show()
 	DebuggerWindow.grab_focus()
+
+func toggle() -> void:
+	DebuggerWindow.visible = not DebuggerWindow.visible
 
 func sign_context(name: String, ctx: LisperContext) -> void:
 	contexts.append([name, ctx])
-	update_contexts()
-	ContextList.select(contexts.size() - 1)
-	update_ctx_sel()
+	if is_node_ready():
+		update_contexts()
+		ContextList.select(contexts.size() - 1)
+		update_ctx_sel()
 
 func unsign_context(name: String, ctx: LisperContext) -> void:
 	for i in contexts.size():

@@ -8,7 +8,6 @@ func do_merge(sets: Array[Dictionary]) -> Array[Dictionary]:
 		&"name": "unnamed",
 		&"touch_radius": 1,
 		&"solid_route_zoffset": -1,
-		&"act_ui": Prop.pushs([&"debug"]),
 		
 		&"cur_dir": -1,
 		
