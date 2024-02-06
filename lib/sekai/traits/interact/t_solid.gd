@@ -125,7 +125,7 @@ static func do_collide_with_group(ctx: LisperContext, this: Mono, hako: Mono, bo
 	return (await hako.applymRSU(ctx, &"collect_collide", [box, z_pos])) \
 				.filter(func (m: Mono): return m != this and m.callmRSUY(ctx, &"group_intersects", group))
 
-static func draw_debug(ctx: LisperContext, this: Mono, item: SekaiItem) -> void:
+static func draw_debug(ctx: LisperContext, this: Mono, ctrl: SekaiControl, item: SekaiItem) -> void:
 	var pos := Vector2(this.position.x, this.position.y - this.position.z * item.ratio_yz)
 	var rbox := this.getp(&"solid_box") as Rect2
 	var box := Rect2(pos + rbox.position, rbox.size)

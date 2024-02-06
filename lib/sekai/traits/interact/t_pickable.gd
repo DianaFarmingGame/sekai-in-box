@@ -43,7 +43,7 @@ var props := {
 	} if ProjectSettings.get_setting(&"sekai/debug_draw_pickable") else {}),
 }
 
-static func draw_debug(ctx: LisperContext, this: Mono, item: SekaiItem) -> void:
+static func draw_debug(ctx: LisperContext, this: Mono, ctrl: SekaiControl, item: SekaiItem) -> void:
 	var dcolor := 0x0088ff66 if this.getp(&"picker_hovered") else 0xffffff66
 	var pos := Vector2(this.position.x, this.position.y - this.position.z * item.ratio_yz)
 	var box := this.getp(&"pick_box") as Rect2
