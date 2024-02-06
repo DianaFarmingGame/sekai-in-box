@@ -3,11 +3,12 @@ class_name GCharacter extends GEntity
 func do_merge(sets: Array[Dictionary]) -> Array[Dictionary]:
 	super.do_merge(sets)
 	name = "GCharacter"
-	merge_traits(sets, [TDefTarget, TSolid, TInput, TProcess, TMoveByInput, TPickByInput, TState, TContainer, TPickable])
+	merge_traits(sets, [TDefTarget, TSolid, TInput, TProcess, TMoveByInput, TPickByInput, TState, TContainer, TPickable, TUI])
 	merge_props(sets, {
 		&"name": "unnamed",
 		&"touch_radius": 1,
 		&"solid_route_zoffset": -1,
+		&"act_ui": Prop.pushs([&"debug"]),
 		
 		&"cur_dir": -1,
 		
@@ -50,6 +51,13 @@ func do_merge(sets: Array[Dictionary]) -> Array[Dictionary]:
 					elif press.has(&"combo"):
 						await this.callm(ctx, &"state/to", &"combo")
 				pass,
+		}),
+		
+		&"on_pick": Prop.puts({
+			&"0:character": func (ctx: LisperContext, this: Mono, ctrl: SekaiControl, pick: Variant, sets: InputSet) -> void:
+				if pick is Mono:
+					if sets.pressings.has(&"mono_select"):
+						print(pick),
 		}),
 		
 		&"on_solid_collide_all": Prop.puts({

@@ -1,4 +1,5 @@
 class_name Mono
+## Sekai 内使用的基本实例类型
 
 var root: Mono = null
 var define: MonoDefine

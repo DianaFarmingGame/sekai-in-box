@@ -38,7 +38,8 @@ var props := {
 					if pair[0] < min_len:
 						min_len = pair[0]
 						min_mono = pair[1]
-				if min_mono != null: this.applyc(ctx, &"on_pick", [min_mono, sets])
+				#if min_mono != null: # IMPORTANT!
+				this.applyc(ctx, &"on_pick", [ctrl, min_mono, sets])
 			pass,
 	}),
 }

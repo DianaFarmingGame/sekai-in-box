@@ -173,7 +173,7 @@ static func exec_gsm(ctx: LisperContext, gsm: Object) -> void:
 		&"self": gsm,
 	})
 	var need_gtx := gsm.get_property_list().any(func (opt): return opt[&"name"] == &"gtx")
-	if need_gtx == true: gsm.gtx = ctx
+	if need_gtx: gsm.gtx = ctx
 	if gsm.has_method(&"gsm_init"): await gsm.gsm_init(ctx)
 	if gsm.has_method(&"gsm"): 
 		var content := await gsm.gsm() as Array
