@@ -13,7 +13,7 @@ var props := {
 		&"2:debug_drawable": func (ctx: LisperContext, this: Mono, ctrl: SekaiControl) -> void:
 			var data := this.getpB(&"layer_data") as Dictionary
 			var item := data[&"debug_draw"] as SekaiItem
-			item.set_y(this.position.y + floorf(this.position.z) * 64)
+			item.set_y(this.position.y + floorf(this.position.z) * 64 + 4096)
 			item.on_draw.connect(func ():
 				this.applymR(ctx, &"on_draw_debug", [ctrl, item])
 			),
@@ -25,7 +25,7 @@ var props := {
 		&"0:debug_drawable": func (ctx: LisperContext, this: Mono) -> void:
 			var data := this.getpB(&"layer_data") as Dictionary
 			var item := data[&"debug_draw"] as SekaiItem
-			item.set_y(this.position.y + floorf(this.position.z) * 64),
+			item.set_y(this.position.y + floorf(this.position.z) * 64 + 4096),
 	} if ProjectSettings.get_setting(&"sekai/debug_draw") else {
 		&"0:drawable": TDrawable.handle_position_mod,
 	}),

@@ -3,7 +3,7 @@ class_name GCharacter extends GEntity
 func do_merge(sets: Array[Dictionary]) -> Array[Dictionary]:
 	super.do_merge(sets)
 	name = "GCharacter"
-	merge_traits(sets, [TDefTarget, TSolid, TInput, TProcess, TMoveByInput, TPickByInput, TState, TContainer, TPickable, TUI])
+	merge_traits(sets, [TDefTarget, TSolid, TInput, TProcess, TMoveByInput, TPickByInput, TState, TContainer, TPickable, TContactable, TUI])
 	merge_props(sets, {
 		&"name": "unnamed",
 		&"touch_radius": 1,
