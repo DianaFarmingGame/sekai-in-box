@@ -12,7 +12,7 @@ var props := {
 	&"on_draw_end": Prop.Stack(), # TODO
 	
 	&"draw/reset": func (ctx: LisperContext, this: Mono) -> void:
-		var item := this.getpB(&"sekai_item") as SekaiItem
+		var item := this.getpB(&"layer") as SekaiItem
 		if item != null:
 			this.setp(&"draw_timer", item.get_time()),
 	&"draw/to": func (ctx: LisperContext, this: Mono, draw_id: StringName) -> void:

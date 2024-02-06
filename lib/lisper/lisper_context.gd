@@ -502,7 +502,10 @@ func stringify_raw_prop_dict(data: Dictionary, indent := 0, depth := 0) -> Strin
 		tags.append('\n' + ''.lpad(indent) + k + ': ')
 		var value = data[k]
 		if value is Dictionary:
-			tags.append(stringify_raw_prop_dict(value, indent, depth + 1))
+			if value.size() == 0:
+				tags.append("{}")
+			else:
+				tags.append(stringify_raw_prop_dict(value, indent, depth + 1))
 		else:
 			tags.append(stringify_raw(data[k], indent + k.length() + 2, depth + 1))
 	return ''.join(tags)
@@ -534,7 +537,10 @@ func stringify_raw(data: Variant, indent := 0, depth := 0, enable_rev_trace := E
 			tags.append('\n' + ''.lpad(indent) + k + ': ')
 			var value = data[k]
 			if value is Dictionary:
-				tags.append(stringify_raw_prop_dict(value, indent, depth + 1))
+				if value.size() == 0:
+					tags.append("{}")
+				else:
+					tags.append(stringify_raw_prop_dict(value, indent, depth + 1))
 			else:
 				tags.append(stringify_raw(data[k], indent + k.length() + 2, depth + 1))
 		tags.append('\n' + ''.lpad(indent - 2) + '}')
@@ -574,7 +580,10 @@ func stringify_raw(data: Variant, indent := 0, depth := 0, enable_rev_trace := E
 				indent += 2
 				for l in data.layers:
 					tags.append('\n' + ''.lpad(indent) + l[0] + ': ')
-					tags.append(stringify_raw_prop_dict(l[1], indent, depth + 1))
+					if l[1].size() == 0:
+						tags.append("{}")
+					else:
+						tags.append(stringify_raw_prop_dict(l[1], indent, depth + 1))
 				return ''.join(tags)
 		return "#GDObject"
 	return var_to_str(data)

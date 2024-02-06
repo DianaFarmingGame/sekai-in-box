@@ -219,10 +219,20 @@ func getpB(key: StringName) -> Variant:
 		return layers[-1][1].get(key)
 	return null
 
+func getpBR(key: StringName) -> Variant:
+	if layers.size() > 0:
+		return layers[-1][1].get(key, define._props.get(key))
+	return define._props.get(key)
+
 func getpBD(key: StringName, default: Variant) -> Variant:
 	if layers.size() > 0:
 		return layers[-1][1].get(key, default)
 	return default
+
+func getpBRD(key: StringName, default: Variant) -> Variant:
+	if layers.size() > 0:
+		return layers[-1][1].get(key, define._props.get(key, default))
+	return define._props.get(key, default)
 
 func getpR(key: StringName) -> Variant:
 	return define._props.get(key)
