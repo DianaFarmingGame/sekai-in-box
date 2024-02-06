@@ -34,8 +34,8 @@ var props := {
 		return await this.applym(ctx, &"move/to_at_speed", [target, this.getp(&"move_speed")]),
 	
 	&"move/to_at_speed": func (ctx: LisperContext, this: Mono, target: Variant, max_speed: float) -> bool:
-		var can_input = this.getp(&"can_input")
-		if can_input: this.setp(&"can_input", false)
+		var can_move = this.getp(&"can_move")
+		if can_move: this.setp(&"can_move", false)
 		var delta: Vector2
 		var blocked := false
 		var block_cnt := 0
@@ -64,7 +64,7 @@ var props := {
 			else:
 				block_cnt = 0
 		this.setpBW(ctx, &"move_cur_speed", Vector2(0, 0))
-		if can_input: this.setp(&"can_input", can_input)
+		if can_move: this.setp(&"can_move", can_move)
 		return not blocked,
 	
 	
@@ -121,7 +121,7 @@ var props := {
 				if all.has(&"move_down"): dir += Vector2(0, 1)
 				if all.has(&"move_left"): dir += Vector2(-1, 0)
 				if all.has(&"move_right"): dir += Vector2(1, 0)
-				var speed := dir.normalized() * 3
+				var speed := dir.normalized() * this.getp(&"move_speed") as Vector2
 				this.setpBW(ctx, &"move_cur_speed", speed)
 			pass,
 	}),
