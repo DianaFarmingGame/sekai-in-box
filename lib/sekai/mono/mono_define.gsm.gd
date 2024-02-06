@@ -40,18 +40,29 @@ func do_merge(sets: Array[Dictionary]) -> Array[Dictionary]:
 		&"on_ready": Prop.Stack(),
 		
 		# 当任意使用 Setter 的属性被修改时触发
+		# @params: StringName: 被修改的键, Variant: 被修改的值
 		&"on_mod": Prop.Stack(),
 		
 		# 当进入任意 SekaiControl 时触发
+		# @params: SekaiControl: 触发的节点
 		&"on_control_enter": Prop.Stack({
 			#&"0:base": func (ctx: LisperContext, this: Mono, ctrl: SekaiControl) -> void:
 				#prints(this, "entered", ctrl),
 		}),
+		
 		# 当离开任意 SekaiControl 时触发
+		# @params: SekaiControl: 触发的节点
 		&"on_control_exit": Prop.Stack({
 			#&"0:base": func (ctx: LisperContext, this: Mono, ctrl: SekaiControl) -> void:
 				#prints(this, "exited", ctrl),
 		}),
+		
+		# 当成为某个 SekaiControl 的 target 时触发
+		# @params: SekaiControl: 触发的节点
+		&"on_target_set": Prop.Stack(),
+		# 取消成为某个 SekaiControl 的 target 时触发
+		# @params: SekaiControl: 触发的节点
+		&"on_target_unset": Prop.Stack(),
 	})
 	return sets
 

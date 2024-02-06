@@ -41,6 +41,8 @@ class_name SekaiControl extends Control
 var target: Mono = null:
 	set(v):
 		if not is_same(target, v):
+			if target is Mono:
+				await target.callm(context, &"on_target_unset", self)
 			target = v
 			_update_target()
 
@@ -134,6 +136,7 @@ func _update_gikou() -> void:
 func _update_target() -> void:
 	if target != null:
 		_hako = target.get_hako()
+		await target.callm(context, &"on_target_set", self)
 	else:
 		_hako = null
 
@@ -175,7 +178,7 @@ func _update_draw_caches() -> void:
 
 ## 将输入事件传输至目标对象
 func _pass_input(sets: InputSet) -> void:
-	if target: target.applyc(context, &"on_input", [self, sets])
+	if target: await target.applyc(context, &"on_input", [self, sets])
 
 
 #
