@@ -57,7 +57,7 @@ func do_merge(sets: Array[Dictionary]) -> Array[Dictionary]:
 					var item := SekaiItem.new()
 					item.on_draw.connect(func ():
 						for mono in lconts:
-							mono.callmR(ctx, &"on_draw", item)
+							mono.callm(ctx, &"on_draw", item)
 					)
 					item.set_y(offset.y + cell.y * y + floorf(offset.z) * 64)
 					for x in size.x:
@@ -66,7 +66,7 @@ func do_merge(sets: Array[Dictionary]) -> Array[Dictionary]:
 						if rid != -1:
 							var mono := sekai.make_mono(rid)
 							mono.position = Vector3(x, y, 0) * cell + offset
-							mono.setpB(&"sekai_item", item)
+							mono.setpB(&"layer", item)
 							contains.append(mono)
 							lconts.append(mono)
 							line[x] = mono

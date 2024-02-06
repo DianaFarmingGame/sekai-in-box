@@ -4,16 +4,15 @@ var id := &"draw_static"
 var requires := [&"drawable", &"draw"]
 
 var props := {
-	&"on_init": Prop.puts({
+	&"on_draw": Prop.Stack(),
+	
+	&"on_ready": Prop.puts({
 		&"99:draw_static": TDrawStatic.update,
 	}),
 	&"on_store": Prop.puts({
 		&"-99:draw_static": func (ctx: LisperContext, this: Mono) -> void:
 			this.dels(&"on_draw", &"0:draw_static")
 			pass,
-	}),
-	&"on_restore": Prop.puts({
-		&"99:draw_static": TDrawStatic.update,
 	}),
 }
 
@@ -28,7 +27,7 @@ static func update(ctx: LisperContext, this: Mono) -> void:
 			var texture = this.getp(&"asserts")[draw[1]]
 			var clip = draw[2]
 			if this.getp(&"draw_flip_h"):
-				this.puts(&"on_draw", [
+				this.putsB(&"on_draw", [
 					&"0:draw_static", func (ctx: LisperContext, this: Mono, item: SekaiItem) -> void:
 						var pos := Vector2(this.position.x, this.position.y - this.position.z * item.ratio_yz)
 						item.pen_set_transform(Transform2D(0, Vector2(-1, 1), 0, pos + clip[0].position + clip[0].size / 2))
@@ -37,7 +36,7 @@ static func update(ctx: LisperContext, this: Mono) -> void:
 						pass,
 				])
 			else:
-				this.puts(&"on_draw", [
+				this.putsB(&"on_draw", [
 					&"0:draw_static", func (ctx: LisperContext, this: Mono, item: SekaiItem) -> void:
 						var pos := Vector2(this.position.x, this.position.y - this.position.z * item.ratio_yz)
 						item.pen_draw_texture_region(texture, Rect2(pos + clip[0].position, clip[0].size), clip[1])
@@ -49,7 +48,7 @@ static func update(ctx: LisperContext, this: Mono) -> void:
 			var frames := draw[3] as Array
 			var timer := this.getp(&"draw_timer") as float
 			if this.getp(&"draw_flip_h"):
-				this.puts(&"on_draw", [
+				this.putsB(&"on_draw", [
 					&"0:draw_static", func (ctx: LisperContext, this: Mono, item: SekaiItem) -> void:
 						var pos := Vector2(this.position.x, this.position.y - this.position.z * item.ratio_yz)
 						var t := (item.get_time() - timer) as float
@@ -61,7 +60,7 @@ static func update(ctx: LisperContext, this: Mono) -> void:
 						pass,
 				])
 			else:
-				this.puts(&"on_draw", [
+				this.putsB(&"on_draw", [
 					&"0:draw_static", func (ctx: LisperContext, this: Mono, item: SekaiItem) -> void:
 						var pos := Vector2(this.position.x, this.position.y - this.position.z * item.ratio_yz)
 						var t := (item.get_time() - timer) as float

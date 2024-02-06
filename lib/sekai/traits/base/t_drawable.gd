@@ -35,7 +35,7 @@ static func handle_control_enter(ctx: LisperContext, this: Mono, ctrl: SekaiCont
 	var item := this.getpB(&"layer") as SekaiItem
 	item.set_y(this.position.y + floorf(this.position.z) * 64)
 	item.on_draw.connect(func ():
-		this.callmR(ctx, &"on_draw", item)
+		this.callm(ctx, &"on_draw", item)
 	)
 
 static func handle_position_mod(ctx: LisperContext, this: Mono) -> void:

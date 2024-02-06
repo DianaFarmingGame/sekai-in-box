@@ -22,6 +22,7 @@ const print_head: String = "[sekai] "
 # 信号
 #
 signal gikou_changed
+signal process(delta: float)
 
 
 
@@ -173,6 +174,15 @@ func _init_globals() -> void:
 ## 初始化执行环境
 func _init_context() -> void:
 	await Lisper.exec_gsm(context, self)
+
+
+
+#
+# 循环
+#
+
+func _process(delta: float) -> void:
+	process.emit(delta)
 
 
 

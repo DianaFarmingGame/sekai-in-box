@@ -1,4 +1,4 @@
-define (load ("../character.gd")
+define (load ("../pc.gd")
 	ref 1101
 	id &实体/角色/嘉然
 	props {

@@ -72,6 +72,7 @@ func _init() -> void:
 
 func _ready() -> void:
 	sekai.gikou_changed.connect(_update_gikou)
+	sekai.process.connect(_on_process)
 	_input_mapper.updated.connect(_on_mapper_input)
 
 func _enter_tree() -> void:
@@ -85,7 +86,7 @@ func _exit_tree() -> void:
 #
 # 循环
 #
-func _process(delta: float) -> void:
+func _on_process(delta: float) -> void:
 	await _update_sight()
 	queue_redraw()
 	if _hako != null:
