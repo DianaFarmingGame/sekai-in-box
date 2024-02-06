@@ -191,7 +191,7 @@ func _update_draw_caches() -> void:
 
 ## 将输入事件传输至目标对象
 func _pass_input(sets: InputSet) -> void:
-	if target: await target.applyc(context, &"on_input", [self, sets])
+	if target and target.getp(&"can_input"): await target.applyc(context, &"on_input", [self, sets])
 
 
 #

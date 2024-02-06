@@ -5,6 +5,11 @@ var id := &"input"
 
 var props := {
 	#
+	# 配置
+	#
+	&"can_input": true,
+	
+	#
 	# 信号
 	#
 	

@@ -10,7 +10,7 @@ var props := {
 	#
 	
 	# 角色的移动速度 (绝对速度, 对角线上也是这个速度)
-	&"move_speed": 3,
+	&"move_speed": 3.0,
 	
 	# 当前是否可以通过输入进行移动 (不影响程序控制的移动行为)
 	&"can_move": true,
@@ -23,17 +23,19 @@ var props := {
 	
 	# 通过偏移量移动
 	&"move/by": func (ctx: LisperContext, this: Mono, delta: Vector2) -> bool:
-		return await this.applym(ctx, &"move_by_at_speed", [delta, this.getp(&"max_speed")]),
+		return await this.applym(ctx, &"move/by_at_speed", [delta, this.getp(&"move_speed")]),
 	
 	# 通过偏移量移动，同时设定速度
-	&"move/by_at_speed": func (ctx: LisperContext, this: Mono, delta: Vector2, max_speed: float) -> bool:
+	&"move/by_at_speed": func (ctx: LisperContext, this: Mono, delta: Vector2, move_speed: float) -> bool:
 		var target := Vector2(this.position.x, this.position.y) + delta
-		return await this.applym(ctx, &"move_to_at_speed", [target, this.getp(&"max_speed")]),
+		return await this.applym(ctx, &"move/to_at_speed", [target, move_speed]),
 	
 	&"move/to": func (ctx: LisperContext, this: Mono, target: Variant) -> bool:
-		return await this.applym(ctx, &"move_to_at_speed", [target, this.getp(&"max_speed")]),
+		return await this.applym(ctx, &"move/to_at_speed", [target, this.getp(&"move_speed")]),
 	
 	&"move/to_at_speed": func (ctx: LisperContext, this: Mono, target: Variant, max_speed: float) -> bool:
+		var can_input = this.getp(&"can_input")
+		if can_input: this.setp(&"can_input", false)
 		var delta: Vector2
 		var blocked := false
 		var block_cnt := 0
@@ -62,6 +64,7 @@ var props := {
 			else:
 				block_cnt = 0
 		this.setpBW(ctx, &"move_cur_speed", Vector2(0, 0))
+		if can_input: this.setp(&"can_input", can_input)
 		return not blocked,
 	
 	
