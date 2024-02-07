@@ -17,7 +17,7 @@ func update(event: InputEvent, dir = null) -> void:
 				obj[0] += 1
 				pressings[action] = obj
 			if event.is_action_released(action):
-				obj[0] -= 1
+				obj[0] = 0
 				releasings[action] = obj
 			if obj[0] > 0:
 				triggered_actions[action] = obj
