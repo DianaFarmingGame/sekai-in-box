@@ -77,5 +77,8 @@ wait (gikou on_inited []
 			contains [mono/make (&物品/卷轴 {stack_count 9})]
 		})
 	)
-
+	
+	do (hako add_mono &kami {
+		position vec3(0 0 0)
+	})
 )

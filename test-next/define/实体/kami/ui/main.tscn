@@ -1,0 +1,39 @@
+[gd_scene load_steps=3 format=3 uid="uid://bddntpoq8y5r3"]
+
+[ext_resource type="Script" path="res://test-next/define/实体/kami/ui/main.gd" id="1_ny1x0"]
+
+[sub_resource type="Theme" id="Theme_rowid"]
+Label/colors/font_shadow_color = Color(0, 0, 0, 0.666667)
+Label/constants/shadow_offset_x = 1
+Label/constants/shadow_offset_y = 2
+
+[node name="Main" type="Control"]
+z_index = 1
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 1
+theme = SubResource("Theme_rowid")
+script = ExtResource("1_ny1x0")
+
+[node name="MarginContainer" type="MarginContainer" parent="."]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -51.5
+offset_right = 51.5
+offset_bottom = 40.0
+grow_horizontal = 2
+theme_override_constants/margin_left = 4
+theme_override_constants/margin_top = 4
+theme_override_constants/margin_right = 4
+theme_override_constants/margin_bottom = 4
+
+[node name="Label" type="Label" parent="MarginContainer"]
+layout_mode = 2
+text = "神様思考中..."
+horizontal_alignment = 1

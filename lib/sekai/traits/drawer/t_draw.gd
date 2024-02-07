@@ -26,7 +26,7 @@ var props := {
 	&"on_draw_debug": Prop.Stack(),
 }
 
-static func on_draw(ctx: LisperContext, this: Mono, item: SekaiItem) -> void:
+static func on_draw(ctx: LisperContext, this: Mono, ctrl: SekaiControl, item: SekaiItem) -> void:
 	var pos := Vector2(this.position.x, this.position.y - this.position.z * item.ratio_yz)
 	var cur_draw = this.getp(&"cur_draw")
 	if cur_draw == &"": return

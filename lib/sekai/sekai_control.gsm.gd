@@ -29,7 +29,11 @@ class_name SekaiControl extends Control
 @export var allow_input_direction: bool = true
 
 ## 图块的单位大小
-@export var unit_size := Vector3(16, 16, 16)
+@export var unit_size := Vector3(16, 16, 16):
+	set(v):
+		if v != unit_size:
+			unit_size = v
+			unit_size_mod.emit()
 
 
 
@@ -58,6 +62,13 @@ var context: LisperContext = null
 func set_target(ptarget: Mono) -> void:
 	if allow_transfer_target:
 		target = ptarget
+
+
+
+#
+# 信号
+#
+signal unit_size_mod
 
 
 
@@ -107,6 +118,7 @@ func _gui_input(event: InputEvent) -> void:
 		var pos := event.position as Vector2
 		dir = (pos - size / 2) / Vector2(unit_size.x, unit_size.y)
 	if allow_input: _input_mapper.update(event, dir)
+	accept_event()
 
 func _unhandled_input(event: InputEvent) -> void:
 	if allow_input: _input_mapper.update(event)

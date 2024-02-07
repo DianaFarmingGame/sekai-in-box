@@ -29,9 +29,15 @@ var _parent: SekaiControl = null
 
 func _enter_tree() -> void:
 	_parent = get_parent()
+	_parent.unit_size_mod.connect(_on_unit_size_mod)
 	unit_size = _parent.unit_size
 
+func _on_unit_size_mod() -> void:
+	unit_size = _parent.unit_size
+	base_transform = Transform2D(0, Vector2(unit_size.x, unit_size.y), 0, Vector2(0, -position.y))
+
 func _exit_tree() -> void:
+	_parent.unit_size_mod.disconnect(_on_unit_size_mod)
 	_parent = null
 
 func _draw() -> void:

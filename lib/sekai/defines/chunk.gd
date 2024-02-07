@@ -57,7 +57,7 @@ func do_merge(sets: Array[Dictionary]) -> Array[Dictionary]:
 					var item := SekaiItem.new()
 					item.on_draw.connect(func ():
 						for mono in lconts:
-							mono.callm(ctx, &"on_draw", item)
+							mono.applym(ctx, &"on_draw", [ctrl, item])
 					)
 					item.set_y(offset.y + cell.y * y + floorf(offset.z) * 64)
 					for x in size.x:

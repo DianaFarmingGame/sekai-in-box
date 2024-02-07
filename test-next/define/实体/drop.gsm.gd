@@ -3,7 +3,7 @@ class_name GDrop extends GEntity
 func do_merge(sets: Array[Dictionary]) -> Array[Dictionary]:
 	super.do_merge(sets)
 	name = "GDrop"
-	ref = 1000
+	ref = 1001
 	id = "drop"
 	merge_traits(sets, [TGroup, TCollisible, TSolid, TProcess, TContainer, 小阴影])
 	merge_props(sets, {

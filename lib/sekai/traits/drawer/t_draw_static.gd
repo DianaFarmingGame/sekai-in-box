@@ -28,7 +28,7 @@ static func update(ctx: LisperContext, this: Mono) -> void:
 			var clip = draw[2]
 			if this.getp(&"draw_flip_h"):
 				this.putsB(&"on_draw", [
-					&"0:draw_static", func (ctx: LisperContext, this: Mono, item: SekaiItem) -> void:
+					&"0:draw_static", func (ctx: LisperContext, this: Mono, ctrl: SekaiControl, item: SekaiItem) -> void:
 						var pos := Vector2(this.position.x, this.position.y - this.position.z * item.ratio_yz)
 						item.pen_set_transform(Transform2D(0, Vector2(-1, 1), 0, pos + clip[0].position + clip[0].size / 2))
 						item.pen_draw_texture_region(texture, Rect2(-clip[0].size / 2, clip[0].size), clip[1])
@@ -37,7 +37,7 @@ static func update(ctx: LisperContext, this: Mono) -> void:
 				])
 			else:
 				this.putsB(&"on_draw", [
-					&"0:draw_static", func (ctx: LisperContext, this: Mono, item: SekaiItem) -> void:
+					&"0:draw_static", func (ctx: LisperContext, this: Mono, ctrl: SekaiControl, item: SekaiItem) -> void:
 						var pos := Vector2(this.position.x, this.position.y - this.position.z * item.ratio_yz)
 						item.pen_draw_texture_region(texture, Rect2(pos + clip[0].position, clip[0].size), clip[1])
 						pass,
@@ -49,7 +49,7 @@ static func update(ctx: LisperContext, this: Mono) -> void:
 			var timer := this.getp(&"draw_timer") as float
 			if this.getp(&"draw_flip_h"):
 				this.putsB(&"on_draw", [
-					&"0:draw_static", func (ctx: LisperContext, this: Mono, item: SekaiItem) -> void:
+					&"0:draw_static", func (ctx: LisperContext, this: Mono, ctrl: SekaiControl, item: SekaiItem) -> void:
 						var pos := Vector2(this.position.x, this.position.y - this.position.z * item.ratio_yz)
 						var t := (item.get_time() - timer) as float
 						var frame_idx := lerpf(0.0, (frames.size() as float), fmod(t, timeout) / timeout) as int
@@ -61,7 +61,7 @@ static func update(ctx: LisperContext, this: Mono) -> void:
 				])
 			else:
 				this.putsB(&"on_draw", [
-					&"0:draw_static", func (ctx: LisperContext, this: Mono, item: SekaiItem) -> void:
+					&"0:draw_static", func (ctx: LisperContext, this: Mono, ctrl: SekaiControl, item: SekaiItem) -> void:
 						var pos := Vector2(this.position.x, this.position.y - this.position.z * item.ratio_yz)
 						var t := (item.get_time() - timer) as float
 						var frame_idx := lerpf(0.0, (frames.size() as float), fmod(t, timeout) / timeout) as int
