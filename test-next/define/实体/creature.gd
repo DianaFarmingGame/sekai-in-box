@@ -7,6 +7,7 @@ func do_merge(sets: Array[Dictionary]) -> Array[Dictionary]:
 		TInput, TProcess, TState, TUI,
 		TSolid, TPickable, TContactable,
 		TMove, TPick,
+		TControlBase,
 	])
 	merge_props(sets, {
 		&"name": "UMA",

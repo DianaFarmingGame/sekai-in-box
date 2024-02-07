@@ -5,6 +5,7 @@ func do_merge(sets: Array[Dictionary]) -> Array[Dictionary]:
 	name = "PC"
 	merge_traits(sets, [
 		TDefTarget,
+		TControlCommon,
 	])
 	merge_props(sets, {
 	})
