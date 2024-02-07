@@ -1,6 +1,6 @@
-class_name TControlCommon extends MonoTrait
+class_name 一般控制 extends MonoTrait
 
-var id := &"control_common"
+var id := &"一般控制"
 var requires := [&"input", &"pick"]
 
 var props := {
@@ -41,7 +41,7 @@ var props := {
 	
 	#--------------------------------------------------------------------------#
 	&"on_input": Prop.puts({
-		&"0:common_actions": func (ctx: LisperContext, this: Mono, ctrl: SekaiControl, sets: InputSet) -> void:
+		&"0:一般控制": func (ctx: LisperContext, this: Mono, ctrl: SekaiControl, sets: InputSet) -> void:
 			if this.getp(&"can_common_action"):
 				for act in sets.pressings.keys():
 					match act:
@@ -56,7 +56,7 @@ var props := {
 			pass,
 	}),
 	&"on_pick": Prop.puts({
-		&"0:common_actions": func (ctx: LisperContext, this: Mono, ctrl: SekaiControl, pick: Variant, sets: InputSet) -> void:
+		&"0:一般控制": func (ctx: LisperContext, this: Mono, ctrl: SekaiControl, pick: Variant, sets: InputSet) -> void:
 			if this.getp(&"can_common_action"):
 				for act in sets.pressings.keys():
 					match act:

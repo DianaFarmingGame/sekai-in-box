@@ -1,14 +1,14 @@
-sekai/exec ("scene.gss.txt")
-
 wait (gikou on_inited []
 	var (hako do (gikou get_hako))
+	
+	exec (+(*mod-dir* "/scene.gss.txt"))
 	
 	var (嘉然 do (hako add_mono &实体/角色/嘉然 {
 		position vec3(5 9 1)
 	}))
 	
 	; 测试：相对移动
-	go (block(
+	#;go (block(
 		func ([我]
 			var (speed 5)
 			delay (2)

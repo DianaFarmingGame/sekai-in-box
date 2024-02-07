@@ -1,6 +1,6 @@
-class_name TControlBase extends MonoTrait
+class_name 菜单控制 extends MonoTrait
 
-var id := &"control_base"
+var id := &"菜单控制"
 var requires := [&"input"]
 
 var props := {
@@ -16,7 +16,7 @@ var props := {
 	
 	#--------------------------------------------------------------------------#
 	&"on_input": Prop.puts({
-		&"0:menu_toggle": func (ctx: LisperContext, this: Mono, ctrl: SekaiControl, sets: InputSet) -> void:
+		&"0:菜单控制": func (ctx: LisperContext, this: Mono, ctrl: SekaiControl, sets: InputSet) -> void:
 			if sets.pressings.has(&"menu_toggle"):
 				this.applyc(ctx, &"on_menu_toggle", [ctrl])
 			pass,
