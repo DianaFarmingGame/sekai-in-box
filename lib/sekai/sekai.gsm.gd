@@ -39,7 +39,7 @@ var gikou: Mono = null
 ## 全局的执行环境（原则上不应该被 Sekai 以外的对象使用）
 var context: LisperContext = null
 
-# TODO: Gloabl DB
+var data: GDatabase
 
 
 
