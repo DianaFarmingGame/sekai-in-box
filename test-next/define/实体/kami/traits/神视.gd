@@ -9,6 +9,7 @@ var props := {
 	
 	&"on_draw": Prop.puts({
 		&"0:kami_sight": func (ctx: LisperContext, this: Mono, ctrl: SekaiControl, item: SekaiItem) -> void:
+			if ctrl.is_sub: return
 			var dis := this.getp(&"kami_sight_distance") as int
 			var cpos := this.position.snapped(Vector3(1, 1, 1))
 			var dpos := Vector2(cpos.x, cpos.y - cpos.z * item.ratio_yz)

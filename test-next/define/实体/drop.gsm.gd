@@ -13,7 +13,7 @@ func do_merge(sets: Array[Dictionary]) -> Array[Dictionary]:
 		&"groups": [&"drop"],
 		
 		&"on_draw": Prop.puts({
-			&"0:drop_item": func (ctx: LisperContext, this: Mono, sitem: SekaiItem) -> void:
+			&"0:drop_item": func (ctx: LisperContext, this: Mono, ctrl: SekaiControl, sitem: SekaiItem) -> void:
 				var pos := Vector2(this.position.x, this.position.y - this.position.z * sitem.ratio_yz)
 				var item := this.getp(&"contains")[0] as Mono
 				var t := sitem.get_time()

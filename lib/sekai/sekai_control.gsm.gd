@@ -22,9 +22,6 @@ class_name SekaiControl extends Control
 ## 是否允许主动监听用户输入
 @export var allow_input: bool = true
 
-## 是否允许监听 Action 输入
-@export var allow_input_action: bool = true
-
 ## 是否允许监听 Direction 输入
 @export var allow_input_direction: bool = true
 
@@ -54,6 +51,9 @@ var target: Mono = null:
 ## 执行上下文
 var context: LisperContext = null
 
+## 当前视图是否为已有视图的子视图
+var is_sub := false
+
 
 
 #
@@ -78,16 +78,21 @@ signal unit_size_mod
 
 func _init() -> void:
 	y_sort_enabled = true
-	texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST_WITH_MIPMAPS
+	if texture_filter == CanvasItem.TEXTURE_FILTER_PARENT_NODE:
+		texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST_WITH_MIPMAPS
 	context = _make_context()
 
 func _ready() -> void:
+	if sekai.gikou != null:
+		_update_gikou()
 	sekai.gikou_changed.connect(_update_gikou)
 	sekai.process.connect(_on_process)
 	_input_mapper.updated.connect(_on_mapper_input)
 
 func _enter_tree() -> void:
 	LisperDebugger.sign_context("SekaiControl", context)
+	if _check_sub(self):
+		is_sub = true
 
 func _exit_tree() -> void:
 	LisperDebugger.unsign_context("SekaiControl", context)
@@ -113,15 +118,18 @@ func _draw() -> void:
 #
 
 func _gui_input(event: InputEvent) -> void:
-	var dir = null
-	if event is InputEventMouse:
-		var pos := event.position as Vector2
-		dir = (pos - size / 2) / Vector2(unit_size.x, unit_size.y)
-	if allow_input: _input_mapper.update(event, dir)
-	accept_event()
+	if allow_input:
+		var dir = null
+		if allow_input_direction and event is InputEventMouse:
+			var pos := event.position as Vector2
+			dir = (pos - size / 2) / Vector2(unit_size.x, unit_size.y)
+		_input_mapper.update(event, dir)
+		accept_event()
 
 func _unhandled_input(event: InputEvent) -> void:
-	if allow_input: _input_mapper.update(event)
+	if allow_input:
+		_input_mapper.update(event)
+		accept_event()
 
 
 
@@ -206,12 +214,24 @@ func _pass_input(sets: InputSet) -> void:
 	if target and target.getp(&"can_input"): await target.applyc(context, &"on_input", [self, sets])
 
 
+## 检查父级是否存在 SekaiControl
+func _check_sub(node: Node) -> bool:
+	var parent = node.get_parent_control()
+	if parent != null:
+		if parent is SekaiControl:
+			return true
+		else:
+			return _check_sub(parent)
+	else:
+		return false
+
+
 #
 # 回调函数
 #
 
 func _on_mapper_input(sets: InputSet) -> void:
-	if allow_input_action: _pass_input(sets)
+	_pass_input(sets)
 
 
 

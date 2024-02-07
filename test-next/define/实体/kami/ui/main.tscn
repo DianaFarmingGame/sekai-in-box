@@ -1,6 +1,7 @@
-[gd_scene load_steps=3 format=3 uid="uid://bddntpoq8y5r3"]
+[gd_scene load_steps=4 format=3 uid="uid://bddntpoq8y5r3"]
 
 [ext_resource type="Script" path="res://test-next/define/实体/kami/ui/main.gd" id="1_ny1x0"]
+[ext_resource type="Script" path="res://lib/sekai/sekai_control.gsm.gd" id="2_7nmqr"]
 
 [sub_resource type="Theme" id="Theme_rowid"]
 Label/colors/font_shadow_color = Color(0, 0, 0, 0.666667)
@@ -37,3 +38,29 @@ theme_override_constants/margin_bottom = 4
 unique_name_in_owner = true
 layout_mode = 2
 horizontal_alignment = 1
+
+[node name="MarginContainer2" type="MarginContainer" parent="."]
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -144.0
+offset_bottom = 144.0
+grow_horizontal = 0
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 8
+theme_override_constants/margin_bottom = 8
+
+[node name="PanelContainer" type="PanelContainer" parent="MarginContainer2"]
+clip_contents = true
+layout_mode = 2
+
+[node name="SekaiControl" type="Control" parent="MarginContainer2/PanelContainer"]
+custom_minimum_size = Vector2(128, 128)
+layout_mode = 2
+script = ExtResource("2_7nmqr")
+allow_transfer_target = false
+allow_input = false
+allow_input_direction = false
+unit_size = Vector3(2, 2, 2)
