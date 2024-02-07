@@ -22,7 +22,7 @@ var props := {
 	&"on_slot_switch": Prop.Stack(),
 	
 	# 选择快捷槽
-	# @params: SekaiControl, int<0~3>: 选择槽位的 index
+	# @params: SekaiControl, int<0~4>: 选择槽位的 index
 	&"on_slot_select": Prop.Stack(),
 	
 	# 开关物品栏
@@ -43,7 +43,7 @@ var props := {
 	&"on_input": Prop.puts({
 		&"0:common_actions": func (ctx: LisperContext, this: Mono, ctrl: SekaiControl, sets: InputSet) -> void:
 			if this.getp(&"can_common_action"):
-				for act in sets.pressings.values():
+				for act in sets.pressings.keys():
 					match act:
 						&"slot_prev": await this.applyc(ctx, &"on_slot_switch", [ctrl, -1])
 						&"slot_next": await this.applyc(ctx, &"on_slot_switch", [ctrl, 1])
@@ -51,13 +51,14 @@ var props := {
 						&"slot_2": await this.applyc(ctx, &"on_slot_select", [ctrl, 1])
 						&"slot_3": await this.applyc(ctx, &"on_slot_select", [ctrl, 2])
 						&"slot_4": await this.applyc(ctx, &"on_slot_select", [ctrl, 3])
+						&"slot_5": await this.applyc(ctx, &"on_slot_select", [ctrl, 4])
 						&"inventory_toggle": await this.applyc(ctx, &"on_inventory_toggle", [ctrl])
 			pass,
 	}),
 	&"on_pick": Prop.puts({
 		&"0:common_actions": func (ctx: LisperContext, this: Mono, ctrl: SekaiControl, pick: Variant, sets: InputSet) -> void:
 			if this.getp(&"can_common_action"):
-				for act in sets.pressings.values():
+				for act in sets.pressings.keys():
 					match act:
 						&"action_primary":
 							await this.applyc(ctx, &"on_action_primary", [ctrl, pick, sets])
