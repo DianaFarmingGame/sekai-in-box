@@ -33,7 +33,7 @@ theme_override_constants/margin_top = 4
 theme_override_constants/margin_right = 4
 theme_override_constants/margin_bottom = 4
 
-[node name="Label" type="Label" parent="MarginContainer"]
+[node name="Tag" type="Label" parent="MarginContainer"]
+unique_name_in_owner = true
 layout_mode = 2
-text = "神様思考中..."
 horizontal_alignment = 1

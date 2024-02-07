@@ -1,13 +1,9 @@
-[gd_scene load_steps=4 format=3 uid="uid://d1busoxns41oo"]
+[gd_scene load_steps=3 format=3 uid="uid://d1busoxns41oo"]
 
 [ext_resource type="Script" path="res://lib/sekai/traits/base/debug_ui.gd" id="1_wyu4n"]
 
-[sub_resource type="SystemFont" id="SystemFont_nsrks"]
-font_names = PackedStringArray("Source Code Pro")
-
 [sub_resource type="LabelSettings" id="LabelSettings_jocpy"]
 line_spacing = 0.0
-font = SubResource("SystemFont_nsrks")
 font_size = 14
 shadow_size = 0
 shadow_color = Color(0, 0, 0, 0.733333)
