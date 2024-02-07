@@ -2,7 +2,7 @@ class_name TSolid extends MonoTrait
 ## 这个 Trait 可以使 Mono 的移动受到碰撞和导航的规则限制
 
 var id := &"solid"
-var requires := [&"position"]
+var requires := [&"position", &"drawable"]
 
 var props := {
 	#

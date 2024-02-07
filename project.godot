@@ -24,6 +24,7 @@ sekai="*res://lib/sekai/sekai.gsm.gd"
 [debug]
 
 gdscript/warnings/unused_parameter=0
+gdscript/warnings/shadowed_variable=0
 gdscript/warnings/integer_division=0
 gdscript/warnings/confusable_local_declaration=0
 
@@ -188,7 +189,7 @@ debug_draw_collisible=false
 debug_draw_routable=false
 debug_draw_solid=false
 debug_draw_contactable=false
-debug_draw_pickable=false
+debug_draw_pickable=true
 define_entry="res://test-next/define_entry.gss.txt"
 render_extra_sight=4
 min_inits_per_frame=8

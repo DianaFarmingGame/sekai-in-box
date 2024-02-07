@@ -2,7 +2,7 @@ class_name TCollisible extends MonoTrait
 ## 为当前 Mono 可碰撞性，和 TSolid 一起使用
 
 var id := &"collisible"
-var requires := [&"position", &"group"]
+var requires := [&"position", &"group", &"drawable"]
 
 var props := {
 	#

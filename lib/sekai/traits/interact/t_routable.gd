@@ -2,7 +2,7 @@ class_name TRoutable extends MonoTrait
 ## 为当前 Mono 可导航性，和 TSolid 一起使用
 
 var id := &"routable"
-var requires := [&"position", &"group"]
+var requires := [&"position", &"group", &"drawable"]
 
 var props := {
 	#

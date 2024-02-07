@@ -61,11 +61,7 @@ var props := {
 		if ctrl.is_sub: return
 		var data := this.getpBR(&"ui_data") as Dictionary
 		var nodes := this.getpBR(&"ui_nodes") as Dictionary
-		var ui := data[uid] as PackedScene
-		var node := ui.instantiate()
-		var need_this := node.get_property_list().any(func (opt): return opt[&"name"] == &"this")
-		if need_this:
-			node.this = this
+		var node := TUI.make_ui(ctx, this, data[uid])
 		nodes[uid] = node
 		this.setpB(&"ui_nodes", nodes)
 		ctrl.add_child(node),
@@ -84,11 +80,7 @@ var props := {
 			var data := this.getpBR(&"ui_data") as Dictionary
 			var nodes := {}
 			for uid in acts:
-				var ui := data[uid] as PackedScene
-				var node := ui.instantiate()
-				var need_this := node.get_property_list().any(func (opt): return opt[&"name"] == &"this")
-				if need_this:
-					node.this = this
+				var node := TUI.make_ui(ctx, this, data[uid])
 				nodes[uid] = node
 			this.setpB(&"ui_nodes", nodes)
 			for node in nodes.values():
@@ -110,3 +102,11 @@ var props := {
 				await this.applycRSU(ctx, &"ui/toggle", [ctrl, &"debug"]),
 	})
 }
+
+static func make_ui(ctx: LisperContext, this: Mono, ui: PackedScene) -> Node:
+	var node := ui.instantiate()
+	if node.get_property_list().any(func (opt): return opt[&"name"] == &"this"):
+		node.this = this
+	if node.get_property_list().any(func (opt): return opt[&"name"] == &"context"):
+		node.context = ctx
+	return node

@@ -5,14 +5,13 @@ func do_merge(sets: Array[Dictionary]) -> Array[Dictionary]:
 	name = "Chunk"
 	ref = 2
 	id = &"chunk"
-	merge_traits(sets, [TPosition])
+	merge_traits(sets, [TPosition, TWithLayer, TDrawable, TPickable])
 	merge_props(sets, {
 		&"chunk_size": Vector2(0, 0),
 		&"chunk_cell": Vector3(1, 1, 1),
 		&"chunk_data": [-1],
 		
 		&"chunk_mat": null,
-		&"chunk_items": [],
 		
 		&"collect_by_pos": func (ctx: LisperContext, this: Mono, pos: Vector3) -> Mono:
 			var offset := this.position
@@ -39,22 +38,31 @@ func do_merge(sets: Array[Dictionary]) -> Array[Dictionary]:
 		
 		
 		&"on_process": null,
+		&"on_init": Prop.puts({
+			&"0:chunk": func (ctx: LisperContext, this: Mono) -> void:
+				var size := this.getp(&"chunk_size") as Vector2
+				var cell := this.getp(&"chunk_cell") as Vector3
+				var dcell := Vector2(cell.x, cell.y)
+				this.setpB(&"pick_box", Rect2(-dcell / 2, dcell * size))
+				var act_layer := this.getpR(&"act_layer") as Array
+				act_layer.append_array(range(size.y).map(func (i): return str(i)))
+				this.setpB(&"act_layer", act_layer),
+		}),
 		&"on_control_enter": Prop.puts({
 			&"0:chunk": func (ctx: LisperContext, this: Mono, ctrl: SekaiControl) -> void:
 				var offset := this.position
 				var data := this.getp(&"chunk_data") as Array
 				var size := this.getp(&"chunk_size") as Vector2
 				var cell := this.getp(&"chunk_cell") as Vector3
+				var layers := this.getp(&"layer_data") as Dictionary
 				var contains := []
 				var mat := []
 				mat.resize(size.y as int)
-				var items := []
-				items.resize(size.y as int)
 				for y in size.y:
 					var line := []
 					var lconts := []
 					line.resize(size.x as int)
-					var item := SekaiItem.new()
+					var item := layers[str(y as int)] as SekaiItem
 					item.on_draw.connect(func ():
 						for mono in lconts:
 							mono.applym(ctx, &"on_draw", [ctrl, item])
@@ -73,20 +81,9 @@ func do_merge(sets: Array[Dictionary]) -> Array[Dictionary]:
 						else:
 							line[x] = null
 					mat[y] = line
-					items[y] = item
-					ctrl.add_child(item)
 				this.setpB(&"contains", contains)
 				this.setpB(&"chunk_mat", mat)
-				this.setpB(&"chunk_items", items)
 				await Async.array_map(contains, func (item): await item._into_container(ctx, this))
-				pass,
-		}),
-		&"on_control_exit": Prop.puts({
-			&"0:chunk": func (ctx: LisperContext, this: Mono, ctrl: SekaiControl) -> void:
-				var items := this.getp(&"chunk_items") as Array
-				for item in items:
-					ctrl.remove_child(item)
-					item.free()
 				pass,
 		}),
 		&"on_store": Prop.puts({

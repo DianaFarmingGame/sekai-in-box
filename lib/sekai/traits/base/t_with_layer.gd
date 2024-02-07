@@ -22,6 +22,9 @@ var props := {
 	# 额外图层的映射表
 	&"layer_data": {},
 	
+	# 图层的不透明度，只用于非发布场合
+	&"layer_opacity": 1.0,
+	
 	
 	
 	#
@@ -98,4 +101,11 @@ var props := {
 			this.setpB(&"layer", null)
 			this.setpB(&"layer_data", {}),
 	}),
+	&"on_layer_opacity": func (ctx: LisperContext, this: Mono, layer_opacity: float) -> float:
+		var item := this.getpBR(&"layer") as SekaiItem
+		var data := this.getpBR(&"layer_data") as Dictionary
+		item.self_modulate = Color(1, 1, 1, layer_opacity)
+		for layer in data.values():
+			layer.self_modulate = Color(1, 1, 1, layer_opacity)
+		return layer_opacity,
 }

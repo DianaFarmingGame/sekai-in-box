@@ -91,8 +91,7 @@ func _ready() -> void:
 
 func _enter_tree() -> void:
 	LisperDebugger.sign_context("SekaiControl", context)
-	if _check_sub(self):
-		is_sub = true
+	is_sub = _check_sub(self)
 
 func _exit_tree() -> void:
 	LisperDebugger.unsign_context("SekaiControl", context)

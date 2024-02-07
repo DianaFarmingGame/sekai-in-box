@@ -14,12 +14,18 @@ func merge(sets: Array[Dictionary], uids: Array, prequires := []) -> Array[Dicti
 		if TraitLike.DETECT_DUPLICATE_TRAIT:
 			push_warning("duplicated trait, uid: ", uid)
 		return sets
+	for u in _get_requires():
+		var missings := []
+		if not uids.has(u):
+			missings.append(u)
+		if missings.size() > 0:
+			push_error("Trait ", _get_uid(), ": missing require: ", missings)
+			breakpoint
+			return sets
 	for t in _get_own_traits():
 		merge_trait(sets, t, uids, prequires)
 	sets = merge_props(sets, _get_own_props())
 	uids.append(uid)
-	for u in _get_requires():
-		if not prequires.has(u): prequires.append(u)
 	return sets
 
 func _do_merge(sets: Array[Dictionary]) -> Array[Dictionary]:

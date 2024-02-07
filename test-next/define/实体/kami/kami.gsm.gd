@@ -10,7 +10,8 @@ func do_merge(sets: Array[Dictionary]) -> Array[Dictionary]:
 		TContactable,
 		TMove, TPick,
 		TDefTarget,
-		菜单控制, 神移, 神视, 神变,
+		菜单控制, 一般控制,
+		神移, 神视, 神变,
 	])
 	merge_props(sets, {
 		&"name": "创造神様",

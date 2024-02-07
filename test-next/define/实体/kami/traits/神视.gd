@@ -20,10 +20,10 @@ var props := {
 					var alpha := clampf((float(dis) - (pos - rpos).length()) / dis, 0, 1) * 0.5
 					if fmod(pos.x + pos.y, 2) == 0 and alpha > 0:
 						item.draw_rect(Rect2(pos - Vector2(0.5, 0.5), Vector2(1, 1)), Color(Color.WHITE, alpha), false)
-			var cursor := this.getp(&"kami_sight_cursor") as Vector3
-			var scursor := cursor.snapped(Vector3(1, 1, 1))
-			var sdcursor := Vector2(scursor.x, scursor.y - scursor.z * item.ratio_yz)
-			item.draw_rect(Rect2(sdcursor - Vector2(0.5, 0.5), Vector2(1, 1)), Color(Color.WHITE, 0.4), true)
+			#var cursor := this.getp(&"kami_sight_cursor") as Vector3
+			#var scursor := cursor.snapped(Vector3(1, 1, 1))
+			#var sdcursor := Vector2(scursor.x, scursor.y - scursor.z * item.ratio_yz)
+			#item.draw_rect(Rect2(sdcursor - Vector2(0.5, 0.5), Vector2(1, 1)), Color(Color.WHITE, 0.4), true)
 			#item.draw_rect(Rect2(sdcursor - Vector2(0.5, 0.5), Vector2(1, 1)), Color.BLACK, false)
 			pass,
 	}),
