@@ -1,11 +1,11 @@
-class_name Hako extends Box
+class_name GHuman extends GAnimal
 
 func do_merge(sets: Array[Dictionary]) -> Array[Dictionary]:
 	super.do_merge(sets)
-	name = "Hako"
-	ref = 1
-	id = &"hako"
+	name = "人类"
+	merge_traits(sets, [
+		一般控制, 有背包,
+	])
 	merge_props(sets, {
-		&"id": null,
 	})
 	return sets

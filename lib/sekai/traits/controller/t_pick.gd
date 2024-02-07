@@ -1,7 +1,7 @@
-class_name TPickByInput extends MonoTrait
+class_name TPick extends MonoTrait
 ## 这个 Trait 可以把 TInput 的输入转换为拾取事件
 
-var id := &"pick_by_input"
+var id := &"pick"
 var requires := [&"position", &"input"]
 
 var props := {
@@ -26,7 +26,7 @@ var props := {
 	
 	#--------------------------------------------------------------------------#
 	&"on_input": Prop.puts({
-		&"0:pick_by_input": func (ctx: LisperContext, this: Mono, ctrl: SekaiControl, sets: InputSet) -> void:
+		&"0:pick": func (ctx: LisperContext, this: Mono, ctrl: SekaiControl, sets: InputSet) -> void:
 			if this.getp(&"can_pick"):
 				var dir := sets.direction
 				var pos := Vector2(this.position.x, this.position.y - this.position.z * ctrl.unit_size.y / ctrl.unit_size.z) + dir
@@ -38,7 +38,8 @@ var props := {
 					if pair[0] < min_len:
 						min_len = pair[0]
 						min_mono = pair[1]
-				if min_mono != null: this.applyc(ctx, &"on_pick", [min_mono, sets])
+				#if min_mono != null: # IMPORTANT!
+				this.applyc(ctx, &"on_pick", [ctrl, min_mono, sets])
 			pass,
 	}),
 }

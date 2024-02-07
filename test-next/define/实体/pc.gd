@@ -1,11 +1,11 @@
-class_name Hako extends Box
+class_name GPC extends GHuman
 
 func do_merge(sets: Array[Dictionary]) -> Array[Dictionary]:
 	super.do_merge(sets)
-	name = "Hako"
-	ref = 1
-	id = &"hako"
+	name = "PC"
+	merge_traits(sets, [
+		TDefTarget,
+	])
 	merge_props(sets, {
-		&"id": null,
 	})
 	return sets

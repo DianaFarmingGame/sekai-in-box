@@ -1,11 +1,11 @@
-class_name Chunk extends MonoDefine
+class_name Chunk extends Box
 
 func do_merge(sets: Array[Dictionary]) -> Array[Dictionary]:
 	super.do_merge(sets)
 	name = "Chunk"
-	ref = 100
+	ref = 2
 	id = &"chunk"
-	merge_traits(sets, [TPosition, TContainer])
+	merge_traits(sets, [TPosition])
 	merge_props(sets, {
 		&"chunk_size": Vector2(0, 0),
 		&"chunk_cell": Vector3(1, 1, 1),
@@ -35,11 +35,10 @@ func do_merge(sets: Array[Dictionary]) -> Array[Dictionary]:
 				else:
 					return null
 			return null,
-		&"collect_collide": func (ctx: LisperContext, this: Mono, region: Rect2, z_pos: int) -> Array:
-			return await this.applymRSU(ctx, &"container/collect_applyc", [&"collect_collide", [region, z_pos]]),
-		&"collect_route": func (ctx: LisperContext, this: Mono, point: Vector2, z_pos: int) -> Array:
-			return await this.applymRSU(ctx, &"container/collect_applyc", [&"collect_route", [point, z_pos]]),
 		
+		
+		
+		&"on_process": null,
 		&"on_control_enter": Prop.puts({
 			&"0:chunk": func (ctx: LisperContext, this: Mono, ctrl: SekaiControl) -> void:
 				var offset := this.position
@@ -58,7 +57,7 @@ func do_merge(sets: Array[Dictionary]) -> Array[Dictionary]:
 					var item := SekaiItem.new()
 					item.on_draw.connect(func ():
 						for mono in lconts:
-							mono.callmR(ctx, &"on_draw", item)
+							mono.callm(ctx, &"on_draw", item)
 					)
 					item.set_y(offset.y + cell.y * y + floorf(offset.z) * 64)
 					for x in size.x:
@@ -67,7 +66,7 @@ func do_merge(sets: Array[Dictionary]) -> Array[Dictionary]:
 						if rid != -1:
 							var mono := sekai.make_mono(rid)
 							mono.position = Vector3(x, y, 0) * cell + offset
-							mono.setpB(&"sekai_item", item)
+							mono.setpB(&"layer", item)
 							contains.append(mono)
 							lconts.append(mono)
 							line[x] = mono

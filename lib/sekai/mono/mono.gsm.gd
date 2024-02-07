@@ -1,4 +1,5 @@
 class_name Mono
+## Sekai 内使用的基本实例类型
 
 var root: Mono = null
 var define: MonoDefine
@@ -24,6 +25,32 @@ static func restore_from_data(ctx: LisperContext, data: Variant) -> Mono:
 	var mono := from_data(data)
 	await mono.restore(ctx)
 	return mono
+
+class FnVal: pass
+
+static func clone_val(value: Variant) -> Variant:
+	if Lisper.is_fn(value):
+		return FnVal.new()
+	if value is Object:
+		return null
+	if value is Array:
+		var res := []
+		for rv in value:
+			var v = clone_val(rv)
+			if v is FnVal:
+				return null
+			if v == null:
+				continue
+			res.append(v)
+		return res
+	if value is Dictionary:
+		var res := {}
+		for k in value.keys():
+			var v = clone_val(value[k])
+			if v != null and not v is FnVal:
+				res[k] = v
+		return res
+	return value
 
 func _into_container(ctx: LisperContext, cont: Mono) -> void:
 	root = cont
@@ -52,6 +79,14 @@ func clone() -> Mono:
 	mono.inited = inited
 	mono.position = position
 	mono.layers = layers.duplicate(true)
+	return mono
+
+func clone_data() -> Mono:
+	var mono := get_script().new() as Mono
+	mono.define = define
+	mono.inited = inited
+	mono.position = position
+	mono.layers = Mono.clone_val(layers)
 	return mono
 
 func _to_data() -> Dictionary:
@@ -114,6 +149,7 @@ func call_watcher(ctx: LisperContext, key: StringName, value: Variant, force := 
 		elif data is Array:
 			for entry in data.duplicate():
 				value = await entry[1].call(ctx, self, value)
+		await applym(ctx, &"on_mod", [key, value])
 	return value
 
 ## get property methods
@@ -183,10 +219,20 @@ func getpB(key: StringName) -> Variant:
 		return layers[-1][1].get(key)
 	return null
 
+func getpBR(key: StringName) -> Variant:
+	if layers.size() > 0:
+		return layers[-1][1].get(key, define._props.get(key))
+	return define._props.get(key)
+
 func getpBD(key: StringName, default: Variant) -> Variant:
 	if layers.size() > 0:
 		return layers[-1][1].get(key, default)
 	return default
+
+func getpBRD(key: StringName, default: Variant) -> Variant:
+	if layers.size() > 0:
+		return layers[-1][1].get(key, define._props.get(key, default))
+	return define._props.get(key, default)
 
 func getpR(key: StringName) -> Variant:
 	return define._props.get(key)

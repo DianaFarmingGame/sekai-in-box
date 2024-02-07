@@ -11,7 +11,7 @@ var props := {
 	} if ProjectSettings.get_setting(&"sekai/debug_draw_contactable") else {})
 }
 
-static func draw_debug(ctx: LisperContext, this: Mono, item: SekaiItem) -> void:
+static func draw_debug(ctx: LisperContext, this: Mono, ctrl: SekaiControl, item: SekaiItem) -> void:
 	var pos := Vector2(this.position.x, this.position.y - this.position.z * item.ratio_yz)
 	var rbox := this.getp(&"solid_box") as Rect2
 	var box := Rect2(pos + rbox.position, rbox.size)

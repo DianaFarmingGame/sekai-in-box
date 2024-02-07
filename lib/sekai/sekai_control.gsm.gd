@@ -41,12 +41,14 @@ class_name SekaiControl extends Control
 var target: Mono = null:
 	set(v):
 		if not is_same(target, v):
+			if target is Mono:
+				await target.callm(context, &"on_target_unset", self)
 			target = v
+			context.def_const(&"target", target)
 			_update_target()
 
 ## 执行上下文
-@onready
-var context: LisperContext = _make_context()
+var context: LisperContext = null
 
 
 
@@ -66,15 +68,25 @@ func set_target(ptarget: Mono) -> void:
 func _init() -> void:
 	y_sort_enabled = true
 	texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST_WITH_MIPMAPS
+	context = _make_context()
+
+func _ready() -> void:
 	sekai.gikou_changed.connect(_update_gikou)
+	sekai.process.connect(_on_process)
 	_input_mapper.updated.connect(_on_mapper_input)
+
+func _enter_tree() -> void:
+	LisperDebugger.sign_context("SekaiControl", context)
+
+func _exit_tree() -> void:
+	LisperDebugger.unsign_context("SekaiControl", context)
 
 
 
 #
 # 循环
 #
-func _process(delta: float) -> void:
+func _on_process(delta: float) -> void:
 	await _update_sight()
 	queue_redraw()
 	if _hako != null:
@@ -121,6 +133,8 @@ defunc (target/set :const :gd ', set_target ,')
 func _make_context() -> LisperContext:
 	var ctx := sekai.context.fork() as LisperContext
 	ctx.def_const(&"control", self)
+	ctx.def_const(&"target", target)
+	ctx.def_const(&"hako", _hako)
 	return ctx
 
 func _update_gikou() -> void:
@@ -134,8 +148,10 @@ func _update_gikou() -> void:
 func _update_target() -> void:
 	if target != null:
 		_hako = target.get_hako()
+		await target.callm(context, &"on_target_set", self)
 	else:
 		_hako = null
+	context.def_const(&"hako", _hako)
 
 ## 更新代表视野内 Mono 的数组
 func _update_sight() -> void:
@@ -175,7 +191,7 @@ func _update_draw_caches() -> void:
 
 ## 将输入事件传输至目标对象
 func _pass_input(sets: InputSet) -> void:
-	if target: target.applyc(context, &"on_input", [self, sets])
+	if target and target.getp(&"can_input"): await target.applyc(context, &"on_input", [self, sets])
 
 
 #

@@ -28,20 +28,41 @@ func _do_merge(sets: Array[Dictionary]) -> Array[Dictionary]:
 func do_merge(sets: Array[Dictionary]) -> Array[Dictionary]:
 	name = "MonoDefine"
 	merge_props(sets, {
+		# 当第一次进入 Gikou 时触发
 		&"on_init": Prop.Stack(),
+		# 当生成结束时被触发
 		&"on_inited": Prop.Stack(),
+		# 当被存储时触发
 		&"on_store": Prop.Stack(),
+		# 当从存储状态中恢复时触发
 		&"on_restore": Prop.Stack(),
+		# 当每次恢复或生成结束时触发
 		&"on_ready": Prop.Stack(),
 		
+		# 当任意使用 Setter 的属性被修改时触发
+		# @params: StringName: 被修改的键, Variant: 被修改的值
+		&"on_mod": Prop.Stack(),
+		
+		# 当进入任意 SekaiControl 时触发
+		# @params: SekaiControl: 触发的节点
 		&"on_control_enter": Prop.Stack({
 			#&"0:base": func (ctx: LisperContext, this: Mono, ctrl: SekaiControl) -> void:
 				#prints(this, "entered", ctrl),
 		}),
+		
+		# 当离开任意 SekaiControl 时触发
+		# @params: SekaiControl: 触发的节点
 		&"on_control_exit": Prop.Stack({
 			#&"0:base": func (ctx: LisperContext, this: Mono, ctrl: SekaiControl) -> void:
 				#prints(this, "exited", ctrl),
 		}),
+		
+		# 当成为某个 SekaiControl 的 target 时触发
+		# @params: SekaiControl: 触发的节点
+		&"on_target_set": Prop.Stack(),
+		# 取消成为某个 SekaiControl 的 target 时触发
+		# @params: SekaiControl: 触发的节点
+		&"on_target_unset": Prop.Stack(),
 	})
 	return sets
 

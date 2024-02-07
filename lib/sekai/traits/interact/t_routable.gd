@@ -45,8 +45,8 @@ var props := {
 	} if ProjectSettings.get_setting(&"sekai/debug_draw_routable") else {})
 }
 
-static func draw_debug(ctx: LisperContext, this: Mono, item: SekaiItem) -> void:
-	var tar := sekai.control_target as Mono
+static func draw_debug(ctx: LisperContext, this: Mono, ctrl: SekaiControl, item: SekaiItem) -> void:
+	var tar := ctrl.target as Mono
 	if tar != null:
 		if this.getp(&"can_route") and floori(this.position.z) == floori(tar.position.z + tar.getp(&"solid_route_zoffset")):
 			var pos := Vector2(this.position.x, this.position.y - this.position.z * item.ratio_yz + tar.getp(&"solid_route_zoffset") * item.ratio_yz)

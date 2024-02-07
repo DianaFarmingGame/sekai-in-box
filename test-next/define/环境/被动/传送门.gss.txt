@@ -5,7 +5,7 @@ defunc (anim_portal [y]
 	array/unfold(4 fn ([x] clip_portal (x y)))
 )
 
-define (load ("../block_static_ext.gd")
+define (load ("portals.gd")
 	ref 2300
 	id &环境/被动/传送门
 	props {

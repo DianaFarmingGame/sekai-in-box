@@ -1,11 +1,10 @@
-class_name Hako extends Box
+extends GBlockStaticExt
 
 func do_merge(sets: Array[Dictionary]) -> Array[Dictionary]:
 	super.do_merge(sets)
-	name = "Hako"
-	ref = 1
-	id = &"hako"
+	name = "Portals"
+	merge_traits(sets, [TInput, TUI])
 	merge_props(sets, {
-		&"id": null,
+		#&"act_ui": Prop.pushs([&"debug"]),
 	})
 	return sets

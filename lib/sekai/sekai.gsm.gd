@@ -22,6 +22,7 @@ const print_head: String = "[sekai] "
 # 信号
 #
 signal gikou_changed
+signal process(delta: float)
 
 
 
@@ -86,9 +87,10 @@ func enter_gikou(id: String) -> void:
 ## 触发当前游戏保存存档
 func record_gikou() -> void:
 	await gikou.store(context)
+	var cgikou := gikou.clone_data()
 	DirAccess.make_dir_recursive_absolute(gikou_store_dir)
 	var file := FileAccess.open(gikou_store_dir.path_join(gikou.getp(&"id") + ".gikou"), FileAccess.WRITE)
-	file.store_var(Mono.to_data(gikou), false)
+	file.store_var(Mono.to_data(cgikou), false)
 	await gikou.restore(context)
 	gikou_changed.emit()
 
@@ -156,6 +158,7 @@ func get_uidx() -> int:
 func _init() -> void:
 	_update_debug_draw()
 	Input.use_accumulated_input = false
+	context = await LisperCommons.make_common_context("Sekai")
 
 func _ready() -> void:
 	await _init_context()
@@ -170,8 +173,16 @@ func _init_globals() -> void:
 
 ## 初始化执行环境
 func _init_context() -> void:
-	context = await LisperCommons.make_common_context("sekai")
 	await Lisper.exec_gsm(context, self)
+
+
+
+#
+# 循环
+#
+
+func _process(delta: float) -> void:
+	process.emit(delta)
 
 
 
