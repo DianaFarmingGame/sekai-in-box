@@ -9,14 +9,14 @@ func _ready() -> void:
 	_update_slots(context, this)
 
 func _enter_tree() -> void:
-	this.putsB(&"on_slots_mod", [&"ui_slots", _update_slots])
-	this.putsB(&"on_cur_slot_mod", [&"ui_slots", _update_slots])
+	this.putsB(&"on_slots_mod", [&"0:ui_slots", _update_slots])
+	this.putsB(&"on_cur_slot_mod", [&"0:ui_slots", _update_slots])
 
 func _exit_tree() -> void:
-	this.delsB(&"on_slots_mod", &"ui_slots")
-	this.delsB(&"on_cur_slot_mod", &"ui_slots")
+	this.delsB(&"on_slots_mod", &"0:ui_slots")
+	this.delsB(&"on_cur_slot_mod", &"0:ui_slots")
 
-var Slot := preload("slot.tscn")
+const Slot := preload("slot.tscn")
 
 func _update_slots(ctx: LisperContext, this: Mono) -> void:
 	for child in SlotList.get_children():

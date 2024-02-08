@@ -175,5 +175,7 @@ func _on_take_control_btn_pressed() -> void:
 		)
 		await get_tree().process_frame
 		await get_tree().process_frame
+		await get_tree().process_frame
+		await get_tree().process_frame
 		nwindow.move_to_center()
 		nwindow.popup_centered(Vector2i(600, 600))

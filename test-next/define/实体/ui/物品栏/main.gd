@@ -1,11 +1,12 @@
 extends Control
 
+var this: Mono
+var context: LisperContext
+var control: SekaiControl
 
-# Called when the node enters the scene tree for the first time.
 func _ready() -> void:
-	pass # Replace with function body.
-
-
-# Called every frame. 'delta' is the elapsed time since the previous frame.
-func _process(delta: float) -> void:
-	pass
+	var node := preload("view.tscn").instantiate()
+	node.this = this
+	node.context = context
+	node.control = control
+	add_child(node)

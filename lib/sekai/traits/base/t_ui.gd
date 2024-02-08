@@ -103,7 +103,7 @@ var props := {
 			if ctrl.is_sub: return
 			if sets.pressings.has(&"toggle_debug_ui"):
 				await this.applycRSU(ctx, &"ui/toggle", [ctrl, &"debug"]),
-	})
+	}),
 }
 
 static func make_ui(ctx: LisperContext, this: Mono, ctrl: SekaiControl, ui: PackedScene) -> Node:
