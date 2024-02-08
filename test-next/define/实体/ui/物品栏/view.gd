@@ -1,26 +1,29 @@
 extends Control
 
 var this: Mono
+var target: Mono
 var context: LisperContext
 var control: SekaiControl
 
 @onready var ItemBox := %ItemBox as VBoxContainer
 
 func _ready() -> void:
+	var tname = target.getp(&"name")
+	%Label.text = str(tname + "的物品" if tname != null else "物品")
 	_update_contains(context, this)
 
 func _enter_tree() -> void:
-	this.putsB(&"on_contains_mod", [&"0:ui_inventory_view", _update_contains])
+	target.putsB(&"on_contains_mod", [&"0:ui_inventory_view", _update_contains])
 
 func _exit_tree() -> void:
-	this.delsB(&"on_contains_mod", &"0:ui_inventory_view")
+	target.delsB(&"on_contains_mod", &"0:ui_inventory_view")
 
 const ItemEntry := preload("entry.tscn")
 
-func _update_contains(ctx: LisperContext, this: Mono) -> void:
+func _update_contains(ctx: LisperContext, target: Mono) -> void:
 	for child in ItemBox.get_children():
 		ItemBox.remove_child(child)
-	var contains := this.getp(&"contains") as Array
+	var contains := target.getp(&"contains") as Array
 	for mono in contains:
 		var texture = await (mono as Mono).emitmRS(ctx, &"icon/get_texture")
 		var entry := ItemEntry.instantiate()

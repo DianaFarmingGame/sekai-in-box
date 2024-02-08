@@ -52,6 +52,10 @@ var props := {
 			if not acts.has(uid): acts.append(uid)
 		this.setpB(&"act_ui", acts),
 	
+	# 获取某个已经开启的 UI 的节点对象
+	&"ui/get": func (ctx: LisperContext, this: Mono, ctrl: SekaiControl, uid: StringName) -> Node:
+		return this.getpBR(&"ui_nodes").get(ctrl, {}).get(uid),
+	
 	
 	
 	#--------------------------------------------------------------------------#
