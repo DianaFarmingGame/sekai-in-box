@@ -160,3 +160,20 @@ func _on_sel_mono_mod() -> void:
 		ActionTabs.set_tab_disabled(ActionType.CHUNK, true)
 	ActionTabs.current_tab = last_act
 
+func _on_take_control_btn_pressed() -> void:
+	if _sel_mono != null:
+		var ncontrol := SekaiControl.new(_sel_mono)
+		var nwindow := Window.new()
+		nwindow.add_child(ncontrol)
+		add_child(nwindow)
+		ncontrol.anchors_preset = Control.PRESET_FULL_RECT
+		ncontrol.unit_size = get_parent().unit_size
+		nwindow.close_requested.connect(func ():
+			nwindow.hide()
+			remove_child(nwindow)
+			nwindow.queue_free()
+		)
+		await get_tree().process_frame
+		await get_tree().process_frame
+		nwindow.move_to_center()
+		nwindow.popup_centered(Vector2i(600, 600))

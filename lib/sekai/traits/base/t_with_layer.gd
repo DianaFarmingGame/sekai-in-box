@@ -77,7 +77,7 @@ var props := {
 		layer.free()
 		data.erase(uid),
 	&"on_control_enter": Prop.puts({
-		&"0:with_layer": func (ctx: LisperContext, this: Mono, ctrl: SekaiControl) -> void:
+		&"-99:with_layer": func (ctx: LisperContext, this: Mono, ctrl: SekaiControl) -> void:
 			var items := this.getpBD(&"layer", {}) as Dictionary
 			var data := this.getpBD(&"layer_data", {}) as Dictionary
 			var item := SekaiItem.new()
@@ -95,7 +95,7 @@ var props := {
 				ctrl.add_child(layer),
 	}),
 	&"on_control_exit": Prop.puts({
-		&"0:with_layer": func (ctx: LisperContext, this: Mono, ctrl: SekaiControl) -> void:
+		&"99:with_layer": func (ctx: LisperContext, this: Mono, ctrl: SekaiControl) -> void:
 			var items := this.getpBD(&"layer", {}) as Dictionary
 			var data := this.getpBD(&"layer_data", {}) as Dictionary
 			var item := items[ctrl] as SekaiItem

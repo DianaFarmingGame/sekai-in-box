@@ -89,6 +89,17 @@ mouse_filter = 2
 visible = false
 layout_mode = 2
 
+[node name="MarginContainer" type="MarginContainer" parent="MarginContainer5/HSplitContainer/VBoxContainer/ActionTabs/通常"]
+layout_mode = 2
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 8
+theme_override_constants/margin_bottom = 8
+
+[node name="TakeControlBtn" type="Button" parent="MarginContainer5/HSplitContainer/VBoxContainer/ActionTabs/通常/MarginContainer"]
+layout_mode = 2
+text = "召唤傀儡神使"
+
 [node name="区块" type="VBoxContainer" parent="MarginContainer5/HSplitContainer/VBoxContainer/ActionTabs"]
 visible = false
 layout_mode = 2
@@ -155,6 +166,7 @@ text_overrun_behavior = 1
 layout_mode = 2
 mouse_filter = 2
 
+[connection signal="pressed" from="MarginContainer5/HSplitContainer/VBoxContainer/ActionTabs/通常/MarginContainer/TakeControlBtn" to="." method="_on_take_control_btn_pressed"]
 [connection signal="text_changed" from="MarginContainer5/HSplitContainer/VBoxContainer/VBoxContainer2/HBoxContainer/DefineFilter" to="." method="_on_define_filter_mod"]
 [connection signal="item_selected" from="MarginContainer5/HSplitContainer/VBoxContainer/VBoxContainer2/DefineList" to="." method="_on_define_list_selected"]
 [connection signal="toggled" from="MarginContainer5/HSplitContainer/VBoxContainer/VBoxContainer/HBoxContainer/Lock" to="." method="_on_lock_toggled"]

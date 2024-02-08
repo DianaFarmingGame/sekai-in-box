@@ -499,7 +499,7 @@ func stringify_raw_prop_dict(data: Dictionary, indent := 0, depth := 0) -> Strin
 	var tags := []
 	indent += 2
 	for k in data.keys():
-		tags.append('\n' + ''.lpad(indent) + k + ': ')
+		tags.append('\n' + ''.lpad(indent) + str(k) + ': ')
 		var value = data[k]
 		if value is Dictionary:
 			if value.size() == 0:
@@ -507,7 +507,7 @@ func stringify_raw_prop_dict(data: Dictionary, indent := 0, depth := 0) -> Strin
 			else:
 				tags.append(stringify_raw_prop_dict(value, indent, depth + 1))
 		else:
-			tags.append(stringify_raw(data[k], indent + k.length() + 2, depth + 1))
+			tags.append(stringify_raw(data[k], indent + str(k).length() + 2, depth + 1))
 	return ''.join(tags)
 
 func stringify_raw(data: Variant, indent := 0, depth := 0, enable_rev_trace := ENABLE_STRINGIFY_REVERSE_TRACE) -> String:

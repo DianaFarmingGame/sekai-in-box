@@ -89,7 +89,9 @@ signal unit_size_mod
 # 初始化
 #
 
-func _init() -> void:
+func _init(ptarget = null) -> void:
+	if ptarget != null:
+		_custom_target = ptarget
 	y_sort_enabled = true
 	if texture_filter == CanvasItem.TEXTURE_FILTER_PARENT_NODE:
 		texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST_WITH_MIPMAPS
@@ -108,6 +110,8 @@ func _enter_tree() -> void:
 
 func _exit_tree() -> void:
 	LisperDebugger.unsign_context("SekaiControl", context)
+	for mono in _monos_in_sight:
+		await (mono as Mono).callm(context, &"on_control_exit", self)
 
 
 
@@ -173,7 +177,10 @@ func _make_context() -> LisperContext:
 func _update_gikou() -> void:
 	var gikou := sekai.gikou
 	if gikou != null:
-		target = gikou.getp(&"def_target")
+		if _custom_target == null:
+			target = gikou.getp(&"def_target")
+		else:
+			target = _custom_target
 	else:
 		target = null
 
@@ -251,6 +258,7 @@ func _on_mapper_input(sets: InputSet) -> void:
 # 内部变量
 #
 
+var _custom_target = null
 var _target_stack := []
 var _hako: Mono = null
 var _input_mapper := InputMapper.new()

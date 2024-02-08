@@ -25,7 +25,10 @@ var props := {
 	#
 	
 	# 当快捷栏的获取内容改变时触发
-	&"on_slot_mod": Prop.Stack(),
+	&"on_slots_mod": Prop.Stack(),
+	
+	# 当前的快捷栏位置改变时触发
+	&"on_cur_slot_mod": Prop.Stack(),
 	
 	
 	
@@ -95,12 +98,16 @@ var props := {
 			data.resize(size)
 			this.setpB(&"slot_data", data),
 	}),
+	&"after_cur_slot": Prop.Stack({
+		&"0:有快捷栏": func (ctx: LisperContext, this: Mono, slot: int) -> void:
+			this.emitc(ctx, &"on_cur_slot_mod"),
+	}),
 	&"after_slot_data": Prop.Stack({
 		&"0:有快捷栏": func (ctx: LisperContext, this: Mono, data: Array) -> void:
-			this.emitc(ctx, &"on_slot_mod"),
+			this.emitc(ctx, &"on_slots_mod"),
 	}),
 	&"on_contains_mod": Prop.puts({
 		&"0:有快捷栏": func (ctx: LisperContext, this: Mono, contains: Array) -> void:
-			this.emitc(ctx, &"on_slot_mod"),
+			this.emitc(ctx, &"on_slots_mod"),
 	}),
 }
