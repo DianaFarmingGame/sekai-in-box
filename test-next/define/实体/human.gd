@@ -6,11 +6,8 @@ func do_merge(sets: Array[Dictionary]) -> Array[Dictionary]:
 	merge_traits(sets, [
 		有背包, 有快捷栏,
 		可控制, 一般控制输入,
+		UI快捷栏, UI物品栏,
 	])
 	merge_props(sets, {
-		&"act_ui": Prop.pushs([&"slots"]),
-		&"ui_data": {
-			&"slots": preload("ui/快捷栏/main.tscn"),
-		}
 	})
 	return sets

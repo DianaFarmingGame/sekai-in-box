@@ -24,7 +24,10 @@ var props := {
 	
 	# 开关物品栏
 	# @params: SekaiControl
-	&"on_inventory_toggle": Prop.Stack(),
+	&"on_inventory_toggle": Prop.Stack({
+		&"0:一般控制": func (ctx: LisperContext, this: Mono, ctrl: SekaiControl) -> void:
+			await this.applymRSU(ctx, &"ui/toggle", [ctrl, &"inventory"]),
+	}),
 	
 	
 	
