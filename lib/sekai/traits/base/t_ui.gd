@@ -25,7 +25,7 @@ var props := {
 	# 启用 UI
 	&"ui/enable": func (ctx: LisperContext, this: Mono, ctrl: SekaiControl, uid: StringName) -> void:
 		if ctrl.is_sub: return
-		var acts := this.getpBR(&"act_ui") as Array
+		var acts := this.getpBR(&"act_ui").duplicate() as Array
 		if not acts.has(uid):
 			await this.applycRSU(ctx, &"ui/add", [ctrl, uid])
 			acts.append(uid)
@@ -34,7 +34,7 @@ var props := {
 	# 禁用 UI
 	&"ui/disable": func (ctx: LisperContext, this: Mono, ctrl: SekaiControl, uid: StringName) -> void:
 		if ctrl.is_sub: return
-		var acts := this.getpBR(&"act_ui") as Array
+		var acts := this.getpBR(&"act_ui").duplicate() as Array
 		if acts.has(uid):
 			await this.applycRSU(ctx, &"ui/remove", [ctrl, uid])
 			acts.erase(uid)
@@ -43,7 +43,7 @@ var props := {
 	# 开关 UI
 	&"ui/toggle": func (ctx: LisperContext, this: Mono, ctrl: SekaiControl, uid: StringName) -> void:
 		if ctrl.is_sub: return
-		var acts := this.getpBR(&"act_ui") as Array
+		var acts := this.getpBR(&"act_ui").duplicate() as Array
 		if acts.has(uid):
 			await this.applycRSU(ctx, &"ui/remove", [ctrl, uid])
 			acts.erase(uid)
@@ -60,7 +60,7 @@ var props := {
 	&"ui/add": func (ctx: LisperContext, this: Mono, ctrl: SekaiControl, uid: StringName) -> void:
 		if ctrl.is_sub: return
 		var data := this.getpBR(&"ui_data") as Dictionary
-		var nodes := this.getpBR(&"ui_nodes") as Dictionary
+		var nodes := this.getpBD(&"ui_nodes", {}) as Dictionary
 		var node := TUI.make_ui(ctx, this, data[uid])
 		nodes[uid] = node
 		this.setpB(&"ui_nodes", nodes)
@@ -89,7 +89,7 @@ var props := {
 	&"on_target_unset": Prop.puts({
 		&"0:ui": func (ctx: LisperContext, this: Mono, ctrl: SekaiControl) -> void:
 			if ctrl.is_sub: return
-			var nodes := this.getpBR(&"ui_nodes") as Dictionary
+			var nodes := this.getpBD(&"ui_nodes", {}) as Dictionary
 			for node in nodes.values():
 				ctrl.remove_child(node)
 				node.free()

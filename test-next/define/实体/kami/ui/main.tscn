@@ -38,50 +38,6 @@ unique_name_in_owner = true
 layout_mode = 2
 horizontal_alignment = 1
 
-[node name="MarginContainer2" type="MarginContainer" parent="."]
-layout_mode = 1
-anchors_preset = 1
-anchor_left = 1.0
-anchor_right = 1.0
-offset_left = -144.0
-offset_bottom = 144.0
-grow_horizontal = 0
-theme_override_constants/margin_left = 8
-theme_override_constants/margin_top = 8
-theme_override_constants/margin_right = 8
-theme_override_constants/margin_bottom = 8
-
-[node name="PanelContainer" type="PanelContainer" parent="MarginContainer2"]
-clip_contents = true
-layout_mode = 2
-
-[node name="MarginContainer3" type="MarginContainer" parent="."]
-layout_mode = 1
-anchors_preset = 2
-anchor_top = 1.0
-anchor_bottom = 1.0
-offset_top = -48.0
-offset_right = 216.0
-grow_vertical = 0
-theme_override_constants/margin_left = 8
-theme_override_constants/margin_top = 8
-theme_override_constants/margin_right = 8
-theme_override_constants/margin_bottom = 8
-
-[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer3"]
-layout_mode = 2
-
-[node name="Label" type="Label" parent="MarginContainer3/VBoxContainer"]
-layout_mode = 2
-text = "神选表"
-
-[node name="PickList" type="ItemList" parent="MarginContainer3/VBoxContainer"]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(200, 0)
-layout_mode = 2
-auto_height = true
-text_overrun_behavior = 1
-
 [node name="MarginContainer4" type="MarginContainer" parent="."]
 layout_mode = 1
 anchors_preset = 3
@@ -102,4 +58,104 @@ theme_override_constants/margin_bottom = 8
 unique_name_in_owner = true
 layout_mode = 2
 
-[connection signal="item_selected" from="MarginContainer3/VBoxContainer/PickList" to="." method="_on_pick_list_item_selected"]
+[node name="MarginContainer5" type="MarginContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 8
+theme_override_constants/margin_bottom = 8
+
+[node name="HSplitContainer" type="HSplitContainer" parent="MarginContainer5"]
+layout_mode = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer5/HSplitContainer"]
+layout_mode = 2
+
+[node name="ActionTabs" type="TabContainer" parent="MarginContainer5/HSplitContainer/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+tab_focus_mode = 0
+
+[node name="无" type="Control" parent="MarginContainer5/HSplitContainer/VBoxContainer/ActionTabs"]
+layout_mode = 2
+mouse_filter = 2
+
+[node name="通常" type="VBoxContainer" parent="MarginContainer5/HSplitContainer/VBoxContainer/ActionTabs"]
+visible = false
+layout_mode = 2
+
+[node name="区块" type="VBoxContainer" parent="MarginContainer5/HSplitContainer/VBoxContainer/ActionTabs"]
+visible = false
+layout_mode = 2
+
+[node name="MarginContainer" type="MarginContainer" parent="MarginContainer5/HSplitContainer/VBoxContainer/ActionTabs/区块"]
+layout_mode = 2
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 8
+theme_override_constants/margin_bottom = 8
+
+[node name="VBoxContainer2" type="VBoxContainer" parent="MarginContainer5/HSplitContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer5/HSplitContainer/VBoxContainer/VBoxContainer2"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="MarginContainer5/HSplitContainer/VBoxContainer/VBoxContainer2/HBoxContainer"]
+layout_mode = 2
+text = "神甄表"
+
+[node name="DefineFilter" type="LineEdit" parent="MarginContainer5/HSplitContainer/VBoxContainer/VBoxContainer2/HBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+placeholder_text = "过滤"
+
+[node name="DefineList" type="ItemList" parent="MarginContainer5/HSplitContainer/VBoxContainer/VBoxContainer2"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer5/HSplitContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer5/HSplitContainer/VBoxContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="MarginContainer5/HSplitContainer/VBoxContainer/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+text = "神选表"
+
+[node name="Control" type="Control" parent="MarginContainer5/HSplitContainer/VBoxContainer/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="Label2" type="Label" parent="MarginContainer5/HSplitContainer/VBoxContainer/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+text = "锁定"
+
+[node name="Lock" type="CheckButton" parent="MarginContainer5/HSplitContainer/VBoxContainer/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+
+[node name="PickList" type="ItemList" parent="MarginContainer5/HSplitContainer/VBoxContainer/VBoxContainer"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(200, 0)
+layout_mode = 2
+size_flags_vertical = 3
+auto_height = true
+text_overrun_behavior = 1
+
+[node name="Control" type="Control" parent="MarginContainer5/HSplitContainer"]
+layout_mode = 2
+mouse_filter = 2
+
+[connection signal="text_changed" from="MarginContainer5/HSplitContainer/VBoxContainer/VBoxContainer2/HBoxContainer/DefineFilter" to="." method="_on_define_filter_mod"]
+[connection signal="item_selected" from="MarginContainer5/HSplitContainer/VBoxContainer/VBoxContainer2/DefineList" to="." method="_on_define_list_selected"]
+[connection signal="toggled" from="MarginContainer5/HSplitContainer/VBoxContainer/VBoxContainer/HBoxContainer/Lock" to="." method="_on_lock_toggled"]
+[connection signal="item_selected" from="MarginContainer5/HSplitContainer/VBoxContainer/VBoxContainer/PickList" to="." method="_on_pick_list_item_selected"]

@@ -13,6 +13,8 @@ config_version=5
 config/name="sekai-in-box"
 run/main_scene="res://test-next/test.tscn"
 config/features=PackedStringArray("4.2", "Forward Plus")
+boot_splash/image="res://icon.png"
+boot_splash/fullsize=false
 config/icon="res://icon.png"
 
 [autoload]
@@ -185,12 +187,13 @@ environment/defaults/default_clear_color=Color(0, 0, 0, 1)
 
 [sekai]
 
+define_entry="res://test-next/define_entry.gss.txt"
+gikou_store_dir="user://gikous"
+render_extra_sight=4
+min_inits_per_frame=8
 debug_draw_collisible=false
 debug_draw_routable=false
 debug_draw_solid=false
 debug_draw_contactable=false
-debug_draw_pickable=true
-define_entry="res://test-next/define_entry.gss.txt"
-render_extra_sight=4
-min_inits_per_frame=8
-gikou_store_dir="user://gikous"
+debug_draw_pickable=false
+debug_draw_chunk=true

@@ -15,6 +15,7 @@ offset_left = 8.0
 offset_top = 8.0
 offset_right = 9.0
 offset_bottom = 56.0
+mouse_filter = 2
 script = ExtResource("1_wyu4n")
 
 [node name="Position" type="Label" parent="."]

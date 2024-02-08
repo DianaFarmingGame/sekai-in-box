@@ -283,7 +283,8 @@ func _update_debug_draw() -> void:
 		ProjectSettings.get_setting(&"sekai/debug_draw_contactable") or \
 		ProjectSettings.get_setting(&"sekai/debug_draw_pickable") or \
 		ProjectSettings.get_setting(&"sekai/debug_draw_routable") or \
-		ProjectSettings.get_setting(&"sekai/debug_draw_solid")
+		ProjectSettings.get_setting(&"sekai/debug_draw_solid") or \
+		ProjectSettings.get_setting(&"sekai/debug_draw_chunk")
 	)
 
 var _indent := 0
