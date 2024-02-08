@@ -63,6 +63,19 @@ func set_target(ptarget: Mono) -> void:
 	if allow_transfer_target:
 		target = ptarget
 
+func push_target(ptarget: Mono) -> void:
+	_target_stack.push_back(target)
+	target = ptarget
+
+func pop_target() -> Mono:
+	if _target_stack.size() > 0:
+		var ntarget = _target_stack.pop_back()
+		var ptarget = target
+		target = ntarget
+		return ptarget
+	else:
+		return null
+
 
 
 #
@@ -101,6 +114,7 @@ func _exit_tree() -> void:
 #
 # 循环
 #
+
 func _on_process(delta: float) -> void:
 	await _update_sight()
 	queue_redraw()
@@ -212,7 +226,6 @@ func _update_draw_caches() -> void:
 func _pass_input(sets: InputSet) -> void:
 	if target and target.getp(&"can_input"): await target.applyc(context, &"on_input", [self, sets])
 
-
 ## 检查父级是否存在 SekaiControl
 func _check_sub(node: Node) -> bool:
 	var parent = node.get_parent_control()
@@ -238,6 +251,7 @@ func _on_mapper_input(sets: InputSet) -> void:
 # 内部变量
 #
 
+var _target_stack := []
 var _hako: Mono = null
 var _input_mapper := InputMapper.new()
 var _monos_in_sight := []

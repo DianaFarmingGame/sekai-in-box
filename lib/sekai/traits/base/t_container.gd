@@ -3,10 +3,30 @@ class_name TContainer extends MonoTrait
 var id := &"container"
 
 var props := {
+	#
+	# 配置
+	#
+	
+	# 物品栏内包含的物品, 可以是 ref_id, 会在初始化时被自动转化
 	&"contains": [],
-	&"on_contains": null,
-	&"contains_data": [],
+	
+	# 物品栏的容量, 和堆叠数量无关
 	&"container_capacity": INF,
+	
+	
+	
+	#
+	# 信号
+	#
+	
+	# 当物品栏发生改变时触发
+	&"on_contains_mod": Prop.Stack(),
+	
+	
+	
+	#
+	# 方法
+	#
 	
 	&"container/add": func (ctx: LisperContext, this: Mono, ref_id: Variant, opts: Dictionary = {}) -> bool:
 		return await this.callm(ctx, &"container/put", sekai.make_mono(ref_id, opts)),
@@ -29,6 +49,13 @@ var props := {
 			return true
 		this.setpF(ctx, &"contains", contains)
 		return false,
+	&"container/get_by_ref_id": func (ctx: LisperContext, this: Mono, ref_id: Variant) -> Variant:
+		var type_d = sekai.get_define(ref_id)
+		var contains := this.getpBD(&"contains", []) as Array
+		for mono in contains:
+			if mono.define.ref == type_d.ref:
+				return mono
+		return null,
 	&"container/pick": func (ctx: LisperContext, this: Mono, item: Mono) -> Mono:
 		var contains := this.getpBD(&"contains", []) as Array
 		item._outof_container()
@@ -82,11 +109,17 @@ var props := {
 				results.append(res)
 		return results,
 	
+	
+	
+	#--------------------------------------------------------------------------#
+	&"contains_data": [],
 	&"on_init": Prop.puts({
 		&"0:container": func (ctx: LisperContext, this: Mono) -> void:
 			var contains := this.getpBD(&"contains", []) as Array
-			for mono in contains: mono.init(ctx)
-			pass,
+			for i in contains.size():
+				var mono = contains[i]
+				if not mono is Mono:
+					contains[i] = sekai.make_mono(mono),
 	}),
 	&"on_store": Prop.puts({
 		&"99:container": func (ctx: LisperContext, this: Mono) -> void:
@@ -105,7 +138,15 @@ var props := {
 			this.setpB(&"contains", contains)
 			this.setpB(&"contains_data", [])
 			await Async.array_map(contains, func (item): await item.restore(ctx))
-			await Async.array_map(contains, func (item): await item._into_container(ctx, this))
 			pass,
 	}),
+	&"on_ready": Prop.puts({
+		&"-99:container": func (ctx: LisperContext, this: Mono) -> void:
+			var contains := this.getpBD(&"contains", []) as Array
+			await Async.array_map(contains, func (item): await item._into_container(ctx, this)),
+	}),
+	&"after_contains": Prop.Stack({
+		&"0:container": func (ctx: LisperContext, this: Mono, contains: Array) -> void:
+			this.emitc(ctx, &"on_contains_mod"),
+	})
 }

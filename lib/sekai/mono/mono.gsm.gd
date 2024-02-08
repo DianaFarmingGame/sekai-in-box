@@ -149,6 +149,7 @@ func call_watcher(ctx: LisperContext, key: StringName, value: Variant, force := 
 		elif data is Array:
 			for entry in data.duplicate():
 				value = await entry[1].call(ctx, self, value)
+		await callm(ctx, StringName("after_" + key), value)
 		await applym(ctx, &"on_mod", [key, value])
 	return value
 

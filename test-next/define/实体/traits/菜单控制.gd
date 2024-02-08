@@ -5,6 +5,13 @@ var requires := [&"input"]
 
 var props := {
 	#
+	# 标记
+	#
+	&"has_menu": true,
+	
+	
+	
+	#
 	# 信号
 	#
 	
