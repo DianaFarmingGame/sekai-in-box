@@ -86,7 +86,7 @@ var props := {
 	# @return: (Mono | null)[]
 	&"slot/get_all": func (ctx: LisperContext, this: Mono) -> Variant:
 		var data := this.getp(&"slot_data") as Array
-		return data.map(func (ref): return this.callmRSUY(ctx, &"container/get_by_ref_id", ref)),
+		return data.map(func (ref): return this.callmRSUY(ctx, &"container/get_by_ref_id", ref) if ref != null else null),
 	
 	
 	

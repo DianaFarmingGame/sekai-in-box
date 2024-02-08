@@ -7,9 +7,6 @@ class_name SekaiControl extends Control
 # 配置项
 #
 
-## 默认进入的 Hako ID
-@export var hako_id: StringName = &"base"
-
 ## 超出渲染裁剪框的额外视野大小
 @export var render_extra_sight: int = ProjectSettings.get_setting("sekai/render_extra_sight")
 
@@ -50,6 +47,16 @@ var target: Mono = null:
 
 ## 执行上下文
 var context: LisperContext = null
+
+## 当前控制的 Hako
+var hako: Mono = null:
+	set(v):
+		if not is_same(hako, v):
+			if hako is Mono:
+				hako.setpB(&"active_level", hako.getp(&"active_level") - 1)
+			hako = v
+			context.def_const(&"hako", hako)
+			hako.setpB(&"active_level", hako.getp(&"active_level") + 1)
 
 ## 当前视图是否为已有视图的子视图
 var is_sub := false
@@ -112,6 +119,10 @@ func _exit_tree() -> void:
 	LisperDebugger.unsign_context("SekaiControl", context)
 	for mono in _monos_in_sight:
 		await (mono as Mono).callm(context, &"on_control_exit", self)
+	if target != null:
+		await target.callm(context, &"on_target_unset", self)
+	if hako != null:
+		hako.setpB(&"active_level", hako.getp(&"active_level") - 1)
 
 
 
@@ -122,8 +133,6 @@ func _exit_tree() -> void:
 func _on_process(delta: float) -> void:
 	await _update_sight()
 	queue_redraw()
-	if _hako != null:
-		await _hako.callc(context, &"on_process", delta)
 
 func _draw() -> void:
 	_update_draw_caches()
@@ -171,7 +180,7 @@ func _make_context() -> LisperContext:
 	var ctx := sekai.context.fork() as LisperContext
 	ctx.def_const(&"control", self)
 	ctx.def_const(&"target", target)
-	ctx.def_const(&"hako", _hako)
+	ctx.def_const(&"hako", hako)
 	return ctx
 
 func _update_gikou() -> void:
@@ -187,18 +196,17 @@ func _update_gikou() -> void:
 ## 每次 target 变更时调用，释放之前的区域，获取新的区域
 func _update_target() -> void:
 	if target != null:
-		_hako = target.get_hako()
+		hako = target.get_hako()
 		await target.callm(context, &"on_target_set", self)
 	else:
-		_hako = null
-	context.def_const(&"hako", _hako)
+		hako = null
 
 ## 更新代表视野内 Mono 的数组
 func _update_sight() -> void:
-	if target != null and _hako != null:
+	if target != null and hako != null:
 		# 注意 不要复用之前的 _monos_in_sight
 		# TODO: 添加视野裁剪
-		_monos_in_sight = _hako.getpB(&"contains")
+		_monos_in_sight = hako.getpB(&"contains")
 	else:
 		_monos_in_sight = []
 	await _update_items()
@@ -260,7 +268,6 @@ func _on_mapper_input(sets: InputSet) -> void:
 
 var _custom_target = null
 var _target_stack := []
-var _hako: Mono = null
 var _input_mapper := InputMapper.new()
 var _monos_in_sight := []
 var _prev_monos_in_sight := []

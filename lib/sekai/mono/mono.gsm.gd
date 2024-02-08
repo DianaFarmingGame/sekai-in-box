@@ -149,8 +149,6 @@ func call_watcher(ctx: LisperContext, key: StringName, value: Variant, force := 
 		elif data is Array:
 			for entry in data.duplicate():
 				value = await entry[1].call(ctx, self, value)
-		await callm(ctx, StringName("after_" + key), value)
-		await applym(ctx, &"on_mod", [key, value])
 	return value
 
 ## get property methods
@@ -264,6 +262,8 @@ func setpW(ctx: LisperContext, key: StringName, value: Variant) -> void:
 		if v != null:
 			if v != value:
 				l[1][key] = await call_watcher(ctx, key, value)
+			await callm(ctx, StringName("after_" + key), value)
+			await applym(ctx, &"on_mod", [key, value])
 			return
 	setpBW(ctx, key, value)
 
@@ -273,6 +273,8 @@ func setpF(ctx: LisperContext, key: StringName, value: Variant) -> void:
 		if v != null:
 			if v != value:
 				l[1][key] = await call_watcher(ctx, key, value, true)
+			await callm(ctx, StringName("after_" + key), value)
+			await applym(ctx, &"on_mod", [key, value])
 			return
 	setpBF(ctx, key, value)
 
@@ -286,12 +288,16 @@ func setpLW(ctx: LisperContext, layer_name: StringName, key: StringName, value: 
 	for l in layers:
 		if l[0] == layer_name:
 			l[1][key] = await call_watcher(ctx, key, value)
+			await callm(ctx, StringName("after_" + key), value)
+			await applym(ctx, &"on_mod", [key, value])
 			return
 
 func setpLF(ctx: LisperContext, layer_name: StringName, key: StringName, value: Variant) -> void:
 	for l in layers:
 		if l[0] == layer_name:
 			l[1][key] = await call_watcher(ctx, key, value, true)
+			await callm(ctx, StringName("after_" + key), value)
+			await applym(ctx, &"on_mod", [key, value])
 			return
 
 func setpB(key: StringName, value: Variant) -> void:
@@ -304,15 +310,23 @@ func setpBW(ctx: LisperContext, key: StringName, value: Variant) -> void:
 	value = await call_watcher(ctx, key, value)
 	if layers.size() > 0:
 		layers[-1][1][key] = value
+		await callm(ctx, StringName("after_" + key), value)
+		await applym(ctx, &"on_mod", [key, value])
 		return
 	cover(&"base", {key: value})
+	await callm(ctx, StringName("after_" + key), value)
+	await applym(ctx, &"on_mod", [key, value])
 
 func setpBF(ctx: LisperContext, key: StringName, value: Variant) -> void:
 	value = await call_watcher(ctx, key, value, true)
 	if layers.size() > 0:
 		layers[-1][1][key] = value
+		await callm(ctx, StringName("after_" + key), value)
+		await applym(ctx, &"on_mod", [key, value])
 		return
 	cover(&"base", {key: value})
+	await callm(ctx, StringName("after_" + key), value)
+	await applym(ctx, &"on_mod", [key, value])
 
 func setpR(key: StringName, value: Variant) -> void:
 	define._props[key] = value

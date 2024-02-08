@@ -183,6 +183,11 @@ func _init_context() -> void:
 
 func _process(delta: float) -> void:
 	process.emit(delta)
+	if gikou != null:
+		var hakos := gikou.getpB(&"contains") as Array
+		for hako in hakos:
+			if hako.getp(&"active_level") > 0:
+				await hako.callc(context, &"on_process", delta)
 
 
 

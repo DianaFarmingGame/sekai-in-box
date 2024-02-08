@@ -7,5 +7,6 @@ func do_merge(sets: Array[Dictionary]) -> Array[Dictionary]:
 	id = &"hako"
 	merge_props(sets, {
 		&"id": null,
+		&"active_level": 0,
 	})
 	return sets

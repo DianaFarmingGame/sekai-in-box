@@ -5,6 +5,8 @@ wait (gikou on_inited []
 	
 	var (嘉然 do (hako add_mono &实体/角色/嘉然 {
 		position vec3(5 9 1)
+		contains [&物品/卷轴]
+		slot_data [&物品/卷轴]
 	}))
 	
 	; 测试：相对移动
