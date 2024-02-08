@@ -50,7 +50,7 @@ var props := {
 
 	&"db/get_group_info": func(ctx: LisperContext, this: Mono, group: StringName, mapping: Dictionary) -> Dictionary:
 		var gi = this.getp("group_info")
-		if !gi.has(group):
+		if !gi.has(group) || group == &"default":
 			print("missing group_info ", group)
 			return {}
 		return gi[group]
