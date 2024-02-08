@@ -4,6 +4,7 @@ var id := &"database"
 
 var props := {
 	&"data": {},
+	&"group_info": {},
 
 	&"db/set": func(ctx: LisperContext, this: Mono, key: StringName, value, group: StringName = &"default") -> void:
 		var db = this.getp("data") as Dictionary
@@ -39,4 +40,18 @@ var props := {
 			db[group] = db[group] if db.has(group) else {}
 			db[group][key] = {props_: value}
 		,
+
+	&"db/set_group_info": func(ctx: LisperContext, this: Mono, group: StringName, mapping: Dictionary):
+		var gi = this.getp("group_info")
+		if gi.has(group):
+			print("Repeat define group_info ", group)
+		gi[group] = mapping
+		,
+
+	&"db/get_group_info": func(ctx: LisperContext, this: Mono, group: StringName, mapping: Dictionary) -> Dictionary:
+		var gi = this.getp("group_info")
+		if !gi.has(group):
+			print("missing group_info ", group)
+			return {}
+		return gi[group]
 }
