@@ -149,6 +149,15 @@ func call_watcher(ctx: LisperContext, key: StringName, value: Variant, force := 
 		elif data is Array:
 			for entry in data.duplicate():
 				value = await entry[1].call(ctx, self, value)
+		#var lidx = layers.size() - 1
+		#while lidx >= 0:
+			#data = layers[lidx][1].get(hkey)
+			#if data is Array:
+				#for entry in data.duplicate():
+					#value = await entry[1].call(ctx, self, value)
+			#elif data is Callable:
+				#value = await data.call(ctx, self, value)
+			#lidx -= 1
 	return value
 
 ## get property methods

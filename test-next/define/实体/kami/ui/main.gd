@@ -9,6 +9,7 @@ const TAGS := [
 
 var this: Mono
 var context: LisperContext
+var control: SekaiControl
 var hako: Mono
 
 @onready var DefineList := %DefineList as ItemList
@@ -167,7 +168,7 @@ func _on_take_control_btn_pressed() -> void:
 		nwindow.add_child(ncontrol)
 		add_child(nwindow)
 		ncontrol.anchors_preset = Control.PRESET_FULL_RECT
-		ncontrol.unit_size = get_parent().unit_size
+		ncontrol.unit_size = control.unit_size
 		nwindow.close_requested.connect(func ():
 			nwindow.hide()
 			remove_child(nwindow)

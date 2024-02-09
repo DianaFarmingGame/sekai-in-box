@@ -144,6 +144,16 @@ func get_assert(path: String) -> Variant:
 		return res
 	return null
 
+## 获取一个 CSV 数据
+func get_csv(path: String) -> Array:
+	var content := []
+	var file := FileAccess.open(path, FileAccess.READ)
+	file.get_csv_line()
+	var _head := file.get_csv_line()
+	while file.get_position() < file.get_length():
+		content.append(Array(file.get_csv_line()))
+	return content
+
 ## 获取一个游戏期间基本唯一的 index
 func get_uidx() -> int:
 	_uidx += 1
@@ -225,6 +235,13 @@ defunc (load :const :gd :apply :pure ',
 		var mod_dir = ctx.get_var(&"*mod-dir*")
 		var path := args[0] as String
 		return get_assert(Lisper.resolve_path(mod_dir, path))
+,')
+
+defunc (csv/load :const :gd :apply :pure ',
+	func (ctx: LisperContext, args: Array) -> Variant:
+		var mod_dir = ctx.get_var(&"*mod-dir*")
+		var path := args[0] as String
+		return get_csv(Lisper.resolve_path(mod_dir, path))
 ,')
 
 sekai/exec ("mono/mono.gsm.gd")
