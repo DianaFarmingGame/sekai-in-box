@@ -1,7 +1,9 @@
-class_name GDatabase extends MonoDefine
+class_name Database extends MonoDefine
 
 func do_merge(sets: Array[Dictionary]) -> Array[Dictionary]:
 	super.do_merge(sets)
-	name = "GDatabase"
+	name = "Database"
+	ref = 1
+	id = &"db"
 	merge_traits(sets, [TDatabase])
 	return sets
