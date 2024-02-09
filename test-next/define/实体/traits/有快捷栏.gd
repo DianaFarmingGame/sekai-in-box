@@ -16,7 +16,7 @@ var props := {
 	&"slot_data": Prop.Stack(),
 	
 	# 当前的快捷栏位置
-	&"cur_slot": 0,
+	&"cur_slot": 1,
 	
 	
 	

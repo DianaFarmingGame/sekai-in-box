@@ -1,6 +1,8 @@
-[gd_scene load_steps=2 format=3 uid="uid://r5sddkd22xlg"]
+[gd_scene load_steps=3 format=3 uid="uid://r5sddkd22xlg"]
 
 [ext_resource type="Script" path="res://test-next/define/实体/ui/快捷栏/slot.gd" id="1_ape4a"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_vylxj"]
 
 [node name="Slot" type="PanelContainer"]
 size_flags_horizontal = 8
@@ -39,3 +41,27 @@ offset_right = 1.0
 offset_bottom = 2.0
 grow_horizontal = 2
 grow_vertical = 2
+
+[node name="Control" type="Control" parent="."]
+layout_mode = 2
+mouse_filter = 2
+
+[node name="DelBtn" type="Button" parent="Control"]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -12.5
+offset_top = -16.0
+offset_right = 19.5
+offset_bottom = 16.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_default_cursor_shape = 2
+theme_override_font_sizes/font_size = 20
+theme_override_styles/focus = SubResource("StyleBoxEmpty_vylxj")
+text = "x"
+flat = true
+
+[connection signal="pressed" from="Control/DelBtn" to="." method="_on_del_btn_pressed"]

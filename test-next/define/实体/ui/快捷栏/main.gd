@@ -3,6 +3,13 @@ extends Control
 var this: Mono
 var context: LisperContext
 
+var can_modify := false:
+	set(v):
+		if v != can_modify:
+			can_modify = v
+			for entry in SlotList.get_children():
+				entry.can_modify = can_modify
+
 @onready var SlotList := %SlotList as VBoxContainer
 
 func _ready() -> void:
@@ -31,8 +38,12 @@ func _update_slots(ctx: LisperContext, this: Mono) -> void:
 		if mono != null:
 			texture = await (mono as Mono).emitmRS(ctx, &"icon/get_texture")
 		var node := Slot.instantiate()
+		node.this = this
+		node.context = context
+		node.slot = rcur
 		node.shortcut_label = str(rcur + 1)
 		node.active = cur == rcur
 		if texture != null:
 			node.texture = texture
+		node.can_modify = can_modify
 		SlotList.add_child(node)

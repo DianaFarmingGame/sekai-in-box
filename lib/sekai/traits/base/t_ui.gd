@@ -64,7 +64,7 @@ var props := {
 		if ctrl.is_sub: return
 		var data := this.getpBR(&"ui_data") as Dictionary
 		var nodes := this.getpBD(&"ui_nodes", {}) as Dictionary
-		var list := nodes.get(nodes, {}) as Dictionary
+		var list := nodes.get(ctrl, {}) as Dictionary
 		var node := TUI.make_ui(ctx, this, ctrl, data[uid])
 		list[uid] = node
 		nodes[ctrl] = list

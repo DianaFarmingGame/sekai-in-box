@@ -25,10 +25,8 @@ func _update_contains(ctx: LisperContext, target: Mono) -> void:
 		ItemBox.remove_child(child)
 	var contains := target.getp(&"contains") as Array
 	for mono in contains:
-		var texture = await (mono as Mono).emitmRS(ctx, &"icon/get_texture")
 		var entry := ItemEntry.instantiate()
-		if texture != null:
-			entry.texture = texture
-		entry.label = mono.getp(&"name")
+		entry.this = mono
+		entry.context = context
+		entry.control = control
 		ItemBox.add_child(entry)
-	print(contains)
