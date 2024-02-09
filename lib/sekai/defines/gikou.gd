@@ -2,7 +2,7 @@ class_name Gikou extends MonoDefine
 
 func do_merge(sets: Array[Dictionary]) -> Array[Dictionary]:
 	super.do_merge(sets)
-	name = "GiKou"
+	name = "Gikou"
 	ref = 0
 	id = &"gikou"
 	merge_traits(sets, [TContainer])

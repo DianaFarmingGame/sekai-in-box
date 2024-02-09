@@ -2,7 +2,7 @@ class_name TPickable extends MonoTrait
 ## 为当前 Mono 可拾取性
 
 var id := &"pickable"
-var requires := [&"position"]
+var requires := [&"position", &"drawable"]
 
 var props := {
 	#
@@ -48,5 +48,5 @@ static func draw_debug(ctx: LisperContext, this: Mono, ctrl: SekaiControl, item:
 	var pos := Vector2(this.position.x, this.position.y - this.position.z * item.ratio_yz)
 	var box := this.getp(&"pick_box") as Rect2
 	box.position += pos
-	item.draw_rect(box, dcolor)
+	#item.draw_rect(box, dcolor)
 	item.draw_rect(box, dcolor | 0xff, false)

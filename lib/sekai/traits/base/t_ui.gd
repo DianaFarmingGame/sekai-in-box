@@ -24,81 +24,98 @@ var props := {
 	
 	# 启用 UI
 	&"ui/enable": func (ctx: LisperContext, this: Mono, ctrl: SekaiControl, uid: StringName) -> void:
-		var acts := this.getpBR(&"act_ui") as Array
-		if not acts.has(uid):
+		if ctrl.is_sub: return
+		var acts := this.getpBR(&"act_ui").duplicate() as Array
+		if not this.getpBR(&"ui_nodes").get(ctrl, {}).has(uid):
 			await this.applycRSU(ctx, &"ui/add", [ctrl, uid])
-			acts.append(uid)
+			if not acts.has(uid): acts.append(uid)
 			this.setpB(&"act_ui", acts),
 	
 	# 禁用 UI
 	&"ui/disable": func (ctx: LisperContext, this: Mono, ctrl: SekaiControl, uid: StringName) -> void:
-		var acts := this.getpBR(&"act_ui") as Array
-		if acts.has(uid):
+		if ctrl.is_sub: return
+		var acts := this.getpBR(&"act_ui").duplicate() as Array
+		if this.getpBR(&"ui_nodes").get(ctrl, {}).has(uid):
 			await this.applycRSU(ctx, &"ui/remove", [ctrl, uid])
 			acts.erase(uid)
 			this.setpB(&"act_ui", acts),
 	
 	# 开关 UI
 	&"ui/toggle": func (ctx: LisperContext, this: Mono, ctrl: SekaiControl, uid: StringName) -> void:
-		var acts := this.getpBR(&"act_ui") as Array
-		if acts.has(uid):
+		if ctrl.is_sub: return
+		var acts := this.getpBR(&"act_ui").duplicate() as Array
+		if this.getpBR(&"ui_nodes").get(ctrl, {}).has(uid):
 			await this.applycRSU(ctx, &"ui/remove", [ctrl, uid])
 			acts.erase(uid)
 		else:
 			await this.applycRSU(ctx, &"ui/add", [ctrl, uid])
-			acts.append(uid)
+			if not acts.has(uid): acts.append(uid)
 		this.setpB(&"act_ui", acts),
-			
+	
+	# 获取某个已经开启的 UI 的节点对象
+	&"ui/get": func (ctx: LisperContext, this: Mono, ctrl: SekaiControl, uid: StringName) -> Node:
+		return this.getpBR(&"ui_nodes").get(ctrl, {}).get(uid),
 	
 	
 	
 	#--------------------------------------------------------------------------#
 	&"ui_nodes": {},
 	&"ui/add": func (ctx: LisperContext, this: Mono, ctrl: SekaiControl, uid: StringName) -> void:
+		if ctrl.is_sub: return
 		var data := this.getpBR(&"ui_data") as Dictionary
-		var nodes := this.getpBR(&"ui_nodes") as Dictionary
-		var ui := data[uid] as PackedScene
-		var node := ui.instantiate()
-		var need_this := node.get_property_list().any(func (opt): return opt[&"name"] == &"this")
-		if need_this:
-			node.this = this
-		nodes[uid] = node
+		var nodes := this.getpBD(&"ui_nodes", {}) as Dictionary
+		var list := nodes.get(ctrl, {}) as Dictionary
+		var node := TUI.make_ui(ctx, this, ctrl, data[uid])
+		list[uid] = node
+		nodes[ctrl] = list
 		this.setpB(&"ui_nodes", nodes)
 		ctrl.add_child(node),
 	&"ui/remove": func (ctx: LisperContext, this: Mono, ctrl: SekaiControl, uid: StringName) -> void:
-		var nodes := this.getpB(&"ui_nodes") as Dictionary
-		var node := nodes[uid] as Node
+		if ctrl.is_sub: return
+		var list := this.getpB(&"ui_nodes")[ctrl] as Dictionary
+		var node := list[uid] as Node
 		ctrl.remove_child(node)
 		node.free()
-		nodes.erase(uid)
-		this.setpB(&"ui_nodes", nodes),
+		list.erase(uid),
 	&"on_target_set": Prop.puts({
 		&"0:ui": func (ctx: LisperContext, this: Mono, ctrl: SekaiControl) -> void:
+			if ctrl.is_sub: return
 			var acts := this.getpBR(&"act_ui") as Array
 			var data := this.getpBR(&"ui_data") as Dictionary
-			var nodes := {}
+			var nodes := this.getpBD(&"ui_nodes", {}) as Dictionary
+			var list := {}
 			for uid in acts:
-				var ui := data[uid] as PackedScene
-				var node := ui.instantiate()
-				var need_this := node.get_property_list().any(func (opt): return opt[&"name"] == &"this")
-				if need_this:
-					node.this = this
-				nodes[uid] = node
+				var node := TUI.make_ui(ctx, this, ctrl, data[uid])
+				list[uid] = node
+			nodes[ctrl] = list
 			this.setpB(&"ui_nodes", nodes)
-			for node in nodes.values():
+			for node in list.values():
 				ctrl.add_child(node),
 	}),
 	&"on_target_unset": Prop.puts({
 		&"0:ui": func (ctx: LisperContext, this: Mono, ctrl: SekaiControl) -> void:
-			var nodes := this.getpBR(&"ui_nodes") as Dictionary
-			for node in nodes.values():
+			if ctrl.is_sub: return
+			var nodes := this.getpBD(&"ui_nodes", {}) as Dictionary
+			var list := nodes[ctrl] as Dictionary
+			for node in list.values():
 				ctrl.remove_child(node)
 				node.free()
-			this.setpB(&"ui_nodes", {}),
+			nodes.erase(ctrl),
 	}),
 	&"on_input": Prop.puts({
 		&"0:ui_debug": func (ctx: LisperContext, this: Mono, ctrl: SekaiControl, sets: InputSet) -> void:
+			if ctrl.is_sub: return
 			if sets.pressings.has(&"toggle_debug_ui"):
 				await this.applycRSU(ctx, &"ui/toggle", [ctrl, &"debug"]),
-	})
+	}),
 }
+
+static func make_ui(ctx: LisperContext, this: Mono, ctrl: SekaiControl, ui: PackedScene) -> Node:
+	var node := ui.instantiate()
+	if node.get_property_list().any(func (opt): return opt[&"name"] == &"this"):
+		node.this = this
+	if node.get_property_list().any(func (opt): return opt[&"name"] == &"context"):
+		node.context = ctx
+	if node.get_property_list().any(func (opt): return opt[&"name"] == &"control"):
+		node.control = ctrl
+	return node

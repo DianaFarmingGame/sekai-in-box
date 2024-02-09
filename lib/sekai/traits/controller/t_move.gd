@@ -51,9 +51,7 @@ var props := {
 		while delta.length() > 0.1:
 			var ppos := this.position
 			var dt := await sekai.process as float
-			var speedv := delta / dt
-			var speed := speedv.length()
-			if speed > max_speed: speedv *= max_speed / speed
+			var speedv := (delta / dt).limit_length(max_speed)
 			this.setpBW(ctx, &"move_cur_speed", speedv)
 			delta = calc_delta.call()
 			if (this.position - ppos).length() < (max_speed * dt) * 0.1:

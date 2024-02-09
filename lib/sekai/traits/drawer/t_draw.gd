@@ -12,9 +12,10 @@ var props := {
 	&"on_draw_end": Prop.Stack(), # TODO
 	
 	&"draw/reset": func (ctx: LisperContext, this: Mono) -> void:
-		var item := this.getpB(&"layer") as SekaiItem
-		if item != null:
-			this.setp(&"draw_timer", item.get_time()),
+		var items := this.getp(&"layer") as Dictionary
+		for item in items.values():
+			if item != null:
+				this.setp(&"draw_timer", item.get_time()),
 	&"draw/to": func (ctx: LisperContext, this: Mono, draw_id: StringName) -> void:
 		this.setp(&"cur_draw", draw_id),
 	&"draw/reset_to": func (ctx: LisperContext, this: Mono, draw_id: StringName) -> void:
@@ -26,7 +27,7 @@ var props := {
 	&"on_draw_debug": Prop.Stack(),
 }
 
-static func on_draw(ctx: LisperContext, this: Mono, item: SekaiItem) -> void:
+static func on_draw(ctx: LisperContext, this: Mono, ctrl: SekaiControl, item: SekaiItem) -> void:
 	var pos := Vector2(this.position.x, this.position.y - this.position.z * item.ratio_yz)
 	var cur_draw = this.getp(&"cur_draw")
 	if cur_draw == &"": return

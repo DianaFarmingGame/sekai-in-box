@@ -4,7 +4,9 @@ func do_merge(sets: Array[Dictionary]) -> Array[Dictionary]:
 	super.do_merge(sets)
 	name = "人类"
 	merge_traits(sets, [
-		一般控制, 有背包,
+		有背包, 有快捷栏,
+		可控制, 一般控制输入,
+		UI快捷栏, UI物品栏,
 	])
 	merge_props(sets, {
 	})

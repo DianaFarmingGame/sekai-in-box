@@ -3,7 +3,7 @@ class_name GDrop extends GEntity
 func do_merge(sets: Array[Dictionary]) -> Array[Dictionary]:
 	super.do_merge(sets)
 	name = "GDrop"
-	ref = 1000
+	ref = 1001
 	id = "drop"
 	merge_traits(sets, [TGroup, TCollisible, TSolid, TProcess, TContainer, 小阴影])
 	merge_props(sets, {
@@ -13,7 +13,7 @@ func do_merge(sets: Array[Dictionary]) -> Array[Dictionary]:
 		&"groups": [&"drop"],
 		
 		&"on_draw": Prop.puts({
-			&"0:drop_item": func (ctx: LisperContext, this: Mono, sitem: SekaiItem) -> void:
+			&"0:drop_item": func (ctx: LisperContext, this: Mono, ctrl: SekaiControl, sitem: SekaiItem) -> void:
 				var pos := Vector2(this.position.x, this.position.y - this.position.z * sitem.ratio_yz)
 				var item := this.getp(&"contains")[0] as Mono
 				var t := sitem.get_time()

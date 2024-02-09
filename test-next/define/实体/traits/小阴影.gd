@@ -8,7 +8,7 @@ var props := {
 		&"小阴影": preload("小阴影.png"),
 	},
 	&"on_draw": Prop.puts({
-		&"-1:小阴影": func (ctx: LisperContext, this: Mono, item: SekaiItem) -> void:
+		&"-1:小阴影": func (ctx: LisperContext, this: Mono, ctrl: SekaiControl, item: SekaiItem) -> void:
 			var pos := Vector2(this.position.x, this.position.y - this.position.z * item.ratio_yz)
 			var texture := this.getp(&"asserts")[&"小阴影"] as Texture2D
 			var rect := Rect2(-1.5, -1.5, 3, 3)

@@ -144,6 +144,16 @@ func get_assert(path: String) -> Variant:
 		return res
 	return null
 
+## 获取一个 CSV 数据
+func get_csv(path: String) -> Array:
+	var content := []
+	var file := FileAccess.open(path, FileAccess.READ)
+	file.get_csv_line()
+	var _head := file.get_csv_line()
+	while file.get_position() < file.get_length():
+		content.append(Array(file.get_csv_line()))
+	return content
+
 ## 获取一个游戏期间基本唯一的 index
 func get_uidx() -> int:
 	_uidx += 1
@@ -183,6 +193,11 @@ func _init_context() -> void:
 
 func _process(delta: float) -> void:
 	process.emit(delta)
+	if gikou != null:
+		var hakos := gikou.getpB(&"contains") as Array
+		for hako in hakos:
+			if hako.getp(&"active_level") > 0:
+				await hako.callc(context, &"on_process", delta)
 
 
 
@@ -220,6 +235,13 @@ defunc (load :const :gd :apply :pure ',
 		var mod_dir = ctx.get_var(&"*mod-dir*")
 		var path := args[0] as String
 		return get_assert(Lisper.resolve_path(mod_dir, path))
+,')
+
+defunc (csv/load :const :gd :apply :pure ',
+	func (ctx: LisperContext, args: Array) -> Variant:
+		var mod_dir = ctx.get_var(&"*mod-dir*")
+		var path := args[0] as String
+		return get_csv(Lisper.resolve_path(mod_dir, path))
 ,')
 
 sekai/exec ("mono/mono.gsm.gd")
@@ -283,7 +305,8 @@ func _update_debug_draw() -> void:
 		ProjectSettings.get_setting(&"sekai/debug_draw_contactable") or \
 		ProjectSettings.get_setting(&"sekai/debug_draw_pickable") or \
 		ProjectSettings.get_setting(&"sekai/debug_draw_routable") or \
-		ProjectSettings.get_setting(&"sekai/debug_draw_solid")
+		ProjectSettings.get_setting(&"sekai/debug_draw_solid") or \
+		ProjectSettings.get_setting(&"sekai/debug_draw_chunk")
 	)
 
 var _indent := 0

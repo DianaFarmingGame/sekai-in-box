@@ -1,7 +1,7 @@
 class_name TContactable extends MonoTrait
 
 var id := &"contactable"
-var requires := [&"position"]
+var requires := [&"position", &"drawable"]
 
 var props := {
 	&"contact_rules": {},

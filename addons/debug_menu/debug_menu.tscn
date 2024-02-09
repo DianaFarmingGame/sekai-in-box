@@ -1,6 +1,11 @@
-[gd_scene load_steps=3 format=3 uid="uid://cggqb75a8w8r"]
+[gd_scene load_steps=4 format=3 uid="uid://cggqb75a8w8r"]
 
 [ext_resource type="Script" path="res://addons/debug_menu/debug_menu.gd" id="1_p440y"]
+
+[sub_resource type="Theme" id="Theme_wrmpu"]
+Label/colors/font_shadow_color = Color(0, 0, 0, 0.533333)
+Label/constants/shadow_offset_x = 1
+Label/constants/shadow_offset_y = 2
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ki0n8"]
 bg_color = Color(0, 0, 0, 0.25098)
@@ -9,6 +14,7 @@ bg_color = Color(0, 0, 0, 0.25098)
 layer = 128
 
 [node name="DebugMenu" type="Control" parent="." node_paths=PackedStringArray("fps", "frame_time", "frame_number", "frame_history_total_avg", "frame_history_total_min", "frame_history_total_max", "frame_history_total_last", "frame_history_cpu_avg", "frame_history_cpu_min", "frame_history_cpu_max", "frame_history_cpu_last", "frame_history_gpu_avg", "frame_history_gpu_min", "frame_history_gpu_max", "frame_history_gpu_last", "fps_graph", "total_graph", "cpu_graph", "gpu_graph", "information", "settings")]
+texture_filter = 3
 custom_minimum_size = Vector2(400, 400)
 layout_mode = 3
 anchors_preset = 1
@@ -22,6 +28,7 @@ grow_horizontal = 0
 size_flags_horizontal = 8
 size_flags_vertical = 4
 mouse_filter = 2
+theme = SubResource("Theme_wrmpu")
 script = ExtResource("1_p440y")
 fps = NodePath("VBoxContainer/FPS")
 frame_time = NodePath("VBoxContainer/FrameTime")
@@ -59,26 +66,20 @@ theme_override_constants/separation = 0
 [node name="FPS" type="Label" parent="DebugMenu/VBoxContainer"]
 modulate = Color(0, 1, 0, 1)
 layout_mode = 2
-theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
-theme_override_constants/outline_size = 5
 theme_override_constants/line_spacing = 0
-theme_override_font_sizes/font_size = 18
+theme_override_font_sizes/font_size = 20
 text = "60 FPS"
 horizontal_alignment = 2
 
 [node name="FrameTime" type="Label" parent="DebugMenu/VBoxContainer"]
 modulate = Color(0, 1, 0, 1)
 layout_mode = 2
-theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
-theme_override_constants/outline_size = 3
 theme_override_font_sizes/font_size = 12
 text = "16.67 mspf (cap: 123 FPS + Adaptive V-Sync)"
 horizontal_alignment = 2
 
 [node name="FrameNumber" type="Label" parent="DebugMenu/VBoxContainer"]
 layout_mode = 2
-theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
-theme_override_constants/outline_size = 3
 theme_override_font_sizes/font_size = 12
 text = "Frame: 1234"
 horizontal_alignment = 2

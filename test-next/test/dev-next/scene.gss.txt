@@ -76,8 +76,3 @@ do (hako add_mono &chunk {
 do (hako add_mono &环境/被动/传送门 {
 	position vec3(1 4 1)
 })
-
-
-var (嘉然 do (hako add_mono &实体/角色/嘉然 {
-	position vec3(5 9 1)
-}))

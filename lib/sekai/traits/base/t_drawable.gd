@@ -11,8 +11,8 @@ var props := {
 	&"on_control_enter": Prop.puts({
 		&"1:drawable": TDrawable.handle_control_enter,
 		&"2:debug_drawable": func (ctx: LisperContext, this: Mono, ctrl: SekaiControl) -> void:
-			var data := this.getpB(&"layer_data") as Dictionary
-			var item := data[&"debug_draw"] as SekaiItem
+			var layers := this.getpB(&"layer_data")[ctrl] as Dictionary
+			var item := layers[&"debug_draw"] as SekaiItem
 			item.set_y(this.position.y + floorf(this.position.z) * 64 + 4096)
 			item.on_draw.connect(func ():
 				this.applymR(ctx, &"on_draw_debug", [ctrl, item])
@@ -24,20 +24,22 @@ var props := {
 		&"0:drawable": TDrawable.handle_position_mod,
 		&"0:debug_drawable": func (ctx: LisperContext, this: Mono) -> void:
 			var data := this.getpB(&"layer_data") as Dictionary
-			var item := data[&"debug_draw"] as SekaiItem
-			item.set_y(this.position.y + floorf(this.position.z) * 64 + 4096),
+			for layers in data.values():
+				var item := layers[&"debug_draw"] as SekaiItem
+				item.set_y(this.position.y + floorf(this.position.z) * 64 + 4096),
 	} if ProjectSettings.get_setting(&"sekai/debug_draw") else {
 		&"0:drawable": TDrawable.handle_position_mod,
 	}),
 }
 
 static func handle_control_enter(ctx: LisperContext, this: Mono, ctrl: SekaiControl) -> void:
-	var item := this.getpB(&"layer") as SekaiItem
+	var item := this.getpB(&"layer")[ctrl] as SekaiItem
 	item.set_y(this.position.y + floorf(this.position.z) * 64)
 	item.on_draw.connect(func ():
-		this.callm(ctx, &"on_draw", item)
+		this.applym(ctx, &"on_draw", [ctrl, item])
 	)
 
 static func handle_position_mod(ctx: LisperContext, this: Mono) -> void:
-	var item := this.getpB(&"layer") as SekaiItem
-	item.set_y(this.position.y + floorf(this.position.z) * 64)
+	var items := this.getpB(&"layer") as Dictionary
+	for item in items.values():
+		item.set_y(this.position.y + floorf(this.position.z) * 64)

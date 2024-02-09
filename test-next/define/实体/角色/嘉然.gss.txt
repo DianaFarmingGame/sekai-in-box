@@ -4,6 +4,7 @@ define (load ("../pc.gd")
 	props {
 		name "嘉然"
 		solid_box rect2(-0.3 -0.1 0.6 0.2)
+		pick_box rect2(-0.5 -1 1 1)
 		asserts {
 			idle load ("魔女帽站立.png")
 			walk load ("魔女帽行走.png")

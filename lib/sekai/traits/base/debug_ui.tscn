@@ -1,13 +1,9 @@
-[gd_scene load_steps=4 format=3 uid="uid://d1busoxns41oo"]
+[gd_scene load_steps=3 format=3 uid="uid://d1busoxns41oo"]
 
 [ext_resource type="Script" path="res://lib/sekai/traits/base/debug_ui.gd" id="1_wyu4n"]
 
-[sub_resource type="SystemFont" id="SystemFont_nsrks"]
-font_names = PackedStringArray("Source Code Pro")
-
 [sub_resource type="LabelSettings" id="LabelSettings_jocpy"]
 line_spacing = 0.0
-font = SubResource("SystemFont_nsrks")
 font_size = 14
 shadow_size = 0
 shadow_color = Color(0, 0, 0, 0.733333)
@@ -19,6 +15,7 @@ offset_left = 8.0
 offset_top = 8.0
 offset_right = 9.0
 offset_bottom = 56.0
+mouse_filter = 2
 script = ExtResource("1_wyu4n")
 
 [node name="Position" type="Label" parent="."]
