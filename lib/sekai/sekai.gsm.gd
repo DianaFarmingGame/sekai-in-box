@@ -36,10 +36,12 @@ var defines: Array[MonoDefine]
 ## 当前进入的 Gikou 实例
 var gikou: Mono = null
 
+## 全局的数据存储对象
+var db: Mono
+
 ## 全局的执行环境（原则上不应该被 Sekai 以外的对象使用）
 var context: LisperContext = null
 
-var data: GDatabase
 
 
 
@@ -170,7 +172,7 @@ func _init() -> void:
 	Input.use_accumulated_input = false
 	context = await LisperCommons.make_common_context("Sekai")
 
-func _ready() -> void:
+func _enter_tree() -> void:
 	await _init_context()
 	await _init_globals()
 	# 封闭执行环境以防止非预测的更改
@@ -179,6 +181,8 @@ func _ready() -> void:
 
 ## 初始化全局数据
 func _init_globals() -> void:
+	db = make_mono(1)
+	context.def_const(&"db", db)
 	if define_entry: await exec_gsx(define_entry)
 
 ## 初始化执行环境
@@ -252,6 +256,7 @@ sekai/exec ("mono/prop.gsm.gd")
 sekai/exec ("utils/base.gsm.gd")
 
 define/sign (load ("defines/gikou.gd"))
+define/sign (load ("defines/database.gd"))
 define/sign (load ("defines/hako.gd"))
 define/sign (load ("defines/chunk.gd"))
 

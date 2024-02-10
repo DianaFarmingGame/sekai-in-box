@@ -3,7 +3,7 @@ class_name Chunk extends Box
 func do_merge(sets: Array[Dictionary]) -> Array[Dictionary]:
 	super.do_merge(sets)
 	name = "Chunk"
-	ref = 2
+	ref = 3
 	id = &"chunk"
 	merge_traits(sets, [TPosition, TWithLayer, TDrawable, TPickable])
 	merge_props(sets, {
