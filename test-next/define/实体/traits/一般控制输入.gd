@@ -1,7 +1,7 @@
 class_name 一般控制输入 extends MonoTrait
 
 var id := &"一般控制输入"
-var requires := [&"input", &"可控制", &"有快捷栏"]
+var requires := [&"input", &"可控制", &"有快捷栏", &"UI快捷栏", &"UI物品栏"]
 
 var props := {
 	#

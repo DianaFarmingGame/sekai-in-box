@@ -99,7 +99,7 @@ var props := {
 			var list := nodes[ctrl] as Dictionary
 			for node in list.values():
 				ctrl.remove_child(node)
-				node.free()
+				node.queue_free()
 			nodes.erase(ctrl),
 	}),
 	&"on_input": Prop.puts({

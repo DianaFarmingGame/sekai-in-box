@@ -103,7 +103,8 @@ func _on_kami_pick(ctx: LisperContext, this: Mono, ctrl: SekaiControl, pick: Var
 				var dcell := Vector2(cell.x, cell.y)
 				var cpos := ((pos - offset) / dcell).snapped(Vector2(1, 1))
 				if 0 <= cpos.x and cpos.x < vsize.x and 0 <= cpos.y and cpos.y < vsize.y:
-					chunk.applymRSU(ctx, &"chunk/set", [cpos, _sel_define.ref])
+					if _sel_define != null:
+						chunk.applymRSU(ctx, &"chunk/set", [cpos, _sel_define.ref])
 
 func _on_kami_pick_cancel(ctx: LisperContext, this: Mono, ctrl: SekaiControl, pick: Variant, sets: InputSet) -> void:
 	if not _locked:
@@ -165,6 +166,8 @@ func _on_take_control_btn_pressed() -> void:
 	if _sel_mono != null:
 		var ncontrol := SekaiControl.new(_sel_mono)
 		var nwindow := Window.new()
+		nwindow.initial_position = Window.WINDOW_INITIAL_POSITION_CENTER_SCREEN_WITH_MOUSE_FOCUS
+		nwindow.size = Vector2i(600, 600)
 		nwindow.add_child(ncontrol)
 		add_child(nwindow)
 		ncontrol.anchors_preset = Control.PRESET_FULL_RECT
@@ -174,9 +177,4 @@ func _on_take_control_btn_pressed() -> void:
 			remove_child(nwindow)
 			nwindow.queue_free()
 		)
-		await get_tree().process_frame
-		await get_tree().process_frame
-		await get_tree().process_frame
-		await get_tree().process_frame
-		nwindow.move_to_center()
-		nwindow.popup_centered(Vector2i(600, 600))
+		nwindow.show()

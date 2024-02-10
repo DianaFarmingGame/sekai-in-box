@@ -1,0 +1,178 @@
+[gd_scene load_steps=2 format=3 uid="uid://dvb6c5rjq0fxg"]
+
+[ext_resource type="Script" path="res://test-next/define/实体/ui/菜单/main.gd" id="1_37ha6"]
+
+[node name="Main" type="ColorRect"]
+z_index = 10
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(1, 1, 1, 0.266667)
+script = ExtResource("1_37ha6")
+
+[node name="CenterContainer" type="CenterContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="PanelContainer" type="PanelContainer" parent="CenterContainer"]
+layout_mode = 2
+
+[node name="MarginContainer" type="MarginContainer" parent="CenterContainer/PanelContainer"]
+layout_mode = 2
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 8
+theme_override_constants/margin_bottom = 8
+
+[node name="VBoxContainer" type="VBoxContainer" parent="CenterContainer/PanelContainer/MarginContainer"]
+custom_minimum_size = Vector2(120, 0)
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="Label" type="Label" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 24
+text = "菜单"
+horizontal_alignment = 1
+
+[node name="HBoxContainer" type="HBoxContainer" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="SaveBtn" type="Button" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 20
+text = "保存"
+
+[node name="SaveMoreBtn" type="Button" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "..."
+
+[node name="LoadBtn" type="Button" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 20
+text = "加载..."
+
+[node name="ExitBtn" type="Button" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "退出"
+
+[node name="LoadWin" type="Window" parent="."]
+unique_name_in_owner = true
+title = "加载 Gikou"
+initial_position = 4
+size = Vector2i(256, 336)
+visible = false
+wrap_controls = true
+transient = true
+exclusive = true
+
+[node name="PanelContainer" type="PanelContainer" parent="LoadWin"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="MarginContainer" type="MarginContainer" parent="LoadWin/PanelContainer"]
+layout_mode = 2
+theme_override_constants/margin_left = 4
+theme_override_constants/margin_top = 4
+theme_override_constants/margin_right = 4
+theme_override_constants/margin_bottom = 4
+
+[node name="VBoxContainer" type="VBoxContainer" parent="LoadWin/PanelContainer/MarginContainer"]
+custom_minimum_size = Vector2(240, 320)
+layout_mode = 2
+
+[node name="LoadGikouList" type="ItemList" parent="LoadWin/PanelContainer/MarginContainer/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/v_separation = 16
+theme_override_font_sizes/font_size = 20
+
+[node name="HBoxContainer" type="HBoxContainer" parent="LoadWin/PanelContainer/MarginContainer/VBoxContainer"]
+layout_mode = 2
+alignment = 2
+
+[node name="ConfirmBtn" type="Button" parent="LoadWin/PanelContainer/MarginContainer/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "加载"
+
+[node name="CloseBtn" type="Button" parent="LoadWin/PanelContainer/MarginContainer/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "取消"
+
+[node name="SaveWin" type="Window" parent="."]
+unique_name_in_owner = true
+title = "保存 Gikou"
+initial_position = 4
+size = Vector2i(256, 336)
+visible = false
+wrap_controls = true
+transient = true
+exclusive = true
+
+[node name="PanelContainer" type="PanelContainer" parent="SaveWin"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="MarginContainer" type="MarginContainer" parent="SaveWin/PanelContainer"]
+layout_mode = 2
+theme_override_constants/margin_left = 4
+theme_override_constants/margin_top = 4
+theme_override_constants/margin_right = 4
+theme_override_constants/margin_bottom = 4
+
+[node name="VBoxContainer" type="VBoxContainer" parent="SaveWin/PanelContainer/MarginContainer"]
+custom_minimum_size = Vector2(240, 320)
+layout_mode = 2
+
+[node name="SaveGikouList" type="ItemList" parent="SaveWin/PanelContainer/MarginContainer/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/v_separation = 16
+theme_override_font_sizes/font_size = 20
+
+[node name="HBoxContainer" type="HBoxContainer" parent="SaveWin/PanelContainer/MarginContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="LineEdit" type="LineEdit" parent="SaveWin/PanelContainer/MarginContainer/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="ConfirmBtn" type="Button" parent="SaveWin/PanelContainer/MarginContainer/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "保存"
+
+[node name="CloseBtn" type="Button" parent="SaveWin/PanelContainer/MarginContainer/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "取消"
+
+[connection signal="pressed" from="CenterContainer/PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/SaveBtn" to="." method="_on_save_btn_pressed"]
+[connection signal="pressed" from="CenterContainer/PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/SaveMoreBtn" to="." method="_on_save_more_btn_pressed"]
+[connection signal="pressed" from="CenterContainer/PanelContainer/MarginContainer/VBoxContainer/LoadBtn" to="." method="_on_load_btn_pressed"]
+[connection signal="pressed" from="CenterContainer/PanelContainer/MarginContainer/VBoxContainer/ExitBtn" to="." method="_on_exit_btn_pressed"]
+[connection signal="close_requested" from="LoadWin" to="." method="_on_load_win_close_requested"]
+[connection signal="pressed" from="LoadWin/PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/ConfirmBtn" to="." method="_on_load_win_confirmed"]
+[connection signal="pressed" from="LoadWin/PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/CloseBtn" to="." method="_on_load_win_close_requested"]
+[connection signal="close_requested" from="SaveWin" to="." method="_on_save_win_close_requested"]
+[connection signal="pressed" from="SaveWin/PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/CloseBtn" to="." method="_on_save_win_close_requested"]
