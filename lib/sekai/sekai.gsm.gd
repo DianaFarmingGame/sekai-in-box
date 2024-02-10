@@ -248,6 +248,13 @@ defunc (csv/load :const :gd :apply :pure ',
 		return get_csv(Lisper.resolve_path(mod_dir, path))
 ,')
 
+defunc (csv/map-let :const :gd :macro ',
+	func (_ctx, body: Array) -> Array:
+		return Lisper.apply(&"array/map-let", [[
+			Lisper.apply(&"csv/load", [[body[0]]]),
+		], body.slice(1)])
+,')
+
 sekai/exec ("mono/mono.gsm.gd")
 sekai/exec ("mono/trait_like.gsm.gd")
 sekai/exec ("mono/mono_trait.gsm.gd")
