@@ -20,9 +20,7 @@ csv/map-let(+(*config_base* "npc.csv")
 					walk [&fixed &walk 0.4 anim_char(8)]
 				}
 				
-				actions {
-					interact 行为
-				}
+				act_action keyword(行为)
 			}
 		)
 

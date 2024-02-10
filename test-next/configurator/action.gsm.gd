@@ -54,7 +54,7 @@ array/for(data func([i record]
 				++(cur-i))
 			defvar(ary array/slice(data i cur-i))
 			defvar(expr template
-				(func([sekai this src]
+				(func([ctrl src tar sets]
 					:expand :raw
 					array/map(ary func([opt]
 						switch(@(opt &类型)
@@ -96,7 +96,7 @@ array/for(data func([i record]
 								template(echo("unsupport dialog type:" :eval @(opt &类型)))
 							))))))
 
-			do (db db/set keyword(@(record &ID)) eval(expr) keyword("行为"))
+			do (db db/set keyword(@(record &ID)) eval(expr) keyword("actions"))
 			))
 	))
 
