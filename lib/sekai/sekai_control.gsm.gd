@@ -56,7 +56,8 @@ var hako: Mono = null:
 				hako.setpB(&"active_level", hako.getp(&"active_level") - 1)
 			hako = v
 			context.def_const(&"hako", hako)
-			hako.setpB(&"active_level", hako.getp(&"active_level") + 1)
+			if hako is Mono:
+				hako.setpB(&"active_level", hako.getp(&"active_level") + 1)
 
 ## 当前视图是否为已有视图的子视图
 var is_sub := false

@@ -7,6 +7,7 @@ func do_merge(sets: Array[Dictionary]) -> Array[Dictionary]:
 		TInput, TProcess, TState, TUI,
 		TSolid, TPickable, TContactable,
 		TMove, TPick,
+		UI菜单,
 		菜单控制,
 	])
 	merge_props(sets, {

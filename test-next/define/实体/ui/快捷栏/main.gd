@@ -28,6 +28,7 @@ const Slot := preload("slot.tscn")
 func _update_slots(ctx: LisperContext, this: Mono) -> void:
 	for child in SlotList.get_children():
 		SlotList.remove_child(child)
+		child.queue_free()
 	var cur := this.getp(&"cur_slot") as int
 	var slots := this.emitmRSUY(ctx, &"slot/get_all") as Array
 	var start := cur - int((slots.size() - 1) / 2)
