@@ -23,6 +23,7 @@ const print_head: String = "[sekai] "
 #
 signal gikou_changed
 signal process(delta: float)
+signal prepared
 
 
 
@@ -172,13 +173,16 @@ func _init() -> void:
 	Input.use_accumulated_input = false
 	context = await LisperCommons.make_common_context("Sekai")
 
-func _enter_tree() -> void:
-	await _init_context()
+func _ready():
 	await _init_globals()
 	# 封闭执行环境以防止非预测的更改
 	context.seal()
 	_build_caches()
+	prepared.emit()
 
+func _enter_tree() -> void:
+	await _init_context()
+	
 ## 初始化全局数据
 func _init_globals() -> void:
 	db = make_mono(1)

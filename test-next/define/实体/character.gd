@@ -112,11 +112,6 @@ func do_merge(sets: Array[Dictionary]) -> Array[Dictionary]:
 			
 			return flag,
 
-		&"put_item": func(ctx: LisperContext, this: Mono, item: Mono) -> bool:
-			#TODO: 处理失败情况
-			return await this.callm(ctx, &"container/put", item)
-			,
-
 		&"change_interact": func (ctx: LisperContext, this: Mono, action_id) -> void:
 			var tmp = this.getp(&"actions")
 			tmp[&"interact"] = sekai.dbs_get("行为", action_id)

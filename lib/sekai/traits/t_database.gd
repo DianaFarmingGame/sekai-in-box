@@ -5,6 +5,7 @@ var id := &"database"
 var props := {
 	&"data": {},
 	&"group_info": {},
+	&"watcher": {},
 
 	&"db/set": func(ctx: LisperContext, this: Mono, key: StringName, value, group: StringName = &"default") -> void:
 		var db = this.getp("data") as Dictionary
@@ -12,6 +13,22 @@ var props := {
 			db[group] =  {}
 			print("db/set: ", "create database group: ", group)
 		db[group][key] = value
+
+		if this.getp("watcher").has(group):
+			this.callm(ctx, &"on_data_change_" + group, [group, key, value])
+		,
+
+	&"db/setgw": func(ctx: LisperContext, this: Mono, group: StringName = &"default") -> void:
+		var db = this.getp("data") as Dictionary
+		var watcher = this.getp("watcher") as Dictionary
+
+		if !db.has(group):
+			db[group] =  {}
+			print("db/setgw: ", "create database group: ", group)
+
+		print("db/setgw: ", "add group watch: ", group)
+		watcher[group] = true
+		this.setp(&"on_data_change_" + group, {})
 		,
 
 	&"db/get": func(ctx: LisperContext, this: Mono, group: StringName, key: StringName) -> Variant:
@@ -68,4 +85,14 @@ var props := {
 			push_warning("db/get_group_info: ", "missing group_info ", group)
 			return {}
 		return gi[group]
+		,
+		
+	
+	&"on_ready": Prop.puts({
+		&"-99:database": func (ctx: LisperContext, this: Mono) -> void:
+			var watcher = this.getp("watcher") as Dictionary
+			for group in watcher:
+				this.setp(&"on_data_change_" + group, {})
+			,
+	}),
 }
