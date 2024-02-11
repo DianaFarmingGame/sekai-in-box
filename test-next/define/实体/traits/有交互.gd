@@ -43,11 +43,11 @@ var props := {
 		var usage = null
 		var lidx = 0
 		for layer in this.layers:
-			for entry in layer[1].get(key).duplicate():
-				usage = await entry[1].call(ctx, this, ctrl, src, tar, sets)
+			for entry in layer[1].get(key, []).duplicate():
+				usage = await ctx.call_method(this, entry[1], [ctrl, src, tar, sets])
 				if usage != null: return usage
 		for entry in this.getpR(key).duplicate():
-			usage = await entry[1].call(ctx, this, ctrl, src, tar, sets)
+			usage = await ctx.call_method(this, entry[1], [ctrl, src, tar, sets])
 			if usage != null: return usage
 		return null,
 	

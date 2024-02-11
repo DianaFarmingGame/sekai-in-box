@@ -9,6 +9,7 @@ func do_merge(sets: Array[Dictionary]) -> Array[Dictionary]:
 		TMove, TPick,
 		UI菜单,
 		菜单控制,
+		有交互
 	])
 	merge_props(sets, {
 		&"name": "UMA",

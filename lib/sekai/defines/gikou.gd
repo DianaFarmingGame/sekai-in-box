@@ -5,7 +5,7 @@ func do_merge(sets: Array[Dictionary]) -> Array[Dictionary]:
 	name = "Gikou"
 	ref = 0
 	id = &"gikou"
-	merge_traits(sets, [TContainer])
+	merge_traits(sets, [TContainer, TDatabase])
 	merge_props(sets, {
 		&"id": null,
 		&"def_target": null,
