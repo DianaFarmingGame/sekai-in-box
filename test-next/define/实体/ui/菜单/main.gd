@@ -8,9 +8,6 @@ var this: Mono
 @onready var SaveGikouList := %SaveGikouList as ItemList
 @onready var SaveID := %SaveID as LineEdit
 
-func _ready() -> void:
-	pass
-
 var _scanned_gikous := []
 
 func _update_gikou_list() -> void:
