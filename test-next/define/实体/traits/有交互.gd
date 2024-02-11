@@ -41,7 +41,6 @@ var props := {
 	&"action/emit": func (ctx: LisperContext, this: Mono, ctrl: SekaiControl, src: Mono, tar: Variant, sets: InputSet) -> Variant:
 		var key := &"action_data"
 		var usage = null
-		var lidx = 0
 		for layer in this.layers:
 			for entry in layer[1].get(key, []).duplicate():
 				usage = await ctx.call_method(this, entry[1], [ctrl, src, tar, sets])
