@@ -11,5 +11,6 @@ func do_merge(sets: Array[Dictionary]) -> Array[Dictionary]:
 		一般控制输入
 	])
 	merge_props(sets, {
+		&"pick_box": Rect2(-0.5, -1, 1, 1),
 	})
 	return sets

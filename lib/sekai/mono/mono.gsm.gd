@@ -869,65 +869,59 @@ func gsm(): return ['
 defunc (do :const :gd :raw ',
 	func (ctx: LisperContext, body: Array, comptime: bool) -> Variant:
 		if comptime: return await LisperCommons.compile_keyword_mask_01(ctx, body)
-		else:
-			var this := await ctx.exec(body[0]) as Mono
-			var act_name := await ctx.exec_as_keyword(body[1]) as StringName
-			return await this.applyr(ctx, act_name, body.slice(2))
+		var this := await ctx.exec(body[0]) as Mono
+		var act_name := await ctx.exec_as_keyword(body[1]) as StringName
+		return await this.applyr(ctx, act_name, body.slice(2))
 ,')
 
 defunc (callm :const :gd :raw ',
 	func (ctx: LisperContext, body: Array, comptime: bool) -> Variant:
 		if comptime: return await LisperCommons.compile_keyword_mask_01(ctx, body)
-		else:
-			var this := await ctx.exec(body[0]) as Mono
-			var method := await ctx.exec_as_keyword(body[1]) as StringName
-			var argv := await ctx.execs(body.slice(2)) as Array
-			return await this.applym(ctx, method, argv)
+		var this := await ctx.exec(body[0]) as Mono
+		var method := await ctx.exec_as_keyword(body[1]) as StringName
+		var argv := await ctx.execs(body.slice(2)) as Array
+		return await this.applym(ctx, method, argv)
 ,')
 
 defunc (getp :const :gd :raw ',
 	func (ctx: LisperContext, body: Array, comptime: bool) -> Variant:
 		if comptime: return await LisperCommons.compile_keyword_mask_01(ctx, body)
-		else:
-			var this := await ctx.exec(body[0]) as Mono
-			var key := await ctx.exec_as_keyword(body[1]) as StringName
-			return this.getp(key)
+		var this := await ctx.exec(body[0]) as Mono
+		var key := await ctx.exec_as_keyword(body[1]) as StringName
+		return this.getp(key)
 ,')
 
 defunc (setp :const :gd :raw ',
 	func (ctx: LisperContext, body: Array, comptime: bool) -> Variant:
 		if comptime: return await LisperCommons.compile_keyword_mask_01(ctx, body)
-		else:
-			var this := await ctx.exec(body[0]) as Mono
-			var key := await ctx.exec_as_keyword(body[1]) as StringName
-			var value = await ctx.exec(body[2])
-			this.setp(key, value)
-			return this
+		var this := await ctx.exec(body[0]) as Mono
+		var key := await ctx.exec_as_keyword(body[1]) as StringName
+		var value = await ctx.exec(body[2])
+		this.setp(key, value)
+		return this
 ,')
 
 defunc (puts :const :gd :raw ',
 	func (ctx: LisperContext, body: Array, comptime: bool) -> Variant:
 		if comptime: return await LisperCommons.compile_keyword_mask_01(ctx, body)
-		else:
-			var this := await ctx.exec(body[0]) as Mono
-			var key := await ctx.exec_as_keyword(body[1]) as StringName
-			var pairs := body[2][1] as Array
-			for i in pairs.size() / 2:
-				var k := await ctx.exec_as_keyword(pairs[2 * i]) as StringName
-				var v = await ctx.exec(pairs[2 * i + 1])
-				this.puts(key, [k, v])
-			return this
+		var this := await ctx.exec(body[0]) as Mono
+		var key := await ctx.exec_as_keyword(body[1]) as StringName
+		var pairs := body[2][1] as Array
+		for i in pairs.size() / 2:
+			var k := await ctx.exec_as_keyword(pairs[2 * i]) as StringName
+			var v = await ctx.exec(pairs[2 * i + 1])
+			this.puts(key, [k, v])
+		return this
 ,')
 
 defunc (dels :const :gd :raw ',
 	func (ctx: LisperContext, body: Array, comptime: bool) -> Variant:
 		if comptime: return await LisperCommons.compile_keyword_mask_01(ctx, body)
-		else:
-			var this := await ctx.exec(body[0]) as Mono
-			var key := await ctx.exec_as_keyword(body[1]) as StringName
-			var head = await ctx.exec(body[2])
-			this.dels(key, head)
-			return this
+		var this := await ctx.exec(body[0]) as Mono
+		var key := await ctx.exec_as_keyword(body[1]) as StringName
+		var head = await ctx.exec(body[2])
+		this.dels(key, head)
+		return this
 ,')
 
 defunc (listen :const :gd :macro ',
@@ -945,12 +939,11 @@ defunc (listen :const :gd :macro ',
 defunc (unlisten :const :gd :raw ',
 	func (ctx: LisperContext, body: Array, comptime: bool) -> Variant:
 		if comptime: return await LisperCommons.compile_keyword_mask_01(ctx, body)
-		else:
-			var this := await ctx.exec(body[0]) as Mono
-			var key := await ctx.exec_as_keyword(body[1]) as StringName
-			var head = await ctx.exec(body[2])
-			this.dels(key, head)
-			return this
+		var this := await ctx.exec(body[0]) as Mono
+		var key := await ctx.exec_as_keyword(body[1]) as StringName
+		var head = await ctx.exec(body[2])
+		this.dels(key, head)
+		return this
 ,')
 
 defunc (wait :const :gd :macro ',
@@ -969,5 +962,16 @@ defunc (wait :const :gd :macro ',
 
 defunc (remove :const :gd :apply ', func (ctx: LisperContext, args: Array): args[0].remove(ctx) ,')
 defunc (queue_remove :const :gd ', func (this: Mono): this.remove.call_deferred() ,')
+
+defunc (. :const :gd :raw ',
+	func (ctx: LisperContext, body: Array, comptime: bool) -> Variant:
+		if comptime: return await LisperCommons.compile_keyword_mask_01(ctx, body)
+		var obj = await ctx.exec(body[0])
+		if obj is Array: return obj[await ctx.exec(body[1])]
+		if obj is Dictionary: return obj[await ctx.exec_as_keyword(body[1])]
+		if obj is Mono: return obj.getp(await ctx.exec_as_keyword(body[1]))
+		ctx.error("unknown ref src")
+		return null
+,')
 
 ']

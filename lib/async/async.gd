@@ -1,8 +1,10 @@
 class_name Async
 
 static func array_map(ary: Array, handle: Callable) -> Array:
-	var res := ary.map(handle)
-	for i in res.size(): res[i] = await res[i]
+	var res := []
+	res.resize(ary.size())
+	for i in ary.size():
+		res[i] = await handle.call(ary[i])
 	return res
 
 static func array_filter(ary: Array, handle: Callable) -> Array:

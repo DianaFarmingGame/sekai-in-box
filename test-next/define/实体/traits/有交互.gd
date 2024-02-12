@@ -8,7 +8,7 @@ var props := {
 	# 配置
 	#
 	
-	# 激活的行为 ID
+	# 激活的行为 ID 或可调用对象
 	# 所有激活的行为会利用 ID 在 ready 时从 Gikou 的 DB 获取
 	# 并以 0 序排列到 base 层的 action_data 内
 	&"act_action": null,
@@ -55,9 +55,13 @@ var props := {
 	#--------------------------------------------------------------------------#
 	&"on_ready": Prop.puts({
 		&"0:有交互": func (ctx: LisperContext, this: Mono) -> void:
-			var id = this.getp(&"act_action")
-			if id != null:
-				var handle = sekai.db.applymRSUY(ctx, &"db/get", [&"actions", id])
+			var act = this.getp(&"act_action")
+			if act != null:
+				var handle = null
+				if Lisper.is_fn(act):
+					handle = act
+				else:
+					handle = sekai.db.applymRSUY(ctx, &"db/get", [&"actions", act])
 				if handle != null:
 					this.pushsB(&"action_data", [&"0:act_action", handle]),
 	}),

@@ -24,6 +24,7 @@ const print_head: String = "[sekai] "
 signal gikou_changed
 signal process(delta: float)
 signal prepared
+var is_prepared := false
 
 
 
@@ -182,6 +183,7 @@ func _ready():
 	await _init_globals()
 	# 封闭执行环境以防止非预测的更改
 	context.seal()
+	is_prepared = true
 	prepared.emit()
 
 func _enter_tree() -> void:

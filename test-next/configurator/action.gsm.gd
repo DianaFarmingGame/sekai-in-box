@@ -81,16 +81,18 @@ array/for(data func([i record]
 							&对话 template(block(
 									add_to_talking_pool(ctrl gikou :eval @(opt &发起者))
 									echo(:eval @(opt &数据))
+									:eval :raw switch(@(opt &发起者)
+										&主 template(do(target msg_dialog/put ctrl {
+											name #(src . name)
+											text :eval @(opt &数据)
+										}))
+										&宾 template(do(target msg_dialog/put ctrl {
+											name #(this . name)
+											text :eval @(opt &数据)
+										}))
+										#t raw<- (echo ("unknown dialog host" @(opt &发起者)))
+									)
 								))
-							&对话 switch(@(opt &发起者)
-								&主 template(do(target dialog/put ctrl {
-									name getp(src name)
-									text :eval @(opt &数据)
-								}))
-								&宾 template(do(target dialog/put ctrl {
-									name getp(this name)
-									text :eval @(opt &数据)
-								})))
 							&选择
 								template
 									(do(src choose_single :eval @(opt &数据)

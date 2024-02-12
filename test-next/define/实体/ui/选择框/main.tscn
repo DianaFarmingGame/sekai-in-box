@@ -1,6 +1,6 @@
-[gd_scene load_steps=2 format=3 uid="uid://dvrg6c6t6t3ii"]
+[gd_scene load_steps=2 format=3 uid="uid://bbm3u2cq0vpdu"]
 
-[ext_resource type="Script" path="res://test-next/define/实体/ui/对话框/main.gd" id="1_fu2rf"]
+[ext_resource type="Script" path="res://test-next/define/实体/ui/选择框/main.gd" id="1_lrhet"]
 
 [node name="Main" type="Control"]
 z_index = 1
@@ -12,7 +12,7 @@ grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
 mouse_force_pass_scroll_events = false
-script = ExtResource("1_fu2rf")
+script = ExtResource("1_lrhet")
 
 [node name="MarginContainer" type="MarginContainer" parent="."]
 layout_mode = 1
@@ -51,7 +51,7 @@ stretch_mode = 3
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="Name" type="Label" parent="MarginContainer/PanelContainer/MarginContainer/HBoxContainer/VBoxContainer"]
+[node name="Title" type="Label" parent="MarginContainer/PanelContainer/MarginContainer/HBoxContainer/VBoxContainer"]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_colors/font_color = Color(0.266667, 1, 0.266667, 1)
@@ -60,11 +60,6 @@ theme_override_constants/shadow_offset_x = 1
 theme_override_constants/shadow_offset_y = 2
 theme_override_font_sizes/font_size = 20
 
-[node name="Dialog" type="Label" parent="MarginContainer/PanelContainer/MarginContainer/HBoxContainer/VBoxContainer"]
+[node name="ChoiceList" type="VBoxContainer" parent="MarginContainer/PanelContainer/MarginContainer/HBoxContainer/VBoxContainer"]
 unique_name_in_owner = true
 layout_mode = 2
-theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.666667)
-theme_override_constants/shadow_offset_x = 1
-theme_override_constants/shadow_offset_y = 2
-
-[connection signal="gui_input" from="MarginContainer/PanelContainer" to="." method="_on_panel_gui_input"]
