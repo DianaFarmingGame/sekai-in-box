@@ -90,6 +90,7 @@ array/for(data func([i record]
 											name getp(this name)
 											text :eval @(opt &数据)
 										}))
+										#t raw<- (echo ("unknown dialog host" @(opt &发起者)))
 									)
 								))
 							&选择

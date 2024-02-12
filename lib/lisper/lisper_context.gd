@@ -489,7 +489,9 @@ func compile(node: Array) -> Array:
 	return node
 
 func compiles(body: Array) -> Array:
-	return await Async.array_map(body, func (n): return await compile(n))
+	return await Async.array_map(body, func (n):
+		await test(n is Array)
+		return await compile(n))
 
 const STRINGIFY_MAX_DEPTH := 32
 
