@@ -95,7 +95,6 @@ array/for(data func([i record]
 							#t
 								template(echo("unsupport dialog type:" :eval @(opt &类型)))
 							))))))
-
 			do (db db/set keyword(@(record &ID)) eval(expr) keyword("actions"))
 			))
 	))
@@ -173,3 +172,4 @@ func exchange_item_data_t(data: String) -> Array:
 	var res = [this_item_input, this_item_output]
 
 	return res
+
