@@ -22,6 +22,25 @@ var(item2mono :const ', func (sekai: Sekai, items: Dictionary) -> Array:
 	return res
 ,')
 
+var(add_to_talking_pool :const ', func(ctrl: SekaiControl, gikou: Mono, mono_id: StringName):
+	var ctx := ctrl.context
+
+	if await gikou.callmRSU(ctx, &"db/has", mono_id):
+		return
+
+	var hako := ctrl.hako
+	var mono = await hako.callmRSU(ctx, &"container/get_by_ref_id", mono_id)
+
+
+	await gikou.applymRSU(ctx, &"db/setp", [&"talking_pool", mono_id, mono])
+	print(await gikou.callm(ctx, &"db/getg", &"default"))
+,')
+
+var(clean_talking_pool :const ', func(ctrl: SekaiControl, gikou: Mono):
+	var ctx := ctrl.context
+
+	await gikou.callm(ctx, &"db/clean", &"talking_pool")
+,')
 
 defvar(data csv/map-let(+(*config_base* "action.csv")
 	[ID 类型 发起者 数据 跳转表] {
@@ -53,14 +72,16 @@ array/for(data func([i record]
 					escape())
 				++(cur-i))
 			defvar(ary array/slice(data i cur-i))
+			var (ary array/concat(ary [{类型 keyword("end")}]))
 			defvar(expr template
 				(func([ctrl src tar sets]
 					:expand :raw
 					array/map(ary func([opt]
 						switch(@(opt &类型)
-							&对话 switch(@(opt &发起者)
-								&主 template(do(src say_to this :eval @(opt &数据)))
-								&宾 template(do(this say_to src :eval @(opt &数据))))
+							&对话 template(block(
+									add_to_talking_pool(ctrl gikou :eval @(opt &发起者))
+									echo(:eval @(opt &数据))
+								))
 							&选择
 								template
 									(do(src choose_single :eval @(opt &数据)
@@ -92,9 +113,12 @@ array/for(data func([i record]
 								))
 							&行为覆盖
 								template(do(this change_interact :eval @(opt &数据)))
+							&end
+								template(clean_talking_pool(ctrl gikou))
 							#t
 								template(echo("unsupport dialog type:" :eval @(opt &类型)))
 							))))))
+									
 			do (db db/set keyword(@(record &ID)) eval(expr) keyword("actions"))
 			))
 	))

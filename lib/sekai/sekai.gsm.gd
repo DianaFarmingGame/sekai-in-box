@@ -151,7 +151,6 @@ func get_assert(path: String) -> Variant:
 func get_csv(path: String) -> Array:
 	var content := []
 	var file := FileAccess.open(path, FileAccess.READ)
-	file.get_csv_line()
 	var _head := file.get_csv_line()
 	while file.get_position() < file.get_length():
 		content.append(Array(file.get_csv_line()))

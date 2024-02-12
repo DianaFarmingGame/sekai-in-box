@@ -176,7 +176,7 @@ buffering/agile_event_flushing=true
 [lisper]
 
 enable_aggressive_opt=true
-debugger_visible=true
+debugger_visible=false
 
 [rendering]
 
@@ -192,7 +192,7 @@ debug_draw_routable=false
 debug_draw_solid=false
 debug_draw_contactable=false
 debug_draw_pickable=false
-define_entry="res://test-next/test/demo/define_entry.gss.txt"
+define_entry="res://test-next/test/dev-configurator/define_entry.gss.txt"
 render_extra_sight=4
 min_inits_per_frame=8
 gikou_store_dir="user://gikous"
