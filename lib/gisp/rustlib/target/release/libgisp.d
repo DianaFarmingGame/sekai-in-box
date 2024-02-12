@@ -1,1 +1,0 @@
-/Users/tuzhanhong/Documents/game/sekai-in-box/lib/gisp/rustlib/target/release/libgisp.dylib: /Users/tuzhanhong/Documents/game/sekai-in-box/lib/gisp/rustlib/src/lib.rs /Users/tuzhanhong/Documents/game/sekai-in-box/lib/gisp/rustlib/src/parser.rs

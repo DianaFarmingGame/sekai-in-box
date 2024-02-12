@@ -1,5 +1,0 @@
-cargo:rustc-cfg=since_api="4.1"
-cargo:rustc-cfg=since_api="4.2"
-cargo:rustc-cfg=before_api="4.3"
-cargo:rustc-cfg=gdextension_minor_api="4.2"
-cargo:rustc-cfg=gdextension_exact_api="4.2"
