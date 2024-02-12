@@ -59,8 +59,14 @@ array/for(data func([i record]
 					array/map(ary func([opt]
 						switch(@(opt &类型)
 							&对话 switch(@(opt &发起者)
-								&主 template(do(src say_to this :eval @(opt &数据)))
-								&宾 template(do(this say_to src :eval @(opt &数据))))
+								&主 template(do(target dialog/put ctrl {
+									name getp(src name)
+									text :eval @(opt &数据)
+								}))
+								&宾 template(do(target dialog/put ctrl {
+									name getp(this name)
+									text :eval @(opt &数据)
+								})))
 							&选择
 								template
 									(do(src choose_single :eval @(opt &数据)

@@ -4,7 +4,7 @@ func do_merge(sets: Array[Dictionary]) -> Array[Dictionary]:
 	super.do_merge(sets)
 	name = "PC"
 	merge_traits(sets, [
-		TDefTarget,
+		TDefTarget, UI对话框,
 	])
 	merge_props(sets, {
 		&"on_action_primary": Prop.puts({

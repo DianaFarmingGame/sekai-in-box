@@ -111,6 +111,12 @@ func sign_define(define: Variant) -> void:
 	define.finalize()
 	if define.ref >= defines.size(): defines.resize(define.ref + 1)
 	defines[define.ref] = define
+	if define.id != null and define.id != &"":
+		if _defines_by_id.has(define.id):
+			var pd := _defines_by_id[define.id] as MonoDefine
+			push_error("duplicated define id: ", pd.name, "(", pd.id, ") and ", define.name, "(", define.id, ")")
+		else:
+			_defines_by_id[define.id] = define
 
 ## 获取一个 Define
 func get_define(ref_id: Variant) -> Variant:
@@ -177,7 +183,6 @@ func _enter_tree() -> void:
 	await _init_globals()
 	# 封闭执行环境以防止非预测的更改
 	context.seal()
-	_build_caches()
 
 ## 初始化全局数据
 func _init_globals() -> void:
@@ -279,16 +284,6 @@ define/sign (load ("defines/chunk.gd"))
 
 var _defines_by_id := {}
 var _assert_cache := {}
-
-func _build_caches() -> void:
-	# build _defines_by_id
-	for define in defines:
-		if define != null and define.id != null and define.id != &"":
-			if _defines_by_id.has(define.id):
-				var pd := _defines_by_id[define.id] as MonoDefine
-				push_error("duplicated define id: ", pd.name, "(", pd.id, ") and ", define.name, "(", define.id, ")")
-			else:
-				_defines_by_id[define.id] = define
 
 
 
