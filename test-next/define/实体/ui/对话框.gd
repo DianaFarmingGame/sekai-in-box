@@ -10,13 +10,13 @@ var props := {
 	
 	# 弹出一个对话并等待其结束
 	# @params: SekaiControl, {text: String, name?: String, avatar?: Texture2D}
-	&"dialog/put": func (ctx: LisperContext, this: Mono, ctrl: SekaiControl, param: Dictionary) -> void:
-		await this.applymRSU(ctx, &"ui/oneshot", [ctrl, &"dialog", param]),
+	&"msg_dialog/put": func (ctx: LisperContext, this: Mono, ctrl: SekaiControl, param: Dictionary) -> void:
+		await this.applymRSU(ctx, &"ui/oneshot", [ctrl, &"msg_dialog", param]),
 	
 	
 	
 	#--------------------------------------------------------------------------#
 	&"ui_data": {
-		&"dialog": preload("对话框/main.tscn"),
+		&"msg_dialog": preload("对话框/main.tscn"),
 	},
 }
