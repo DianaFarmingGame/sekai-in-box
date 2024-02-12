@@ -4,5 +4,5 @@ sekai/exec ("../../.define.gss.txt")
 
 var(*config_base* +(*mod-dir* "/csvs/"))
 
-sekai/exec ("../../configurator/action.gsm.gd")
+;sekai/exec ("../../configurator/action.gsm.gd")
 ;sekai/exec ("../../configurator/task.gsm.gd")

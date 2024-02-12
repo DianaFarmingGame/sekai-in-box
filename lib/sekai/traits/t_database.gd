@@ -15,7 +15,7 @@ var props := {
 		db[group][key] = value
 
 		if this.getp("watcher").has(group):
-			this.callm(ctx, &"on_data_change_" + group, [group, key, value])
+			this.callm(ctx, &"on_data_change_" + group, [key, value])
 		,
 
 	&"db/setgw": func(ctx: LisperContext, this: Mono, group: StringName = &"default") -> void:
@@ -92,7 +92,7 @@ var props := {
 		&"-99:database": func (ctx: LisperContext, this: Mono) -> void:
 			var watcher = this.getp("watcher") as Dictionary
 			for group in watcher:
-				this.setp(&"on_data_change_" + group, {})
+				this.setp(&"on_data_change_" + group, Prop.Stack())
 			,
 	}),
 }
