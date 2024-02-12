@@ -1,7 +1,0 @@
-defvar(自用工具 define/make (Item
-	props {
-		groups prop/pushs ([&物品])
-		name "自用工具"
-		}
-			)
-)

@@ -1,0 +1,22 @@
+define (load ("item.gd")
+	ref 3000
+	id &物品/卷轴
+	props {
+		name "卷轴"
+		
+		can_stack #t
+		stack_capacity 16
+	
+		can_charge #f
+		charge_point 1
+		charge_capacity 1
+		
+		can_trade #t
+		trade_price 500
+		trade_stability 0.8
+		
+		asserts {
+			icon load("卷轴.png")
+		}
+		icon [&icon rect2(0 0 32 32)]
+	})

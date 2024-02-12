@@ -1,0 +1,436 @@
+define (load ("../block_static_ext.gd")
+	ref 2101
+	props {
+		asserts {
+			main load ("../地形.png")
+		}
+		cur_draw &top_center
+		draw_data {
+			top_corner_nw [&static &main clip_ground(0 0)]
+			top_corner_ne [&static &main clip_ground(2 0)]
+			top_corner_se [&static &main clip_box(2 2)]
+			top_corner_sw [&static &main clip_box(0 2)]
+			top_side_n [&static &main clip_ground(1 0)]
+			top_side_e [&static &main clip_ground(2 1)]
+			top_side_s [&static &main clip_box(1 2)]
+			top_side_w [&static &main clip_ground(0 1)]
+			top_center [&static &main clip_ground(1 1)]
+			
+			middle_corner_se [&static &main clip_wall(2 4)]
+			middle_corner_sw [&static &main clip_wall(0 4)]
+			middle_side_s [&static &main clip_wall(1 4)]
+			
+			bottom_corner_se [&static &main clip_wall(2 5)]
+			bottom_corner_sw [&static &main clip_wall(0 5)]
+			bottom_side_s [&static &main clip_wall(1 5)]
+			
+			thin_corner_se [&static &main clip_box(5 2)]
+			thin_corner_sw [&static &main clip_box(3 2)]
+			thin_side_s [&static &main clip_box(4 2)]
+			
+			top_concave_nw [&static &main clip_ground(3 6)]
+			top_concave_ne [&static &main clip_ground(4 6)]
+			top_concave_se [&static &main clip_ground(4 7)]
+			top_concave_sw [&static &main clip_ground(3 7)]
+		}
+		atile_size vec3(3 3 3)
+		groups prop/pushs([2101])
+		atile_matches [[2101 2102]]
+		atile_rules [[
+			[
+				0	0	0
+				0	-1	0
+				0	0	0
+				
+				0	-1	-1
+				-1	0	1
+				-1	1	1
+				
+				0	0	0
+				0	0	0
+				0	0	0
+			] {
+				cover {
+					cur_draw &top_corner_nw
+				}
+			}
+		][
+			[
+				0	0	0
+				0	-1	0
+				0	0	0
+				
+				-1	-1	0
+				1	0	-1
+				1	1	-1
+				
+				0	0	0
+				0	0	0
+				0	0	0
+			] {
+				cover {
+					cur_draw &top_corner_ne
+				}
+			}
+		][
+			[
+				0	0	0
+				0	-1	0
+				0	0	0
+				
+				1	1	-1
+				1	0	-1
+				-1	-1	0
+				
+				0	0	0
+				0	1	0
+				0	-1	0
+			] {
+				cover {
+					cur_draw &top_corner_se
+				}
+			}
+		][
+			[
+				0	0	0
+				0	-1	0
+				0	0	0
+				
+				-1	1	1
+				-1	0	1
+				0	-1	-1
+				
+				0	0	0
+				0	1	0
+				0	-1	0
+			] {
+				cover {
+					cur_draw &top_corner_sw
+				}
+			}
+		][
+			[
+				0	0	0
+				0	-1	0
+				0	0	0
+				
+				0	-1	0
+				1	0	1
+				1	1	1
+				
+				0	0	0
+				0	0	0
+				0	0	0
+			] {
+				cover {
+					cur_draw &top_side_n
+				}
+			}
+		][
+			[
+				0	0	0
+				0	-1	0
+				0	0	0
+				
+				1	1	0
+				1	0	-1
+				1	1	0
+				
+				0	0	0
+				0	0	0
+				0	0	0
+			] {
+				cover {
+					cur_draw &top_side_e
+				}
+			}
+		][
+			[
+				0	0	0
+				0	-1	0
+				0	0	0
+				
+				1	1	1
+				1	0	1
+				0	-1	0
+				
+				0	0	0
+				0	1	0
+				0	-1	0
+			] {
+				cover {
+					cur_draw &top_side_s
+				}
+			}
+		][
+			[
+				0	0	0
+				0	-1	0
+				0	0	0
+				
+				0	1	1
+				-1	0	1
+				0	1	1
+				
+				0	0	0
+				0	0	0
+				0	0	0
+			] {
+				cover {
+					cur_draw &top_side_w
+				}
+			}
+		][
+			[
+				0	0	0
+				0	-1	0
+				0	0	0
+				
+				1	1	1
+				1	0	1
+				1	1	1
+				
+				0	0	0
+				0	0	0
+				0	0	0
+			] {
+				cover {
+					cur_draw &top_center
+				}
+			}
+		][
+			[
+				0	0	0
+				0	1	0
+				0	0	0
+				
+				1	1	-1
+				1	0	-1
+				-1	-1	0
+				
+				0	0	0
+				0	1	0
+				0	-1	0
+			] {
+				cover {
+					cur_draw &middle_corner_se
+				}
+			}
+		][
+			[
+				0	0	0
+				0	1	0
+				0	0	0
+				
+				-1	1	1
+				-1	0	1
+				0	-1	-1
+				
+				0	0	0
+				0	1	0
+				0	-1	0
+			] {
+				cover {
+					cur_draw &middle_corner_sw
+				}
+			}
+		][
+			[
+				0	0	0
+				0	1	0
+				0	0	0
+				
+				1	1	1
+				1	0	1
+				0	-1	0
+				
+				0	0	0
+				0	1	0
+				0	-1	0
+			] {
+				cover {
+					cur_draw &middle_side_s
+				}
+			}
+		][
+			[
+				0	0	0
+				0	1	0
+				0	0	0
+				
+				1	1	-1
+				1	0	-1
+				-1	-1	0
+				
+				0	0	0
+				0	0	0
+				0	0	0
+			] {
+				cover {
+					cur_draw &bottom_corner_se
+				}
+			}
+		][
+			[
+				0	0	0
+				0	1	0
+				0	0	0
+				
+				-1	1	1
+				-1	0	1
+				0	-1	-1
+				
+				0	0	0
+				0	0	0
+				0	0	0
+			] {
+				cover {
+					cur_draw &bottom_corner_sw
+				}
+			}
+		][
+			[
+				0	0	0
+				0	1	0
+				0	0	0
+				
+				1	1	1
+				1	0	1
+				0	-1	0
+				
+				0	0	0
+				0	0	0
+				0	0	0
+			] {
+				cover {
+					cur_draw &bottom_side_s
+				}
+			}
+		][
+			[
+				0	0	0
+				0	-1	0
+				0	0	0
+				
+				1	1	-1
+				1	0	-1
+				-1	-1	0
+				
+				0	0	0
+				0	0	0
+				0	0	0
+			] {
+				cover {
+					cur_draw &thin_corner_se
+				}
+			}
+		][
+			[
+				0	0	0
+				0	-1	0
+				0	0	0
+				
+				-1	1	1
+				-1	0	1
+				0	-1	-1
+				
+				0	0	0
+				0	0	0
+				0	0	0
+			] {
+				cover {
+					cur_draw &thin_corner_sw
+				}
+			}
+		][
+			[
+				0	0	0
+				0	-1	0
+				0	0	0
+				
+				1	1	1
+				1	0	1
+				0	-1	0
+				
+				0	0	0
+				0	0	0
+				0	0	0
+			] {
+				cover {
+					cur_draw &thin_side_s
+				}
+			}
+		][
+			[
+				0	0	0
+				0	-1	0
+				0	0	0
+				
+				-1	1	1
+				1	0	1
+				1	1	1
+				
+				0	0	0
+				0	0	0
+				0	0	0
+			] {
+				cover {
+					cur_draw &top_concave_nw
+				}
+			}
+		][
+			[
+				0	0	0
+				0	-1	0
+				0	0	0
+				
+				1	1	-1
+				1	0	1
+				1	1	1
+				
+				0	0	0
+				0	0	0
+				0	0	0
+			] {
+				cover {
+					cur_draw &top_concave_ne
+				}
+			}
+		][
+			[
+				0	0	0
+				0	-1	0
+				0	0	0
+				
+				1	1	1
+				1	0	1
+				1	1	-1
+				
+				0	0	0
+				0	0	0
+				0	0	0
+			] {
+				cover {
+					cur_draw &top_concave_se
+				}
+			}
+		][
+			[
+				0	0	0
+				0	-1	0
+				0	0	0
+				
+				1	1	1
+				1	0	1
+				-1	1	1
+				
+				0	0	0
+				0	0	0
+				0	0	0
+			] {
+				cover {
+					cur_draw &top_concave_sw
+				}
+			}
+		]]
+	})

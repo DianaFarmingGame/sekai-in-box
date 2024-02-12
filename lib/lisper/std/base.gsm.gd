@@ -217,7 +217,7 @@ defunc (switch :const :gd :raw ',
 					var caser_trunk := body[2 * i + 2] as Array
 					if Lisper.is_raw(caser_node):
 						var caser = caser_node[1]
-						if is_same(caser, true) or is_same(caser, value):
+						if is_same(caser, true) or Lisper.is_same_approx(caser, value):
 							return Lisper.RawOverride(caser_trunk)
 						else:
 							body.remove_at(2 * i + 2)
@@ -229,7 +229,7 @@ defunc (switch :const :gd :raw ',
 			var value = await ctx.exec(body[0])
 			for i in (body.size() - 1) / 2:
 				var caser = await ctx.exec(body[2 * i + 1])
-				if is_same(caser, true) or is_same(caser, value):
+				if is_same(caser, true) or Lisper.is_same_approx(caser, value):
 					return await ctx.exec(body[2 * i + 2])
 			return null
 ,')
@@ -282,6 +282,7 @@ defunc (num :const :gd :pure ',
 defunc (echo :const :gd :apply ',
 	func (ctx: LisperContext, args: Array) -> Variant:
 		var msg := ' '.join(args.map(func (e): return str(e)))
+		LisperDebugger.output(msg, null, "   ⁋ ", "     ")
 		var lines := msg.split('\n')
 		print('\n'.join(Array(lines).map(func (l): return ctx.print_head + l)))
 		return args[-1] if args.size() > 0 else null
@@ -289,7 +290,8 @@ defunc (echo :const :gd :apply ',
 
 defunc (echo_val :const :gd :apply ',
 	func (ctx: LisperContext, args: Array) -> Variant:
-		var msg := ' '.join(args.map(func (e): return ctx.stringify_raw(e)))
+		var msg := ' '.join(args.map(func (e): return ctx.stringify_raw(e, 0, 0, false)))
+		LisperDebugger.output(msg, null, "   ⁋ ", "     ")
 		var lines := msg.split('\n')
 		print('\n'.join(Array(lines).map(func (l): return ctx.print_head + l)))
 		return args[-1] if args.size() > 0 else null
@@ -298,6 +300,7 @@ defunc (echo_val :const :gd :apply ',
 defunc (echo_raw :const :gd :apply ',
 	func (ctx: LisperContext, args: Array) -> Variant:
 		var msg := ' '.join(args.map(func (e): return ctx.stringify(e)))
+		LisperDebugger.output(msg, null, "   ⁋ ", "     ")
 		var lines := msg.split('\n')
 		print('\n'.join(Array(lines).map(func (l): return ctx.print_head + l)))
 		return args[-1] if args.size() > 0 else null
@@ -306,6 +309,7 @@ defunc (echo_raw :const :gd :apply ',
 defunc (echo_rich :const :gd :apply ',
 	func (ctx: LisperContext, args: Array) -> Variant:
 		var msg := ' '.join(args.map(func (e): return str(e)))
+		LisperDebugger.output(msg, null, "   ⁋ ", "     ")
 		var lines := msg.split('\n')
 		print_rich('\n'.join(Array(lines).map(func (l): return ctx.print_head + l)))
 		return args[-1] if args.size() > 0 else null
@@ -316,11 +320,10 @@ defunc (eval :const :gd :apply ',
 		return (await ctx.execs(args))[-1]
 ,')
 
-defunc (debug :const :gd :raw ',
-	func (ctx: LisperContext, body: Array, comptime: bool) -> Variant:
+defunc (debug :const :gd :apply ',
+	func (_ctx: LisperContext, args: Array) -> Variant:
 		breakpoint
-		if comptime: return await ctx.compiles(body)
-		return (await ctx.execs(body))[-1]
+		return args[-1] if args.size() > 0 else null
 ,')
 
 defunc (go :const :gd :raw ',
@@ -330,7 +333,7 @@ defunc (go :const :gd :raw ',
 ,')
 
 defunc (+ :const :gd :pure ', func (a, b): return a + b ,')
-defunc (,- :const :gd :pure ', func (a, b): return a - b ,')
+defunc (- :const :gd :pure ', func (a, b): return a - b ,')
 defunc (* :const :gd :pure ', func (a, b): return a * b ,')
 defunc (/ :const :gd :pure ', func (a, b): return a / b ,')
 
@@ -385,7 +388,7 @@ defunc (or :const :gd :raw ',
 			return res
 ,')
 
-defunc (+1 :const :gd :raw ',
+defunc (++ :const :gd :raw ',
 	func (ctx: LisperContext, body: Array, comptime: bool) -> Variant:
 		if comptime: return await LisperCommons.compile_keyword_mask_1(ctx, body)
 		else:
@@ -394,7 +397,7 @@ defunc (+1 :const :gd :raw ',
 			return null
 ,')
 
-defunc (,-1 :const :gd :raw ',
+defunc (-- :const :gd :raw ',
 	func (ctx: LisperContext, body: Array, comptime: bool) -> Variant:
 		if comptime: return await LisperCommons.compile_keyword_mask_1(ctx, body)
 		else:

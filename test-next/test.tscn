@@ -1,0 +1,23 @@
+[gd_scene load_steps=3 format=3 uid="uid://bg4iddb6xu0v"]
+
+[ext_resource type="Script" path="res://test-next/test.gd" id="1_5kwlx"]
+[ext_resource type="Script" path="res://lib/sekai/sekai_control.gsm.gd" id="1_yiehe"]
+
+[node name="Test" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_5kwlx")
+
+[node name="SekaiControl" type="Control" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_yiehe")
+unit_size = Vector3(64, 64, 64)

@@ -46,7 +46,7 @@ static func compile_keyword_mask_01(ctx: LisperContext, body: Array) -> Array:
 		cid += 1
 	return cdata
 
-static func _parse_func(ctx: LisperContext, body: Array) -> Array:
+static func _parse_func(ctx: LisperContext, body: Array) -> Lisper.Function:
 	var res := ctx.strip_flags(body)
 	var flags := res[0] as Array
 	body = res[1]
@@ -72,7 +72,7 @@ static func _parse_func(ctx: LisperContext, body: Array) -> Array:
 			printerr("failed to get handle")
 			printerr("node: ", ctx.stringify(node))
 			printerr("@: ", ctx.stringifys(body))
-			return []
+			return Lisper.Function.new()
 	else:
 		var args := await Async.array_map(body[0][1], ctx.exec_as_keyword)
 		var tbody := await ctx.compiles(body.slice(1))
@@ -81,18 +81,23 @@ static func _parse_func(ctx: LisperContext, body: Array) -> Array:
 		return Lisper.FnLPCall(args, tbody)
 
 static func def_commons(context: LisperContext) -> void:
-	context.def_vars([Lisper.VarFlag.CONST, Lisper.VarFlag.FIX], {
+	context.def_consts({
 		&"exec": Lisper.FnGDApply( func (ctx: LisperContext, args: Array) -> void:
 			var mod_dir = ctx.get_var(&"*mod-dir*")
 			var path := args[0] as String
 			if path.is_relative_path() and mod_dir != null:
 				path = (mod_dir as String).path_join(path)
-			await Lisper.exec_gsm(ctx, load(path))),
+			await Lisper.exec(ctx, path)),
 		&"!break": Lisper.FnGDRaw( func (ctx: LisperContext, body: Array, comptime: bool) -> Variant:
 			if comptime: return await ctx.compiles(body)
 			var vname := "!::" + str(await ctx.exec(body[0])) if body.size() > 0 else "!::break"
 			await ctx.trigger_break(vname)
 			return null),
+		&"!debug": Lisper.FnGDRaw( func (ctx: LisperContext, body: Array, comptime: bool) -> Variant:
+			if comptime: return await ctx.compiles(body)
+			var vname := "!::debug"
+			await ctx.trigger_break(vname)
+			return (await ctx.execs(body))[-1]),
 		&"defvar": Lisper.FnGDRaw( func (ctx: LisperContext, body: Array, comptime: bool) -> Variant:
 			if comptime: return await compile_keyword_mask_1(ctx, body)
 			var res := ctx.strip_flags(body)
@@ -134,5 +139,9 @@ static func def_commons(context: LisperContext) -> void:
 			var handle := await _parse_func(ctx, body)
 			if comptime: return Lisper.RawOverride(Lisper.Raw(handle))
 			return handle),
+		&"remember": Lisper.FnGDApplyP( func (ctx: LisperContext, args: Array) -> Variant:
+			var target = args[0]
+			ctx.remembers.append(args)
+			return target),
 	})
 	await Lisper.exec(context, "res://lib/lisper/std/commons.gss.txt")

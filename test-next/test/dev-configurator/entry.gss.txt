@@ -1,0 +1,7 @@
+wait (gikou on_inited []
+	var (hako do (gikou get_hako))
+	
+	exec (+(*mod-dir* "/scene.gss.txt"))
+
+	exec (+(*mod-dir* "../../../configurator/npc.gsm.gd"))
+)

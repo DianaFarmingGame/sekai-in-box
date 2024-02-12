@@ -1,0 +1,54 @@
+[gd_scene load_steps=4 format=3 uid="uid://r5sddkd22xlg"]
+
+[ext_resource type="Script" path="res://test-next/define/实体/ui/快捷栏/slot.gd" id="1_ape4a"]
+[ext_resource type="Texture2D" uid="uid://dhc0lfyow451u" path="res://test-next/define/实体/ui/快捷栏/背包栏框.png" id="2_2hknj"]
+[ext_resource type="Texture2D" uid="uid://mdokg6g58sqw" path="res://test-next/define/实体/ui/快捷栏/否.png" id="3_hf2jj"]
+
+[node name="Slot" type="TextureRect"]
+anchors_preset = -1
+anchor_right = 0.0555556
+anchor_bottom = 0.05
+offset_right = -32.0
+offset_bottom = -32.0
+size_flags_horizontal = 8
+texture = ExtResource("2_2hknj")
+script = ExtResource("1_ape4a")
+metadata/_edit_use_anchors_ = true
+
+[node name="Texture" type="TextureRect" parent="."]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+expand_mode = 2
+
+[node name="TextureShadow" type="TextureRect" parent="Texture"]
+unique_name_in_owner = true
+modulate = Color(0.266667, 0.266667, 0.266667, 1)
+show_behind_parent = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="DelBtn" type="TextureButton" parent="."]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 1.0
+anchor_right = 1.0
+anchor_bottom = 0.062
+offset_left = -26.0
+offset_top = -15.0
+offset_right = -6.0
+offset_bottom = 5.016
+grow_horizontal = 0
+mouse_default_cursor_shape = 2
+texture_normal = ExtResource("3_hf2jj")
+
+[connection signal="pressed" from="DelBtn" to="." method="_on_del_btn_pressed"]

@@ -5,10 +5,12 @@ static var ENABLE_STRINGIFY_REVERSE_TRACE := true
 
 var parent = null
 var vars := {}
+var remembers := []
 var source = null
 var print_head := ""
 var dbg_name := ""
 var jumps := []
+var sealed := false
 
 static func extend(ctx: LisperContext) -> LisperContext:
 	var nctx := LisperContext.new()
@@ -30,6 +32,7 @@ func clone() -> LisperContext:
 	var ctx := LisperContext.new()
 	ctx.parent = parent
 	ctx.vars = vars.duplicate(true)
+	ctx.remembers = remembers.duplicate()
 	ctx.source = source
 	ctx.print_head = print_head
 	return ctx
@@ -40,14 +43,32 @@ func fork() -> LisperContext:
 	ctx.print_head = print_head
 	return ctx
 
+func fork_sign(pname = null) -> LisperContext:
+	if pname == null: pname = str("root::", _root_idx)
+	var ctx := fork()
+	ctx.dbg_name = pname
+	LisperDebugger.sign_context(ctx.dbg_name, ctx)
+	_root_idx += 1
+	return ctx
+
 func destroy() -> void:
 	LisperDebugger.unsign_context(dbg_name, self)
+
+func seal() -> void:
+	sealed = true
+
+func unseal() -> void:
+	sealed = false
 
 func get_var(name: StringName) -> Variant:
 	var res = vars.get(name)
 	return res[1] if res != null else parent.get_var(name) if parent != null else null
 
 func set_var(name: StringName, data: Variant) -> void:
+	if sealed:
+		push_error("error modify sealed context")
+		printerr("error modify sealed context:")
+		printerr("set ", name, ": ", data)
 	var pdata = vars.get(name)
 	if pdata != null:
 		vars[name][1] = data
@@ -55,36 +76,81 @@ func set_var(name: StringName, data: Variant) -> void:
 		parent.set_var(name, data) if parent != null else null
 
 func def_var(flags: Array, name: StringName, data: Variant) -> void:
+	if sealed:
+		push_error("error modify sealed context")
+		printerr("error modify sealed context:")
+		printerr("def ", name, ": ", data)
 	vars[name] = [flags, data]
 
 func undef_var(name: StringName) -> void:
+	if sealed:
+		push_error("error modify sealed context")
+		printerr("error modify sealed context:")
+		printerr("undef ", name)
 	vars.erase(name)
 
 func def_const(name: StringName, data: Variant) -> void:
+	if sealed:
+		push_error("error modify sealed context")
+		printerr("error modify sealed context:")
+		printerr("def ", name, ": ", data)
 	vars[name] = [[Lisper.VarFlag.CONST], data]
 
+var _module_meta_stack := []
+
+func push_module_meta(meta: Dictionary) -> void:
+	var pmeta := {}
+	for k in meta.keys():
+		pmeta[k] = vars.get(k)
+		vars[k] = [[Lisper.VarFlag.CONST], meta[k]]
+	_module_meta_stack.push_back(pmeta)
+
+func pop_module_meta() -> void:
+	if _module_meta_stack.size() > 0:
+		var pmeta := _module_meta_stack.pop_back() as Dictionary
+		vars.merge(pmeta, true)
+		for k in pmeta.keys():
+			if pmeta[k] != null:
+				vars[k] = pmeta[k]
+			else:
+				vars.erase(k)
+
 func def_vars(flags: Array, data_map: Dictionary) -> void:
+	if sealed:
+		push_error("error modify sealed context")
+		printerr("error modify sealed context:")
+		printerr("def ", data_map)
 	for k in data_map.keys():
 		vars[k] = [flags, data_map[k]]
 
 func def_consts(data_map: Dictionary) -> void:
+	if sealed:
+		push_error("error modify sealed context")
+		printerr("error modify sealed context:")
+		printerr("def ", data_map)
 	for k in data_map.keys():
 		vars[k] = [[Lisper.VarFlag.CONST], data_map[k]]
 
 func def_fn(flags: Array, type: Lisper.FnType, name: StringName, handle: Variant) -> void:
+	if sealed:
+		push_error("error modify sealed context")
+		printerr("error modify sealed context:")
+		printerr("defunc ", name, handle)
 	vars[name] = [flags, [type, handle]]
 
 func def_fns(flags: Array, type: Lisper.FnType, handle_map: Dictionary) -> void:
+	if sealed:
+		push_error("error modify sealed context")
+		printerr("error modify sealed context:")
+		printerr("defunc ", handle_map)
 	for k in handle_map.keys():
 		vars[k] = [flags, [type, handle_map[k]]]
 
 func find_var(value: Variant) -> Variant:
-	var res = null
 	for k in vars:
 		if is_same(value, vars[k][1]):
-			res = k
-			break
-	return res if res != null else parent.find_var(value) if parent != null else null
+			return k
+	return parent.find_var(value) if parent != null else null
 
 func is_const(name: StringName) -> Variant:
 	var res = vars.get(name)
@@ -139,6 +205,9 @@ func meval(content: Array) -> Variant:
 	if gss_data != null:
 		gss_data = gss_data.map(func (n): return _gsm_replace(inserts, n))
 		return await execs(gss_data)
+	push_error("failed to tokenize expression")
+	printerr("failed to tokenize expression:")
+	printerr(gss)
 	return null
 
 func _gsm_replace(inserts: Array, node: Array) -> Array:
@@ -172,7 +241,7 @@ func exec(node: Array) -> Variant:
 			var body = (node[1] as Array).slice(1)
 			jumps.push_back(node)
 			var handle = await exec(head)
-			if handle is Callable or handle is Array:
+			if Lisper.is_fn(handle):
 				var res = await call_fn_raw(handle, body)
 				jumps.pop_back()
 				return res
@@ -197,7 +266,7 @@ func exec_map_part(pairs: Array) -> Dictionary:
 		res[k] = v
 	return res
 
-func call_fn_raw(handle: Variant, body: Array) -> Variant:
+func call_fn_raw(handle: Variant, body: Array = []) -> Variant:
 	match Lisper.fn_get_type(handle):
 		Lisper.FnType.GD_RAW:
 			return await Lisper.fn_gd_get_handle(handle).call(self, body, false)
@@ -228,7 +297,7 @@ func call_fn_raw(handle: Variant, body: Array) -> Variant:
 			))
 			return null
 
-func call_fn(handle: Variant, vargs: Array) -> Variant:
+func call_fn(handle: Variant, vargs: Array = []) -> Variant:
 	match Lisper.fn_get_type(handle):
 		Lisper.FnType.GD_RAW:
 			return await Lisper.fn_gd_get_handle(handle).call(self, vargs.map(Lisper.Raw), false)
@@ -256,10 +325,74 @@ func call_fn(handle: Variant, vargs: Array) -> Variant:
 			))
 			return null
 
+func call_method_raw(this: Variant, handle: Variant, body: Array = []) -> Variant:
+	match Lisper.fn_get_type(handle):
+		Lisper.FnType.GD_RAW:
+			return await Lisper.fn_gd_get_handle(handle).call(self, this, body, false)
+		Lisper.FnType.GD_MACRO:
+			return await exec(await Lisper.fn_gd_get_handle(handle).call(self, body))
+		Lisper.FnType.GD_CALL, Lisper.FnType.GD_CALL_PURE:
+			var rargs := [self, this]
+			rargs.append_array(await execs(body))
+			return await Lisper.fn_gd_get_handle(handle).callv(rargs)
+		Lisper.FnType.GD_APPLY, Lisper.FnType.GD_APPLY_PURE:
+			var vargs := await execs(body)
+			return await Lisper.fn_gd_get_handle(handle).call(self, this, vargs)
+		Lisper.FnType.LP_CALL, Lisper.FnType.LP_CALL_PURE:
+			var fctx := fork()
+			var args := Lisper.fn_lp_get_args(handle)
+			if args.size() != body.size():
+				await error(str("argument list not match expect ", args.size(), " found ", body.size(), '\n',
+					"need: ", args, '\n',
+					"provide: ", stringifys(body),
+				))
+				return null
+			var vargs := await execs(body)
+			fctx.def_const(&"this", this)
+			for iarg in args.size():
+				fctx.def_var([], args[iarg], vargs[iarg])
+			return (await fctx.execs(Lisper.fn_lp_get_body(handle)))[-1]
+		_:
+			await error(str("unknown call handle type: ", handle, '\n',
+				"arguments: ", stringifys(body),
+			))
+			return null
+
+func call_method(this: Variant, handle: Variant, vargs: Array = []) -> Variant:
+	match Lisper.fn_get_type(handle):
+		Lisper.FnType.GD_RAW:
+			return await Lisper.fn_gd_get_handle(handle).call(self, this, vargs.map(Lisper.Raw), false)
+		Lisper.FnType.GD_MACRO:
+			return await exec(await Lisper.fn_gd_get_handle(handle).call(self, vargs.map(Lisper.Raw)))
+		Lisper.FnType.GD_CALL, Lisper.FnType.GD_CALL_PURE:
+			var rargs := [self, this]
+			rargs.append_array(vargs)
+			return await Lisper.fn_gd_get_handle(handle).callv(rargs)
+		Lisper.FnType.GD_APPLY, Lisper.FnType.GD_APPLY_PURE:
+			return await Lisper.fn_gd_get_handle(handle).call(self, this, vargs)
+		Lisper.FnType.LP_CALL, Lisper.FnType.LP_CALL_PURE:
+			var fctx := fork()
+			var args := Lisper.fn_lp_get_args(handle)
+			if args.size() != vargs.size():
+				await error(str("argument list not match expect ", args.size(), " found ", vargs.size(), '\n',
+					"need: ", args, '\n',
+					"provide: ", stringify_raws(vargs),
+				))
+				return null
+			fctx.def_const(&"this", this)
+			for iarg in args.size():
+				fctx.def_var([], args[iarg], vargs[iarg])
+			return (await fctx.execs(Lisper.fn_lp_get_body(handle)))[-1]
+		_:
+			await error(str("unknown call handle type: ", handle, '\n',
+				"arguments: ", stringify_raws(vargs),
+			))
+			return null
+
 var _flag_comptime := false
 var _flag_pure_rollback := false
 
-func check_valid_handle(handle: Array) -> bool:
+func check_valid_handle(handle: Variant) -> bool:
 	if _flag_comptime:
 		match Lisper.fn_get_type(handle):
 			Lisper.FnType.GD_CALL_PURE, \
@@ -286,7 +419,7 @@ func compile(node: Array) -> Array:
 			var body := node[1].slice(1) as Array
 			head = await compile(head)
 			if head[0] == Lisper.TType.RAW:
-				var handle := head[1] as Array
+				var handle = head[1]
 				if Lisper.fn_get_type(handle) == Lisper.FnType.GD_RAW:
 					_flag_comptime = true
 					var res := await Lisper.fn_gd_get_handle(handle).call(self, body, true) as Array
@@ -356,13 +489,32 @@ func compile(node: Array) -> Array:
 	return node
 
 func compiles(body: Array) -> Array:
-	return await Async.array_map(body, func (n): return await compile(n))
+	return await Async.array_map(body, func (n):
+		await test(n is Array)
+		return await compile(n))
 
 const STRINGIFY_MAX_DEPTH := 32
 
+func stringify_raw_prop_dict(data: Dictionary, indent := 0, depth := 0) -> String:
+	if depth > STRINGIFY_MAX_DEPTH: return "..."
+	if data.size() == 0: return ""
+	var tags := []
+	indent += 2
+	for k in data.keys():
+		tags.append('\n' + ''.lpad(indent) + str(k) + ': ')
+		var value = data[k]
+		if value is Dictionary:
+			if value.size() == 0:
+				tags.append("{}")
+			else:
+				tags.append(stringify_raw_prop_dict(value, indent, depth + 1))
+		else:
+			tags.append(stringify_raw(data[k], indent + str(k).length() + 2, depth + 1))
+	return ''.join(tags)
+
 func stringify_raw(data: Variant, indent := 0, depth := 0, enable_rev_trace := ENABLE_STRINGIFY_REVERSE_TRACE) -> String:
 	if depth > STRINGIFY_MAX_DEPTH: return "..."
-	if enable_rev_trace and (data is Callable or data is Array or data is Dictionary):
+	if enable_rev_trace and (data is Array or data is Dictionary or Lisper.is_fn(data) or data is Mono):
 		var vname = find_var(data)
 		if vname != null:
 			return '#' + vname
@@ -373,26 +525,42 @@ func stringify_raw(data: Variant, indent := 0, depth := 0, enable_rev_trace := E
 		var msg := 'λ:' + type as String
 		match Lisper.fn_get_type(data):
 			Lisper.FnType.LP_CALL, Lisper.FnType.LP_CALL_PURE:
-				indent += msg.length() + 2
-				msg += " ([" + ' '.join(Lisper.fn_lp_get_args(data)) + "]\n" + ''.lpad(indent) + stringifys(Lisper.fn_lp_get_body(data), indent, depth + 8) + ')'
+				var tags := [" [" + ' '.join(Lisper.fn_lp_get_args(data)) + "]: "]
+				indent += 2
+				for node in Lisper.fn_lp_get_body(data):
+					tags.append('\n' + ''.lpad(indent) + stringify(node, indent, depth + 8))
+				msg += ''.join(tags)
 		return msg
 	if data is Dictionary:
-		var ks := data.keys() as Array
-		if ks.size() == 0: return "{}"
-		var res := ['{']
-		for k in ks:
-			var v = data[k]
-			res.append('\n' + ''.lpad(indent + 2) + k + ' ' + stringify_raw(v, indent + 2, depth + 1))
-		res.append('\n' + ''.lpad(indent) + '}')
-		return ''.join(res)
-	if data is Array:
-		var res := '[' + (stringify_raw(data[0], indent + 1, depth + 1) if data.size() > 0 else '')
-		for n in data.slice(1):
-			var idn := Lisper.count_last_len(res, indent)
-			if idn - indent > 8:
-				res += '\n' + ''.lpad(indent) + ' ' + stringify_raw(n, indent + 1, depth + 1)
+		if data.size() == 0: return "{}"
+		var tags := ['{']
+		indent += 2
+		for k in data.keys():
+			tags.append('\n' + ''.lpad(indent) + k + ': ')
+			var value = data[k]
+			if value is Dictionary:
+				if value.size() == 0:
+					tags.append("{}")
+				else:
+					tags.append(stringify_raw_prop_dict(value, indent, depth + 1))
 			else:
-				res += ' ' + stringify_raw(n, idn + 1, depth + 1)
+				tags.append(stringify_raw(data[k], indent + k.length() + 2, depth + 1))
+		tags.append('\n' + ''.lpad(indent - 2) + '}')
+		return ''.join(tags)
+	if data is Array:
+		var res := '['
+		var strip_first := true
+		var body := data as Array
+		for n in body:
+			if strip_first:
+				strip_first = false
+				res += stringify_raw(n, indent + 1, depth + 1)
+			else:
+				var idn := Lisper.count_last_len(res, indent)
+				if idn - indent > 8:
+					res += ('\n' + ''.lpad(indent) + ' ') + stringify_raw(n, indent + 1, depth + 1)
+				else:
+					res += ' ' + stringify_raw(n, idn + 1, depth + 1)
 		res += ']'
 		return res
 	if data is String:
@@ -404,6 +572,21 @@ func stringify_raw(data: Variant, indent := 0, depth := 0, enable_rev_trace := E
 	if data is bool:
 		return "#t" if data else "#f"
 	if data is Object:
+		if data is Mono:
+			var ref := str('@', data.define.id if data.define.id != &"" else data.define.ref)
+			if enable_rev_trace:
+				return "#Mono" + ref
+			else:
+				if data.layers.size() == 0: return "#Mono" + ref + " {}"
+				var tags := ["#Mono" + ref + ': ']
+				indent += 2
+				for l in data.layers:
+					tags.append('\n' + ''.lpad(indent) + l[0] + ': ')
+					if l[1].size() == 0:
+						tags.append("{}")
+					else:
+						tags.append(stringify_raw_prop_dict(l[1], indent, depth + 1))
+				return ''.join(tags)
 		return "#GDObject"
 	return var_to_str(data)
 

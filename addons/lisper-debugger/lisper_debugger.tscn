@@ -67,7 +67,7 @@ text = "Contexts"
 
 [node name="ContextList" type="ItemList" parent="DebuggerWindow/PanelContainer/MarginContainer/TabContainer/Console/HSplitContainer/HBoxContainer/VBoxContainer"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(120, 0)
+custom_minimum_size = Vector2(160, 0)
 layout_mode = 2
 size_flags_vertical = 3
 
@@ -84,6 +84,7 @@ unique_name_in_owner = true
 custom_minimum_size = Vector2(100, 40)
 layout_mode = 2
 size_flags_vertical = 3
+text = "Lisper Debugger Gen 1"
 editable = false
 drag_and_drop_selection_enabled = false
 middle_mouse_paste_enabled = false

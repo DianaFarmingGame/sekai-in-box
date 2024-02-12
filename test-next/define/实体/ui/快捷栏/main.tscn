@@ -1,0 +1,53 @@
+[gd_scene load_steps=4 format=3 uid="uid://cyt5qpkglw00a"]
+
+[ext_resource type="Script" path="res://test-next/define/实体/ui/快捷栏/main.gd" id="1_boeln"]
+[ext_resource type="PackedScene" uid="uid://r5sddkd22xlg" path="res://test-next/define/实体/ui/快捷栏/slot.tscn" id="2_bh720"]
+[ext_resource type="Texture2D" uid="uid://ctve0s56blv24" path="res://test-next/define/实体/ui/快捷栏/背包选中.png" id="2_r6b20"]
+
+[node name="Main" type="Control"]
+layout_mode = 3
+anchor_left = 0.244792
+anchor_top = 0.848437
+anchor_right = 0.710069
+anchor_bottom = 0.898438
+offset_right = 1.52588e-05
+grow_horizontal = 2
+grow_vertical = 0
+script = ExtResource("1_boeln")
+metadata/_edit_use_anchors_ = true
+
+[node name="SlotList" type="HBoxContainer" parent="."]
+unique_name_in_owner = true
+layout_mode = 0
+offset_right = 256.0
+offset_bottom = 32.0
+theme_override_constants/separation = 0
+metadata/_edit_group_ = true
+
+[node name="Slot" parent="SlotList" instance=ExtResource("2_bh720")]
+layout_mode = 2
+
+[node name="Slot2" parent="SlotList" instance=ExtResource("2_bh720")]
+layout_mode = 2
+
+[node name="Slot3" parent="SlotList" instance=ExtResource("2_bh720")]
+layout_mode = 2
+
+[node name="Slot4" parent="SlotList" instance=ExtResource("2_bh720")]
+layout_mode = 2
+
+[node name="Select" type="TextureRect" parent="."]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -20.0
+offset_top = -16.0
+offset_right = 20.0
+offset_bottom = 16.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("2_r6b20")

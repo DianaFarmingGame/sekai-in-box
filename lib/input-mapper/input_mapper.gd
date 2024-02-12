@@ -1,10 +1,13 @@
 class_name InputMapper
 
-signal updated(triggered: Dictionary, pressings: Dictionary, releasings: Dictionary)
+signal updated(set: InputSet)
 
 var triggered_actions := {}
 
-func update(event: InputEvent) -> void:
+var cur_direction := Vector2(0, 0)
+
+func update(event: InputEvent, dir = null) -> void:
+	if dir != null: cur_direction = dir
 	var pressings := {}
 	var releasings := {}
 	for action in InputMap.get_actions():
@@ -14,11 +17,10 @@ func update(event: InputEvent) -> void:
 				obj[0] += 1
 				pressings[action] = obj
 			if event.is_action_released(action):
-				obj[0] -= 1
+				obj[0] = 0
 				releasings[action] = obj
 			if obj[0] > 0:
 				triggered_actions[action] = obj
 			else:
 				triggered_actions.erase(action)
-#	print(triggered_actions)
-	updated.emit(triggered_actions, pressings, releasings)
+	updated.emit(InputSet.new(cur_direction, triggered_actions, pressings, releasings))
