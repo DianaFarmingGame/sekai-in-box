@@ -23,6 +23,7 @@ const print_head: String = "[sekai] "
 #
 signal gikou_changed
 signal process(delta: float)
+signal prepared
 
 
 
@@ -156,7 +157,6 @@ func get_assert(path: String) -> Variant:
 func get_csv(path: String) -> Array:
 	var content := []
 	var file := FileAccess.open(path, FileAccess.READ)
-	file.get_csv_line()
 	var _head := file.get_csv_line()
 	while file.get_position() < file.get_length():
 		content.append(Array(file.get_csv_line()))
@@ -178,12 +178,15 @@ func _init() -> void:
 	Input.use_accumulated_input = false
 	context = await LisperCommons.make_common_context("Sekai")
 
-func _enter_tree() -> void:
-	await _init_context()
+func _ready():
 	await _init_globals()
 	# 封闭执行环境以防止非预测的更改
 	context.seal()
+	prepared.emit()
 
+func _enter_tree() -> void:
+	await _init_context()
+	
 ## 初始化全局数据
 func _init_globals() -> void:
 	db = make_mono(1)
