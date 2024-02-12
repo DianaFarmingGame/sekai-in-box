@@ -153,7 +153,8 @@ theme_override_font_sizes/font_size = 20
 [node name="HBoxContainer" type="HBoxContainer" parent="SaveWin/PanelContainer/MarginContainer/VBoxContainer"]
 layout_mode = 2
 
-[node name="LineEdit" type="LineEdit" parent="SaveWin/PanelContainer/MarginContainer/VBoxContainer/HBoxContainer"]
+[node name="SaveID" type="LineEdit" parent="SaveWin/PanelContainer/MarginContainer/VBoxContainer/HBoxContainer"]
+unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 
@@ -175,4 +176,6 @@ text = "取消"
 [connection signal="pressed" from="LoadWin/PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/ConfirmBtn" to="." method="_on_load_win_confirmed"]
 [connection signal="pressed" from="LoadWin/PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/CloseBtn" to="." method="_on_load_win_close_requested"]
 [connection signal="close_requested" from="SaveWin" to="." method="_on_save_win_close_requested"]
+[connection signal="item_selected" from="SaveWin/PanelContainer/MarginContainer/VBoxContainer/SaveGikouList" to="." method="_on_save_gikou_list_item_selected"]
+[connection signal="pressed" from="SaveWin/PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/ConfirmBtn" to="." method="_on_save_win_confirmed"]
 [connection signal="pressed" from="SaveWin/PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/CloseBtn" to="." method="_on_save_win_close_requested"]

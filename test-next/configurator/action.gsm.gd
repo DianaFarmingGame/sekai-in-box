@@ -82,6 +82,15 @@ array/for(data func([i record]
 									add_to_talking_pool(ctrl gikou :eval @(opt &发起者))
 									echo(:eval @(opt &数据))
 								))
+							&对话 switch(@(opt &发起者)
+								&主 template(do(target dialog/put ctrl {
+									name getp(src name)
+									text :eval @(opt &数据)
+								}))
+								&宾 template(do(target dialog/put ctrl {
+									name getp(this name)
+									text :eval @(opt &数据)
+								})))
 							&选择
 								template
 									(do(src choose_single :eval @(opt &数据)

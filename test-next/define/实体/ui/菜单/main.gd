@@ -6,9 +6,7 @@ var this: Mono
 @onready var SaveWin := %SaveWin as Window
 @onready var LoadGikouList := %LoadGikouList as ItemList
 @onready var SaveGikouList := %SaveGikouList as ItemList
-
-func _ready() -> void:
-	pass
+@onready var SaveID := %SaveID as LineEdit
 
 var _scanned_gikous := []
 
@@ -59,3 +57,13 @@ func _on_load_win_confirmed() -> void:
 	if sels.size() > 0:
 		var id := _scanned_gikous[sels[0]] as String
 		await sekai.enter_gikou(id)
+
+
+func _on_save_gikou_list_item_selected(index: int) -> void:
+	SaveID.text = _scanned_gikous[index]
+
+
+func _on_save_win_confirmed() -> void:
+	var id := SaveID.text
+	sekai.gikou.setpB(&"id", id)
+	await sekai.record_gikou()
