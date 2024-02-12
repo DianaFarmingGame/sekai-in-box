@@ -2,8 +2,8 @@ extends Control
 
 var this: Mono
 
-@onready var LoadWin := %LoadWin as Window
-@onready var SaveWin := %SaveWin as Window
+@onready var LoadWin := %Load
+@onready var SaveWin := %Save
 @onready var LoadGikouList := %LoadGikouList as ItemList
 @onready var SaveGikouList := %SaveGikouList as ItemList
 @onready var SaveID := %SaveID as LineEdit

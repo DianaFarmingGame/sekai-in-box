@@ -1,0 +1,10 @@
+/Users/tuzhanhong/Documents/game/sekai-in-box/lib/gisp/rustlib/target/release/deps/libgodot4_prebuilt-60917aa6398ad865.rmeta: /Users/tuzhanhong/.cargo/git/checkouts/godot4-prebuilt-3eb6001913442638/3328a4c/src/lib.rs /Users/tuzhanhong/.cargo/git/checkouts/godot4-prebuilt-3eb6001913442638/3328a4c/src/../res/gdextension_interface.h /Users/tuzhanhong/.cargo/git/checkouts/godot4-prebuilt-3eb6001913442638/3328a4c/src/../res/gdextension_interface_macos.rs /Users/tuzhanhong/.cargo/git/checkouts/godot4-prebuilt-3eb6001913442638/3328a4c/src/../res/extension_api.json
+
+/Users/tuzhanhong/Documents/game/sekai-in-box/lib/gisp/rustlib/target/release/deps/libgodot4_prebuilt-60917aa6398ad865.rlib: /Users/tuzhanhong/.cargo/git/checkouts/godot4-prebuilt-3eb6001913442638/3328a4c/src/lib.rs /Users/tuzhanhong/.cargo/git/checkouts/godot4-prebuilt-3eb6001913442638/3328a4c/src/../res/gdextension_interface.h /Users/tuzhanhong/.cargo/git/checkouts/godot4-prebuilt-3eb6001913442638/3328a4c/src/../res/gdextension_interface_macos.rs /Users/tuzhanhong/.cargo/git/checkouts/godot4-prebuilt-3eb6001913442638/3328a4c/src/../res/extension_api.json
+
+/Users/tuzhanhong/Documents/game/sekai-in-box/lib/gisp/rustlib/target/release/deps/godot4_prebuilt-60917aa6398ad865.d: /Users/tuzhanhong/.cargo/git/checkouts/godot4-prebuilt-3eb6001913442638/3328a4c/src/lib.rs /Users/tuzhanhong/.cargo/git/checkouts/godot4-prebuilt-3eb6001913442638/3328a4c/src/../res/gdextension_interface.h /Users/tuzhanhong/.cargo/git/checkouts/godot4-prebuilt-3eb6001913442638/3328a4c/src/../res/gdextension_interface_macos.rs /Users/tuzhanhong/.cargo/git/checkouts/godot4-prebuilt-3eb6001913442638/3328a4c/src/../res/extension_api.json
+
+/Users/tuzhanhong/.cargo/git/checkouts/godot4-prebuilt-3eb6001913442638/3328a4c/src/lib.rs:
+/Users/tuzhanhong/.cargo/git/checkouts/godot4-prebuilt-3eb6001913442638/3328a4c/src/../res/gdextension_interface.h:
+/Users/tuzhanhong/.cargo/git/checkouts/godot4-prebuilt-3eb6001913442638/3328a4c/src/../res/gdextension_interface_macos.rs:
+/Users/tuzhanhong/.cargo/git/checkouts/godot4-prebuilt-3eb6001913442638/3328a4c/src/../res/extension_api.json:
