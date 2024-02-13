@@ -113,10 +113,12 @@ array/for(data func([i record]
 								template(task/on(keyword(:eval @(opt &数据))))
 							&关闭任务
 								template(task/off(keyword(:eval @(opt &数据))))
-							&修改任务描述
-								template(task/desc(:eval keyword(@(@(opt &数据) 0)) :eval @(@(opt &数据) 1)))
 							&修改变量
-								template(data/set(:eval keyword(@(@(opt &数据) 0)) eval(dbr/raw(string->raw(:eval @(@(opt &数据) 1))))))
+								template(
+									do(
+										gikou db/set :eval keyword(@(@(opt &数据) 0)) eval(do (gikou db/val_replace string->raw(:eval @(@(opt &数据) 1)))) keyword("vals")
+									)
+								)
 							&变量检测
 								template(if(data/judge(string->raw(:eval @(opt &数据)))
 									do(this dialog_to src :eval @(@(opt &跳转表) 0))
@@ -140,6 +142,7 @@ array/for(data func([i record]
 	))
 
 ']
+
 
 func item_judge_t(items: String):
 	var item_dic = {}
@@ -215,4 +218,5 @@ func exchange_item_data_t(data: String) -> Array:
 	var res = [this_item_input, this_item_output]
 
 	return res
+
 
