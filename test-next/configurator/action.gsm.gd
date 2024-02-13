@@ -5,7 +5,6 @@ var(jump_t_dailog ', jump_t_dailog,')
 var(jump_t_non_dailog ', jump_t_non_dailog,')
 var(change_desc_data_t ', change_desc_data_t,')
 var(change_data_data_t ', change_data_data_t,')
-var(judge_data_data_t ', judge_data_data_t,')
 var(exchange_item_data_t ', exchange_item_data_t,')
 var(item2mono :const ', func (sekai: Sekai, items: Dictionary) -> Array:
 	var res = []
@@ -50,7 +49,6 @@ defvar(data csv/map-let(+(*config_base* "action.csv")
 		数据 switch(类型
 			"修改任务描述" change_desc_data_t(数据)
 			"修改变量" change_data_data_t(数据)
-			"变量检测" judge_data_data_t(数据)
 			"物品交换" exchange_item_data_t(数据)
 			#t 数据)
 		跳转表 switch(类型
@@ -114,15 +112,11 @@ array/for(data func([i record]
 							&关闭任务
 								template(task/off(keyword(:eval @(opt &数据))))
 							&修改变量
-								template(
-									do(
-										gikou db/set :eval keyword(@(@(opt &数据) 0)) eval(do (gikou db/val_replace string->raw(:eval @(@(opt &数据) 1)))) keyword("vals")
-									)
-								)
+								template(do(gikou db/set :eval keyword(@(@(opt &数据) 0)) eval(do (gikou db/val_replace string->raw(:eval @(@(opt &数据) 1)))) keyword("vals")))
 							&变量检测
-								template(if(data/judge(string->raw(:eval @(opt &数据)))
-									do(this dialog_to src :eval @(@(opt &跳转表) 0))
-									do(this dialog_to src :eval @(@(opt &跳转表) 1))
+								template(if(eval(do (gikou db/val_replace string->raw(:eval @(opt &数据))))
+									echo("success")
+									echo("fail")
 								))
 							&物品交换
 								template(switch(do(src exchange_item item2mono(*sekai* :eval @(@(opt &数据) 0)) :eval @(@(opt &数据) 1))
@@ -184,21 +178,6 @@ func change_data_data_t(data: String):
 	res[0].strip_edges()
 
 	return res
-
-func judge_data_data_t(data: String):
-	var data_ary := data.split(":")
-	for i in data_ary:
-		i.strip_edges()
-
-	var untokenize = ""
-	untokenize += StringName(str(data_ary[1]))
-	untokenize += "("
-	untokenize += str(data_ary[0])
-	untokenize += " "
-	untokenize += str(data_ary[2])
-	untokenize += ")"
-
-	return untokenize
 
 func exchange_item_data_t(data: String) -> Array:
 	var this_item_input = {}
