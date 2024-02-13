@@ -54,7 +54,7 @@ var props := {
 		return null
 		,
 
-	&"db/get": func(ctx: LisperContext, this: Mono, group: StringName, key: StringName) -> Variant:
+	&"db/get": func(ctx: LisperContext, this: Mono, key: StringName, group: StringName = &"default") -> Variant:
 		var db = this.getp(&"data") as Dictionary
 		if db.has(group) and db[group].has(key):
 			return db[group][key]

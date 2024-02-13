@@ -61,7 +61,7 @@ var props := {
 				if Lisper.is_fn(act):
 					handle = act
 				else:
-					handle = sekai.db.applymRSUY(ctx, &"db/get", [&"actions", act])
+					handle = sekai.db.applymRSUY(ctx, &"db/get", [act, &"actions"])
 				if handle != null:
 					this.pushsB(&"action_data", [&"0:act_action", handle]),
 	}),
