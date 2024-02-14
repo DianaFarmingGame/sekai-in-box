@@ -95,7 +95,7 @@ var props := {
 			db[group][key] = {}
 			print("[db/clean]: clean ", group, ": ", key)
 		else:
-			push_warning("[db/del] ", group, ": ", key, " not exist")
+			push_warning("[db/clean] ", group, ": ", key, " not exist")
 		,
 
 	&"db/has": func(ctx: LisperContext, this: Mono, key: StringName, group: StringName = &"default") -> bool:

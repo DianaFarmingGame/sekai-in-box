@@ -13,17 +13,22 @@ var(item2mono :const ', func (sekai: Sekai, items: Dictionary) -> Array:
 		var item_id = item
 		var item_num = items[item]
 
-		var item_define = sekai.get_define(item_id)
-		var item_mono = sekai.make_mono_by_define(Mono, item_define, {&"props": {&"stack_count": item_num}})
+		var item_mono = sekai.make_mono(item_id, {&"props": {&"stack_count": item_num}})
 
 		res.append(item_mono)
 
 	return res
 ,')
 
-var(add_to_talking_pool :const ', func(ctrl: SekaiControl, gikou: Mono, mono_id: StringName) -> Mono:
+var(add_to_talking_pool :const ', func(ctrl: SekaiControl, gikou: Mono, mono_id: Variant) -> Mono:
 	var ctx := ctrl.context
 
+	if mono_id is Mono:
+		var mono = mono_id
+		mono_id = mono.define.id
+		await gikou.applymRSU(ctx, &"db/setp", [&"talking_pool", mono_id, mono])
+		return mono
+		
 	if await gikou.callmRSU(ctx, &"db/has", mono_id):
 		return await gikou.applymRSU(ctx, &"db/getp", [&"talking_pool", mono_id])
 
@@ -73,6 +78,7 @@ array/for(data func([i record]
 			var (ary array/concat(ary [{类型 keyword("end")}]))
 			defvar(expr template
 				(func([ctrl src tar sets]
+					add_to_talking_pool(ctrl gikou tar)
 					:expand :raw
 					array/map(ary func([opt]
 						switch(@(opt &类型)
@@ -119,9 +125,9 @@ array/for(data func([i record]
 									echo("fail")
 								))
 							&物品交换
-								template(switch(do(src exchange_item item2mono(*sekai* :eval @(@(opt &数据) 0)) :eval @(@(opt &数据) 1))
-										1 do(this dialog_to src :eval @(@(opt &跳转表) 0))
-										2 do(this dialog_to src :eval @(@(opt &跳转表) 1))
+								template(switch(do(src exchange_item :eval @(@(opt &数据) 0) :eval @(@(opt &数据) 1))
+									1 echo("fail send")
+									2 echo("fail receive")
 								))
 							&行为覆盖
 								template(do(this change_interact :eval @(opt &数据)))
