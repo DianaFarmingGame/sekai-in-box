@@ -12,7 +12,7 @@ csv/map-let(+(*config_base* "task.csv")
 		name			任务名
 		desc			任务描述
 		finish			keyword(完成条件)
-		action			keyword(完成行为)
+		next			keyword(完成行为)
 		require_type	需求类型
 		require_desc	需求描述
 		require_data	需求数据
@@ -24,23 +24,48 @@ final(sekai)
 ']
 
 
+# task format
+# {
+# 	"id": &"",
+# 	"group": &"",
+# 	"name": "",
+# 	"desc": "",
+# 	"next": &"",
+# 	"finish": &"",
+# 	"requirements: [{
+# 		"type": TASK_TYPE,
+# 		"required": {
+#			"key": "",
+#			"value": "",
+#			"compare": COMPAIR_TYPE,
+#		},
+# 		"desc": "",
+#	}],
+
 var res_map := {}
 
 func produce(db, o: Dictionary):
 	if o["id"] != "":
 		if res_map.size() > 0:
-			sekai.dbs_define("任务", res_map["id"], res_map)
+			sekai.make_mono(4, res_map)
 			
 		res_map = o
 		res_map.erase("require_type")
 		res_map.erase("require_desc")
 		res_map.erase("require_data")
-		res_map["require"] = []
+		res_map["requirements"] = []
 
-	res_map["require"].append({
-		"type": o["require_type"],
-		"desc": o["require_desc"],
-		"data": o["require_data"]
+	var required := {}
+	var data = o["require_data"].split(" ", false)
+	
+	required["key"] = data[0]
+	required["value"] = data[1]
+	required["compare"] = data[2]
+
+	res_map["requirements"].append({
+		"type": o["type"],
+		"desc": o["desc"],
+		"data": required
 	})
 	
 

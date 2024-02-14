@@ -1,10 +1,9 @@
-class_name TTaskContainer extends MonoTrait
+class_name TTaskManager extends MonoTrait
 
-var id := &"task_container"
+var id := &"task_manager"
 
 var props := {
-	&"tasks": {},
-	&"activate": {},
+	&"kvs": {},
 
 	&"task/get_activate": func(ctx, this, ) -> Dictionary:
 		return {}

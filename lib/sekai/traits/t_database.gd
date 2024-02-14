@@ -42,7 +42,7 @@ var props := {
 			data[props_] = value
 		else:
 			push_warning("[db/setp] ", group, " :", key, " not exist")
-			this.applym(ctx, &"db/set", [key, {props_: value}, group])
+			this.applym(ctx, &"db/set", [key, {props_: value}])
 		,
 
 	&"db/getg": func(ctx: LisperContext, this: Mono, group: StringName = &"default") -> Variant:
