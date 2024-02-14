@@ -1,7 +1,7 @@
 [gd_scene load_steps=3 format=3 uid="uid://dvb6c5rjq0fxg"]
 
 [ext_resource type="Script" path="res://test-next/define/实体/ui/菜单/main.gd" id="1_37ha6"]
-[ext_resource type="Texture2D" uid="uid://dnjhsp4qfhnj3" path="res://test-next/define/实体/ui/菜单/选项框.png" id="2_11sph"]
+[ext_resource type="Texture2D" uid="uid://t6ja4qmaj51y" path="res://test-next/define/实体/ui/菜单/选项框.png" id="2_11sph"]
 
 [node name="Main" type="ColorRect"]
 z_index = 10

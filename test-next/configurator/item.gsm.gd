@@ -19,7 +19,7 @@ func gsm():
 				groups 				prop/pushs([组])
 				icon 				[&icon rect2(0 0 32 32)]
 	
-				&stackable 			能否堆叠
+				&can_stack 			能否堆叠
 				&stack_capacity		堆叠上限
 	
 				&chargeable			能否修复
