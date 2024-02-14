@@ -14,7 +14,7 @@ var props := {
 			var item_id = item
 			var item_num = input_item[item]
 
-			var item_mono = sekai.make_mono(item_id, {&"props": {&"stack_count": item_num}})
+			var item_mono = sekai.make_mono(item_id, {&"stack_count": item_num})
 
 			inputs.append(item_mono)
 
