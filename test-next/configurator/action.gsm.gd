@@ -5,7 +5,6 @@ var(jump_t_dailog ', jump_t_dailog,')
 var(jump_t_non_dailog ', jump_t_non_dailog,')
 var(change_desc_data_t ', change_desc_data_t,')
 var(change_data_data_t ', change_data_data_t,')
-var(judge_data_data_t ', judge_data_data_t,')
 var(exchange_item_data_t ', exchange_item_data_t,')
 var(item2mono :const ', func (sekai: Sekai, items: Dictionary) -> Array:
 	var res = []
@@ -14,31 +13,36 @@ var(item2mono :const ', func (sekai: Sekai, items: Dictionary) -> Array:
 		var item_id = item
 		var item_num = items[item]
 
-		var item_define = sekai.get_define(item_id)
-		var item_mono = sekai.make_mono_by_define(Mono, item_define, {&"props": {&"stack_count": item_num}})
+		var item_mono = sekai.make_mono(item_id, {&"props": {&"stack_count": item_num}})
 
 		res.append(item_mono)
 
 	return res
 ,')
 
-var(add_to_talking_pool :const ', func(ctrl: SekaiControl, gikou: Mono, mono_id: StringName):
+var(add_to_talking_pool :const ', func(ctrl: SekaiControl, gikou: Mono, mono_id: Variant) -> Mono:
 	var ctx := ctrl.context
 
+	if mono_id is Mono:
+		var mono = mono_id
+		mono_id = mono.define.id
+		await gikou.applymRSU(ctx, &"db/setp", [&"talking_pool", mono_id, mono])
+		return mono
+		
 	if await gikou.callmRSU(ctx, &"db/has", mono_id):
-		return
+		return await gikou.applymRSU(ctx, &"db/getp", [&"talking_pool", mono_id])
 
 	var hako := ctrl.hako
 	var mono = await hako.callmRSU(ctx, &"container/get_by_ref_id", mono_id)
 
 
 	await gikou.applymRSU(ctx, &"db/setp", [&"talking_pool", mono_id, mono])
-	print(await gikou.callm(ctx, &"db/getg", &"default"))
+	
+	return mono
 ,')
 
 var(clean_talking_pool :const ', func(ctrl: SekaiControl, gikou: Mono):
 	var ctx := ctrl.context
-
 	await gikou.callm(ctx, &"db/clean", &"talking_pool")
 ,')
 
@@ -50,7 +54,6 @@ defvar(data csv/map-let(+(*config_base* "action.csv")
 		数据 switch(类型
 			"修改任务描述" change_desc_data_t(数据)
 			"修改变量" change_data_data_t(数据)
-			"变量检测" judge_data_data_t(数据)
 			"物品交换" exchange_item_data_t(数据)
 			#t 数据)
 		跳转表 switch(类型
@@ -75,30 +78,36 @@ array/for(data func([i record]
 			var (ary array/concat(ary [{类型 keyword("end")}]))
 			defvar(expr template
 				(func([ctrl src tar sets]
+					add_to_talking_pool(ctrl gikou tar)
 					:expand :raw
 					array/map(ary func([opt]
 						switch(@(opt &类型)
-							&对话 template(block(
-									add_to_talking_pool(ctrl gikou :eval @(opt &发起者))
-									echo(:eval @(opt &数据))
-									:eval :raw switch(@(opt &发起者)
-										&主 template(do(target msg_dialog/put ctrl {
-											name #(src . name)
-											text :eval @(opt &数据)
-										}))
-										&宾 template(do(target msg_dialog/put ctrl {
-											name #(this . name)
-											text :eval @(opt &数据)
-										}))
-										#t raw<- (echo ("unknown dialog host" @(opt &发起者)))
-									)
+							&对话
+								template(block(
+									var (talker add_to_talking_pool(ctrl gikou :eval @(opt &发起者)))
+									do(target msg_dialog/put ctrl {
+										name #(talker . name)
+										avatar #((talker . asserts) @ "avatar")
+										text :eval @(opt &数据)
+									})
 								))
+							&旁白
+								template(do(target msg_dialog/put ctrl {
+									name :eval @(opt &发起者)
+									text :eval @(opt &数据)
+								}))
 							&选择
 								template
-									(do(src choose_single :eval @(opt &数据)
-										:expand :raw
+									(do(target choose_dialog/switch ctrl {title: :eval @(opt &数据)} 
+										:expand :raw 
 										array/flat(array/map(@(opt &跳转表) func([item]
-											[raw<-(@(item 0)) template(do(this dialog_to src :eval @(item 1)))])))))
+											[
+												raw<-(@(item 2))
+												raw<-(@(item 0)) 
+												template(do(db db/get :eval @(item 1) keyword("actions")))
+											]
+										)))
+									))
 							&背包检测
 								template(if(do(src check_bag_item :eval item_judge_t(@(opt &数据)))
 									do(this dialog_to src :eval @(@(opt &跳转表) 0))
@@ -108,19 +117,17 @@ array/for(data func([i record]
 								template(task/on(keyword(:eval @(opt &数据))))
 							&关闭任务
 								template(task/off(keyword(:eval @(opt &数据))))
-							&修改任务描述
-								template(task/desc(:eval keyword(@(@(opt &数据) 0)) :eval @(@(opt &数据) 1)))
 							&修改变量
-								template(data/set(:eval keyword(@(@(opt &数据) 0)) eval(dbr/raw(string->raw(:eval @(@(opt &数据) 1))))))
+								template(do(gikou db/set :eval keyword(@(@(opt &数据) 0)) eval(do (gikou db/val_replace string->raw(:eval @(@(opt &数据) 1)))) keyword("vals")))
 							&变量检测
-								template(if(data/judge(string->raw(:eval @(opt &数据)))
-									do(this dialog_to src :eval @(@(opt &跳转表) 0))
-									do(this dialog_to src :eval @(@(opt &跳转表) 1))
+								template(if(eval(do (gikou db/val_replace string->raw(:eval @(opt &数据))))
+									echo("success")
+									echo("fail")
 								))
 							&物品交换
-								template(switch(do(src exchange_item item2mono(*sekai* :eval @(@(opt &数据) 0)) :eval @(@(opt &数据) 1))
-										1 do(this dialog_to src :eval @(@(opt &跳转表) 0))
-										2 do(this dialog_to src :eval @(@(opt &跳转表) 1))
+								template(switch(do(src exchange_item :eval @(@(opt &数据) 0) :eval @(@(opt &数据) 1))
+									1 echo("fail send")
+									2 echo("fail receive")
 								))
 							&行为覆盖
 								template(do(this change_interact :eval @(opt &数据)))
@@ -135,6 +142,7 @@ array/for(data func([i record]
 	))
 
 ']
+
 
 func item_judge_t(items: String):
 	var item_dic = {}
@@ -151,7 +159,10 @@ func jump_t_dailog(table: String) -> Array:
 	var res = []
 	for item in table_ary:
 		var item_ary = item.split(":")
-		res.append([item_ary[0].strip_edges(), item_ary[1].strip_edges()])
+		if item_ary.size() == 3:
+			res.append([item_ary[0].strip_edges(), StringName(item_ary[1].strip_edges()), item_ary[2].strip_edges()])
+		else:
+			res.append([item_ary[0].strip_edges(), StringName(item_ary[1].strip_edges()), "#t"])
 	return res
 
 func jump_t_non_dailog(table: String) -> Array:
@@ -174,21 +185,6 @@ func change_data_data_t(data: String):
 
 	return res
 
-func judge_data_data_t(data: String):
-	var data_ary := data.split(":")
-	for i in data_ary:
-		i.strip_edges()
-
-	var untokenize = ""
-	untokenize += StringName(str(data_ary[1]))
-	untokenize += "("
-	untokenize += str(data_ary[0])
-	untokenize += " "
-	untokenize += str(data_ary[2])
-	untokenize += ")"
-
-	return untokenize
-
 func exchange_item_data_t(data: String) -> Array:
 	var this_item_input = {}
 	var this_item_output = {}
@@ -207,4 +203,5 @@ func exchange_item_data_t(data: String) -> Array:
 	var res = [this_item_input, this_item_output]
 
 	return res
+
 

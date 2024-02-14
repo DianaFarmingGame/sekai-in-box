@@ -54,7 +54,7 @@ var props := {
 		return null
 		,
 
-	&"db/get": func(ctx: LisperContext, this: Mono, group: StringName, key: StringName) -> Variant:
+	&"db/get": func(ctx: LisperContext, this: Mono, key: StringName, group: StringName = &"default") -> Variant:
 		var db = this.getp(&"data") as Dictionary
 		if db.has(group) and db[group].has(key):
 			return db[group][key]
@@ -95,7 +95,7 @@ var props := {
 			db[group][key] = {}
 			print("[db/clean]: clean ", group, ": ", key)
 		else:
-			push_warning("[db/del] ", group, ": ", key, " not exist")
+			push_warning("[db/clean] ", group, ": ", key, " not exist")
 		,
 
 	&"db/has": func(ctx: LisperContext, this: Mono, key: StringName, group: StringName = &"default") -> bool:
@@ -117,7 +117,10 @@ var props := {
 			return {}
 		return gi[group]
 		,
-		
+
+	&"db/val_replace": func(ctx: LisperContext, this: Mono, data: Variant) -> Variant:
+		return await db_val_replace(ctx, this, data)
+		,
 	
 	&"on_ready": Prop.puts({
 		&"-99:database": func (ctx: LisperContext, this: Mono) -> void:
@@ -127,3 +130,38 @@ var props := {
 			,
 	}),
 }
+
+func db_val_replace(ctx: LisperContext, this: Mono, data: Variant) -> Variant:
+	var entry = data
+	var res := []
+	if 	entry[0] == Lisper.TType.ARRAY or \
+		entry[0] == Lisper.TType.MAP or	\
+		entry[0] == Lisper.TType.LIST:
+		for i in range(entry[1].size()):
+			var r = await db_val_replace(ctx, this, entry[1][i])
+			if r == null: 
+				return null
+			entry[1][i] = r
+			
+		res = entry
+	elif entry[0] == Lisper.TType.TOKEN:
+		if ctx.get_var(entry[1]) != null:
+			res = entry
+			return res
+		var key = entry[1]
+		var value = await this.applym(ctx, &"db/get", [key, &"vals"])
+		assert(value != null, "data not found: " + key)
+		
+		if value is float:
+			res = Lisper.Number(value)
+		elif value is bool:
+			res = Lisper.Bool(value)
+		elif value is String:
+			res = Lisper.String(value)
+		elif value is Array:
+			res = Lisper.List(value)
+		
+	else:
+		res = entry
+
+	return res
