@@ -1,7 +1,11 @@
-[gd_scene load_steps=3 format=3 uid="uid://dvb6c5rjq0fxg"]
+[gd_scene load_steps=5 format=3 uid="uid://dvb6c5rjq0fxg"]
 
 [ext_resource type="Script" path="res://test-next/define/实体/ui/菜单/main.gd" id="1_37ha6"]
-[ext_resource type="Texture2D" uid="uid://t6ja4qmaj51y" path="res://test-next/define/实体/ui/菜单/选项框.png" id="2_11sph"]
+[ext_resource type="StyleBox" uid="uid://q5w8oty08mkl" path="res://test/asset/ui/window.tres" id="3_pgl5x"]
+[ext_resource type="Texture2D" uid="uid://byeryj5q4wu0l" path="res://test-next/define/实体/ui/菜单/输入框.png" id="4_kh2tk"]
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_lwu8w"]
+texture = ExtResource("4_kh2tk")
 
 [node name="Main" type="ColorRect"]
 z_index = 10
@@ -13,7 +17,7 @@ grow_vertical = 2
 color = Color(1, 1, 1, 0.266667)
 script = ExtResource("1_37ha6")
 
-[node name="TextureRect" type="TextureRect" parent="."]
+[node name="TextureRect" type="MarginContainer" parent="."]
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -26,56 +30,48 @@ offset_right = 86.0
 offset_bottom = 99.0
 grow_horizontal = 2
 grow_vertical = 2
-texture = ExtResource("2_11sph")
 
-[node name="VBoxContainer" type="VBoxContainer" parent="TextureRect"]
+[node name="PanelContainer" type="PanelContainer" parent="TextureRect"]
+layout_mode = 2
+theme_override_styles/panel = ExtResource("3_pgl5x")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="TextureRect/PanelContainer"]
 custom_minimum_size = Vector2(120, 0)
-layout_mode = 1
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -60.0
-offset_top = -74.0
-offset_right = 60.0
-offset_bottom = 74.0
-grow_horizontal = 2
-grow_vertical = 2
+layout_mode = 2
 theme_override_constants/separation = 8
 
-[node name="Label" type="Label" parent="TextureRect/VBoxContainer"]
+[node name="Label" type="Label" parent="TextureRect/PanelContainer/VBoxContainer"]
 layout_mode = 2
 theme_override_font_sizes/font_size = 24
 text = "菜单"
 horizontal_alignment = 1
 
-[node name="HBoxContainer" type="HBoxContainer" parent="TextureRect/VBoxContainer"]
+[node name="HBoxContainer" type="HBoxContainer" parent="TextureRect/PanelContainer/VBoxContainer"]
 layout_mode = 2
 
-[node name="SaveBtn" type="Button" parent="TextureRect/VBoxContainer/HBoxContainer"]
+[node name="SaveBtn" type="Button" parent="TextureRect/PanelContainer/VBoxContainer/HBoxContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_font_sizes/font_size = 20
 text = "保存"
 
-[node name="SaveMoreBtn" type="Button" parent="TextureRect/VBoxContainer/HBoxContainer"]
+[node name="SaveMoreBtn" type="Button" parent="TextureRect/PanelContainer/VBoxContainer/HBoxContainer"]
 layout_mode = 2
 theme_override_font_sizes/font_size = 20
 text = "..."
 
-[node name="LoadBtn" type="Button" parent="TextureRect/VBoxContainer"]
+[node name="LoadBtn" type="Button" parent="TextureRect/PanelContainer/VBoxContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_font_sizes/font_size = 20
 text = "加载..."
 
-[node name="ExitBtn" type="Button" parent="TextureRect/VBoxContainer"]
+[node name="ExitBtn" type="Button" parent="TextureRect/PanelContainer/VBoxContainer"]
 layout_mode = 2
 theme_override_font_sizes/font_size = 20
 text = "退出"
 
-[node name="Load" type="TextureRect" parent="."]
+[node name="Load" type="MarginContainer" parent="."]
 unique_name_in_owner = true
 visible = false
 layout_mode = 0
@@ -83,42 +79,41 @@ offset_left = 108.0
 offset_top = 120.0
 offset_right = 416.0
 offset_bottom = 502.0
-texture = ExtResource("2_11sph")
 
-[node name="VBoxContainer" type="VBoxContainer" parent="Load"]
+[node name="PanelContainer" type="PanelContainer" parent="Load"]
+layout_mode = 2
+theme_override_styles/panel = ExtResource("3_pgl5x")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Load/PanelContainer"]
 custom_minimum_size = Vector2(240, 320)
 layout_mode = 2
-offset_left = 20.0
-offset_top = 26.0
-offset_right = 291.0
-offset_bottom = 356.0
 
-[node name="Label" type="Label" parent="Load/VBoxContainer"]
+[node name="Label" type="Label" parent="Load/PanelContainer/VBoxContainer"]
 layout_mode = 2
 text = "加载存档"
 
-[node name="LoadGikouList" type="ItemList" parent="Load/VBoxContainer"]
+[node name="LoadGikouList" type="ItemList" parent="Load/PanelContainer/VBoxContainer"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_vertical = 3
 theme_override_constants/v_separation = 16
 theme_override_font_sizes/font_size = 20
 
-[node name="HBoxContainer" type="HBoxContainer" parent="Load/VBoxContainer"]
+[node name="HBoxContainer" type="HBoxContainer" parent="Load/PanelContainer/VBoxContainer"]
 layout_mode = 2
 alignment = 2
 
-[node name="ConfirmBtn" type="Button" parent="Load/VBoxContainer/HBoxContainer"]
+[node name="ConfirmBtn" type="Button" parent="Load/PanelContainer/VBoxContainer/HBoxContainer"]
 layout_mode = 2
 theme_override_font_sizes/font_size = 20
 text = "加载"
 
-[node name="CloseBtn" type="Button" parent="Load/VBoxContainer/HBoxContainer"]
+[node name="CloseBtn" type="Button" parent="Load/PanelContainer/VBoxContainer/HBoxContainer"]
 layout_mode = 2
 theme_override_font_sizes/font_size = 20
 text = "取消"
 
-[node name="Save" type="TextureRect" parent="."]
+[node name="Save" type="MarginContainer" parent="."]
 unique_name_in_owner = true
 visible = false
 layout_mode = 0
@@ -126,51 +121,52 @@ offset_left = 115.0
 offset_top = 121.0
 offset_right = 413.0
 offset_bottom = 502.0
-texture = ExtResource("2_11sph")
 
-[node name="VBoxContainer" type="VBoxContainer" parent="Save"]
+[node name="PanelContainer" type="PanelContainer" parent="Save"]
+layout_mode = 2
+theme_override_styles/panel = ExtResource("3_pgl5x")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Save/PanelContainer"]
 custom_minimum_size = Vector2(240, 320)
 layout_mode = 2
-offset_left = 17.0
-offset_top = 26.0
-offset_right = 283.0
-offset_bottom = 357.0
 
-[node name="Label" type="Label" parent="Save/VBoxContainer"]
+[node name="Label" type="Label" parent="Save/PanelContainer/VBoxContainer"]
 layout_mode = 2
 text = "存档"
 
-[node name="SaveGikouList" type="ItemList" parent="Save/VBoxContainer"]
+[node name="SaveGikouList" type="ItemList" parent="Save/PanelContainer/VBoxContainer"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_vertical = 3
 theme_override_constants/v_separation = 16
 theme_override_font_sizes/font_size = 20
 
-[node name="HBoxContainer" type="HBoxContainer" parent="Save/VBoxContainer"]
+[node name="HBoxContainer" type="HBoxContainer" parent="Save/PanelContainer/VBoxContainer"]
 layout_mode = 2
 
-[node name="SaveID" type="LineEdit" parent="Save/VBoxContainer/HBoxContainer"]
+[node name="SaveID" type="LineEdit" parent="Save/PanelContainer/VBoxContainer/HBoxContainer"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
+theme_override_styles/normal = SubResource("StyleBoxTexture_lwu8w")
+alignment = 1
 
-[node name="ConfirmBtn" type="Button" parent="Save/VBoxContainer/HBoxContainer"]
+[node name="ConfirmBtn" type="Button" parent="Save/PanelContainer/VBoxContainer/HBoxContainer"]
 layout_mode = 2
 theme_override_font_sizes/font_size = 20
 text = "保存"
 
-[node name="CloseBtn" type="Button" parent="Save/VBoxContainer/HBoxContainer"]
+[node name="CloseBtn" type="Button" parent="Save/PanelContainer/VBoxContainer/HBoxContainer"]
 layout_mode = 2
 theme_override_font_sizes/font_size = 20
 text = "取消"
 
-[connection signal="pressed" from="TextureRect/VBoxContainer/HBoxContainer/SaveBtn" to="." method="_on_save_btn_pressed"]
-[connection signal="pressed" from="TextureRect/VBoxContainer/HBoxContainer/SaveMoreBtn" to="." method="_on_save_more_btn_pressed"]
-[connection signal="pressed" from="TextureRect/VBoxContainer/LoadBtn" to="." method="_on_load_btn_pressed"]
-[connection signal="pressed" from="TextureRect/VBoxContainer/ExitBtn" to="." method="_on_exit_btn_pressed"]
-[connection signal="pressed" from="Load/VBoxContainer/HBoxContainer/ConfirmBtn" to="." method="_on_load_win_confirmed"]
-[connection signal="pressed" from="Load/VBoxContainer/HBoxContainer/CloseBtn" to="." method="_on_load_win_close_requested"]
-[connection signal="item_selected" from="Save/VBoxContainer/SaveGikouList" to="." method="_on_save_gikou_list_item_selected"]
-[connection signal="pressed" from="Save/VBoxContainer/HBoxContainer/ConfirmBtn" to="." method="_on_save_win_confirmed"]
-[connection signal="pressed" from="Save/VBoxContainer/HBoxContainer/CloseBtn" to="." method="_on_save_win_close_requested"]
+[connection signal="pressed" from="TextureRect/PanelContainer/VBoxContainer/HBoxContainer/SaveBtn" to="." method="_on_save_btn_pressed"]
+[connection signal="pressed" from="TextureRect/PanelContainer/VBoxContainer/HBoxContainer/SaveMoreBtn" to="." method="_on_save_more_btn_pressed"]
+[connection signal="pressed" from="TextureRect/PanelContainer/VBoxContainer/LoadBtn" to="." method="_on_load_btn_pressed"]
+[connection signal="pressed" from="TextureRect/PanelContainer/VBoxContainer/ExitBtn" to="." method="_on_exit_btn_pressed"]
+[connection signal="pressed" from="Load/PanelContainer/VBoxContainer/HBoxContainer/ConfirmBtn" to="." method="_on_load_win_confirmed"]
+[connection signal="pressed" from="Load/PanelContainer/VBoxContainer/HBoxContainer/CloseBtn" to="." method="_on_load_win_close_requested"]
+[connection signal="item_selected" from="Save/PanelContainer/VBoxContainer/SaveGikouList" to="." method="_on_save_gikou_list_item_selected"]
+[connection signal="pressed" from="Save/PanelContainer/VBoxContainer/HBoxContainer/ConfirmBtn" to="." method="_on_save_win_confirmed"]
+[connection signal="pressed" from="Save/PanelContainer/VBoxContainer/HBoxContainer/CloseBtn" to="." method="_on_save_win_close_requested"]
