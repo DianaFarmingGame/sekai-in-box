@@ -10,4 +10,6 @@ var props := {
 	
 	# 是否允许接收一般操作 (菜单操作除外)
 	&"can_common_action": true,
+	
+	# TODO: block on_move
 }

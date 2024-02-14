@@ -32,10 +32,10 @@ var props := {
 		return await this.callm(ctx, &"container/put", sekai.make_mono(ref_id, opts)),
 	&"container/put": func (ctx: LisperContext, this: Mono, item: Mono) -> bool:
 		var contains := this.getpBD(&"contains", []) as Array
-		if item.getp(&"stackable"):
+		if item.getp(&"can_stack"):
 			var putted := false
 			for mono in contains:
-				if mono.define.ref == item.define.ref and mono.getp(&"stackable") and await mono.callm(ctx, &"stack/put", item):
+				if mono.define.ref == item.define.ref and mono.getp(&"can_stack") and await mono.callm(ctx, &"stack/put", item):
 					putted = true
 					break
 			if putted:
@@ -69,7 +69,7 @@ var props := {
 		for mono in contains:
 			if try_count <= 0: break
 			if mono.define.ref == type_d.ref:
-				try_count -= mono.getp(&"stack/count") if mono.getp(&"stackable") else 1
+				try_count -= mono.getp(&"stack/count") if mono.getp(&"can_stack") else 1
 		if try_count <= 0:
 			var picks := []
 			var removes := []
@@ -78,17 +78,17 @@ var props := {
 				if count == 0: break
 				var item = null
 				if mono.define.ref == type_d.ref:
-					if mono.getp(&"stackable"):
+					if mono.getp(&"can_stack"):
 						item = await mono.callm(ctx, &"stack/try_pick", count)
 						if item != null: count -= item.getp(&"stack/count")
 					else:
 						item = mono
 						count -= 1
 				if item == mono: removes.append(mono)
-				if item.getp(&"stackable"):
+				if item.getp(&"can_stack"):
 					var putted := false
 					for m in picks:
-						if m.define.ref == item.define.ref and m.getp(&"stackable") and await m.callm(ctx, &"stack/put", item):
+						if m.define.ref == item.define.ref and m.getp(&"can_stack") and await m.callm(ctx, &"stack/put", item):
 							putted = true
 							break
 					if putted: continue

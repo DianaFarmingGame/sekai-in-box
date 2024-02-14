@@ -5,7 +5,8 @@ var param: Dictionary
 signal finished
 
 func _ready() -> void:
-	if param.get(&"name") != null:
+	var vname = param.get(&"name")
+	if vname != null and vname.length() > 0:
 		%Name.text = param[&"name"]
 	else:
 		%Name.visible = false
