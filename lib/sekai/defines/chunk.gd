@@ -85,6 +85,7 @@ func do_merge(sets: Array[Dictionary]) -> Array[Dictionary]:
 		&"on_store": Prop.puts({
 			&"-1:chunk": func (ctx: LisperContext, this: Mono) -> void:
 				this.setpB(&"contains", [])
+				this.setpB(&"chunk_mat", null)
 				pass,
 		}),
 		&"on_draw_debug": Prop.puts({
