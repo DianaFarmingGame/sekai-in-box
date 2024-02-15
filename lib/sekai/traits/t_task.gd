@@ -33,12 +33,11 @@ var props := {
 	#	}],
 
 	&"task/start": func(ctx, this: Mono):
-		var status = this.getp(&"task_status")
-		if status != TASK_STATUS.START or status != TASK_STATUS.COMPLETE:
-			print("task " + this.getp(&"task_data")["id"] + " start")
-			this.callm(ctx, &"task/set_status", TASK_STATUS.START)
-		else:
-			push_warning(ctx, "[task/start] task " + this.getp("task_data")["id"] + " already start")
+		this.callm(ctx, &"task/set_status", TASK_STATUS.START)
+		,
+
+	&"task/complete": func(ctx, this: Mono):
+		this.callm(ctx, &"task/set_status", TASK_STATUS.COMPLETE)
 		,
 
 	#--------------------------------------------------------------------------#
@@ -95,7 +94,7 @@ var props := {
 		sekai.gikou.pushs(&"on_data_change_vals", [
 			&"1:task" + this.getp(&"task_data")["id"], func(ctx, gikou: Mono, key: StringName, value):
 					if key == this.getp("task_data")["finish"] && value == true:
-						this.callm(ctx, &"task_status", TASK_STATUS.COMPLETE)
+						this.emitm(ctx, &"task/complete")
 						print("task " + this.getp(&"task_data")["id"] + " complete")
 					,
 				],)
