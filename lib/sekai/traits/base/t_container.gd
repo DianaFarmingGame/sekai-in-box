@@ -49,11 +49,19 @@ var props := {
 			return true
 		this.setpF(ctx, &"contains", contains)
 		return false,
+	&"container/count_by_ref_id": func (ctx: LisperContext, this: Mono, ref_id: Variant) -> int:
+		var ref = sekai.get_define(ref_id).ref
+		var contains := this.getpBR(&"contains") as Array
+		var count := 0
+		for mono in contains:
+			if mono.define.ref == ref:
+				count += mono.getp(&"stack/count") if mono.getp(&"can_stack") else 1
+		return count,
 	&"container/get_by_ref_id": func (ctx: LisperContext, this: Mono, ref_id: Variant) -> Variant:
-		var type_d = sekai.get_define(ref_id)
+		var ref = sekai.get_define(ref_id).ref
 		var contains := this.getpBD(&"contains", []) as Array
 		for mono in contains:
-			if mono.define.ref == type_d.ref:
+			if mono.define.ref == ref:
 				return mono
 		return null,
 	&"container/pick": func (ctx: LisperContext, this: Mono, item: Mono) -> Mono:
@@ -63,12 +71,12 @@ var props := {
 		this.setpF(ctx, &"contains", contains)
 		return item,
 	&"container/pick_by_ref_id": func (ctx: LisperContext, this: Mono, ref_id: Variant, count := 1) -> Variant:
-		var type_d = sekai.get_define(ref_id)
+		var ref = sekai.get_define(ref_id).ref
 		var contains := this.getpBD(&"contains", []) as Array
 		var try_count := count
 		for mono in contains:
 			if try_count <= 0: break
-			if mono.define.ref == type_d.ref:
+			if mono.define.ref == ref:
 				try_count -= mono.getp(&"stack/count") if mono.getp(&"can_stack") else 1
 		if try_count <= 0:
 			var picks := []
@@ -77,7 +85,7 @@ var props := {
 				var mono = contains[-(i + 1)]
 				if count == 0: break
 				var item = null
-				if mono.define.ref == type_d.ref:
+				if mono.define.ref == ref:
 					if mono.getp(&"can_stack"):
 						item = await mono.callm(ctx, &"stack/try_pick", count)
 						if item != null: count -= item.getp(&"stack/count")
