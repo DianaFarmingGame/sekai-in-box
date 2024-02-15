@@ -68,7 +68,7 @@ func exec_gsx(path: String) -> void:
 
 ## 建立一个新游戏（不会立即存档）
 func start_gikou(id: String, entry := "") -> void:
-	if gikou != null: await exit_gikou()
+	if gikou != null: exit_gikou()
 	gikou = make_mono(&"gikou", {&"id": id})
 	context.push_module_meta({
 		&"gikou": gikou,
@@ -79,7 +79,8 @@ func start_gikou(id: String, entry := "") -> void:
 
 ## 进入一个已有游戏的存档
 func enter_gikou(id: String) -> void:
-	if gikou != null: await exit_gikou()
+	if gikou != null: exit_gikou()
+	await process
 	var file := FileAccess.open(gikou_store_dir.path_join(id + ".gikou"), FileAccess.READ)
 	gikou = Mono.from_data(file.get_var(false))
 	context.push_module_meta({
@@ -90,17 +91,13 @@ func enter_gikou(id: String) -> void:
 
 ## 触发当前游戏保存存档
 func record_gikou() -> void:
-	await gikou.store(context)
-	var cgikou := gikou.clone_data()
 	DirAccess.make_dir_recursive_absolute(gikou_store_dir)
 	var file := FileAccess.open(gikou_store_dir.path_join(gikou.getp(&"id") + ".gikou"), FileAccess.WRITE)
-	file.store_var(Mono.to_data(cgikou), false)
-	await gikou.restore(context)
+	file.store_var(await Mono.store_to_data(context, gikou), false)
 	gikou_changed.emit()
 
 ## 退出当前游戏
 func exit_gikou() -> void:
-	await gikou.store(context)
 	gikou = null
 	context.pop_module_meta()
 	gikou_changed.emit()

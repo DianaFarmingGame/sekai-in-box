@@ -1,0 +1,10 @@
+[gd_resource type="StyleBoxTexture" load_steps=2 format=3 uid="uid://q5w8oty08mkl"]
+
+[ext_resource type="Texture2D" uid="uid://d3eff4fo0w3gc" path="res://test-next/define/实体/ui/选择框/选项框.png" id="1_ronn3"]
+
+[resource]
+texture = ExtResource("1_ronn3")
+texture_margin_left = 20.0
+texture_margin_top = 20.0
+texture_margin_right = 20.0
+texture_margin_bottom = 20.0

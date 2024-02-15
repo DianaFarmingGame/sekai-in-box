@@ -13,8 +13,10 @@ static func to_data(mono: Mono) -> Variant:
 	return mono._to_data()
 
 static func store_to_data(ctx: LisperContext, mono: Mono) -> Variant:
-	await mono.store(ctx)
-	return to_data(mono)
+	var dmono := mono.clone()
+	await dmono.store(ctx)
+	var vmono := dmono.clone_data()
+	return to_data(vmono)
 
 static func from_data(data: Variant) -> Mono:
 	var mono := Mono.new()
@@ -27,27 +29,29 @@ static func restore_from_data(ctx: LisperContext, data: Variant) -> Mono:
 	return mono
 
 class FnVal: pass
+class SkipVal: pass
 
 static func clone_val(value: Variant) -> Variant:
 	if Lisper.is_fn(value):
 		return FnVal.new()
 	if value is Object:
-		return null
+		return SkipVal.new()
 	if value is Array:
 		var res := []
 		for rv in value:
 			var v = clone_val(rv)
 			if v is FnVal:
-				return null
-			if v == null:
+				return SkipVal.new()
+			if v is SkipVal:
 				continue
 			res.append(v)
 		return res
 	if value is Dictionary:
 		var res := {}
 		for k in value.keys():
+			if k is Object or Lisper.is_fn(k): continue
 			var v = clone_val(value[k])
-			if v != null and not v is FnVal:
+			if not v is SkipVal or not v is FnVal:
 				res[k] = v
 		return res
 	return value

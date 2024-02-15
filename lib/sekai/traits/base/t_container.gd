@@ -124,9 +124,7 @@ var props := {
 	&"on_store": Prop.puts({
 		&"99:container": func (ctx: LisperContext, this: Mono) -> void:
 			var contains := this.getpBD(&"contains", []) as Array
-			await Async.array_map(contains, func (item): await item.store(ctx))
-			contains.map(func (item): item._outof_container())
-			var contains_data := contains.map(Mono.to_data)
+			var contains_data := await Async.array_map(contains, func (item): return await Mono.store_to_data(ctx, item))
 			this.setpB(&"contains_data", contains_data)
 			this.setpB(&"contains", [])
 			pass,
@@ -135,6 +133,7 @@ var props := {
 		&"-99:container": func (ctx: LisperContext, this: Mono) -> void:
 			var contains_data := this.getpD(&"contains_data", []) as Array
 			var contains := contains_data.map(Mono.from_data)
+			contains.map(func (mono): mono.root = this)
 			this.setpB(&"contains", contains)
 			this.setpB(&"contains_data", [])
 			await Async.array_map(contains, func (item): await item.restore(ctx))
