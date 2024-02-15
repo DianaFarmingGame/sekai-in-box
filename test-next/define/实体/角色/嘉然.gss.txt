@@ -13,36 +13,36 @@ define (load ("../pc.gd")
 			idle [&fixed &idle 0.6 anim_char(4)]
 			walk [&fixed &walk 0.4 anim_char(8)]
 		}
-		action_data {
-			primary fn ([ctrl src tar sets]
-				do (target msg_dialog/put ctrl {
-					avatar #(src . asserts . avatar)
-					name #(src . name)
-					text "你好!"
-				})
-				do (target choose_dialog/put ctrl {
-					title "选择:"
-					choices [
-						{text "Hello"}
-						{text "World" value #t}
-					]
-				})
-				do (target choose_dialog/match ctrl {title "选择:"} [
-					["选项 1"]
-					["选项 2" fn ([] echo ("you selected 选项 2!"))]
-				])
-				do (target choose_dialog/switch ctrl {title "选择:"}
-					#t "这个选项可见" #t
-					#f "这个选项不可见" #f
-					#t "选项 3" echo ("you selected 选项 3!")
-				)
-				#t
-			)
-			secondary fn ([ctrl src tar sets]
-				do (target msg_dialog/put ctrl {
-					text "你进行了副操作!"
-				})
-				#t
-			)
-		}
+action_data {
+	primary fn ([ctrl src tar sets]
+		do (target msg_dialog/put ctrl {
+			avatar #(src . asserts . avatar)
+			name #(src . name)
+			text "你好!"
+		})
+		do (target choose_dialog/put ctrl {
+			title "选择:"
+			choices [
+				{text "Hello"}
+				{text "World" value #t}
+			]
+		})
+		do (target choose_dialog/match ctrl {title "选择:"} [
+			["选项 1"]
+			["选项 2" fn ([] echo ("you selected 选项 2!"))]
+		])
+		do (target choose_dialog/switch ctrl {title "选择:"}
+			#t "这个选项可见" #t
+			#f "这个选项不可见" #f
+			#t "选项 3" echo ("you selected 选项 3!")
+		)
+		#t
+	)
+	secondary fn ([ctrl src tar sets]
+		do (target msg_dialog/put ctrl {
+			text "你进行了副操作!"
+		})
+		#t
+	)
+}
 	})

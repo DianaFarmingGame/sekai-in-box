@@ -63,12 +63,14 @@ var props := {
 		for layer in this.layers:
 			var handle = layer[1].get(key, {}).get(type)
 			if handle != null:
+				if not Lisper.is_fn(handle): handle = sekai.db.applymRSUY(ctx, &"db/get", [id, &"actions"])
 				usage = await ctx.call_method(this, handle, [ctrl, src, tar, sets])
 				if usage != null:
 					await this.applyc(ctx, &"on_action", [type, ctrl, src, tar, sets])
 					return usage
 		var handle = this.getpRD(key, {}).get(type)
 		if handle != null:
+			if not Lisper.is_fn(handle): handle = sekai.db.applymRSUY(ctx, &"db/get", [id, &"actions"])
 			usage = await ctx.call_method(this, handle, [ctrl, src, tar, sets])
 			if usage != null:
 				await this.applyc(ctx, &"on_action", [type, ctrl, src, tar, sets])
