@@ -15,7 +15,7 @@ var props := {
 	#		src: Mono: 发起行为的原始对象,
 	#		tar: Mono | null: 行为可能指向的目标对象,
 	#		InputSet,
-	# @return: int: 触发已处理 阻止后续的行为被触发 同时代表操作消耗的精力值, null: 触发未处理
+	# @return: true: 操作成功, null: 触发未处理
 	&"action_data": {},
 	
 	
@@ -56,7 +56,7 @@ var props := {
 	#		src: Mono: 发起行为的原始对象,
 	#		tar: Mono | null: 行为可能指向的目标对象,
 	#		InputSet,
-	# @return: int: 操作消耗的精力值 | null: 触发未处理
+	# @return: true: 操作成功 | null: 触发未处理
 	&"action/emit": func (ctx: LisperContext, this: Mono, type: StringName, ctrl: SekaiControl, src: Mono, tar: Variant, sets: InputSet) -> Variant:
 		var key := &"action_data"
 		var usage = null
@@ -82,11 +82,11 @@ var props := {
 	#		src: Mono: 发起行为的原始对象,
 	#		tar: Mono | null: 行为可能指向的目标对象,
 	#		InputSet,
-	# @return 0
+	# @return true
 	&"action/call": func (ctx: LisperContext, this: Mono, id: StringName, ctrl: SekaiControl, src: Mono, tar: Variant, sets: InputSet) -> int:
 		var handle = sekai.db.applymRSUY(ctx, &"db/get", [id, &"actions"])
 		await ctx.call_method(this, handle, [ctrl, src, tar, sets])
-		return 0,
+		return true,
 	
 	
 	
