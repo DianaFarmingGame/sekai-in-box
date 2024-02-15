@@ -10,7 +10,7 @@ var control: SekaiControl
 func _ready() -> void:
 	var tname = target.getp(&"name")
 	%Label.text = str(tname + "的物品" if tname != null else "物品")
-	_update_contains(context, this)
+	_update_contains(context, target)
 
 func _enter_tree() -> void:
 	target.putsB(&"on_contains_mod", [&"0:ui_inventory_view", _update_contains])
