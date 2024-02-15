@@ -71,8 +71,10 @@ var props := {
 	# @return: Mono | null
 	&"slot/get": func (ctx: LisperContext, this: Mono, slot: int) -> Variant:
 		var data := this.getp(&"slot_data") as Array
-		var ref := data[slot] as int
-		return this.callmRSUY(ctx, &"container/get_by_ref_id", ref),
+		var ref = data[slot]
+		if ref != null:
+			return this.callmRSUY(ctx, &"container/get_by_ref_id", ref)
+		return null,
 	
 	# 获取当前选择的快捷栏的物品 (非取出)
 	# @params: void
