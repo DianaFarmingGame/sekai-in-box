@@ -33,10 +33,12 @@ var props := {
 	#	}],
 
 	&"task/start": func(ctx, this: Mono):
+		print("task " + this.getp(&"task_data")["id"] + " start")
 		this.callm(ctx, &"task/set_status", TASK_STATUS.START)
 		,
 
 	&"task/complete": func(ctx, this: Mono):
+		print("task " + this.getp(&"task_data")["id"] + " complete")
 		this.callm(ctx, &"task/set_status", TASK_STATUS.COMPLETE)
 		,
 
@@ -53,8 +55,7 @@ var props := {
 		watch_init(ctx, this, status)
 		,
 
-
-	&"add_watch_vals": func(ctx, this: Mono):
+	&"task/add_watch_vals": func(ctx, this: Mono):
 		sekai.gikou.pushs(&"on_data_change_vals", [
 			&"0:task_" + this.getp(&"task_data")["id"], func(ctx, gikou: Mono, key: String, value):
 					if key.begins_with("is_ok_task_"):
@@ -64,43 +65,27 @@ var props := {
 						var r = require[i]
 						if r["type"] == REQUIREMENT_TYPE.WATCH_VAR and r["data"]["key"] == key:
 							r["current"] = value
-							var res := var_compare(r["data"]["value"], value, r["data"]["compare"])
-							if res:
-								r["complete"] = true
-								print("task " + this.getp(&"task_data")["id"] + " requirement ", i , " complete")
-								finish_requirement_db(ctx, this.getp(&"task_data")["id"], str(i), gikou)
-							else:
-								r["complete"] = false
-								unfinish_requirement_db(ctx, this.getp(&"task_data")["id"], str(i), gikou)
+							check_vals(ctx, this, gikou, r, i)
 
-					var flag = true
-					for r in require:
-						if r["complete"] == false:
-							flag = false
-							break
-
-					if flag:
-						print("task " + this.getp(&"task_data")["id"] + " all requirement complete")
-						finish_requirement_db(ctx, this.getp(&"task_data")["id"], "all", gikou)
+					check_all_requirements(ctx, this, gikou, require)
 					,
 				],)
 		,
 
-	&"remove_watch_vals": func(ctx, this: Mono):
+	&"task/remove_watch_vals": func(ctx, this: Mono):
 		sekai.gikou.dels(&"on_data_change_vals", &"0:task_" + this.getp(&"task_data")["id"])
 		,
 
-	&"add_task_watcher": func(ctx, this: Mono):
+	&"task/add_task_watcher": func(ctx, this: Mono):
 		sekai.gikou.pushs(&"on_data_change_vals", [
 			&"1:task" + this.getp(&"task_data")["id"], func(ctx, gikou: Mono, key: StringName, value):
 					if key == this.getp("task_data")["finish"] && value == true:
 						this.emitm(ctx, &"task/complete")
-						print("task " + this.getp(&"task_data")["id"] + " complete")
 					,
 				],)
 		,
 
-	&"remove_task_watcher": func(ctx, this: Mono):
+	&"task/remove_task_watcher": func(ctx, this: Mono):
 		sekai.gikou.dels(&"on_data_change_vals", &"1:task" + this.getp(&"task_data")["id"])
 		,
 		
@@ -118,9 +103,6 @@ var props := {
 					
 			,
 	}),
-
-
-	
 }
 
 enum TASK_STATUS {
@@ -174,19 +156,65 @@ func watch_init(ctx: LisperContext, this: Mono, status: TASK_STATUS):
 	if status == TASK_STATUS.START:
 		this.setp(&"processing", true)
 		var task = this.getp(&"task_data")
-
-		if task["finish"] != &"":
-			this.emitm(ctx, &"add_task_watcher")
 		
+		if task["finish"] != &"":
+			this.emitm(ctx, &"task/add_task_watcher")
+			
+		data_init(ctx, this)
+		
+		var flags = []
+		for i in len(REQUIREMENT_TYPE):
+			flags.append(false)
+
 		for r in task["requirements"]:
 			if r["type"] == REQUIREMENT_TYPE.WATCH_VAR:
-				this.emitm(ctx, &"add_watch_vals")
+				flags[REQUIREMENT_TYPE.WATCH_VAR] = true
 			elif r["type"] == REQUIREMENT_TYPE.BAG_CHECK:
-				pass
+				flags[REQUIREMENT_TYPE.BAG_CHECK] = true
 			elif r["type"] == REQUIREMENT_TYPE.DISTANCE_CHECK:
-				pass
+				flags[REQUIREMENT_TYPE.DISTANCE_CHECK] = true
+
+		if flags[REQUIREMENT_TYPE.WATCH_VAR]:
+			this.emitm(ctx, &"task/add_watch_vals")
 	else:
 		this.setp(&"processing", false)
-		this.emitm(ctx, &"remove_watch_vals")
-		this.emitm(ctx, &"remove_task_watcher")
+		this.emitm(ctx, &"task/remove_watch_vals")
+		this.emitm(ctx, &"task/remove_task_watcher")
 
+
+func check_vals(ctx, this: Mono, gikou: Mono, r, idx):
+	var res := var_compare(r["data"]["value"], r["current"], r["data"]["compare"])
+	if res:
+		r["complete"] = true
+		print("task " + this.getp(&"task_data")["id"] + " requirement ", idx , " complete")
+		finish_requirement_db(ctx, this.getp(&"task_data")["id"], str(idx), gikou)
+	else:
+		r["complete"] = false
+		unfinish_requirement_db(ctx, this.getp(&"task_data")["id"], str(idx), gikou)
+
+func check_all_requirements(ctx, this: Mono, gikou: Mono, require):
+	var flag = true
+	for r in require:
+		if r["complete"] == false:
+			flag = false
+			break
+		
+	if flag:
+		print("task " + this.getp(&"task_data")["id"] + " all requirement complete")
+		finish_requirement_db(ctx, this.getp(&"task_data")["id"], "all", gikou)
+
+func data_init(ctx: LisperContext, this: Mono):
+	var require = this.getp(&"task_data")["requirements"] as Array
+	for i in len(require):
+		var r = require[i]
+		r["complete"] = false
+		if r["type"] == REQUIREMENT_TYPE.WATCH_VAR:
+			r["current"] = await sekai.gikou.applym(ctx, "db/get", [r["data"]["key"], &"vals"])
+			await sekai.gikou.applym(ctx, "db/set", [&"is_ok_task_" + this.getp(&"task_data")["id"] + "_" + str(i), false, &"vals"])
+			check_vals(ctx, this, sekai.gikou, r, i)
+		elif r["type"] == REQUIREMENT_TYPE.BAG_CHECK:
+			pass
+		elif r["type"] == REQUIREMENT_TYPE.DISTANCE_CHECK:
+			pass
+
+	check_all_requirements(ctx, this, sekai.gikou, require)

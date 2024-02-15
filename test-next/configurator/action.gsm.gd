@@ -116,7 +116,7 @@ array/for(data func([i record]
 							&开启任务
 								template(do(gikou taskm/activate keyword(:eval @(opt &数据))))
 							&完成任务
-								template(echo ("1111"))
+								template(do(gikou task/deactivate keyword(:eval @(opt &数据))))
 							&修改变量
 								template(do(gikou db/set :eval keyword(@(@(opt &数据) 0)) eval(do (gikou db/val_replace string->raw(:eval @(@(opt &数据) 1)))) keyword("vals")))
 							&变量检测

@@ -5,10 +5,6 @@ var id := &"task_manager"
 var requires := [&"kv_container"]
 
 var props := {
-	&"taskm/get_activate": func(ctx, this) -> Dictionary:
-		return {}
-		,
-
 	&"taskm/activate": func(ctx, this: Mono, task_id: StringName) -> bool:
 		var tasks = this.getp(&"kvs") as Dictionary
 		if not tasks.has(task_id):
@@ -18,6 +14,18 @@ var props := {
 		var task = tasks[task_id] as Mono
 		
 		task.emitm(ctx, &"task/start")
+		return true
+		,
+
+	&"taskm/deactivate": func(ctx, this: Mono, task_id: StringName) -> bool:
+		var tasks = this.getp(&"kvs") as Dictionary
+		if not tasks.has(task_id):
+			push_error("task/deactivate: ", "task not found: ", task_id)
+			return false
+		
+		var task = tasks[task_id] as Mono
+		
+		task.emitm(ctx, &"task/stop")
 		return true
 		,
 	
