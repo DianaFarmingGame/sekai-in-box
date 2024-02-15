@@ -37,7 +37,7 @@ var props := {
 	
 	# 触发交互行为
 	# @params: SekaiControl, src: Mono: 发起行为的原始对象, tar: Mono | null: 行为可能指向的目标对象, InputSet
-	# @return: int: 操作消耗的精力值, false: 触发未处理
+	# @return: int: 操作消耗的精力值 | null: 触发未处理
 	&"action/emit": func (ctx: LisperContext, this: Mono, ctrl: SekaiControl, src: Mono, tar: Variant, sets: InputSet) -> Variant:
 		var key := &"action_data"
 		var usage = null
@@ -49,6 +49,13 @@ var props := {
 			usage = await ctx.call_method(this, entry[1], [ctrl, src, tar, sets])
 			if usage != null: return usage
 		return null,
+	
+	# 跳转交互
+	# @params: id: StringName, SekaiControl, src: Mono: 发起行为的原始对象, tar: Mono | null: 行为可能指向的目标对象, InputSet
+	&"action/call": func (ctx: LisperContext, this: Mono, id: StringName, ctrl: SekaiControl, src: Mono, tar: Variant, sets: InputSet) -> int:
+		var handle = sekai.db.applymRSUY(ctx, &"db/get", [id, &"actions"])
+		await ctx.call_method(this, handle, [ctrl, src, tar, sets])
+		return 0,
 	
 	
 	
