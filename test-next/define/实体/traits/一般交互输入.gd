@@ -8,9 +8,9 @@ var props := {
 		&"0:一般交互": func (ctx: LisperContext, this: Mono, ctrl: SekaiControl, pick: Variant, sets: InputSet) -> void:
 			var item = this.emitmRSUY(ctx, &"slot/get_current")
 			if item != null:
-				if await item.applymRSU(ctx, &"action/emit", [&"primary", ctrl, this, pick, sets]): return
+				if await item.applymRS(ctx, &"action/emit", [&"primary", ctrl, this, pick, sets]): return
 			if pick != null:
-				if await pick.applymRSU(ctx, &"action/emit", [&"primary", ctrl, this, pick, sets]): return
+				if await pick.applymRS(ctx, &"action/emit", [&"primary", ctrl, this, pick, sets]): return
 			pass,
 	}),
 	
@@ -18,9 +18,9 @@ var props := {
 		&"0:一般交互": func (ctx: LisperContext, this: Mono, ctrl: SekaiControl, pick: Variant, sets: InputSet) -> void:
 			var item = this.emitmRSUY(ctx, &"slot/get_current")
 			if item != null:
-				if await item.applymRSU(ctx, &"action/emit", [&"secondary", ctrl, this, pick, sets]): return
+				if await item.applymRS(ctx, &"action/emit", [&"secondary", ctrl, this, pick, sets]): return
 			if pick != null:
-				if await pick.applymRSU(ctx, &"action/emit", [&"secondary", ctrl, this, pick, sets]): return
+				if await pick.applymRS(ctx, &"action/emit", [&"secondary", ctrl, this, pick, sets]): return
 			pass,
 	}),
 }

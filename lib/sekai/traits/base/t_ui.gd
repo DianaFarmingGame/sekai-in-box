@@ -36,13 +36,13 @@ var props := {
 	# 一次性启用 UI, 一直阻塞, 并在 UI 触发 finished 信号时关闭并返回信号的传参
 	&"ui/oneshot": func (ctx: LisperContext, this: Mono, ctrl: SekaiControl, uid: StringName, param = null) -> Variant:
 		if ctrl.is_sub: return null
-		if not this.getpBR(&"ui_nodes").get(ctrl, {}).has(uid):
-			var node = this.applymRSUY(ctx, &"ui/add", [ctrl, uid, param])
-			if node.has_signal(&"finished"):
-				var res = await node.finished
-				this.applymRSUY(ctx, &"ui/remove", [ctrl, uid])
-				return res
-		return null,
+		var data := this.getpBR(&"ui_data") as Dictionary
+		var node := TUI.make_ui(ctx, this, ctrl, data[uid], param)
+		ctrl.add_child(node)
+		var res = await node.finished
+		ctrl.remove_child(node)
+		node.queue_free()
+		return res,
 	
 	# 禁用 UI
 	&"ui/disable": func (ctx: LisperContext, this: Mono, ctrl: SekaiControl, uid: StringName) -> void:
