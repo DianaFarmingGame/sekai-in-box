@@ -35,6 +35,9 @@ var props := {
 		kvs.erase(key)
 		,
 
-	
+	&"kv/has": func(ctx: LisperContext, this: Mono, key: String) -> bool:
+		var kvs = this.getp(&"kvs") as Dictionary
+		return kvs.has(key)
+		,
 }
 

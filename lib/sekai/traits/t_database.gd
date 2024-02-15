@@ -15,7 +15,7 @@ var props := {
 		db[group][key] = value
 
 		if this.getp("watcher").has(group):
-			this.callm(ctx, &"on_data_change_" + group, [key, value])
+			this.applym(ctx, &"on_data_change_" + group, [key, value])
 		,
 
 	&"db/setgw": func(ctx: LisperContext, this: Mono, group: StringName = &"default") -> void:
@@ -28,7 +28,7 @@ var props := {
 
 		print("[db/setgw] ", "add group watch: ", group)
 		watcher[group] = true
-		this.setp(&"on_data_change_" + group, {})
+		this.setp(&"on_data_change_" + group, Prop.Stack())
 		,
 		
 	&"db/setp": func(ctx: LisperContext, this: Mono, key: StringName, props_: StringName, value, group: StringName = &"default"):

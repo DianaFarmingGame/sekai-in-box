@@ -114,9 +114,9 @@ array/for(data func([i record]
 									do(this dialog_to src :eval @(@(opt &跳转表) 1))
 								))
 							&开启任务
-								template(task/on(keyword(:eval @(opt &数据))))
-							&关闭任务
-								template(task/off(keyword(:eval @(opt &数据))))
+								template(do(gikou taskm/activate keyword(:eval @(opt &数据))))
+							&完成任务
+								template(echo ("1111"))
 							&修改变量
 								template(do(gikou db/set :eval keyword(@(@(opt &数据) 0)) eval(do (gikou db/val_replace string->raw(:eval @(@(opt &数据) 1)))) keyword("vals")))
 							&变量检测

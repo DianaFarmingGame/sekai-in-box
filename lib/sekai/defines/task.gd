@@ -7,7 +7,7 @@ func do_merge(sets: Array[Dictionary]) -> Array[Dictionary]:
 	ref = 4
 	id = &"task"
 
-	merge_traits(sets, [TTask])
+	merge_traits(sets, [TProcess, TTask])
 
 	merge_props(sets, {
 

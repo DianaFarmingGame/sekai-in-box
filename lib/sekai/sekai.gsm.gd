@@ -274,6 +274,7 @@ sekai/exec ("utils/base.gsm.gd")
 
 define/sign (load ("defines/gikou.gd"))
 define/sign (load ("defines/database.gd"))
+define/sign (load ("defines/task.gd"))
 define/sign (load ("defines/hako.gd"))
 define/sign (load ("defines/chunk.gd"))
 
