@@ -1,0 +1,18 @@
+define (load ("箱子.gd")
+	ref 2303
+	id &环境/被动/附魔台
+	props {
+		name "附魔台"
+		need_route #f
+		can_route #f
+		collision_boxes [rect2(-0.3 0 0.6 0.5)]
+		pick_box rect2(-0.3 -0.4 0.6 0.9)
+		asserts {
+			main load ("互动家具.png")
+		}
+		draw_data {
+			opened [&sticky &main 0.4 anim_build(0 3 4 #f)]
+			closed [&sticky &main 0.4 anim_build(0 3 4 #t)]
+		}
+	}
+)

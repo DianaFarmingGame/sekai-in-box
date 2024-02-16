@@ -1,6 +1,7 @@
-class_name 有精力 extends MonoTrait
+class_name 二元状态 extends MonoTrait
 
-var id := &"有精力"
+var id := &"二元状态"
+var requires := [&"state"]
 
 var props := {
 	#

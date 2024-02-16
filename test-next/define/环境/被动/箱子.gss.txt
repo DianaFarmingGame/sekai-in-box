@@ -6,13 +6,13 @@ define (load ("箱子.gd")
 		need_route #f
 		can_route #f
 		collision_boxes [rect2(-0.3 0 0.6 0.5)]
-		pick_box rect2(-0.4 -0.3 0.8 0.8)
+		pick_box rect2(-0.3 -0.3 0.6 0.8)
 		asserts {
 			main load ("互动家具.png")
 		}
-		cur_draw &main
 		draw_data {
-			main [&fixed &main 2 anim_build(0 1 4)]
+			opened [&sticky &main 0.4 anim_build(0 1 4 #f)]
+			closed [&sticky &main 0.4 anim_build(0 1 4 #t)]
 		}
 	}
 )

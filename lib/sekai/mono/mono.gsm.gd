@@ -119,6 +119,17 @@ func get_hako() -> Mono:
 			return root.get_hako()
 	return null
 
+class RSignal extends RefCounted:
+	signal finished(res)
+
+func wait(key: StringName) -> Variant:
+	var head := StringName(str("0:", sekai.get_uidx()))
+	var sig := RSignal.new()
+	putsB(key, [head, func (ctx: LisperContext, this: Mono, res = null):
+		this.delsB(key, head)
+		sig.finished.emit(res)])
+	return await sig.finished
+
 func cover(layer_name: StringName, layer: Dictionary) -> void:
 	if layers.size() == 0 and layer_name != &"base": cover(&"base", {})
 	layers.push_front([layer_name, layer])

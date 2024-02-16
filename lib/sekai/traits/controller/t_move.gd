@@ -125,10 +125,13 @@ var props := {
 	}),
 	&"on_process": Prop.puts({
 		&"0:move": func (ctx: LisperContext, this: Mono, delta: float) -> void:
-			var speed := this.getpBR(&"move_cur_speed") as Vector2
-			if speed != Vector2(0, 0):
-				var dpos := speed * delta
-				await this.callm(ctx, &"position/move", Vector3(dpos.x, 0, 0))
-				await this.callm(ctx, &"position/move", Vector3(0, dpos.y, 0)),
+			if this.getp(&"can_move"):
+				var speed := this.getpBR(&"move_cur_speed") as Vector2
+				if speed != Vector2(0, 0):
+					var dpos := speed * delta
+					await this.callm(ctx, &"position/move", Vector3(dpos.x, 0, 0))
+					await this.callm(ctx, &"position/move", Vector3(0, dpos.y, 0))
+			else:
+				this.setpBW(ctx, &"move_cur_speed", Vector2(0, 0)),
 	}),
 }

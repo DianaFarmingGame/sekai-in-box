@@ -1,32 +1,39 @@
-[gd_scene load_steps=4 format=3 uid="uid://cyt5qpkglw00a"]
+[gd_scene load_steps=5 format=3 uid="uid://cyt5qpkglw00a"]
 
 [ext_resource type="Script" path="res://test-next/define/实体/ui/快捷栏/main.gd" id="1_boeln"]
 [ext_resource type="PackedScene" uid="uid://r5sddkd22xlg" path="res://test-next/define/实体/ui/快捷栏/slot.tscn" id="2_bh720"]
 [ext_resource type="Texture2D" uid="uid://ctve0s56blv24" path="res://test-next/define/实体/ui/快捷栏/背包选中.png" id="2_r6b20"]
+[ext_resource type="Script" path="res://test-next/define/实体/ui/快捷栏/Select.gd" id="4_gq055"]
 
 [node name="Main" type="Control"]
 layout_mode = 3
-anchor_left = 0.244792
-anchor_top = 0.848437
-anchor_right = 0.710069
-anchor_bottom = 0.898438
-offset_right = 1.52588e-05
-grow_horizontal = 2
-grow_vertical = 0
-script = ExtResource("1_boeln")
-metadata/_edit_use_anchors_ = true
-
-[node name="SlotList" type="HBoxContainer" parent="."]
-unique_name_in_owner = true
-layout_mode = 1
 anchors_preset = 12
 anchor_top = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_top = -32.0
+offset_top = -95.0
+offset_bottom = -29.0
 grow_horizontal = 2
 grow_vertical = 0
+script = ExtResource("1_boeln")
+
+[node name="SlotList" type="HBoxContainer" parent="."]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(2.08165e-12, 2.08165e-12)
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -128.0
+offset_top = -32.0
+offset_right = 128.0
+offset_bottom = 32.0
+grow_horizontal = 2
+grow_vertical = 2
 theme_override_constants/separation = 0
+alignment = 1
 metadata/_edit_group_ = true
 
 [node name="Slot" parent="SlotList" instance=ExtResource("2_bh720")]
@@ -43,16 +50,20 @@ layout_mode = 2
 
 [node name="Select" type="TextureRect" parent="."]
 unique_name_in_owner = true
+custom_minimum_size = Vector2(74, 59)
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = -20.0
-offset_top = -16.0
-offset_right = 20.0
-offset_bottom = 16.0
+offset_left = -37.0
+offset_top = -29.5
+offset_right = 37.0
+offset_bottom = 29.5
 grow_horizontal = 2
 grow_vertical = 2
 texture = ExtResource("2_r6b20")
+script = ExtResource("4_gq055")
+
+[connection signal="resized" from="SlotList" to="." method="_on_slot_list_resized"]

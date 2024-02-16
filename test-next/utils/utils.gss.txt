@@ -16,8 +16,22 @@ defunc (clip16_cover [x y]
 defunc (clip_build [x y]
 	[rect2(-0.5 -0.5 1 1) rect2(*(x 32) *(y 32) 32 32)]
 )
-defunc (anim_build [x y frame]
-	array/unfold(frame fn ([f] clip_build (+(x f) y)))
+defunc (anim_build [x y frame is_reverse]
+	var (res array/unfold(frame fn ([f] clip_build (+(x f) y))))
+	if (is_reverse
+		array/reverse (res)
+		res
+	)
+)
+defunc (clip1x2_build [x y]
+	[rect2(-0.5 -1.5 1 2) rect2(*(x 32) *(y 32) 32 64)]
+)
+defunc (anim1x2_build [x y frame is_reverse]
+	var (res array/unfold(frame fn ([f] clip1x2_build (+(x f) y))))
+	if (is_reverse
+		array/reverse (res)
+		res
+	)
 )
 defunc (clip3x3_build [x y]
 	[rect2(-1.5 -2.5 3 3) rect2(*(x 96) *(y 96) 96 96)]
