@@ -47,9 +47,9 @@ static func on_draw(ctx: LisperContext, this: Mono, ctrl: SekaiControl, item: Se
 		&"fixed":
 			var texture = this.getp(&"asserts")[draw[1]]
 			var timeout := draw[2] as float
-			var t := (item.get_time() - this.getp(&"draw_timer")) as float
+			var t := item.get_time() - this.getp(&"draw_timer") as float
 			var frames := draw[3] as Array
-			var frame_idx := lerpf(0.0, (frames.size() as float), fmod(t, timeout) / timeout) as int
+			var frame_idx := frames.size() * fposmod(t / timeout, 1) as int
 			var frame = frames[frame_idx]
 			if this.getp(&"draw_flip_h"):
 				item.pen_set_transform(Transform2D(0, Vector2(-1, 1), 0, pos + frame[0].position + frame[0].size / 2))
