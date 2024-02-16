@@ -19,7 +19,10 @@ var props := {
 	# @params: SekaiControl
 	&"on_menu_toggle": Prop.Stack({
 		&"0:菜单控制": func (ctx: LisperContext, this: Mono, ctrl: SekaiControl) -> void:
-			await this.applymRSU(ctx, &"ui/toggle", [ctrl, &"menu"]),
+			if await this.applymRSU(ctx, &"ui/toggle", [ctrl, &"menu"]) != null:
+				this.emitmRSUY(ctx, &"control/block")
+			else:
+				this.emitmRSUY(ctx, &"control/unblock"),
 	}),
 	
 	

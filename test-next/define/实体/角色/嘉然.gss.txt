@@ -45,4 +45,5 @@ define (load ("../pc.gd")
 				#t
 			)
 		}
-	})
+	}
+)
