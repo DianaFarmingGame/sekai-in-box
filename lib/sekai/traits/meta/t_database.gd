@@ -7,7 +7,7 @@ var props := {
 	&"group_info": {},
 	&"watcher": {},
 
-	&"db/set": func(ctx: LisperContext, this: Mono, key: StringName, value, group: StringName = &"default") -> void:
+	&"db/set": func(ctx: LisperContext, this: Mono, key: Variant, value, group: StringName = &"default") -> void:
 		var db = this.getp(&"data") as Dictionary
 		if !db.has(group):
 			db[group] =  {}
@@ -58,7 +58,7 @@ var props := {
 		return null
 		,
 
-	&"db/get": func(ctx: LisperContext, this: Mono, key: StringName, group: StringName = &"default") -> Variant:
+	&"db/get": func(ctx: LisperContext, this: Mono, key: Variant, group: StringName = &"default") -> Variant:
 		var db = this.getp(&"data") as Dictionary
 		if db.has(group) and db[group].has(key):
 			return db[group][key]
