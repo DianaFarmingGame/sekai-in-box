@@ -231,7 +231,7 @@ func _update_draw_caches() -> void:
 	var usize2 := Vector2(unit_size.x, unit_size.y)
 	if target is Mono: cpos = target.position
 	var pos := Vector2(cpos.x, cpos.y - (cpos.z * unit_size.y) / unit_size.z)
-	var offset := -pos + (size * 0.5).floor() / usize2
+	var offset := ((size * 0.5).floor() - pos * usize2).round() / usize2
 	var box := Rect2(-offset, size / usize2).grow(render_extra_sight)
 	_cam_position = pos
 	_item_offset = offset

@@ -12,7 +12,7 @@ define (load ("箱子.gd")
 		}
 		cur_draw &main
 		draw_data {
-			main [&static &main clip_build(0 1)]
+			main [&fixed &main 2 anim_build(0 1 4)]
 		}
 	}
 )

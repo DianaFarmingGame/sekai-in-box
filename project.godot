@@ -41,7 +41,7 @@ window/defaults/default_clear_color=Color(0, 0, 0, 1)
 
 [editor_plugins]
 
-enabled=PackedStringArray("res://addons/debug_menu/plugin.cfg", "res://addons/lisper-debugger/plugin.cfg", "res://addons/sekai/plugin.cfg")
+enabled=PackedStringArray("res://addons/FileSystemView/plugin.cfg", "res://addons/debug_menu/plugin.cfg", "res://addons/lisper-debugger/plugin.cfg", "res://addons/sekai/plugin.cfg")
 
 [filesystem]
 
