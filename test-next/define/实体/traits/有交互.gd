@@ -84,7 +84,7 @@ var props := {
 	#		tar: Mono | null: 行为可能指向的目标对象,
 	#		InputSet,
 	# @return true
-	&"action/call": func (ctx: LisperContext, this: Mono, id: Variant, ctrl: SekaiControl, src: Mono, tar: Variant, sets: InputSet) -> int:
+	&"action/call": func (ctx: LisperContext, this: Mono, id: StringName, ctrl: SekaiControl, src: Mono, tar: Variant, sets: InputSet) -> int:
 		var handle = sekai.db.applymRSUY(ctx, &"db/get", [id, &"actions"])
 		await ctx.call_method(this, handle, [ctrl, src, tar, sets])
 		return true,

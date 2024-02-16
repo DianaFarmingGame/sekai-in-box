@@ -118,11 +118,14 @@ array/for(data func([i record]
 							&完成任务
 								template(do(gikou task/deactivate keyword(:eval @(opt &数据))))
 							&修改变量
-								template(do(gikou db/set :eval keyword(@(@(opt &数据) 0)) eval(do (gikou db/val_replace string->raw(:eval @(@(opt &数据) 1)))) keyword("vals")))
+								template(do(gikou db/set :eval keyword(@(@(opt &数据) 0)) eval(do(gikou db/val_replace string->raw(:eval @(@(opt &数据) 1)))) keyword("vals")))
 							&变量检测
-								template(if(eval(do (gikou db/val_replace string->raw(:eval @(opt &数据))))
-									echo("success")
-									echo("fail")
+								template(if(eval(do(gikou db/val_replace string->raw(:eval @(opt &数据))))
+									if(==(:eval @(@(opt &跳转表) 0) "pass")
+										echo("[lisp] val check" :eval @(opt &数据) "success")
+										do(this action/call :eval @(@(opt &跳转表) 0) ctrl src tar sets)
+									)
+									do(this action/call :eval @(@(opt &跳转表) 1) ctrl src tar sets)
 								))
 							&物品交换
 								template(switch(do(src exchange_item :eval @(@(opt &数据) 0) :eval @(@(opt &数据) 1))
@@ -166,10 +169,10 @@ func jump_t_dailog(table: String) -> Array:
 	return res
 
 func jump_t_non_dailog(table: String) -> Array:
-	var res := table.split("\n")
+	var res := Array(table.split("\n"))
 
 	for i in range(res.size()):
-		res[i] = res[i].strip_edges()
+		res[i] = StringName(res[i].strip_edges())
 
 	return res
 
