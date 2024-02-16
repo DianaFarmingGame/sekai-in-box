@@ -15,7 +15,10 @@ var props := {
 	#	choices?: {text: String, value?: Variant = idx}[],
 	# }
 	&"choose_dialog/put": func (ctx: LisperContext, this: Mono, ctrl: SekaiControl, param: Dictionary) -> Variant:
-		return await this.applymRSU(ctx, &"ui/oneshot", [ctrl, &"choose_dialog", param]),
+		this.emitmRSUY(ctx, &"control/block")
+		var res = await this.applymRSU(ctx, &"ui/oneshot", [ctrl, &"choose_dialog", param])
+		this.emitmRSUY(ctx, &"control/unblock")
+		return res,
 	
 	# 弹出一个选择并等待其结束 (GDScript 用快捷版本)
 	# @params: SekaiControl, {
@@ -28,7 +31,7 @@ var props := {
 			choices.append({&"text": branch[0]})
 		param = param.duplicate()
 		param[&"choices"] = choices
-		var idx := await this.applymRSU(ctx, &"ui/oneshot", [ctrl, &"choose_dialog", param]) as int
+		var idx := await this.applymRSU(ctx, &"choose_dialog/put", [ctrl, param]) as int
 		var branch := branches[idx] as Array
 		if branch.size() > 1:
 			return await ctx.call_fn(branch[1])
@@ -53,7 +56,7 @@ var props := {
 				choices.append({&"text": text})
 				branches.append(branch)
 		param[&"choices"] = choices
-		var idx := await this.applymRSU(ctx, &"ui/oneshot", [ctrl, &"choose_dialog", param]) as int
+		var idx := await this.applymRSU(ctx, &"choose_dialog/put", [ctrl, param]) as int
 		return await ctx.exec(branches[idx])),
 	
 	
