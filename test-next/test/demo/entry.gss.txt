@@ -3,5 +3,5 @@ wait (gikou on_inited []
 	
 	exec (+(*mod-dir* "/scene.gss.txt"))
 
-	exec (+(*mod-dir* "../../../configurator/npc.gsm.gd"))
+	;exec (+(*mod-dir* "../../../configurator/npc.gsm.gd"))
 )

@@ -76,9 +76,38 @@ var props := {
 		sekai.gikou.dels(&"on_data_change_vals", &"0:task_" + this.getp(&"task_data")["id"])
 		,
 
+	&"task/add_container_watch": func(ctx, this: Mono):
+		var mono_id_map = {}
+		for r_ in this.getp(&"task_data")["requirements"]:
+			var mono_id = r_["data"]["mono_id"]
+			if mono_id_map.has(mono_id):
+				continue
+			#TODO switch to global mono get
+			var hako = await sekai.gikou.emitm(ctx, &"get_hako")
+			var mono = await hako.callm(ctx, &"container/get_by_ref_id", mono_id) as Mono
+			mono_id_map[mono_id] = true
+			mono.pushs(&"on_contains_mod", [
+				&"0:task_" + this.getp(&"task_data")["id"], func(ctx, mono: Mono):
+						var require = this.getp(&"task_data")["requirements"] as Array
+						var gikou = sekai.gikou
+						for i in len(require):
+							var r = require[i]
+							if r["type"] == REQUIREMENT_TYPE.BAG_CHECK:
+								r["current"] = mono.callmRSUY(ctx, &"container/count_by_ref_id", r["data"]["key"])
+								check_vals(ctx, this, gikou, r, i)
+
+						check_all_requirements(ctx, this, gikou, require)
+						,
+					],)
+		,
+
+	&"task/remove_container_watch": func(ctx, this: Mono):
+		sekai.gikou.dels(&"on_contains_mod", &"0:task_" + this.getp(&"task_data")["id"])
+		,
+
 	&"task/add_task_watcher": func(ctx, this: Mono):
 		sekai.gikou.pushs(&"on_data_change_vals", [
-			&"1:task" + this.getp(&"task_data")["id"], func(ctx, gikou: Mono, key: StringName, value):
+			&"1:task_" + this.getp(&"task_data")["id"], func(ctx, gikou: Mono, key: StringName, value):
 					if key == this.getp("task_data")["finish"] && value == true:
 						this.emitm(ctx, &"task/complete")
 					,
@@ -86,7 +115,7 @@ var props := {
 		,
 
 	&"task/remove_task_watcher": func(ctx, this: Mono):
-		sekai.gikou.dels(&"on_data_change_vals", &"1:task" + this.getp(&"task_data")["id"])
+		sekai.gikou.dels(&"on_data_change_vals", &"1:task_" + this.getp(&"task_data")["id"])
 		,
 		
 
@@ -128,8 +157,8 @@ enum COMPAIR_TYPE {
 }
 
 func var_compare(a, b, compare: COMPAIR_TYPE) -> bool:
-	if b is bool:
-		a = false if a == 0 else true
+	if a is bool:
+		b = false if b == 0 else true
 		
 	if compare == COMPAIR_TYPE.EQUAL:
 		return a == b
@@ -147,10 +176,10 @@ func var_compare(a, b, compare: COMPAIR_TYPE) -> bool:
 		return false
 
 func finish_requirement_db(ctx: LisperContext, id: StringName, name: String, gikou: Mono):
-	gikou.applym(ctx, "db/set", [&"is_ok_task_" + id + "_" + name, true, &"vals"])
+	gikou.applym(ctx, "db/set", ["is_ok_task_" + id + "_" + name, true, &"vals"])
 
 func unfinish_requirement_db(ctx: LisperContext, id: StringName, name: String, gikou: Mono):
-	gikou.applym(ctx, "db/set", [&"is_ok_task_" + id + "_" + name, false, &"vals"])
+	gikou.applym(ctx, "db/set", ["is_ok_task_" + id + "_" + name, false, &"vals"])
 
 func watch_init(ctx: LisperContext, this: Mono, status: TASK_STATUS):
 	if status == TASK_STATUS.START:
@@ -176,6 +205,8 @@ func watch_init(ctx: LisperContext, this: Mono, status: TASK_STATUS):
 
 		if flags[REQUIREMENT_TYPE.WATCH_VAR]:
 			this.emitm(ctx, &"task/add_watch_vals")
+		if flags[REQUIREMENT_TYPE.BAG_CHECK]:
+			this.emitm(ctx, &"task/add_container_watch")
 	else:
 		this.setp(&"processing", false)
 		this.emitm(ctx, &"task/remove_watch_vals")
@@ -183,7 +214,7 @@ func watch_init(ctx: LisperContext, this: Mono, status: TASK_STATUS):
 
 
 func check_vals(ctx, this: Mono, gikou: Mono, r, idx):
-	var res := var_compare(r["data"]["value"], r["current"], r["data"]["compare"])
+	var res := var_compare(r["current"], r["data"]["value"], r["data"]["compare"])
 	if res:
 		r["complete"] = true
 		print("task " + this.getp(&"task_data")["id"] + " requirement ", idx , " complete")
@@ -205,16 +236,20 @@ func check_all_requirements(ctx, this: Mono, gikou: Mono, require):
 
 func data_init(ctx: LisperContext, this: Mono):
 	var require = this.getp(&"task_data")["requirements"] as Array
+	await sekai.gikou.applym(ctx, "db/set", [&"is_ok_task_" + this.getp(&"task_data")["id"] + "_all", false, &"vals"])
 	for i in len(require):
 		var r = require[i]
 		r["complete"] = false
+
+		await sekai.gikou.applym(ctx, "db/set", [&"is_ok_task_" + this.getp(&"task_data")["id"] + "_" + str(i), false, &"vals"])
+
 		if r["type"] == REQUIREMENT_TYPE.WATCH_VAR:
-			r["current"] = await sekai.gikou.applym(ctx, "db/get", [r["data"]["key"], &"vals"])
-			await sekai.gikou.applym(ctx, "db/set", [&"is_ok_task_" + this.getp(&"task_data")["id"] + "_" + str(i), false, &"vals"])
-			check_vals(ctx, this, sekai.gikou, r, i)
+			r["current"] = sekai.gikou.applymRSUY(ctx, "db/get", [r["data"]["key"], &"vals"])
 		elif r["type"] == REQUIREMENT_TYPE.BAG_CHECK:
-			pass
+			r["current"] = sekai.gikou.callmRSUY(ctx, &"container/count_by_ref_id", r["data"]["key"])
 		elif r["type"] == REQUIREMENT_TYPE.DISTANCE_CHECK:
 			pass
 
+		check_vals(ctx, this, sekai.gikou, r, i)
+			
 	check_all_requirements(ctx, this, sekai.gikou, require)

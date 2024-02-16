@@ -60,7 +60,15 @@ func produce(o: Dictionary):
 		res_map["requirements"] = []
 
 	var required := {}
-	var data = o["require_data"].split(" ", false)
+
+	var data
+
+	if o["require_type"] == "背包检测":
+		var datas = o["require_data"].split(":", false)
+		required["mono_id"] = StringName(datas[0])
+		data = datas[1].split(" ", false)
+	else:
+		data = o["require_data"].split(" ", false)
 	
 	required["key"] = data[0]
 	required["value"] = float(data[2])
