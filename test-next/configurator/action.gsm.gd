@@ -103,8 +103,8 @@ array/for(data func([i record]
 										:expand :raw 
 										array/flat(array/map(@(opt &跳转表) func([item]
 											[
-												raw<-(@(item 2))
-												raw<-(@(item 0)) 
+												template(eval(do(gikou db/val_replace string->raw(:eval @(item 2)))))
+												raw<-(@(item 0))
 												template(do(this action/call :eval @(item 1) ctrl src tar sets))
 											]
 										)))

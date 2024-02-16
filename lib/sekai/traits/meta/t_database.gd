@@ -35,7 +35,7 @@ var props := {
 		this.setp(&"on_data_change_" + group, Prop.Stack())
 		,
 		
-	&"db/setp": func(ctx: LisperContext, this: Mono, key: StringName, props_: StringName, value, group: StringName = &"default"):
+	&"db/setp": func(ctx: LisperContext, this: Mono, key: Variant, props_: StringName, value, group: StringName = &"default"):
 		var db = this.getp(&"data") as Dictionary
 		if db.has(group) and db[group].has(key):
 			var data = db[group][key]
@@ -67,7 +67,7 @@ var props := {
 		return null
 		,
 
-	&"db/getp": func(ctx: LisperContext, this: Mono, key: StringName, props_: StringName, group: StringName = &"default") -> Variant:
+	&"db/getp": func(ctx: LisperContext, this: Mono, key: Variant, props_: StringName, group: StringName = &"default") -> Variant:
 		var db = this.getp(&"data") as Dictionary
 		if db.has(group) and db[group].has(key):
 			var data = db[group][key]
@@ -85,7 +85,7 @@ var props := {
 		return null
 		,
 
-	&"db/del": func(ctx: LisperContext, this: Mono, key: StringName, group: StringName = &"default"):
+	&"db/del": func(ctx: LisperContext, this: Mono, key: Variant, group: StringName = &"default"):
 		var db = this.getp(&"data") as Dictionary
 		if db.has(group) and db[group].has(key):
 			db[group].erase(key)
@@ -93,7 +93,7 @@ var props := {
 			push_warning("[db/del] ", group, ": ", key, " not exist")
 		,
 
-	&"db/clean": func(ctx: LisperContext, this: Mono, key: StringName, group: StringName = &"default"):
+	&"db/clean": func(ctx: LisperContext, this: Mono, key: Variant, group: StringName = &"default"):
 		var db = this.getp(&"data") as Dictionary
 		if db.has(group) and db[group].has(key):
 			db[group][key] = {}
@@ -102,7 +102,7 @@ var props := {
 			push_warning("[db/clean] ", group, ": ", key, " not exist")
 		,
 
-	&"db/has": func(ctx: LisperContext, this: Mono, key: StringName, group: StringName = &"default") -> bool:
+	&"db/has": func(ctx: LisperContext, this: Mono, key: Variant, group: StringName = &"default") -> bool:
 		var db = this.getp(&"data") as Dictionary
 		return db.has(group) and db[group].has(key)
 		,
@@ -123,7 +123,8 @@ var props := {
 		,
 
 	&"db/val_replace": func(ctx: LisperContext, this: Mono, data: Variant) -> Variant:
-		return await db_val_replace(ctx, this, data)
+		var data_c = data.duplicate(true)
+		return await db_val_replace(ctx, this, data_c)
 		,
 	
 	&"on_ready": Prop.puts({
@@ -154,9 +155,10 @@ func db_val_replace(ctx: LisperContext, this: Mono, data: Variant) -> Variant:
 			return res
 		var key = entry[1]
 		var value = await this.applym(ctx, &"db/get", [key, &"vals"])
-		assert(value != null, "data not found: " + key)
+		if value == null:
+			push_error("[db_val_replace] ", "data not found: ", key)
 		
-		if value is float:
+		if value is float or value is int:
 			res = Lisper.Number(value)
 		elif value is bool:
 			res = Lisper.Bool(value)
