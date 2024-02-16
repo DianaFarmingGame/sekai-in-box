@@ -104,7 +104,7 @@ array/for(data func([i record]
 											[
 												raw<-(@(item 2))
 												raw<-(@(item 0)) 
-												template(do(db db/get :eval @(item 1) keyword("actions")))
+												template(do(this action/call :eval @(item 1) ctrl src tar sets))
 											]
 										)))
 									))
