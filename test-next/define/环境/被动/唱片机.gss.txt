@@ -1,0 +1,18 @@
+define (load ("箱子.gd")
+	ref 2307
+	id &环境/被动/唱片机
+	props {
+		name "唱片机"
+		need_route #f
+		can_route #f
+		collision_boxes [rect2(-0.3 0 0.6 0.5)]
+		pick_box rect2(-0.3 -0.5 0.6 1.0)
+		asserts {
+			main load ("互动家具.png")
+		}
+		draw_data {
+			opened [&static &main clip_build(3 2)]
+			closed [&static &main clip_build(2 2)]
+		}
+	}
+)
