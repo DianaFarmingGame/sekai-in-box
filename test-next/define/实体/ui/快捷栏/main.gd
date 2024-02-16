@@ -31,7 +31,10 @@ func _update_slots(ctx: LisperContext, this: Mono) -> void:
 		child.queue_free()
 	var cur := this.getp(&"cur_slot") as int
 	var slots := this.emitmRSUY(ctx, &"slot/get_all") as Array
-	$Select.position = Vector2(-4 + cur * 32,0)
+	$Select.position = SlotList.position + Vector2(64 * cur -5,2)
+	$Select.this = this
+	$Select.context = context
+	$Select.slot = cur
 	for i in range(0, slots.size()):
 		var rcur := wrapi(i, 0, slots.size())
 		var mono = slots[rcur]
@@ -46,3 +49,7 @@ func _update_slots(ctx: LisperContext, this: Mono) -> void:
 			node.texture = texture
 		node.can_modify = can_modify
 		SlotList.add_child(node)
+
+func _on_slot_list_resized():
+	if(SlotList != null):
+		$Select.position = SlotList.position + Vector2(64 * $Select.slot -5,2)

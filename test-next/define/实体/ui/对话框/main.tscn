@@ -1,8 +1,9 @@
-[gd_scene load_steps=7 format=3 uid="uid://cnd3qsrwxse70"]
+[gd_scene load_steps=8 format=3 uid="uid://cnd3qsrwxse70"]
 
 [ext_resource type="Script" path="res://test-next/define/实体/ui/对话框/main.gd" id="1_fu2rf"]
 [ext_resource type="Texture2D" uid="uid://b2omjxtpcbpqc" path="res://test-next/define/实体/ui/对话框/对话框.png" id="2_b8dov"]
 [ext_resource type="Texture2D" uid="uid://dgo17b2op7ffh" path="res://test-next/define/实体/ui/对话框/下一页标.png" id="3_tqh5y"]
+[ext_resource type="Texture2D" uid="uid://dy1wshsfr4i3u" path="res://test-next/define/实体/角色/立绘.png" id="4_eyi3q"]
 
 [sub_resource type="Animation" id="Animation_qns6n"]
 length = 0.4
@@ -10,50 +11,14 @@ loop_mode = 1
 tracks/0/type = "value"
 tracks/0/imported = false
 tracks/0/enabled = true
-tracks/0/path = NodePath(".:anchor_left")
+tracks/0/path = NodePath(".:position")
 tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/keys = {
-"times": PackedFloat32Array(0),
-"transitions": PackedFloat32Array(1),
+"times": PackedFloat32Array(0, 0.2),
+"transitions": PackedFloat32Array(1, 1),
 "update": 0,
-"values": [0.94403]
-}
-tracks/1/type = "value"
-tracks/1/imported = false
-tracks/1/enabled = true
-tracks/1/path = NodePath(".:anchor_top")
-tracks/1/interp = 1
-tracks/1/loop_wrap = true
-tracks/1/keys = {
-"times": PackedFloat32Array(0),
-"transitions": PackedFloat32Array(1),
-"update": 0,
-"values": [0.738318]
-}
-tracks/2/type = "value"
-tracks/2/imported = false
-tracks/2/enabled = true
-tracks/2/path = NodePath(".:anchor_right")
-tracks/2/interp = 1
-tracks/2/loop_wrap = true
-tracks/2/keys = {
-"times": PackedFloat32Array(0),
-"transitions": PackedFloat32Array(1),
-"update": 0,
-"values": [0.964552]
-}
-tracks/3/type = "value"
-tracks/3/imported = false
-tracks/3/enabled = true
-tracks/3/path = NodePath(".:anchor_bottom")
-tracks/3/interp = 1
-tracks/3/loop_wrap = true
-tracks/3/keys = {
-"times": PackedFloat32Array(0),
-"transitions": PackedFloat32Array(1),
-"update": 0,
-"values": [0.82243]
+"values": [Vector2(-10, -23), Vector2(-10, -30)]
 }
 
 [sub_resource type="Animation" id="Animation_mdn2x"]
@@ -118,86 +83,84 @@ _data = {
 [node name="dialog" type="Control"]
 z_index = 5
 layout_mode = 3
-anchor_left = 0.0347222
-anchor_top = 0.778125
-anchor_right = 0.965278
-anchor_bottom = 0.945312
-offset_top = -1.52588e-05
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -194.0
+offset_bottom = -49.0
 grow_horizontal = 2
-grow_vertical = 2
+grow_vertical = 0
 script = ExtResource("1_fu2rf")
-metadata/_edit_use_anchors_ = true
 
-[node name="TextureRect" type="TextureRect" parent="."]
+[node name="MarginContainer" type="CenterContainer" parent="."]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+
+[node name="TextureRect" type="TextureRect" parent="MarginContainer"]
+custom_minimum_size = Vector2(576, 145)
+layout_mode = 2
 texture = ExtResource("2_b8dov")
 expand_mode = 2
-stretch_mode = 4
+stretch_mode = 5
 
-[node name="TextureRect2" type="TextureRect" parent="TextureRect"]
-layout_mode = 1
-anchors_preset = -1
-anchor_left = 0.94403
-anchor_top = 0.738318
-anchor_right = 0.964552
-anchor_bottom = 0.82243
-offset_right = 1.52588e-05
-grow_horizontal = 0
-grow_vertical = 0
+[node name="TextureRect2" type="TextureRect" parent="MarginContainer/TextureRect"]
+layout_mode = 0
+offset_left = -10.0
+offset_top = -23.0
+offset_right = -1.0
+offset_bottom = -15.0
 texture = ExtResource("3_tqh5y")
-metadata/_edit_use_anchors_ = true
 
-[node name="AnimationPlayer" type="AnimationPlayer" parent="TextureRect/TextureRect2"]
+[node name="AnimationPlayer" type="AnimationPlayer" parent="MarginContainer/TextureRect/TextureRect2"]
 libraries = {
 "": SubResource("AnimationLibrary_upscb")
 }
 autoplay = "new_animation"
 
-[node name="Name" type="RichTextLabel" parent="TextureRect"]
-unique_name_in_owner = true
-layout_mode = 1
-anchors_preset = -1
-anchor_left = 0.253731
-anchor_top = 0.11215
-anchor_right = 0.44403
-anchor_bottom = 0.336449
-bbcode_enabled = true
-text = "[color=pink]嘉然[/color]"
-metadata/_edit_use_anchors_ = true
-
-[node name="Avatar" type="TextureRect" parent="TextureRect"]
-unique_name_in_owner = true
-layout_mode = 1
-anchors_preset = -1
-anchor_left = 0.0149253
-anchor_top = -0.130841
-anchor_right = 0.194663
-anchor_bottom = 0.906542
-offset_left = 1.91554e-05
-offset_right = -1.69277e-05
-grow_horizontal = 2
-grow_vertical = 2
-expand_mode = 3
-stretch_mode = 4
-metadata/_edit_use_anchors_ = true
-
-[node name="Dialog" type="RichTextLabel" parent="TextureRect"]
+[node name="Name" type="RichTextLabel" parent="MarginContainer/TextureRect"]
 unique_name_in_owner = true
 layout_mode = 0
+offset_left = 141.0
+offset_top = 26.0
+offset_right = 230.0
+offset_bottom = 50.0
+bbcode_enabled = true
+text = "[color=pink]嘉然[/color]"
+
+[node name="Avatar" type="TextureRect" parent="MarginContainer/TextureRect"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 3.0
+offset_top = 3.0
+offset_right = 117.0
+offset_bottom = 117.0
+texture = ExtResource("4_eyi3q")
+expand_mode = 2
+stretch_mode = 5
+
+[node name="Dialog" type="RichTextLabel" parent="MarginContainer/TextureRect"]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = -1
 anchor_left = 0.244403
 anchor_top = 0.308412
 anchor_right = 0.934701
 anchor_bottom = 0.80374
+offset_left = 6.22387
+offset_top = 6.28026
+offset_right = -0.387791
+offset_bottom = -7.5423
 theme_override_colors/default_color = Color(0.454902, 0.239216, 0, 1)
 bbcode_enabled = true
 text = "天王盖地虎，[color=green]嘉然[/color]一米五
 天王盖地虎，嘉然一米五"
 scroll_following = true
-metadata/_edit_use_anchors_ = true
 
-[connection signal="gui_input" from="TextureRect" to="." method="_on_texture_rect_gui_input"]
+[connection signal="gui_input" from="." to="." method="_on_gui_input"]
+[connection signal="gui_input" from="MarginContainer/TextureRect/Name" to="." method="_on_name_gui_input"]
+[connection signal="gui_input" from="MarginContainer/TextureRect/Dialog" to="." method="_on_dialog_gui_input"]
