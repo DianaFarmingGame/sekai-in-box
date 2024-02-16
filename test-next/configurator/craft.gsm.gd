@@ -63,15 +63,14 @@ func need_t(need: String) -> Dictionary:
 		if item == "":
 			continue
 		var item_info := item.split(":")
-		craft_map["id"] = StringName(item_info[0])
-		craft_map["num"] = item_info[1]
+		craft_map[StringName(item_info[0])] = item_info[1]
 	return craft_map
 
 func craft_t(craft: String) -> Dictionary:
 	var item_info := craft.split(":")
-	return {"id": StringName(item_info[0]), "num": item_info[1]}
+	return {StringName(item_info[0]): item_info[1]}
 
 func fuel_t(fuel: String) -> Dictionary:
 	var item_info := fuel.split(":")
-	return {"id": StringName(item_info[0]), "num": item_info[1]}
+	return {StringName(item_info[0]): item_info[1]}
 

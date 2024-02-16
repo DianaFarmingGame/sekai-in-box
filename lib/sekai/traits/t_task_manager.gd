@@ -30,7 +30,11 @@ var props := {
 		,
 	
 	&"taskm/update": func(ctx, this: Mono):
-		var task_defines = await sekai.db.callm(sekai.context, &"db/getg", &"task") as Dictionary
+		var task_defines = await sekai.db.callm(sekai.context, &"db/getg", &"task")
+		
+		if task_defines == null:
+			return
+			
 		for i in task_defines:
 			if not await this.callm(ctx, &"kv/has", task_defines[i]["id"]):
 				var mono = sekai.make_mono(4, {"task_data": task_defines[i]})

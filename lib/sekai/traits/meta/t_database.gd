@@ -12,6 +12,10 @@ var props := {
 		if !db.has(group):
 			db[group] =  {}
 			print("[db/set] ", "create database group: ", group)
+		
+		if db[group].has(key) and db[group][key] == value:
+			return
+		
 		db[group][key] = value
 
 		if this.getp("watcher").has(group):
