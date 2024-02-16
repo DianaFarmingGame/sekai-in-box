@@ -345,8 +345,7 @@ defunc (== :const :gd :pure ', func (a, b): return a == b ,')
 defunc (!= :const :gd :pure ', func (a, b): return a != b ,')
 defunc (not :const :gd :pure ', func (v): return not v ,')
 
-defunc (@ :const :gd :pure ', func (src, ref): 
-	return src[ref] ,')
+defunc (@ :const :gd :pure ', func (src, ref): return src[ref] ,')
 defunc (@= :const :gd :pure ', func (src, ref, value): src[ref] = value ,')
 
 defunc (and :const :gd :raw ',
