@@ -1,6 +1,6 @@
 func gsm(): return ['
 
-var(item_judge_t ', item_judge_t,')
+var(judge_bag_data_t ', judge_bag_data_t,')
 var(jump_t_dailog ', jump_t_dailog,')
 var(jump_t_non_dailog ', jump_t_non_dailog,')
 var(change_desc_data_t ', change_desc_data_t,')
@@ -55,6 +55,7 @@ defvar(data csv/map-let(+(*config_base* "action.csv")
 			"修改任务描述" change_desc_data_t(数据)
 			"修改变量" change_data_data_t(数据)
 			"物品交换" exchange_item_data_t(数据)
+			"背包检测" judge_bag_data_t(数据)
 			#t 数据)
 		跳转表 switch(类型
 			"选择" jump_t_dailog(跳转表)
@@ -109,20 +110,26 @@ array/for(data func([i record]
 										)))
 									))
 							&背包检测
-								template(if(do(src check_bag_item :eval item_judge_t(@(opt &数据)))
-									do(this dialog_to src :eval @(@(opt &跳转表) 0))
-									do(this dialog_to src :eval @(@(opt &跳转表) 1))
+								template(if(>=(do(src container/count_by_ref_id :eval @(@(opt &数据) 0)) :eval @(@(opt &数据) 1))
+									if(==(:eval @(@(opt &跳转表) 0) "pass")
+										echo("[lisp] bag check" :eval @(@(opt &数据) 0) ":" :eval @(@(opt &数据) 1) "success")
+										do(this action/call :eval @(@(opt &跳转表) 0) ctrl src tar sets)
+									)
+									do(this action/call :eval @(@(opt &跳转表) 1) ctrl src tar sets)
 								))
 							&开启任务
 								template(do(gikou taskm/activate keyword(:eval @(opt &数据))))
 							&完成任务
 								template(do(gikou task/deactivate keyword(:eval @(opt &数据))))
 							&修改变量
-								template(do(gikou db/set :eval keyword(@(@(opt &数据) 0)) eval(do (gikou db/val_replace string->raw(:eval @(@(opt &数据) 1)))) keyword("vals")))
+								template(do(gikou db/set :eval keyword(@(@(opt &数据) 0)) eval(do(gikou db/val_replace string->raw(:eval @(@(opt &数据) 1)))) keyword("vals")))
 							&变量检测
-								template(if(eval(do (gikou db/val_replace string->raw(:eval @(opt &数据))))
-									echo("success")
-									echo("fail")
+								template(if(eval(do(gikou db/val_replace string->raw(:eval @(opt &数据))))
+									if(==(:eval @(@(opt &跳转表) 0) "pass")
+										echo("[lisp] val check" :eval @(opt &数据) "success")
+										do(this action/call :eval @(@(opt &跳转表) 0) ctrl src tar sets)
+									)
+									do(this action/call :eval @(@(opt &跳转表) 1) ctrl src tar sets)
 								))
 							&物品交换
 								template(switch(do(src exchange_item :eval @(@(opt &数据) 0) :eval @(@(opt &数据) 1))
@@ -144,14 +151,10 @@ array/for(data func([i record]
 ']
 
 
-func item_judge_t(items: String):
-	var item_dic = {}
-	var item_ary = items.split(" ", false)
-	
-	for item in item_ary:
-		item_dic[item.split(":")[0]] = int(item.split(":")[1])
-	
-	return item_dic
+func judge_bag_data_t(item: String):
+	var res = Array(item.split(":"))
+	res[1] = int(res[1])
+	return res
 
 func jump_t_dailog(table: String) -> Array:
 	var table_ary = table.split("\n", false)
@@ -166,10 +169,10 @@ func jump_t_dailog(table: String) -> Array:
 	return res
 
 func jump_t_non_dailog(table: String) -> Array:
-	var res := table.split("\n")
+	var res := Array(table.split("\n"))
 
 	for i in range(res.size()):
-		res[i] = res[i].strip_edges()
+		res[i] = StringName(res[i].strip_edges())
 
 	return res
 

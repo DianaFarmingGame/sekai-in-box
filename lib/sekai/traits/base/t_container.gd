@@ -55,7 +55,7 @@ var props := {
 		var count := 0
 		for mono in contains:
 			if mono.define.ref == ref:
-				count += mono.getp(&"stack/count") if mono.getp(&"can_stack") else 1
+				count += mono.getp(&"stack_count") if mono.getp(&"can_stack") else 1
 		return count,
 	&"container/get_by_ref_id": func (ctx: LisperContext, this: Mono, ref_id: Variant) -> Variant:
 		var ref = sekai.get_define(ref_id).ref
