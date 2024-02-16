@@ -5,6 +5,13 @@ defunc (array/size :const :gd :pure ',
 		return ary.size()
 ,')
 
+defunc (array/reverse :const :gd :pure ',
+	func (ary: Array) -> Array:
+		var res := ary.duplicate()
+		res.reverse()
+		return res
+,')
+
 defunc (array/concat :const :gd :apply :pure ',
 	func (_ctx, args: Array) -> Array:
 		var res := []

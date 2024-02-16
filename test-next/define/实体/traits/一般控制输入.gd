@@ -26,14 +26,7 @@ var props := {
 	# @params: SekaiControl
 	&"on_inventory_toggle": Prop.Stack({
 		&"0:一般控制": func (ctx: LisperContext, this: Mono, ctrl: SekaiControl) -> void:
-			if await this.applymRSU(ctx, &"ui/toggle", [ctrl, &"inventory"]) != null:
-				this.emitmRSUY(ctx, &"control/block")
-			else:
-				this.emitmRSUY(ctx, &"control/unblock")
-			var node = this.applymRSUY(ctx, &"ui/get", [ctrl, &"slots"])
-			if node != null:
-				node.can_modify = this.applymRSUY(ctx, &"ui/get", [ctrl, &"inventory"]) != null
-			pass,
+			await this.callmRSU(ctx, &"inventory/toggle", ctrl),
 	}),
 	
 	
