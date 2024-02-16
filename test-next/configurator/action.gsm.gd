@@ -150,7 +150,7 @@ array/for(data func([i record]
 										)
 								))
 							&行为覆盖
-								template(do(this change_interact :eval @(opt &数据)))
+								template(do(this action/set keyword("primary") :eval @(opt &数据)))
 							&end
 								template(clean_talking_pool(ctrl gikou))
 							#t
