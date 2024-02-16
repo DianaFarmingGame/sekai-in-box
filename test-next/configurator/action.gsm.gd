@@ -133,8 +133,21 @@ array/for(data func([i record]
 								))
 							&物品交换
 								template(switch(do(src exchange_item :eval @(@(opt &数据) 0) :eval @(@(opt &数据) 1))
-									1 echo("fail send")
-									2 echo("fail receive")
+									&0
+										if (==(:eval @(@(opt &跳转表) 0) "pass")
+											echo("[lisp] exchange item +: " :eval @(@(opt &数据) 0) "-:" :eval @(@(opt &数据) 1) "success")
+											do(this action/call :eval @(@(opt &跳转表) 0) ctrl src tar sets)
+										)
+									&1
+										if (==(:eval @(@(opt &跳转表) 1) "pass")
+											echo("[lisp] exchange item +: " :eval @(@(opt &数据) 0) "-:" :eval @(@(opt &数据) 1) "send fail")
+											do(this action/call :eval @(@(opt &跳转表) 1) ctrl src tar sets)
+										)
+									&2
+										if (==(:eval @(@(opt &跳转表) 2) "pass")
+											echo("[lisp] exchange item +: " :eval @(@(opt &数据) 0) "-:" :eval @(@(opt &数据) 1) "receive fail")
+											do(this action/call :eval @(@(opt &跳转表) 2) ctrl src tar sets)
+										)
 								))
 							&行为覆盖
 								template(do(this change_interact :eval @(opt &数据)))
