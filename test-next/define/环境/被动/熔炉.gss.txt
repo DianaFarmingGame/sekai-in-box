@@ -1,0 +1,18 @@
+define (load ("箱子.gd")
+	ref 2305
+	id &环境/被动/熔炉
+	props {
+		name "熔炉"
+		need_route #f
+		can_route #f
+		collision_boxes [rect2(-0.3 0 0.6 0.5)]
+		pick_box rect2(-0.3 -0.4 0.6 0.9)
+		asserts {
+			main load ("互动家具.png")
+		}
+		draw_data {
+			opened [&static &main clip_build(3 0)]
+			closed [&static &main clip_build(2 0)]
+		}
+	}
+)

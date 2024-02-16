@@ -1,0 +1,18 @@
+define (load ("箱子.gd")
+	ref 2304
+	id &环境/被动/烹饪台
+	props {
+		name "烹饪台"
+		need_route #f
+		can_route #f
+		collision_boxes [rect2(-0.3 0 0.6 0.5)]
+		pick_box rect2(-0.3 -0.5 0.6 1.0)
+		asserts {
+			main load ("互动家具.png")
+		}
+		draw_data {
+			opened [&static &main clip_build(1 0)]
+			closed [&static &main clip_build(0 0)]
+		}
+	}
+)
