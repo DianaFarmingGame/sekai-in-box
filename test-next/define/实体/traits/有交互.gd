@@ -30,7 +30,17 @@ var props := {
 	#		src: Mono: 发起行为的原始对象,
 	#		tar: Mono | null: 行为可能指向的目标对象,
 	#		InputSet
-	&"on_action": {},
+	&"on_action": {
+		&"0:set_db_val": func (ctx: LisperContext, this: Mono, type: StringName, ctrl: SekaiControl, src: Mono, tar: Variant, sets: InputSet) -> void:
+			var name = this.getpBD(&"id", "")
+			var key = StringName(name + "_is_" + type)
+			var count = sekai.gikou.applymRSUY(ctx, &"db/get", [key, &"vals"])
+			if count == null:
+				push_error("[有交互] ", key ,"not exists")
+			count += 1
+			sekai.gikou.applymRSUY(ctx, &"db/set", [key, count, &"vals"])
+			,
+	},
 	
 	
 	
@@ -92,4 +102,13 @@ var props := {
 	
 	
 	#--------------------------------------------------------------------------#
+
+	&"on_ready": Prop.puts({
+		&"-99:set_db_val": func (ctx: LisperContext, this: Mono) -> void:
+			var action_data = this.getpBD(&"action_data", {})
+			for key in action_data:
+				if not sekai.gikou.callmRSUY(ctx, &"db/has", [key, &"vals"]):
+					sekai.gikou.applymRSUY(ctx, &"db/set", [key, 0, &"vals"])
+			,
+	},)
 }
