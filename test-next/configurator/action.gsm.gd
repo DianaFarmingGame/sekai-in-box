@@ -46,6 +46,11 @@ var(clean_talking_pool :const ', func(ctrl: SekaiControl, gikou: Mono):
 	await gikou.callm(ctx, &"db/clean", &"talking_pool")
 ,')
 
+var(random_choose :const ', func(ary: Array) -> Variant:
+	var idx = randi() % ary.size()
+	return ary[idx]
+,')
+
 defvar(data csv/map-let(+(*config_base* "action.csv")
 	[ID 类型 发起者 数据 跳转表] {
 		ID ID
@@ -62,6 +67,7 @@ defvar(data csv/map-let(+(*config_base* "action.csv")
 			"背包检测" jump_t_non_dailog(跳转表)
 			"变量检测" jump_t_non_dailog(跳转表)
 			"物品交换" jump_t_non_dailog(跳转表)
+			"随机多选一" jump_t_non_dailog(跳转表)
 			#t "")
 	}))
 
@@ -151,6 +157,8 @@ array/for(data func([i record]
 								))
 							&行为覆盖
 								template(do(this action/set keyword("primary") :eval @(opt &数据)))
+							&随机多选一
+								template(do(this action/call random_choose(:eval @(opt &跳转表)) ctrl src tar sets))
 							&end
 								template(clean_talking_pool(ctrl gikou))
 							#t
