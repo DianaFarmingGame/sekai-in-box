@@ -12,6 +12,7 @@ sekai/exec ("../../configurator/action.gsm.gd")
 sekai/exec ("../../configurator/npc_define.gsm.gd")
 sekai/exec ("../../configurator/task.gsm.gd")
 sekai/exec ("../../configurator/craft.gsm.gd")
+sekai/exec ("../../configurator/item.gsm.gd")
 
 init()
 
