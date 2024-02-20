@@ -51,6 +51,21 @@ var(random_choose :const ', func(ary: Array) -> Variant:
 	return ary[idx]
 ,')
 
+var(get_mono :const ', func(ctrl: SekaiControl, gikou: Mono, mono_id: Variant) -> Mono:
+	var ctx := ctrl.context
+
+	if mono_id is Mono:
+		return mono_id
+		
+	if await gikou.callmRSU(ctx, &"db/has", mono_id):
+		return await gikou.applymRSU(ctx, &"db/getp", mono_id)
+
+	var hako := ctrl.hako
+	var mono = await hako.callmRSU(ctx, &"container/get_by_ref_id", mono_id)
+
+	return mono
+,')
+
 defvar(data csv/map-let(+(*config_base* "action.csv")
 	[ID 类型 发起者 数据 跳转表] {
 		ID ID
@@ -159,6 +174,13 @@ array/for(data func([i record]
 								template(do(this action/set keyword("primary") :eval @(opt &数据)))
 							&随机多选一
 								template(do(this action/call random_choose(:eval @(opt &跳转表)) ctrl src tar sets))
+							&走向
+								template(block(
+									var (starter add_to_talking_pool(ctrl gikou :eval @(opt &发起者)))
+									var (end add_to_talking_pool(ctrl gikou :eval @(opt &数据)))
+									go
+										(do(starter move/to end))
+								))
 							&end
 								template(clean_talking_pool(ctrl gikou))
 							#t

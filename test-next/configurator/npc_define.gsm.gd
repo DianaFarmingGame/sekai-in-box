@@ -10,9 +10,9 @@ csv/map-let(+(*config_base* "npc.csv")
 			solid_box rect2(-0.3 -0.1 0.6 0.2)
 			name 名称
 			asserts {
-				idle 	load(+("asserts/" 图片/站立))
-				walk 	load(+("asserts/" 图片/移动))
-				avatar 	load (+("asserts/" 图片/头像))
+				idle 	load(#("asserts/" + 图片/站立 + ".png"))
+				walk 	load(#("asserts/" + 图片/移动 + ".png"))
+				avatar 	load(#("asserts/" + 图片/头像 + ".png"))
 			}
 
 			draw_data {

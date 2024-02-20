@@ -10,7 +10,7 @@ var(*config_base* +(*mod-dir* "/csvs/"))
 
 sekai/exec ("../../configurator/action.gsm.gd")
 sekai/exec ("../../configurator/npc_define.gsm.gd")
-sekai/exec ("../../configurator/task.gsm.gd")
+;sekai/exec ("../../configurator/task.gsm.gd")
 sekai/exec ("../../configurator/craft.gsm.gd")
 
 init()
