@@ -26,7 +26,7 @@ func gsm():
 				&trade_stability	num (保值度)
 	
 				asserts {
-					icon load(+("asserts/" 图片/图标))
+					icon load(#("asserts/" + 图片/图标 + ".png"))
 				}
 
 				icon [&icon rect2(0 0 32 32)]
