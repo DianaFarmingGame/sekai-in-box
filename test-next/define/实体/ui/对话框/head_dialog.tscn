@@ -1,0 +1,10 @@
+[gd_scene load_steps=2 format=3 uid="uid://cmaptdf7aeu06"]
+
+[ext_resource type="Texture2D" uid="uid://8cm1psypau8i" path="res://test-next/define/实体/ui/对话框/头顶对话框.png" id="1_b5yuh"]
+
+[node name="HeadDialog" type="TextureRect"]
+offset_left = -47.0
+offset_top = -61.0
+offset_right = 40.0
+offset_bottom = -1.0
+texture = ExtResource("1_b5yuh")

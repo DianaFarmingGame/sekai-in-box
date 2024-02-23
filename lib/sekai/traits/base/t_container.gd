@@ -77,7 +77,7 @@ var props := {
 		for mono in contains:
 			if try_count <= 0: break
 			if mono.define.ref == ref:
-				try_count -= mono.getp(&"stack/count") if mono.getp(&"can_stack") else 1
+				try_count -= mono.getp(&"stack_count") if mono.getp(&"can_stack") else 1
 		if try_count <= 0:
 			var picks := []
 			var removes := []
@@ -88,7 +88,7 @@ var props := {
 				if mono.define.ref == ref:
 					if mono.getp(&"can_stack"):
 						item = await mono.callm(ctx, &"stack/try_pick", count)
-						if item != null: count -= item.getp(&"stack/count")
+						if item != null: count -= item.getp(&"stack_count")
 					else:
 						item = mono
 						count -= 1

@@ -1,0 +1,41 @@
+[gd_scene load_steps=4 format=3 uid="uid://u8q3gd02xb8e"]
+
+[ext_resource type="Texture2D" uid="uid://lv1g8ibxwyki" path="res://test-next/define/实体/ui/合成台/合成台框.png" id="1_xh4d5"]
+[ext_resource type="Texture2D" uid="uid://df7xxr7cfcmjh" path="res://test-next/define/物品/卷轴.png" id="2_2rrti"]
+[ext_resource type="Script" path="res://test-next/define/实体/ui/合成台/slot.gd" id="2_qurvq"]
+
+[node name="Slot" type="TextureRect"]
+custom_minimum_size = Vector2(47, 47)
+anchors_preset = -1
+anchor_right = 0.0555556
+anchor_bottom = 0.05
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("1_xh4d5")
+script = ExtResource("2_qurvq")
+metadata/_edit_use_anchors_ = true
+
+[node name="TextureRect" type="TextureRect" parent="."]
+layout_mode = 1
+anchors_preset = -1
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("2_2rrti")
+metadata/_edit_use_anchors_ = true
+
+[node name="Label" type="Label" parent="."]
+layout_mode = 1
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -40.0
+offset_top = -21.0
+offset_right = -5.0
+grow_horizontal = 0
+grow_vertical = 0
+text = "(1/1)"
+horizontal_alignment = 2

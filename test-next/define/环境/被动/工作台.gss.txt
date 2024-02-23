@@ -1,4 +1,4 @@
-define (load ("箱子.gd")
+define (load ("合成.gd")
 	ref 2306
 	id &环境/被动/工作台
 	props {

@@ -1,0 +1,148 @@
+[gd_scene load_steps=11 format=3 uid="uid://dxfigiu78vxil"]
+
+[ext_resource type="Texture2D" uid="uid://d0tvcuj60ki8p" path="res://test-next/define/实体/ui/合成台/合成台.png" id="1_cmmw3"]
+[ext_resource type="Script" path="res://test-next/define/实体/ui/合成台/craft.gd" id="2_3n3vc"]
+[ext_resource type="Texture2D" uid="uid://ciy146m8dp43d" path="res://test-next/define/实体/ui/合成台/拖动条.png" id="3_xvfrj"]
+[ext_resource type="Texture2D" uid="uid://coct8kk3p6ce" path="res://test-next/define/实体/ui/合成台/拖动闲置.png" id="4_bnu4i"]
+[ext_resource type="Texture2D" uid="uid://7qy76xr4b1do" path="res://test-next/define/实体/ui/合成台/拖动点击.png" id="5_44h56"]
+[ext_resource type="Script" path="res://test-next/define/实体/ui/合成台/scroll.gd" id="6_46hpq"]
+[ext_resource type="PackedScene" uid="uid://o4l0uxk562c2" path="res://test-next/define/实体/ui/合成台/item_button.tscn" id="7_ah6pc"]
+[ext_resource type="Texture2D" uid="uid://cw43dtt86yfi0" path="res://test-next/define/实体/ui/合成台/制作按钮.png" id="8_7viru"]
+[ext_resource type="PackedScene" uid="uid://u8q3gd02xb8e" path="res://test-next/define/实体/ui/合成台/slot.tscn" id="8_onwpg"]
+[ext_resource type="Texture2D" uid="uid://kcmkpta4f5bw" path="res://test-next/define/实体/ui/合成台/否.png" id="10_31e68"]
+
+[node name="craft" type="TextureRect"]
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -255.0
+offset_top = -224.0
+offset_right = 256.0
+offset_bottom = 96.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("1_cmmw3")
+expand_mode = 3
+stretch_mode = 4
+script = ExtResource("2_3n3vc")
+
+[node name="scrollBar" type="TextureRect" parent="."]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.412916
+anchor_top = 0.15625
+anchor_right = 0.430528
+anchor_bottom = 0.78125
+texture = ExtResource("3_xvfrj")
+metadata/_edit_use_anchors_ = true
+
+[node name="scroll" type="TextureButton" parent="."]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.398453
+anchor_top = 0.152174
+anchor_right = 0.437137
+anchor_bottom = 0.220497
+offset_left = -1.08622e-05
+offset_right = 1.22303
+offset_bottom = 1.22976
+keep_pressed_outside = true
+texture_normal = ExtResource("4_bnu4i")
+texture_pressed = ExtResource("5_44h56")
+script = ExtResource("6_46hpq")
+y_max = 235
+y_min = 50
+
+[node name="list" type="ScrollContainer" parent="."]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.0841487
+anchor_top = 0.146875
+anchor_right = 0.389432
+anchor_bottom = 0.771875
+vertical_scroll_mode = 3
+metadata/_edit_use_anchors_ = true
+
+[node name="CraftList" type="VBoxContainer" parent="list"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="ItemButton" parent="list/CraftList" instance=ExtResource("7_ah6pc")]
+layout_mode = 2
+
+[node name="ItemButton2" parent="list/CraftList" instance=ExtResource("7_ah6pc")]
+layout_mode = 2
+
+[node name="ItemButton3" parent="list/CraftList" instance=ExtResource("7_ah6pc")]
+layout_mode = 2
+
+[node name="describe" type="Label" parent="."]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.659259
+anchor_top = 0.312499
+anchor_right = 0.929144
+anchor_bottom = 0.503288
+offset_left = 1.33976e-05
+offset_right = -1.07714e-05
+text = "这是一个背包"
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 1
+text_overrun_behavior = 1
+metadata/_edit_use_anchors_ = true
+
+[node name="Needs" type="HBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.53816
+anchor_top = 0.575
+anchor_right = 0.92955
+anchor_bottom = 0.721875
+metadata/_edit_use_anchors_ = true
+
+[node name="Slot" parent="Needs" instance=ExtResource("8_onwpg")]
+layout_mode = 2
+
+[node name="Slot2" parent="Needs" instance=ExtResource("8_onwpg")]
+layout_mode = 2
+
+[node name="Slot3" parent="Needs" instance=ExtResource("8_onwpg")]
+layout_mode = 2
+
+[node name="Slot4" parent="Needs" instance=ExtResource("8_onwpg")]
+layout_mode = 2
+
+[node name="check" type="TextureButton" parent="."]
+layout_mode = 0
+anchor_left = 0.690162
+anchor_top = 0.782894
+anchor_right = 0.78287
+anchor_bottom = 0.822368
+offset_left = -1.41466e-05
+offset_right = 1.07258e-05
+texture_normal = ExtResource("8_7viru")
+metadata/_edit_use_anchors_ = true
+
+[node name="Target" parent="." instance=ExtResource("8_onwpg")]
+layout_mode = 1
+anchor_left = 0.55773
+anchor_top = 0.3375
+anchor_right = 0.651663
+anchor_bottom = 0.48125
+grow_horizontal = 1
+grow_vertical = 1
+
+[node name="Close" type="TextureButton" parent="."]
+layout_mode = 0
+offset_left = 464.0
+offset_top = 14.0
+offset_right = 484.0
+offset_bottom = 36.0
+texture_normal = ExtResource("10_31e68")
+
+[connection signal="pressed" from="check" to="." method="_on_check_pressed"]
+[connection signal="pressed" from="Close" to="." method="_on_close_pressed"]

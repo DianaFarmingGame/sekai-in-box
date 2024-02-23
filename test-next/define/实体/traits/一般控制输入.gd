@@ -26,6 +26,7 @@ var props := {
 	# @params: SekaiControl
 	&"on_inventory_toggle": Prop.Stack({
 		&"0:一般控制": func (ctx: LisperContext, this: Mono, ctrl: SekaiControl) -> void:
+			print("open")
 			await this.callmRSU(ctx, &"inventory/toggle", ctrl),
 	}),
 	

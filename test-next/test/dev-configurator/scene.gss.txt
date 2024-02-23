@@ -108,7 +108,7 @@ do (hako add_mono &环境/被动/落地灯 {
 
 var (嘉然 do (hako add_mono &实体/角色/嘉然 {
 	position vec3(5 9 1)
-	contains [&物品/卷轴]
+	contains [&物品/卷轴 &物品/卷轴 &物品/卷轴 &物品/卷轴 &物品/卷轴]
 }))
 
 ;do(hako add_mono &kami)

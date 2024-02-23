@@ -1,0 +1,9 @@
+[gd_scene load_steps=3 format=3 uid="uid://ghs7dnh6xg4j"]
+
+[ext_resource type="Texture2D" uid="uid://lkkmm2jwj0ul" path="res://test-next/define/实体/ui/合成台/fail.jpeg" id="1_33dvc"]
+[ext_resource type="Script" path="res://test-next/define/实体/ui/合成台/fade.gd" id="2_60tlj"]
+
+[node name="Fade" type="Sprite2D"]
+position = Vector2(271, 323)
+texture = ExtResource("1_33dvc")
+script = ExtResource("2_60tlj")
