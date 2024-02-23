@@ -1,0 +1,52 @@
+[gd_scene load_steps=5 format=3 uid="uid://cusca8t27nyko"]
+
+[ext_resource type="Script" path="res://test-next/define/实体/ui/状态栏/status.gd" id="1_8pae4"]
+[ext_resource type="Texture2D" uid="uid://8a40d2dx6u8k" path="res://test-next/define/实体/ui/状态栏/精力条底.png" id="2_vkse0"]
+[ext_resource type="Texture2D" uid="uid://d1chcujaustum" path="res://test-next/define/实体/ui/状态栏/精力条.png" id="3_5y4md"]
+[ext_resource type="Texture2D" uid="uid://cafkagnha0aw4" path="res://test-next/define/实体/ui/状态栏/金钱栏.png" id="4_24e66"]
+
+[node name="Status" type="Control"]
+z_index = 10
+layout_mode = 3
+anchors_preset = 10
+anchor_right = 1.0
+grow_horizontal = 2
+script = ExtResource("1_8pae4")
+
+[node name="TextureProgressBar" type="TextureProgressBar" parent="."]
+custom_minimum_size = Vector2(2.08165e-12, 2.08165e-12)
+layout_mode = 0
+offset_left = 29.0
+offset_top = 23.0
+offset_right = 187.0
+offset_bottom = 48.0
+max_value = 110.0
+value = 50.0
+texture_under = ExtResource("2_vkse0")
+texture_progress = ExtResource("3_5y4md")
+texture_progress_offset = Vector2(14, 4)
+radial_center_offset = Vector2(2.08165e-12, 2.08165e-12)
+
+[node name="TextureRect" type="TextureRect" parent="."]
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -134.0
+offset_top = 23.0
+offset_right = -15.0
+offset_bottom = 55.0
+grow_horizontal = 0
+texture = ExtResource("4_24e66")
+expand_mode = 3
+
+[node name="Label" type="Label" parent="TextureRect"]
+layout_mode = 0
+anchor_left = 0.218487
+anchor_top = 0.21875
+anchor_right = 0.932773
+anchor_bottom = 0.84375
+text = "100"
+horizontal_alignment = 1
+vertical_alignment = 1
+metadata/_edit_use_anchors_ = true
