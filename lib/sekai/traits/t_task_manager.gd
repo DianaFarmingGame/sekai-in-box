@@ -5,6 +5,35 @@ var id := &"task_manager"
 var requires := [&"kv_container"]
 
 var props := {
+	&"taskm/get_by_id": func(ctx, this: Mono, task_id: StringName) -> Variant:
+		var tasks = this.getp(&"kvs") as Dictionary
+		if not tasks.has(task_id):
+			push_error("task/get_by_id: ", "task not found: ", task_id)
+			return null
+
+		var task = tasks[task_id] as Mono
+
+		var task_data = task.getp(&"task_data")
+		var task_status = task.getp(&"task_status")
+
+		return {"data": task_data, "status": task_status}
+		,
+
+	&"taskm/get_by_status": func(ctx, this: Mono, status: int) -> Variant:
+		var tasks = this.getp(&"kvs") as Dictionary
+		var result = {}
+
+		for i in tasks:
+			var task = tasks[i] as Mono
+			var task_data = task.getp(&"task_data")
+			var task_status = task.getp(&"task_status")
+
+			if status == -1 || status == task_status:
+				result[i] = {"data": task_data, "status": task_status}
+
+		return result
+		,
+
 	&"taskm/activate": func(ctx, this: Mono, task_id: StringName) -> bool:
 		var tasks = this.getp(&"kvs") as Dictionary
 		if not tasks.has(task_id):
@@ -13,8 +42,11 @@ var props := {
 		
 		var task = tasks[task_id] as Mono
 		
-		task.emitm(ctx, &"task/start")
-		return true
+		if task.emitmRSUY(ctx, &"task/start"):
+			this.applymR(ctx, &"on_status_changed", [task_id, TASK_STATUS.START])
+			return true
+		else:
+			return false
 		,
 
 	&"taskm/deactivate": func(ctx, this: Mono, task_id: StringName) -> bool:
@@ -25,8 +57,11 @@ var props := {
 		
 		var task = tasks[task_id] as Mono
 		
-		task.emitm(ctx, &"task/stop")
-		return true
+		if task.emitmRSUY(ctx, &"task/stop"):
+			this.applymR(ctx, &"on_status_changed", [task_id, TASK_STATUS.NOT_START])
+			return true
+		else:
+			return false
 		,
 	
 	&"taskm/update": func(ctx, this: Mono):
@@ -42,6 +77,8 @@ var props := {
 				this.applym(ctx, &"kv/set", [i, mono])
 		,
 
+	&"on_status_changed": Prop.Stack(),
+
 	&"on_ready": Prop.puts({
 		&"0:taskm": func(ctx, this: Mono):
 			this.emitm(ctx, &"taskm/update")
@@ -50,3 +87,9 @@ var props := {
 	}),
 }
 
+enum TASK_STATUS {
+	NOT_START = 0,
+	START = 1,
+	COMPLETE = 2,
+	FAIL = 3,
+}
