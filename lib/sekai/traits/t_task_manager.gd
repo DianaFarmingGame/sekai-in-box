@@ -83,6 +83,9 @@ var props := {
 		&"0:taskm": func(ctx, this: Mono):
 			this.emitm(ctx, &"taskm/update")
 			this.callm(ctx, &"db/setgw", &"vals")
+			
+			var kv = this.getp(&"kvs")
+			print(kv)
 			,
 	}),
 }
