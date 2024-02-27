@@ -32,23 +32,30 @@ var props := {
 	#       "complete": bool
 	#	}],
 
-	&"task/start": func(ctx, this: Mono):
+	&"task/start": func(ctx, this: Mono) -> bool:
 		print("task " + this.getp(&"task_data")["id"] + " start")
-		this.callm(ctx, &"task/set_status", TASK_STATUS.START)
+		if this.callmRSUY(ctx, &"task/set_status", TASK_STATUS.START):
+			return true
+
+		return false
 		,
 
-	&"task/complete": func(ctx, this: Mono):
+	&"task/complete": func(ctx, this: Mono) -> bool:
 		print("task " + this.getp(&"task_data")["id"] + " complete")
-		this.callm(ctx, &"task/set_status", TASK_STATUS.COMPLETE)
+		if this.callmRSUY(ctx, &"task/set_status", TASK_STATUS.COMPLETE):
+			return true
+
+		return false
 		,
 
 	#--------------------------------------------------------------------------#
-	&"task/set_status": func(ctx, this: Mono, status: TASK_STATUS):
+	&"task/set_status": func(ctx, this: Mono, status: TASK_STATUS) -> bool:
 		var cur_status = this.getp(&"task_status")
 		if status == cur_status:
 			push_warning("[task/start] task " + this.getp("task_data")["id"] + " already in ", status)
-			return
+			return false
 		this.setpW(ctx, &"task_status", status)
+		return true
 		,
 
 	&"after_task_status": func(ctx, this: Mono, status: TASK_STATUS):
