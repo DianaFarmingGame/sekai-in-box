@@ -1,0 +1,80 @@
+[gd_scene load_steps=7 format=3 uid="uid://dxfigiu78vxil"]
+
+[ext_resource type="Texture2D" uid="uid://dh0fifljiutht" path="res://test-next/define/实体/ui/任务栏/任务书.png" id="1_cs245"]
+[ext_resource type="Script" path="res://test-next/define/实体/ui/任务栏/task.gd" id="2_i7b1d"]
+[ext_resource type="Texture2D" uid="uid://ciy146m8dp43d" path="res://test-next/define/实体/ui/合成台/拖动条.png" id="3_xvfrj"]
+[ext_resource type="Texture2D" uid="uid://coct8kk3p6ce" path="res://test-next/define/实体/ui/合成台/拖动闲置.png" id="4_bnu4i"]
+[ext_resource type="Texture2D" uid="uid://7qy76xr4b1do" path="res://test-next/define/实体/ui/合成台/拖动点击.png" id="5_44h56"]
+[ext_resource type="Script" path="res://test-next/define/实体/ui/合成台/scroll.gd" id="6_46hpq"]
+
+[node name="Task" type="TextureRect"]
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -255.0
+offset_top = -224.0
+offset_right = 256.0
+offset_bottom = 96.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("1_cs245")
+expand_mode = 3
+stretch_mode = 4
+script = ExtResource("2_i7b1d")
+
+[node name="scrollBar" type="TextureRect" parent="."]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.412916
+anchor_top = 0.15625
+anchor_right = 0.430528
+anchor_bottom = 0.78125
+texture = ExtResource("3_xvfrj")
+metadata/_edit_use_anchors_ = true
+
+[node name="scroll" type="TextureButton" parent="."]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.398453
+anchor_top = 0.152174
+anchor_right = 0.437137
+anchor_bottom = 0.220497
+offset_left = -1.08622e-05
+offset_right = 1.22303
+offset_bottom = 1.22976
+keep_pressed_outside = true
+texture_normal = ExtResource("4_bnu4i")
+texture_pressed = ExtResource("5_44h56")
+script = ExtResource("6_46hpq")
+y_max = 235
+y_min = 50
+
+[node name="list" type="ScrollContainer" parent="."]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.0841487
+anchor_top = 0.146875
+anchor_right = 0.389432
+anchor_bottom = 0.771875
+vertical_scroll_mode = 3
+metadata/_edit_use_anchors_ = true
+
+[node name="CraftList" type="VBoxContainer" parent="list"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="describe" type="Label" parent="."]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.549902
+anchor_top = 0.134375
+anchor_right = 0.917808
+anchor_bottom = 0.496875
+offset_left = 1.33976e-05
+offset_right = -1.07714e-05
+autowrap_mode = 1
+text_overrun_behavior = 1
+metadata/_edit_use_anchors_ = true

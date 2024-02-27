@@ -52,8 +52,7 @@ func get_craft_list():
 			if item == null:
 				continue
 			var need_num = record["need"][id]
-			# mock
-			var need_ref = 3000
+			var need_ref = item.ref
 			craft_list[ref]["needs"] = {}
 			craft_list[ref]["needs"][need_ref] = {}
 			craft_list[ref]["needs"][need_ref]["num"] = need_num

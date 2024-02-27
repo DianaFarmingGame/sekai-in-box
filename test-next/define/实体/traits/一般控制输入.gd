@@ -26,8 +26,14 @@ var props := {
 	# @params: SekaiControl
 	&"on_inventory_toggle": Prop.Stack({
 		&"0:一般控制": func (ctx: LisperContext, this: Mono, ctrl: SekaiControl) -> void:
-			print("open")
 			await this.callmRSU(ctx, &"inventory/toggle", ctrl),
+	}),
+	
+	# 开关任务栏
+	# @params: SekaiControl
+	&"on_task_toggle": Prop.Stack({
+		&"0:一般控制": func (ctx: LisperContext, this: Mono, ctrl: SekaiControl) -> void:
+			await this.callmRSU(ctx, &"task/toggle", ctrl),
 	}),
 	
 	
@@ -46,6 +52,7 @@ var props := {
 						&"slot_4": await this.applyc(ctx, &"on_slot_select", [ctrl, 3])
 						&"slot_5": await this.applyc(ctx, &"on_slot_select", [ctrl, 4])
 						&"inventory_toggle": await this.applyc(ctx, &"on_inventory_toggle", [ctrl])
+						&"task_toggle": await this.applyc(ctx, &"on_task_toggle", [ctrl])
 			pass,
 	}),
 }
