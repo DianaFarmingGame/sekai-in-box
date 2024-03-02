@@ -3,9 +3,10 @@ func gsm():
 
 var(produce ', produce,')
 var(final ', final,')
+var(reward_t ', reward_t,')
 
 csv/map-let(+(*config_base* "task.csv")
-	[ID 组 任务名 任务描述 完成条件 完成行为 需求类型 需求描述 需求数据]
+	[ID 组 任务名 任务描述 完成条件 完成行为 任务奖励 需求类型 需求描述 需求数据]
 	produce({
 		id				keyword(ID)
 		group			组
@@ -13,6 +14,8 @@ csv/map-let(+(*config_base* "task.csv")
 		desc			任务描述
 		finish			keyword(完成条件)
 		next			keyword(完成行为)
+		rewards			reward_t(任务奖励)
+
 		require_type	需求类型
 		require_desc	需求描述
 		require_data	需求数据
@@ -147,3 +150,16 @@ func task_init(task: Dictionary):
 		k["complete"] = false
 
 	task["status"] = TASK_STATUS.NOT_START
+
+func reward_t(rewards_s: String) -> Dictionary:
+	var rewards = rewards_s.split(" ", false)
+	var reward := {}
+
+	for i in rewards.size():
+		var r = rewards[i].split(":", false)
+		if r[0] == "金币":
+			reward["money"] = int(r[1])
+		else:
+			reward[r[0]] = int(r[1])
+
+	return reward
