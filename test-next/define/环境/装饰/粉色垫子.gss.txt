@@ -1,0 +1,17 @@
+define (load ("家具.gd")
+	ref 2425
+	id &环境/装饰/粉色垫子
+	props {
+		name "粉色垫子"
+		need_route #f
+		can_route #f
+		collision_boxes [rect2(-0.8 -0.4 1.6 0.9)]
+		pick_box rect2(-0.3 -0.3 0.6 0.8)
+		asserts {
+			main load ("../房间.png")
+		}
+		draw_data {
+			main [&static &main [rect2(-0.5 -0.5 1 1) rect2(*(10 32) *(5 32) *(1 32) *(1 32))]]
+		}
+	}
+)
