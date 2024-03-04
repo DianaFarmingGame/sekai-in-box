@@ -1,15 +1,13 @@
-defvar (road/make func([ref x_offset diverse]
-	define/make (load ("../block_static_ext.gd")
+defvar (road/make func([ref id name x_offset diverse]
+	define/make (load ("随机装饰面.gd")
 		ref ref
+		id id
+		name name
 		props {
-			need_route #f
-			can_route #f
-			need_collision #f
-			can_collide #f
 			asserts {
-				main load ("../路.png")
+				main load ("路面.png")
 			}
-			cur_draw &
+			cur_draw &center
 			draw_data {
 				corner_nw [&static &main clip_ground(+(x_offset 0) 0)]
 				corner_ne [&static &main clip_ground(+(x_offset 2) 0)]
@@ -41,12 +39,12 @@ defvar (road/make func([ref x_offset diverse]
 				]
 				[])
 			atile_size vec3(3 3 1)
-			groups prop/pushs([ref])
-			atile_matches [[ref]]
+			groups prop/pushs([id])
+			atile_matches [[id]]
 			atile_rules *atile_rules_3x3x1_crossed*
 		})))
 
-define/sign(road/make(2402 0 #f))
-define/sign(road/make(2403 3 #t))
-define/sign(road/make(2404 6 #f))
-define/sign(road/make(2405 9 #t))
+define/sign(road/make(2402 &环境/装饰/路面-土 "路面-土" 0 #f))
+define/sign(road/make(2403 &环境/装饰/路面-石 "路面-石" 3 #t))
+define/sign(road/make(2404 &环境/装饰/路面-草 "路面-草" 6 #f))
+define/sign(road/make(2405 &环境/装饰/路面-砖 "路面-砖" 9 #t))
