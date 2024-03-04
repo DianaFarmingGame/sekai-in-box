@@ -70,6 +70,9 @@ func init(ctx: LisperContext) -> void:
 		await emitc(ctx, &"on_inited")
 		await emitc(ctx, &"on_ready")
 
+func update(ctx: LisperContext) -> void:
+	await emitc(ctx, &"on_update")
+
 func store(ctx: LisperContext) -> void:
 	await emitc(ctx, &"on_store")
 

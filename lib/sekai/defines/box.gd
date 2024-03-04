@@ -11,12 +11,18 @@ func do_merge(sets: Array[Dictionary]) -> Array[Dictionary]:
 			return mono,
 		&"collect_by_pos": func (ctx: LisperContext, this: Mono, pos: Vector3) -> Array:
 			return await this.applymRSU(ctx, &"container/collect_applyc", [&"collect_by_pos", [pos]]),
+		&"collect_by_region": func (ctx: LisperContext, this: Mono, region: AABB) -> Array:
+			return await this.applymRSU(ctx, &"container/collect_applyc", [&"collect_by_region", [region]]),
 		&"collect_collide": func (ctx: LisperContext, this: Mono, region: Rect2, z_pos: int) -> Array:
 			return await this.applymRSU(ctx, &"container/collect_applyc", [&"collect_collide", [region, z_pos]]),
 		&"collect_route": func (ctx: LisperContext, this: Mono, point: Vector2, z_pos: int) -> Array:
 			return await this.applymRSU(ctx, &"container/collect_applyc", [&"collect_route", [point, z_pos]]),
 		&"collect_pick": func (ctx: LisperContext, this: Mono, ctrl: SekaiControl, cursor: Vector2) -> Array:
 			return await this.applymRSU(ctx, &"container/collect_applyc", [&"collect_pick", [ctrl, cursor]]),
+		&"update_region": func (ctx: LisperContext, this: Mono, region: AABB) -> void:
+			var monos := await this.callmRSU(ctx, &"collect_by_region", region) as Array
+			for mono in monos:
+				await mono.update(ctx),
 		
 		&"on_process": func (ctx: LisperContext, this: Mono, delta: float) -> void:
 			var contains := this.getpB(&"contains") as Array

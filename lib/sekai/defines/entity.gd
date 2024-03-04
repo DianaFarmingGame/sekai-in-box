@@ -10,5 +10,10 @@ func do_merge(sets: Array[Dictionary]) -> Array[Dictionary]:
 				return this
 			else:
 				return null,
+		&"collect_by_region": func (ctx: LisperContext, this: Mono, region: AABB) -> Mono:
+			if region.has_point(this.position):
+				return this
+			else:
+				return null,
 	})
 	return sets

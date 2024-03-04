@@ -38,6 +38,8 @@ func do_merge(sets: Array[Dictionary]) -> Array[Dictionary]:
 		&"on_restore": Prop.Stack(),
 		# 当每次恢复或生成结束时触发
 		&"on_ready": Prop.Stack(),
+		# 当临近方块更新时触发
+		&"on_update": Prop.Stack(),
 		
 		# 当任意使用 Setter 的属性被修改时触发
 		# @params: StringName: 被修改的键, Variant: 被修改的值

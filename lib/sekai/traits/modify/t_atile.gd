@@ -37,6 +37,9 @@ var props := {
 	&"on_ready": Prop.puts({
 		&"-9:atile": TATile.update,
 	}),
+	&"on_update": Prop.puts({
+		&"-9:atile": TATile.update,
+	}),
 }
 
 static func update(ctx: LisperContext, this: Mono) -> void:
