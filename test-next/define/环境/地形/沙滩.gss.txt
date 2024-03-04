@@ -1,0 +1,35 @@
+fn (drawer [x y]
+	[&layers [
+		[&static &main clip_ground(7 1)]
+		[&fixed &main 1.6 anim_ground(x y 6 #f)]
+	]]
+)
+
+define (load ("构造体.gd")
+	ref 2104
+	id &环境/地形/沙滩
+	name "沙滩"
+	props {
+		need_collision #f
+		can_collide #f
+		asserts {
+			main load ("沙滩.png")
+		}
+		cur_draw &center
+		draw_data {
+			corner_nw drawer (0 0)
+			corner_ne drawer (12 0)
+			corner_se drawer (12 2)
+			corner_sw drawer (0 2)
+			side_n drawer (6 0)
+			side_e drawer (12 1)
+			side_s drawer (6 2)
+			side_w drawer (0 1)
+			center [&static &main clip_ground(6 1)]
+		}
+		atile_size vec3(3 3 1)
+		groups prop/pushs([&环境/地形/沙滩])
+		atile_matches [[&环境/地形/沙滩 &环境/地形/土壤 &环境/地形/沙地]]
+		atile_rules *atile_rules_3x3x1_crossed*
+	}
+)

@@ -70,7 +70,7 @@ static func on_draw(ctx: LisperContext, this: Mono, ctrl: SekaiControl, item: Se
 			var frames := draw[3] as Array
 			var frame_idx := clampi(frames.size() * (t / timeout + 1) as int, 0, frames.size() - 1)
 			frame = frames[frame_idx]
-		&"autotile":
+		&"atile":
 			var tile := this.getp(&"atile_result") as Array
 			if tile.size() == 9:
 				var ts := [

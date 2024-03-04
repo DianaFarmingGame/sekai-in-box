@@ -1,6 +1,16 @@
 defunc (clip_ground [x y]
 	[rect2(-0.5 -1.5 1 1) rect2(*(x 32) *(y 32) 32 32)]
 )
+defunc (clip_atile_ground [x y]
+	[rect2(-0.5 -1.5 0.5 0.5) rect2(*(x 16) *(y 16) 16 16)]
+)
+defunc (anim_ground [x y frame is_reverse]
+	var (res array/unfold(frame fn ([f] clip_ground (+(x f) y))))
+	if (is_reverse
+		array/reverse (res)
+		res
+	)
+)
 defunc (clip_box [x y]
 	[rect2(-0.5 -1.5 1 2) rect2(*(x 32) *(y 32) 32 64)]
 )

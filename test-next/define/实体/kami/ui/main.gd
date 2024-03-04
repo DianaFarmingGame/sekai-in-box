@@ -40,7 +40,7 @@ var _sel_define: MonoDefine = null
 func _load_defines() -> void:
 	for define in sekai.defines:
 		if define != null:
-			var label := str(define.name if define.name else '') + str('@' + define.id if define.id else '') + str('[', define.ref ,']')
+			var label := str(define.name + ' ' if define.name else '') + str('@' + define.id if define.id else '') + str('[', define.ref ,']')
 			_defines.append([label, define])
 	_update_filtered_defines()
 

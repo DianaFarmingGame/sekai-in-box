@@ -8,8 +8,8 @@ define (load ("田地.gd")
 		}
 		cur_draw &main
 		draw_data {
-			main [&autotile &main [rect2(-0.5 -1.5 0.5 0.5) rect2(0 0 16 16)]]
-			wet [&autotile &main [rect2(-0.5 -1.5 0.5 0.5) rect2(64 0 16 16)]]
+			main [&atile &main clip_atile_ground (0 0)]
+			wet [&atile &main clip_atile_ground (4 0)]
 		}
 		atile_size vec3(3 3 1)
 		groups prop/pushs([2200])

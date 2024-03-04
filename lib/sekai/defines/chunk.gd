@@ -19,9 +19,10 @@ func do_merge(sets: Array[Dictionary]) -> Array[Dictionary]:
 			if data.size() != size.x * size.y:
 				var ndata := []
 				ndata.resize(size.x * size.y as int)
-				for i in ndata:
+				for i in ndata.size():
 					ndata[i] = data[i % data.size()]
 				data = ndata
+				this.setpB(&"chunk_data", data)
 			data[(pos.y * size.x + pos.x) as int] = sekai.get_define(ref_id).ref
 			await Chunk.rebuild_mat(ctx, this),
 		&"chunk/remove": func (ctx: LisperContext, this: Mono, pos: Vector2) -> void:
@@ -30,9 +31,10 @@ func do_merge(sets: Array[Dictionary]) -> Array[Dictionary]:
 			if data.size() != size.x * size.y:
 				var ndata := []
 				ndata.resize(size.x * size.y as int)
-				for i in ndata:
+				for i in ndata.size():
 					ndata[i] = data[i % data.size()]
 				data = ndata
+				this.setpB(&"chunk_data", data)
 			data[(pos.y * size.x + pos.x) as int] = -1
 			await Chunk.rebuild_mat(ctx, this),
 		&"collect_by_pos": func (ctx: LisperContext, this: Mono, pos: Vector3) -> Mono:

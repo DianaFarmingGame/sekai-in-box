@@ -1,0 +1,48 @@
+fn (drawer [ux uy x y]
+	[&layers [
+		[&static &main clip_ground(ux uy)]
+		[&fixed &main 1.6 anim_ground(x y 3 #f)]
+	]]
+)
+
+fn (水体/sign [ref id name ux uy]
+	define (load ("构造体.gd")
+		ref ref
+		id id
+		name name
+		props {
+			need_route #f
+			can_route #f
+			need_collision #f
+			can_collide #f
+			asserts {
+				main load ("水体.png")
+			}
+			cur_draw &center
+			draw_data {
+				corner_nw drawer (ux uy 0 0)
+				corner_ne drawer (ux uy 6 0)
+				corner_se drawer (ux uy 6 2)
+				corner_sw drawer (ux uy 0 2)
+				side_n drawer (ux uy 3 0)
+				side_e drawer (ux uy 6 1)
+				side_s drawer (ux uy 3 2)
+				side_w drawer (ux uy 0 1)
+				center [&static &main clip_ground(3 1)]
+				concave_nw drawer (ux uy 0 3)
+				concave_ne drawer (ux uy 3 3)
+				concave_se drawer (ux uy 3 4)
+				concave_sw drawer (ux uy 0 4)
+				concaves_nw_se drawer (ux uy 6 3)
+				concaves_ne_sw drawer (ux uy 6 4)
+			}
+			atile_size vec3(3 3 1)
+			groups prop/pushs([&环境/地形/水体])
+			atile_matches [[&环境/地形/水体]]
+			atile_rules *atile_rules_3x3x1_crossed*
+		}
+	)
+)
+
+水体/sign (2102 &环境/地形/水体-土壤 "水体-土壤" 9 0)
+水体/sign (2103 &环境/地形/水体-沙地 "水体-沙地" 9 1)
