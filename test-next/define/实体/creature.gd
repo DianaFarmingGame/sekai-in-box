@@ -4,6 +4,7 @@ func do_merge(sets: Array[Dictionary]) -> Array[Dictionary]:
 	super.do_merge(sets)
 	name = "生物"
 	merge_traits(sets, [
+		TUID,
 		TInput, TProcess, TState, TUI,
 		TSolid, TPickable, TContactable,
 		TMove, TPick,
