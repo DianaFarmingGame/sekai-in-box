@@ -7,6 +7,7 @@ var props := {
 	&"atile_size": Vector3(0, 0, 0),
 	&"atile_matches": [],
 	&"atile_rules": [],
+	&"atile_result": [],
 	
 	&"atile_cache": null,
 	&"compilers": Prop.puts({
@@ -64,6 +65,7 @@ static func update(ctx: LisperContext, this: Mono) -> void:
 							if mono != this and await mono.callmRS(ctx, &"group/intersects", atile_matches[idx]):
 								base[(sz - 1 - dz) * sy * sx + dy * sx + dx].append(idx + 1)
 								break
+		this.setpB(&"atile_result", base.map(func (sets): return 1 if sets.has(1) else 0))
 		for rule in atile_data:
 			var mask := rule[0] as Array
 			var cfg := rule[1] as Dictionary

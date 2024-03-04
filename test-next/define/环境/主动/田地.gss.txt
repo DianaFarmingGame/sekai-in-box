@@ -1,0 +1,18 @@
+define (load ("田地.gd")
+	ref 2200
+	id &环境/主动/田地
+	name "田地"
+	props {
+		asserts {
+			main load ("田地.png")
+		}
+		cur_draw &main
+		draw_data {
+			main [&autotile &main [rect2(-0.5 -1.5 0.5 0.5) rect2(0 0 16 16)]]
+			wet [&autotile &main [rect2(-0.5 -1.5 0.5 0.5) rect2(64 0 16 16)]]
+		}
+		atile_size vec3(3 3 1)
+		groups prop/pushs([2200])
+		atile_matches [[2200]]
+	}
+)
