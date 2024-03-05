@@ -1,0 +1,14 @@
+fn ([]
+
+fn (sign [ref id name]
+	define (load ("../block.gd")
+		ref ref
+		id id
+		name name
+		props {
+			;;
+		}
+	)
+)
+
+)

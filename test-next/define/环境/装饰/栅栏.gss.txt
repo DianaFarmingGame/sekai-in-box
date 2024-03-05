@@ -1,0 +1,16 @@
+define (load ("栅栏.gd")
+	ref 2406
+	id &环境/装饰/栅栏
+	name "栅栏"
+	props {
+		asserts {
+			main load ("栅栏.png")
+		}
+		cur_draw &main
+		draw_data {
+			main [&atile &main clip_atile_cover(0 0)]
+		}
+		atile_size vec3(3 3 1)
+		groups prop/pushs([&环境/装饰/栅栏])
+		atile_matches [[&环境/装饰/栅栏]]
+	})
