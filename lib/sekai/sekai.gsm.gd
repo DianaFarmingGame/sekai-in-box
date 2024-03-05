@@ -109,11 +109,14 @@ func sign_define(define: Variant) -> void:
 	define = MonoDefine.get_define(define)
 	define.finalize()
 	if define.ref >= defines.size(): defines.resize(define.ref + 1)
+	if defines[define.ref] != null:
+		var pd := defines[define.ref] as MonoDefine
+		push_error("duplicated define ref: ", pd.name, "@", pd.id, "[", pd.ref, "] and ", define.name, "@", define.id, "[", define.ref, "]")
 	defines[define.ref] = define
 	if define.id != null and define.id != &"":
 		if _defines_by_id.has(define.id):
 			var pd := _defines_by_id[define.id] as MonoDefine
-			push_error("duplicated define id: ", pd.name, "(", pd.id, ") and ", define.name, "(", define.id, ")")
+			push_error("duplicated define id: ", pd.name, "@", pd.id, "[", pd.ref, "] and ", define.name, "@", define.id, "[", define.ref, "]")
 		else:
 			_defines_by_id[define.id] = define
 

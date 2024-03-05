@@ -1,5 +1,5 @@
 define (load ("家具.gd")
-	ref 2433
+	ref 2463
 	id &环境/装饰/木椅
 	props {
 		name "木椅"

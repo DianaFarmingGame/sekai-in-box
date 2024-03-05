@@ -1,5 +1,5 @@
 define (load ("家具.gd")
-	ref 2437
+	ref 2467
 	id &环境/装饰/嘉然的豪华地毯
 	props {
 		name "嘉然的豪华地毯"

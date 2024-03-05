@@ -1,0 +1,128 @@
+define (load ("随机装饰物.gd")
+	ref 2413
+	id &环境/装饰/装饰-木箱
+	name "装饰-木箱"
+	props {
+		asserts {
+			main load ("乡镇装饰.png")
+		}
+		cur_draw &box1
+		draw_data {
+			box1 [&static &main clip_cover(0 0)]
+			box2 [&static &main clip_cover(1 0)]
+			box3 [&static &main clip_cover(2 0)]
+			box4 [&static &main clip_cover(3 0)]
+		}
+		random_rules [
+			[1 { cover { cur_draw &box1 }}]
+			[1 { cover { cur_draw &box2 }}]
+			[1 { cover { cur_draw &box3 }}]
+			[1 { cover { cur_draw &box4 }}]
+		]
+	}
+)
+
+define (load ("随机装饰物.gd")
+	ref 2414
+	id &环境/装饰/装饰-墓碑
+	name "装饰-墓碑"
+	props {
+		asserts {
+			main load ("乡镇装饰.png")
+		}
+		cur_draw &tomb1
+		draw_data {
+			tomb1 [&static &main clip_cover(0 1)]
+			tomb2 [&static &main clip_cover(1 1)]
+			tomb3 [&static &main clip_cover(2 1)]
+			tomb4 [&static &main clip_cover(3 1)]
+		}
+		random_rules [
+			[1 { cover { cur_draw &tomb1 }}]
+			[1 { cover { cur_draw &tomb2 }}]
+			[1 { cover { cur_draw &tomb3 }}]
+			[1 { cover { cur_draw &tomb4 }}]
+		]
+	}
+)
+
+fn ([]
+
+fn (sign [ref id name x y]
+	define (load ("装饰物.gd")
+		ref ref
+		id id
+		name name
+		props {
+			asserts {
+				main load ("乡镇装饰.png")
+			}
+			cur_draw &main
+			draw_data {
+				main [&static &main clip_cover(x y)]
+			}
+		}
+	)
+)
+
+sign (2415 &环境/装饰/装饰-大木桶 "装饰-大木桶" 0 2)
+sign (2416 &环境/装饰/装饰-小木桶 "装饰-小木桶" 1 2)
+sign (2417 &环境/装饰/装饰-木柴堆 "装饰-木柴堆" 2 2)
+sign (2418 &环境/装饰/装饰-木柴 "装饰-木柴" 3 2)
+sign (2419 &环境/装饰/装饰-水槽 "装饰-水槽" 0 3)
+sign (2420 &环境/装饰/装饰-铁砧 "装饰-铁砧" 1 3)
+sign (2421 &环境/装饰/装饰-木牌 "装饰-木牌" 2 3)
+sign (2422 &环境/装饰/装饰-水瓶 "装饰-水瓶" 3 3)
+
+)()
+
+define (load ("随机装饰物.gd")
+	ref 2423
+	id &环境/装饰/装饰-花篮
+	name "装饰-花篮"
+	props {
+		asserts {
+			main load ("乡镇装饰.png")
+		}
+		cur_draw &main1
+		draw_data {
+			main1 [&static &main clip_cover(0 4)]
+			main2 [&static &main clip_cover(1 4)]
+		}
+		random_rules [
+			[1 { cover { cur_draw &main1 }}]
+			[1 { cover { cur_draw &main2 }}]
+		]
+	}
+)
+
+fn ([]
+
+fn (sign [ref id name clip collide]
+	define (load ("装饰物.gd")
+		ref ref
+		id id
+		name name
+		props {
+			need_collision #t
+			can_collide #t
+			collision_boxes [collide]
+			asserts {
+				main load ("乡镇装饰.png")
+			}
+			cur_draw &main
+			draw_data {
+				main [&static &main clip]
+			}
+		}
+	)
+)
+
+sign (2424 &环境/装饰/装饰-晾衣架 "装饰-晾衣架" [rect2(-0.5 -1.5 2 2) rect2(0 *(5 32) 64 64)] rect2(-0.5 -0.5 2 1))
+sign (2425 &环境/装饰/装饰-路灯-东 "装饰-路灯-东" [rect2(-0.5 -2.5 1 3) rect2(*(2 32) *(4 32) 32 96)] rect2(-0.5 -0.5 1 1))
+sign (2426 &环境/装饰/装饰-路灯-西 "装饰-路灯-西" [rect2(-0.5 -2.5 1 3) rect2(*(3 32) *(4 32) 32 96)] rect2(-0.5 -0.5 1 1))
+sign (2427 &环境/装饰/装饰-长椅-南 "装饰-长椅-南" [rect2(-0.5 -1.5 2 2) rect2(0 *(7 32) 64 64)] rect2(-0.5 -0.5 2 1))
+sign (2428 &环境/装饰/装饰-长椅-东 "装饰-长椅-东" [rect2(-0.5 -1.5 1 2) rect2(*(2 32) *(7 32) 32 64)] rect2(-0.5 -1.5 1 2))
+sign (2429 &环境/装饰/装饰-长椅-西 "装饰-长椅-西" [rect2(-0.5 -1.5 1 2) rect2(*(3 32) *(7 32) 32 64)] rect2(-0.5 -1.5 1 2))
+
+)()
