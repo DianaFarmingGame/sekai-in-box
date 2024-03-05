@@ -26,10 +26,14 @@ define (load ("构造体.gd")
 			side_s drawer (6 2)
 			side_w drawer (0 1)
 			center [&static &main clip_ground(6 1)]
+			concave_nw drawer (0 3)
+			concave_ne drawer (6 3)
+			concave_se drawer (6 4)
+			concave_sw drawer (0 4)
 		}
 		atile_size vec3(3 3 1)
 		groups prop/pushs([&环境/地形/沙滩])
 		atile_matches [[&环境/地形/沙滩 &环境/地形/土壤 &环境/地形/沙地]]
-		atile_rules *atile_rules_3x3x1_crossed*
+		atile_rules *atile_rules_3x3x1*
 	}
 )

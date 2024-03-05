@@ -8,7 +8,7 @@ define (load ("随机面.gd")
 		asserts {
 			main load ("沙地.png")
 		}
-		cur_draw &center
+		cur_draw &main1
 		draw_data {
 			main1 [&static &main clip_ground(0 0)]
 			main2 [&static &main clip_ground(0 1)]

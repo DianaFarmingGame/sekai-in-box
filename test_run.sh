@@ -1,3 +1,3 @@
 #!/bin/sh
 
-./test/export/test.x86_64
+./export/test.x86_64
