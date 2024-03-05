@@ -5,8 +5,8 @@ define (load ("家具.gd")
 		name "书柜"
 		need_route #f
 		can_route #f
-		collision_boxes [rect2(-0.8 -0.4 1.6 0.9)]
-		pick_box rect2(-0.3 -0.3 0.6 0.8)
+		collision_boxes [rect2(-0.7 0.0 1.4 0.9)]
+		pick_box rect2(-0.7 -0.8 1.4 1.6)
 		asserts {
 			main load ("../房间.png")
 		}
