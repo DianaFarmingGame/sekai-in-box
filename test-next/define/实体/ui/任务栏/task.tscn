@@ -72,9 +72,22 @@ anchors_preset = -1
 anchor_left = 0.549902
 anchor_top = 0.134375
 anchor_right = 0.917808
-anchor_bottom = 0.496875
+anchor_bottom = 0.659375
 offset_left = 1.33976e-05
 offset_right = -1.07714e-05
+theme_override_colors/font_color = Color(0.411765, 0.294118, 0.109804, 1)
 autowrap_mode = 1
 text_overrun_behavior = 1
+metadata/_edit_use_anchors_ = true
+
+[node name="HBoxContainer" type="HBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.53816
+anchor_top = 0.646875
+anchor_right = 0.92955
+anchor_bottom = 0.79375
+offset_left = -1.31726e-05
+offset_right = -1.16825e-05
+alignment = 1
 metadata/_edit_use_anchors_ = true
