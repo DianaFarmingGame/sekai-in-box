@@ -62,6 +62,8 @@ func _on_define_list_selected(index: int) -> void:
 	_sel_define = _filtered_defines[index]
 
 func _on_kami_hover(ctx: LisperContext, this: Mono, ctrl: SekaiControl, pick: Variant, sets: InputSet) -> void:
+	if sets.triggered.has(&"action_primary"):
+		_on_kami_pick(ctx, this, ctrl, pick, sets)
 	if pick != null:
 		HoverInfo.text = str(pick.define.id, '[', pick.define.ref, '] ', pick.position.snapped(Vector3(0.1, 0.1, 0.1)))
 

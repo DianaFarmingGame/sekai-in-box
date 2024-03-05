@@ -25,9 +25,10 @@ func do_merge(sets: Array[Dictionary]) -> Array[Dictionary]:
 					ndata[i] = data[i % data.size()]
 				data = ndata
 				this.setpB(&"chunk_data", data)
-			var rid := sekai.get_define(ref_id).ref as int
-			data[(pos.y * size.x + pos.x) as int] = rid
-			var mono := sekai.make_mono(rid)
+			var ref := sekai.get_define(ref_id).ref as int
+			if data[(pos.y * size.x + pos.x) as int] == ref: return
+			data[(pos.y * size.x + pos.x) as int] = ref
+			var mono := sekai.make_mono(ref)
 			mono.position = Vector3(pos.x, pos.y, 0) * cell + offset
 			mono.root = this
 			var mat := this.getp(&"chunk_mat") as Array
