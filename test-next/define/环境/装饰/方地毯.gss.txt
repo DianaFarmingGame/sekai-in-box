@@ -11,7 +11,7 @@ define (load ("家具.gd")
 			main load ("../房间.png")
 		}
 		draw_data {
-			main [&static &main [rect2(-0.5 -0.5 1 1) rect2(*(12 32) *(5 32) *(1 32) *(1 32))]]
+			main [&static &main [rect2(-0.5 -2 1 1) rect2(*(12 32) *(5 32) *(1 32) *(1 32))]]
 		}
 	}
 )

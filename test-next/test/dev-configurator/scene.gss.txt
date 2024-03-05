@@ -60,11 +60,11 @@ do (hako add_mono &环境/被动/工作台 {
 })
 
 do (hako add_mono &环境/装饰/方地毯 {
-	position vec3(1 3 1)
+	position vec3(1 8 0)
 })
 
 do (hako add_mono &环境/装饰/方木箱 {
-	position vec3(2 3 1)
+	position vec3(2 3 0)
 })
 
 do (hako add_mono &环境/被动/唱片机 {
@@ -104,7 +104,7 @@ do (hako add_mono &环境/装饰/木椅 {
 })
 
 do (hako add_mono &环境/装饰/圆地毯 {
-	position vec3(6 6 1)
+	position vec3(6 6 0)
 })
 
 do (hako add_mono &环境/装饰/床 {
@@ -128,7 +128,7 @@ do (hako add_mono &环境/装饰/蜡烛 {
 })
 
 do (hako add_mono &环境/装饰/嘉然的豪华地毯 {
-	position vec3(7 8 1)
+	position vec3(7 8 0)
 })
 
 do (hako add_mono &环境/装饰/衣柜 {
