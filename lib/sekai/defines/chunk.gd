@@ -29,6 +29,7 @@ func do_merge(sets: Array[Dictionary]) -> Array[Dictionary]:
 			data[(pos.y * size.x + pos.x) as int] = rid
 			var mono := sekai.make_mono(rid)
 			mono.position = Vector3(pos.x, pos.y, 0) * cell + offset
+			mono.root = this
 			var mat := this.getp(&"chunk_mat") as Array
 			var contains := this.getp(&"contains") as Array
 			var prev = mat[pos.y][pos.x]
@@ -37,7 +38,7 @@ func do_merge(sets: Array[Dictionary]) -> Array[Dictionary]:
 				contains.erase(prev)
 				(prev as Mono)._outof_container()
 			contains.append(mono)
-			await mono._into_container(ctx, this)
+			#await mono._into_container(ctx, this)
 			await this.get_hako().callmRSU(ctx, &"update_region", AABB(Vector3(pos.x, pos.y, 0) + this.position, Vector3()).grow(1))
 			var layer_data := this.getp(&"layer_data") as Dictionary
 			for ctrl in layer_data.keys():
@@ -69,23 +70,22 @@ func do_merge(sets: Array[Dictionary]) -> Array[Dictionary]:
 		&"collect_by_pos": func (ctx: LisperContext, this: Mono, pos: Vector3) -> Mono:
 			var offset := this.position
 			var cell := this.getp(&"chunk_cell") as Vector3
-			if abs(offset.z - pos.z) < cell.z / 2:
-				var posi = Vector3i((pos - offset) / cell)
-				var size := this.getp(&"chunk_size") as Vector2
-				if 0 <= posi.x and posi.x < size.x and 0 <= posi.y and posi.y < size.y:
-					var mat = this.getp(&"chunk_mat")
-					if mat != null:
-						return mat[posi.y][posi.x]
-					else:
-						var data := this.getp(&"chunk_data") as Array
-						var i := (posi.y * size.x + posi.x) as int
-						var rid = data[i % data.size()]
-						if rid != -1:
-							return sekai.make_mono(rid)
-						else:
-							return null
+			var size := this.getp(&"chunk_size") as Vector2
+			var posi = Vector3i((pos - offset) / cell)
+			if 0 <= posi.x and posi.x < size.x and 0 <= posi.y and posi.y < size.y:
+				var mat = this.getp(&"chunk_mat")
+				if mat != null:
+					return mat[posi.y][posi.x]
 				else:
-					return null
+					var data := this.getp(&"chunk_data") as Array
+					var i := (posi.y * size.x + posi.x) as int
+					var rid = data[i % data.size()]
+					if rid != -1:
+						return sekai.make_mono(rid)
+					else:
+						return null
+			else:
+				return null
 			return null,
 		&"collect_by_region": func (ctx: LisperContext, this: Mono, region: AABB) -> Variant:
 			var offset := this.position
@@ -114,6 +114,16 @@ func do_merge(sets: Array[Dictionary]) -> Array[Dictionary]:
 				else:
 					return null
 			return null,
+		&"render_box_intersects": func (ctx: LisperContext, this: Mono, ctrl: SekaiControl, box: Rect2) -> bool:
+			var rbox = this.getp(&"_c_render_box")
+			if rbox == null:
+				var offset := this.position
+				var cell := this.getp(&"chunk_cell") as Vector3
+				var size := this.getp(&"chunk_size") as Vector2
+				var ratio_yz := ctrl.unit_size.y / ctrl.unit_size.z
+				rbox = Rect2(Vector2(offset.x, offset.y - offset.z * ratio_yz), size * Vector2(cell.x, cell.y))
+				this.setpB(&"_c_render_box", rbox)
+			return rbox.intersects(box),
 		
 		
 		
@@ -124,12 +134,13 @@ func do_merge(sets: Array[Dictionary]) -> Array[Dictionary]:
 				var cell := this.getp(&"chunk_cell") as Vector3
 				var dcell := Vector2(cell.x, cell.y)
 				this.setpB(&"pick_box", Rect2(-dcell / 2, dcell * size))
-				var act_layer := this.getpR(&"act_layer") as Array
+				var act_layer := this.getpBR(&"act_layer").duplicate() as Array
 				act_layer.append_array(range(size.y).map(func (i): return str(i)))
 				this.setpB(&"act_layer", act_layer),
 		}),
 		&"on_ready": Prop.puts({
 			&"0:chunk": func (ctx: LisperContext, this: Mono) -> void:
+				@warning_ignore("redundant_await")
 				await Chunk.rebuild_mat(ctx, this),
 		}),
 		&"on_control_enter": Prop.puts({
@@ -188,6 +199,7 @@ static func rebuild_mat(ctx: LisperContext, this: Mono) -> void:
 			if rid != -1:
 				var mono := sekai.make_mono(rid)
 				mono.position = Vector3(x, y, 0) * cell + offset
+				mono.root = this
 				contains.append(mono)
 				line[x] = mono
 			else:
@@ -195,7 +207,7 @@ static func rebuild_mat(ctx: LisperContext, this: Mono) -> void:
 		mat[y] = line
 	this.setpB(&"contains", contains)
 	this.setpB(&"chunk_mat", mat)
-	await Async.array_map(contains, func (mono): await mono._into_container(ctx, this))
+	#await Async.array_map(contains, func (mono): await mono._into_container(ctx, this))
 	var layer_data := this.getp(&"layer_data") as Dictionary
 	for ctrl in layer_data.keys():
 		Chunk.update_control(ctx, this, ctrl)
@@ -215,7 +227,16 @@ static func update_control(ctx: LisperContext, this: Mono, ctrl: SekaiControl) -
 			item.on_draw.disconnect(conn[&"callable"])
 		item.on_draw.connect(func ():
 			for mono in lconts:
-				mono.applym(ctx, &"on_draw", [ctrl, item]))
+				if mono.inited:
+					mono.applym(ctx, &"on_draw", [ctrl, item])
+				else:
+					var mpos := mono.position as Vector3
+					var pos := Vector2(mpos.x, mpos.y - mpos.z * item.ratio_yz)
+					if ctrl._is_idle(pos):
+						mono.init(ctx)
+					else:
+						ctrl._update_padding_pos(pos)
+		)
 
 static func exit_control(ctx: LisperContext, this: Mono, ctrl: SekaiControl) -> void:
 	var contains := this.getp(&"contains") as Array

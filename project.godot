@@ -192,12 +192,12 @@ environment/defaults/default_clear_color=Color(0, 0, 0, 1)
 
 [sekai]
 
-debug_draw_collisible=true
+debug_draw_collisible=false
 debug_draw_routable=false
-debug_draw_solid=true
+debug_draw_solid=false
 debug_draw_contactable=false
-debug_draw_pickable=true
-define_entry="res://test-next/test/dev-configurator/define_entry.gsm.gd"
+debug_draw_pickable=false
+define_entry="res://test-next/define_entry.gss.txt"
 render_extra_sight=4
 min_inits_per_frame=8
 gikou_store_dir="res://test-next/gikous"

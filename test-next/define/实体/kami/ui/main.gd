@@ -87,7 +87,13 @@ func _on_kami_pick(ctx: LisperContext, this: Mono, ctrl: SekaiControl, pick: Var
 		if res.size() > 0:
 			for entry in res:
 				var mono := entry[1] as Mono
-				PickList.add_item(str(mono.define.id, '[', mono.define.ref, '] ', mono.position.snapped(Vector3(0.1, 0.1, 0.1))))
+				PickList.add_item(str(
+					mono.getp(&"name") + ': ' if mono.getp(&"name") != null else '',
+					str(mono.define.name) if mono.define.name != &"" else '',
+					str('@', mono.define.id) if mono.define.id != &"" else '',
+					'[', mono.define.ref, '] ',
+					mono.position.snapped(Vector3(0.1, 0.1, 0.1))
+				))
 				_pick_monos.append(mono)
 			PickList.select(0)
 			_on_pick_list_item_selected(0)

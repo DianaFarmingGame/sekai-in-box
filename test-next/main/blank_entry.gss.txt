@@ -1,0 +1,34 @@
+wait (gikou on_inited []
+	var (hako do (gikou get_hako))
+	
+	array/unfold(8 fn ([x]
+		array/unfold(8 fn ([y]
+			do (hako add_mono &chunk {
+				name "地形层"
+				position vec3(*(x 16) *(y 16) 0)
+				chunk_size vec2(16 16)
+				chunk_data [2101]
+			})
+			do (hako add_mono &chunk {
+				name "覆盖层1"
+				position vec3(*(x 16) *(y 16) 0)
+				chunk_size vec2(16 16)
+				chunk_data [-1]
+			})
+			do (hako add_mono &chunk {
+				name "覆盖层2"
+				position vec3(*(x 16) *(y 16) 0)
+				chunk_size vec2(16 16)
+				chunk_data [-1]
+			})
+			do (hako add_mono &chunk {
+				name "建筑层"
+				position vec3(*(x 16) *(y 16) 1)
+				chunk_size vec2(16 16)
+				chunk_data [-1]
+			})
+		))
+	))
+
+	do(hako add_mono &kami)
+)

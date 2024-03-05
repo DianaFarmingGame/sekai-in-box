@@ -62,10 +62,11 @@ static func update(ctx: LisperContext, this: Mono) -> void:
 		for dz in sz:
 			for dy in sy:
 				for dx in sx:
-					var monos = await hako.callm(ctx, &"collect_by_pos", pos + Vector3(dx - rx, dy - ry, dz - rz) * size)
+					var monos = await hako.callmRSU(ctx, &"collect_by_pos", pos + Vector3(dx - rx, dy - ry, dz - rz) * size)
 					for idx in atile_matches.size():
 						for mono in monos:
 							if mono != this and await mono.callmRS(ctx, &"group/intersects", atile_matches[idx]):
+							#if mono != this and atile_matches[idx].has(mono.define.ref):
 								base[(sz - 1 - dz) * sy * sx + dy * sx + dx].append(idx + 1)
 								break
 		this.setpB(&"atile_result", base.map(func (sets): return 1 if sets.has(1) else 0))

@@ -13,7 +13,7 @@ class_name SekaiControl extends Control
 ## 每帧至少处理的最低图块加载数量
 @export var min_inits_per_frame: int = ProjectSettings.get_setting("sekai/min_inits_per_frame")
 
-## 是否允许在 Sekai 的请求下变更 target TODO
+## 是否允许在 Sekai 的请求下变更 target
 @export var allow_transfer_target: bool = true
 
 ## 是否允许主动监听用户输入
@@ -132,7 +132,8 @@ func _exit_tree() -> void:
 #
 
 func _on_process(delta: float) -> void:
-	await _update_sight()
+	if not _sight_updating:
+		_update_sight()
 	queue_redraw()
 
 func _draw() -> void:
@@ -202,15 +203,28 @@ func _update_target() -> void:
 	else:
 		hako = null
 
+var _sight_updating := false
+
 ## 更新代表视野内 Mono 的数组
 func _update_sight() -> void:
+	_sight_updating = true
 	if target != null and hako != null:
-		# 注意 不要复用之前的 _monos_in_sight
-		# TODO: 添加视野裁剪
-		_monos_in_sight = hako.getpB(&"contains")
+		# 注意: 不要复用之前的 _monos_in_sight
+		var contains := hako.getpB(&"contains") as Array
+		var nconts := []
+		var counter := 0
+		for mono in contains:
+			counter += 1
+			if counter > 16:
+				counter = 0
+				await sekai.process
+			if mono.applymRSUY(context, &"render_box_intersects", [self, _render_box]):
+				nconts.append(mono)
+		_monos_in_sight = nconts
 	else:
 		_monos_in_sight = []
 	await _update_items()
+	_sight_updating = false
 
 ## 触发离开和进入视野 Mono 的事件
 func _update_items() -> void:
@@ -237,6 +251,19 @@ func _update_draw_caches() -> void:
 	_item_offset = offset
 	_render_box = box
 	_frame_time = Time.get_ticks_usec()
+
+## 判断某个位置的方块是否允许在空闲时间初始化
+func _is_idle(pos: Vector2) -> bool:
+	var ne := _cam_position.distance_squared_to(pos)
+	if 1 < (_cur_nearest + 1) / ne:
+		_min_count -= 1
+		return _min_count >= 0 or Time.get_ticks_usec() - _frame_time < 10_000
+	return false
+
+## 更新空闲加载半径
+func _update_padding_pos(pos: Vector2) -> void:
+	var ne := _cam_position.distance_squared_to(pos)
+	if ne < _next_nearest: _next_nearest = ne
 
 ## 将输入事件传输至目标对象
 func _pass_input(sets: InputSet) -> void:
