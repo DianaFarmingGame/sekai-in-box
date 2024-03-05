@@ -177,7 +177,7 @@ static func draw_debug(ctx: LisperContext, this: Mono, ctrl: SekaiControl, item:
 		var dcell := Vector2(cell.x, cell.y) * 0.9
 		for x in size.x:
 			for y in size.y:
-				var pos := offset + Vector2(x, y)
+				var pos := offset + Vector2(x * cell.x, y * cell.y)
 				item.draw_rect(Rect2(pos - dcell/2, dcell), Color(1, 1, 1, 0.4), false)
 				#var i := (y * size.x + x) as int
 				#var rid = data[i % data.size()]
@@ -227,18 +227,19 @@ static func update_control(ctx: LisperContext, this: Mono, ctrl: SekaiControl) -
 			mono.setpB(&"layer", items)
 		for conn in item.on_draw.get_connections():
 			item.on_draw.disconnect(conn[&"callable"])
-		item.on_draw.connect(func ():
-			for mono in lconts:
-				if mono.inited:
-					mono.applym(ctx, &"on_draw", [ctrl, item])
-				else:
-					var mpos := mono.position as Vector3
-					var pos := Vector2(mpos.x, mpos.y - mpos.z * item.ratio_yz)
-					if ctrl._is_idle(pos):
-						mono.init(ctx)
+		if lconts.size() > 0:
+			item.on_draw.connect(func ():
+				for mono in lconts:
+					if mono.inited:
+						mono.applym(ctx, &"on_draw", [ctrl, item])
 					else:
-						ctrl._update_padding_pos(pos)
-		)
+						var mpos := mono.position as Vector3
+						var pos := Vector2(mpos.x, mpos.y - mpos.z * item.ratio_yz)
+						if ctrl._is_idle(pos):
+							mono.init(ctx)
+						else:
+							ctrl._update_padding_pos(pos)
+			)
 
 static func exit_control(ctx: LisperContext, this: Mono, ctrl: SekaiControl) -> void:
 	var contains := this.getp(&"contains") as Array

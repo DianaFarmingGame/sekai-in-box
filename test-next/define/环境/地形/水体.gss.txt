@@ -1,3 +1,5 @@
+fn ([]
+
 fn (drawer [ux uy x y]
 	[&layers [
 		[&static &main clip_ground(ux uy)]
@@ -5,7 +7,7 @@ fn (drawer [ux uy x y]
 	]]
 )
 
-fn (水体/sign [ref id name ux uy]
+fn (sign [ref id name ux uy]
 	define (load ("构造体.gd")
 		ref ref
 		id id
@@ -44,5 +46,7 @@ fn (水体/sign [ref id name ux uy]
 	)
 )
 
-水体/sign (2102 &环境/地形/水体-土壤 "水体-土壤" 9 0)
-水体/sign (2103 &环境/地形/水体-沙地 "水体-沙地" 9 1)
+sign (2102 &环境/地形/水体-土壤 "水体-土壤" 9 0)
+sign (2103 &环境/地形/水体-沙地 "水体-沙地" 9 1)
+
+)()

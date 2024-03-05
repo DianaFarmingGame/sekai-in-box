@@ -11,6 +11,6 @@ define (load ("装饰面.gd")
 			main [&atile &main clip_atile_ground(0 0)]
 		}
 		atile_size vec3(3 3 1)
-		groups prop/pushs([2401])
-		atile_matches [[2401]]
+		groups prop/pushs([&环境/装饰/草地])
+		atile_matches [[&环境/装饰/草地]]
 	})
