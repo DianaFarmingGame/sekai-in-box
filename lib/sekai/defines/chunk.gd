@@ -55,6 +55,7 @@ func do_merge(sets: Array[Dictionary]) -> Array[Dictionary]:
 					ndata[i] = data[i % data.size()]
 				data = ndata
 				this.setpB(&"chunk_data", data)
+			if data[(pos.y * size.x + pos.x) as int] == -1: return
 			data[(pos.y * size.x + pos.x) as int] = -1
 			var mat := this.getp(&"chunk_mat") as Array
 			var contains := this.getp(&"contains") as Array
