@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://dil45t100jxhx"
-path="res://.godot/imported/portals.png-74d281e85d6fc1d5765092183fb62156.ctex"
+uid="uid://ngsq88ibou2c"
+path="res://.godot/imported/房子.png-a52f4fe792b44abf2cbfb7d2d265662d.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://test-next/define/环境/被动/portals.png"
-dest_files=["res://.godot/imported/portals.png-74d281e85d6fc1d5765092183fb62156.ctex"]
+source_file="res://test-next/define/环境/被动/房子.png"
+dest_files=["res://.godot/imported/房子.png-a52f4fe792b44abf2cbfb7d2d265662d.ctex"]
 
 [params]
 

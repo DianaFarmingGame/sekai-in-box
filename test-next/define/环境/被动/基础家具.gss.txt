@@ -1,0 +1,37 @@
+define (load ("箱子.gd")
+	ref 2302
+	id &环境/被动/电视
+	props {
+		name "电视"
+		need_route #f
+		can_route #f
+		collision_boxes [rect2(-0.4 0 0.8 0.4)]
+		pick_box rect2(-0.4 -0.8 0.8 1.2)
+		asserts {
+			main load ("互动家具.png")
+		}
+		draw_data {
+			opened [&sticky &main 0.4 anim1x2_build(0 4 4 #t)]
+			closed [&sticky &main 0.4 anim1x2_build(0 4 4 #f)]
+		}
+	}
+)
+
+define (load ("箱子.gd")
+	ref 2308
+	id &环境/被动/落地灯
+	props {
+		name "落地灯"
+		need_route #f
+		can_route #f
+		collision_boxes [rect2(-0.1 0.1 0.2 0.2)]
+		pick_box rect2(-0.3 -0.8 0.6 1.2)
+		asserts {
+			main load ("互动家具.png")
+		}
+		draw_data {
+			opened [&static &main clip1x2_build(1 6)]
+			closed [&static &main clip1x2_build(0 6)]
+		}
+	}
+)
