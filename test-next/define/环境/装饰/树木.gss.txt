@@ -1,14 +1,43 @@
-fn ([]
-
-fn (sign [ref id name]
-	define (load ("../block.gd")
-		ref ref
-		id id
-		name name
-		props {
-			;;
+define (load ("随机装饰物.gd")
+	ref 2430
+	id &环境/装饰/树
+	name "树"
+	props {
+		need_collision #t
+		can_collide #t
+		asserts {
+			main load ("树木.png")
 		}
-	)
+		cur_draw &main1
+		draw_data {
+			main1 [&static &main [rect2(-1.5 -2.5 3 3) rect2(*(0 32) 0 96 96)]]
+			main2 [&static &main [rect2(-1.5 -2.5 3 3) rect2(*(3 32) 0 96 96)]]
+			main3 [&static &main [rect2(-1.5 -2.5 3 3) rect2(*(6 32) 0 96 96)]]
+		}
+		random_rules [
+			[1 { cover { cur_draw &main1 }}]
+			[1 { cover { cur_draw &main2 }}]
+			[1 { cover { cur_draw &main3 }}]
+		]
+	}
 )
 
+define (load ("随机装饰物.gd")
+	ref 2431
+	id &环境/装饰/灌木
+	name "灌木"
+	props {
+		asserts {
+			main load ("树木.png")
+		}
+		cur_draw &main1
+		draw_data {
+			main1 [&static &main [rect2(-0.5 -0.5 1 1) rect2(*(0 32) 96 32 32)]]
+			main2 [&static &main [rect2(-0.5 -0.5 1 1) rect2(*(1 32) 96 32 32)]]
+		}
+		random_rules [
+			[1 { cover { cur_draw &main1 }}]
+			[1 { cover { cur_draw &main2 }}]
+		]
+	}
 )
