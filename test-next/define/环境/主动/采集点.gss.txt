@@ -1,0 +1,26 @@
+fn ([]
+
+fn (sign [ref id name x y]
+	define (load ("生长物.gd")
+		ref ref
+		id id
+		name name
+		props {
+			asserts {
+				main load ("采集点.png")
+			}
+			cur_draw &main
+			cur_draw_variant 0
+			draw_data {
+				main [&diverse [
+					[&static &main clip_cover (x y)]
+					[&static &main clip_cover (+(1 x) y)]
+				]]
+			}
+		}
+	)
+)
+
+sign (2234 &环境/主动/农业-树莓丛 "农业-树莓丛" 0 0)
+
+)()

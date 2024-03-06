@@ -1,0 +1,26 @@
+fn ([]
+
+fn (sign [ref id name offset round]
+	define (load ("生长物.gd")
+		ref ref
+		id id
+		name name
+		props {
+			asserts {
+				main load ("庄稼.png")
+			}
+			cur_draw &main
+			cur_draw_variant 4
+			draw_data {
+				main [&diverse array/unfold (round fn ([i] [&static &main clip_cover (i offset)]))]
+			}
+		}
+	)
+)
+
+sign (2235 &环境/主动/农业-五月花 "农业-五月花" 0 5)
+sign (2236 &环境/主动/农业-白菜 "农业-白菜" 1 5)
+sign (2237 &环境/主动/农业-小麦 "农业-小麦" 2 5)
+sign (2238 &环境/主动/农业-南瓜 "农业-南瓜" 3 6)
+
+)()

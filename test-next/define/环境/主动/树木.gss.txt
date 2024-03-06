@@ -1,0 +1,33 @@
+fn ([]
+
+fn (sign [ref id name offset]
+	define (load ("生长物.gd")
+		ref ref
+		id id
+		name name
+		props {
+			asserts {
+				main load ("树木.png")
+			}
+			cur_draw &main
+			cur_draw_variant 0
+			draw_data {
+				main [&diverse [
+					[&static &main [rect2(-0.5 -0.5 1 1) rect2(offset 0 32 32)]]
+					[&static &main [rect2(-0.5 -0.5 1 1) rect2(+(32 offset) 0 32 32)]]
+					[&static &main [rect2(-0.5 -0.5 1 1) rect2(offset 32 32 32)]]
+					[&static &main [rect2(-0.5 -0.5 1 1) rect2(+(32 offset) 32 32 32)]]
+					[&static &main [rect2(-0.5 -1.5 1 2) rect2(#(2 * 32 + offset) 0 32 64)]]
+					[&static &main [rect2(-1.5 -2.5 3 3) rect2(offset 64 96 96)]]
+				]]
+			}
+		}
+	)
+)
+
+sign (2230 &环境/主动/农业-橡树 "农业-橡树" *(0 96))
+sign (2231 &环境/主动/农业-针杉 "农业-针杉" *(1 96))
+sign (2232 &环境/主动/农业-桦树 "农业-桦树" *(2 96))
+sign (2233 &环境/主动/农业-椰树 "农业-椰树" *(3 96))
+
+)()

@@ -1,0 +1,47 @@
+fn ([]
+
+fn (sign [ref id name vars]
+	define (load ("随机收集点.gd")
+		ref ref
+		id id
+		name name
+		props {
+			asserts {
+				main load ("收集点.png")
+			}
+			cur_draw &main
+			cur_draw_variant 0
+			draw_data {
+				main [&diverse array/map (vars fn ([opt] [&static &main clip_cover (@(opt 0) @(opt 1))]))]
+			}
+			random_rules array/unfold (array/size (vars) fn ([i] [1 { cover { cur_draw_variant i }}]))
+		}
+	)
+)
+
+sign (2360 &环境/被动/收集点-木头 "收集点-木头" [[0 0] [1 0]])
+sign (2361 &环境/被动/收集点-石头 "收集点-石头" [[0 1] [1 1]])
+
+fn (sign [ref id name x y]
+	define (load ("收集点.gd")
+		ref ref
+		id id
+		name name
+		props {
+			asserts {
+				main load ("收集点.png")
+			}
+			cur_draw &main
+			draw_data {
+				main [&static &main clip_cover (x y)]
+			}
+		}
+	)
+)
+
+sign (2362 &环境/被动/收集点-沙堆 "收集点-沙堆" 0 2)
+sign (2363 &环境/被动/收集点-红宝石 "收集点-红宝石" 0 3)
+sign (2364 &环境/被动/收集点-蓝宝石 "收集点-蓝宝石" 1 3)
+sign (2365 &环境/被动/收集点-黄宝石 "收集点-黄宝石" 2 3)
+
+)()
