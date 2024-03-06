@@ -1,0 +1,56 @@
+fn ([]
+
+fn (sign [ref id name clip]
+	define (load ("建筑物.gd")
+		ref ref
+		id id
+		name name
+		props {
+			collision_boxes [rect2(-1.5 -1 3 1.5)]
+			pick_box rect2(-0.5 -0.5 1 1)
+			asserts {
+				main load ("房子.png")
+			}
+			cur_draw &main
+			draw_data {
+				main [&static &main clip]
+			}
+		}
+	)
+)
+
+sign (2330 &环境/被动/木屋-红 "木屋-红" [rect2(-1.5 -4.5 3 5) rect2(*(0 32) *(0 32) *(3 32) *(5 32))])
+sign (2331 &环境/被动/木屋-灰-1 "木屋-灰-1" [rect2(-1.5 -4.5 3 5) rect2(*(3 32) *(0 32) *(3 32) *(5 32))])
+sign (2332 &环境/被动/木屋-灰-2 "木屋-灰-2" [rect2(-1.5 -3.5 3 4) rect2(*(6 32) *(1 32) *(3 32) *(4 32))])
+sign (2333 &环境/被动/木房-灰-1 "木房-灰-1" [rect2(-1.5 -4.5 3 5) rect2(*(0 32) *(5 32) *(3 32) *(5 32))])
+sign (2334 &环境/被动/木房-灰-2 "木房-灰-2" [rect2(-1.5 -4.5 3 5) rect2(*(3 32) *(5 32) *(3 32) *(5 32))])
+sign (2335 &环境/被动/木房-灰-3 "木房-灰-3" [rect2(-1.5 -4.5 3 5) rect2(*(6 32) *(5 32) *(3 32) *(5 32))])
+
+fn (sign [ref id name clip flip_h]
+	define (load ("建筑物.gd")
+		ref ref
+		id id
+		name name
+		props {
+			collision_boxes [rect2(-1.5 0 3 1.5)]
+			pick_box rect2(-0.5 0.5 1 1)
+			asserts {
+				main load ("房子.png")
+			}
+			cur_draw &main
+			draw_flip_h flip_h
+			draw_data {
+				main [&static &main clip]
+			}
+		}
+	)
+)
+
+sign (2336 &环境/被动/厢房-红-左 "厢房-红-左" [rect2(-1.5 -1.5 3 3) rect2(*(0 32) *(10 32) *(3 32) *(3 32))] #t)
+sign (2337 &环境/被动/厢房-红-右 "厢房-红-右" [rect2(-1.5 -1.5 3 3) rect2(*(0 32) *(10 32) *(3 32) *(3 32))] #f)
+sign (2338 &环境/被动/厢房-灰-左 "厢房-灰-左" [rect2(-1.5 -1.5 3 3) rect2(*(3 32) *(10 32) *(3 32) *(3 32))] #t)
+sign (2339 &环境/被动/厢房-灰-右 "厢房-灰-右" [rect2(-1.5 -1.5 3 3) rect2(*(3 32) *(10 32) *(3 32) *(3 32))] #f)
+sign (2340 &环境/被动/棚屋-左 "棚屋-左" [rect2(-1.5 -1.5 3 3) rect2(*(6 32) *(10 32) *(3 32) *(3 32))] #t)
+sign (2341 &环境/被动/棚屋-右 "棚屋-右" [rect2(-1.5 -1.5 3 3) rect2(*(6 32) *(10 32) *(3 32) *(3 32))] #f)
+
+)()
