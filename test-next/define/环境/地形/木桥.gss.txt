@@ -1,0 +1,35 @@
+fn ([]
+
+fn (sign [ref id name offset]
+	define (load ("构造体.gd")
+		ref ref
+		id id
+		name name
+		props {
+			asserts {
+				main load ("木桥.png")
+			}
+			cur_draw &center
+			draw_data {
+				corner_nw [&static &main clip_ground(+(offset 0) 0)]
+				corner_ne [&static &main clip_ground(+(offset 2) 0)]
+				corner_se [&static &main clip_ground(+(offset 2) 2)]
+				corner_sw [&static &main clip_ground(+(offset 0) 2)]
+				side_n [&static &main clip_ground(+(offset 1) 0)]
+				side_e [&static &main clip_ground(+(offset 2) 1)]
+				side_s [&static &main clip_ground(+(offset 1) 2)]
+				side_w [&static &main clip_ground(+(offset 0) 1)]
+				center [&static &main clip_ground(+(offset 1) 1)]
+			}
+			atile_size vec3(3 3 1)
+			groups prop/pushs([id])
+			atile_matches [[id]]
+			atile_rules *atile_rules_3x3x1_rect*
+		}
+	)
+)
+
+sign (2106 &环境/地形/木桥-纵 "木桥-纵" 0)
+sign (2107 &环境/地形/木桥-横 "木桥-横" 3)
+
+)()

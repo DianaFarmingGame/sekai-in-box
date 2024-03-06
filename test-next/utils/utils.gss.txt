@@ -65,7 +65,7 @@ defunc (clip_item [x y]
 	rect2(*(x 32) *(y 32) 32 32)
 )
 
-defvar(*atile_rules_3x3x1* [[
+defvar (*atile_rules_3x3x1_rect* [[
 	[
 		0	-1	0
 		-1	0	1
@@ -155,7 +155,9 @@ defvar(*atile_rules_3x3x1* [[
 			cur_draw &center
 		}
 	}
-][
+]])
+
+defvar(*atile_rules_3x3x1* array/concat(*atile_rules_3x3x1_rect* [[
 	[
 		-1	1	1
 		1	0	1
@@ -195,7 +197,7 @@ defvar(*atile_rules_3x3x1* [[
 			cur_draw &concave_sw
 		}
 	}
-]])
+]]))
 
 defvar(*atile_rules_3x3x1_crossed* array/concat(*atile_rules_3x3x1* [[
 	[

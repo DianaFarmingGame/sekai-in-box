@@ -28,4 +28,4 @@
 (with-output-to-file (build-path ".define.gss.txt") #:exists 'replace #:mode 'text
   (lambda () (printf content)))
 
-(printf "all complete!")
+(printf "all complete!\n")
