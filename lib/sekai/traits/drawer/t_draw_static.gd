@@ -25,23 +25,27 @@ static func draw_handle(ctx: LisperContext, this: Mono, draw: Array) -> void:
 		draw_handle(ctx, this, draw[1][this.getp(&"cur_draw_variant")])
 		return
 	var texture = this.getp(&"asserts")[draw[1]]
+	var pos := Vector2(this.position.x, this.position.y - this.position.z)
 	match draw[0]:
 		&"static":
 			var clip = draw[2]
 			if this.getp(&"draw_flip_h"):
+				var trans := Transform2D(0, Vector2(-1, 1), 0, pos + clip[0].position + clip[0].size / 2)
+				var rect := Rect2(-clip[0].size / 2, clip[0].size)
+				var region := clip[1] as Rect2
 				this.putsB(&"on_draw", [
 					&"0:draw_static", func (ctx: LisperContext, this: Mono, ctrl: SekaiControl, item: SekaiItem) -> void:
-						var pos := Vector2(this.position.x, this.position.y - this.position.z * item.ratio_yz)
-						item.pen_set_transform(Transform2D(0, Vector2(-1, 1), 0, pos + clip[0].position + clip[0].size / 2))
-						item.pen_draw_texture_region(texture, Rect2(-clip[0].size / 2, clip[0].size), clip[1])
+						item.pen_set_transform(trans)
+						item.pen_draw_texture_region(texture, rect, region)
 						item.pen_clear_transform()
 						pass,
 				])
 			else:
+				var rect := Rect2(pos + clip[0].position, clip[0].size)
+				var region := clip[1] as Rect2
 				this.putsB(&"on_draw", [
 					&"0:draw_static", func (ctx: LisperContext, this: Mono, ctrl: SekaiControl, item: SekaiItem) -> void:
-						var pos := Vector2(this.position.x, this.position.y - this.position.z * item.ratio_yz)
-						item.pen_draw_texture_region(texture, Rect2(pos + clip[0].position, clip[0].size), clip[1])
+						item.pen_draw_texture_region(texture, rect, region)
 						pass,
 				])
 		&"fixed":
@@ -51,7 +55,6 @@ static func draw_handle(ctx: LisperContext, this: Mono, draw: Array) -> void:
 			if this.getp(&"draw_flip_h"):
 				this.putsB(&"on_draw", [
 					&"0:draw_static", func (ctx: LisperContext, this: Mono, ctrl: SekaiControl, item: SekaiItem) -> void:
-						var pos := Vector2(this.position.x, this.position.y - this.position.z * item.ratio_yz)
 						var t := (item.get_time() - timer) as float
 						var frame_idx := lerpf(0.0, (frames.size() as float), fmod(t, timeout) / timeout) as int
 						var frame = frames[frame_idx]
@@ -63,7 +66,6 @@ static func draw_handle(ctx: LisperContext, this: Mono, draw: Array) -> void:
 			else:
 				this.putsB(&"on_draw", [
 					&"0:draw_static", func (ctx: LisperContext, this: Mono, ctrl: SekaiControl, item: SekaiItem) -> void:
-						var pos := Vector2(this.position.x, this.position.y - this.position.z * item.ratio_yz)
 						var t := (item.get_time() - timer) as float
 						var frame_idx := lerpf(0.0, (frames.size() as float), fmod(t, timeout) / timeout) as int
 						var frame = frames[frame_idx]
@@ -81,7 +83,6 @@ static func draw_handle(ctx: LisperContext, this: Mono, draw: Array) -> void:
 				]
 				this.putsB(&"on_draw", [
 					&"0:draw_static", func (ctx: LisperContext, this: Mono, ctrl: SekaiControl, item: SekaiItem) -> void:
-						var pos := Vector2(this.position.x, this.position.y - this.position.z * item.ratio_yz)
 						for t in ts:
 							var dbox := draw[2][0] as Rect2
 							var cbox := draw[2][1] as Rect2
