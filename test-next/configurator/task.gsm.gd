@@ -70,6 +70,10 @@ func produce(o: Dictionary):
 		var datas = o["require_data"].split(":", false)
 		required["mono_id"] = StringName(datas[0])
 		data = datas[1].split(" ", false)
+	if o["require_type"] == "物品使用":
+		var datas = o["require_data"].split(":", false)
+		required["action_type"] = StringName(datas[0])
+		data = datas[1].split(" ", false)
 	else:
 		data = o["require_data"].split(" ", false)
 	
@@ -126,6 +130,7 @@ enum REQUIREMENT_TYPE {
 	WATCH_VAR = 0,
 	BAG_CHECK = 1,
 	DISTANCE_CHECK = 2,
+	ITEM_USE = 3
 }
 
 enum TASK_STATUS {

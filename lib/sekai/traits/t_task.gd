@@ -7,6 +7,9 @@ var requires := [&"process"]
 # &"is_ok_task_" + id + "_" + idx
 # &"is_ok_task_" + id + "_all"
 
+var diana: Mono
+var tang: Mono
+
 var props := {
 	&"task_data": {},
 	&"task_status": TASK_STATUS.NOT_START,
@@ -70,6 +73,8 @@ var props := {
 					var require = this.getp(&"task_data")["requirements"] as Array
 					for i in len(require):
 						var r = require[i]
+						if r["complete"]:
+							continue
 						if r["type"] == REQUIREMENT_TYPE.WATCH_VAR and r["data"]["key"] == key:
 							r["current"] = value
 							check_vals(ctx, this, gikou, r, i)
@@ -99,6 +104,8 @@ var props := {
 						var gikou = sekai.gikou
 						for i in len(require):
 							var r = require[i]
+							if r["complete"]:
+								continue
 							if r["type"] == REQUIREMENT_TYPE.BAG_CHECK:
 								r["current"] = mono.callmRSUY(ctx, &"container/count_by_ref_id", r["data"]["key"])
 								check_vals(ctx, this, gikou, r, i)
@@ -106,6 +113,44 @@ var props := {
 						check_all_requirements(ctx, this, gikou, require)
 						,
 					],)
+		,
+
+	&"task/add_item_use_watch": func(ctx, this: Mono):
+		tang.pushs(&"on_action", 
+			[&"0:task_" + this.getp(&"task_data")["id"], func(ctx, mono: Mono, type: StringName, ctrl: SekaiControl, src: Mono, tar: Variant, sets: InputSet):
+				var require = this.getp(&"task_data")["requirements"] as Array
+
+				var gikou = sekai.gikou
+				for i in len(require):
+					var r = require[i]
+					if r["complete"]:
+						continue
+					if r["type"] == REQUIREMENT_TYPE.ITEM_USE and r["data"]["action_type"] == type:
+						r["current"] += 1
+						check_vals(ctx, this, gikou, r, i)
+
+				check_all_requirements(ctx, this, gikou, require)])
+		
+		diana.pushs(&"on_action", 
+			[&"0:task_" + this.getp(&"task_data")["id"], func(ctx, mono: Mono, type: StringName, ctrl: SekaiControl, src: Mono, tar: Variant, sets: InputSet):
+				var require = this.getp(&"task_data")["requirements"] as Array
+
+				var gikou = sekai.gikou
+				for i in len(require):
+					var r = require[i]
+					if r["complete"]:
+						continue
+					if r["type"] == REQUIREMENT_TYPE.ITEM_USE and r["data"]["action_type"] == type:
+						r["current"] += 1
+						check_vals(ctx, this, gikou, r, i)
+
+				check_all_requirements(ctx, this, gikou, require)]
+			)
+		,
+
+	&"task/remove_item_use_watch": func(ctx, this: Mono):
+		diana.dels(&"on_action", &"0:task_" + this.getp(&"task_data")["id"])
+		tang.dels(&"on_action", &"0:task_" + this.getp(&"task_data")["id"])
 		,
 
 	&"task/remove_container_watch": func(ctx, this: Mono):
@@ -133,10 +178,14 @@ var props := {
 	}),
 
 	&"on_ready": Prop.puts({
+		&"0:get_var": func(ctx, this: Mono):
+			diana = sekai.gikou.callmRSUY(ctx, &"get_uid", &"实体/角色/嘉然")
+			tang = sekai.gikou.callmRSUY(ctx, &"get_uid", &"实体/角色/嘉心糖")
+			,
+		
 		&"0:task_requirements_check": func(ctx, this: Mono):
 			var status = this.getp(&"task_status")
 			watch_init(ctx, this, status)
-					
 			,
 	}),
 }
@@ -152,6 +201,7 @@ enum REQUIREMENT_TYPE {
 	WATCH_VAR = 0,
 	BAG_CHECK = 1,
 	DISTANCE_CHECK = 2,
+	ITEM_USE = 3
 }
 
 enum COMPAIR_TYPE {
@@ -209,15 +259,24 @@ func watch_init(ctx: LisperContext, this: Mono, status: TASK_STATUS):
 				flags[REQUIREMENT_TYPE.BAG_CHECK] = true
 			elif r["type"] == REQUIREMENT_TYPE.DISTANCE_CHECK:
 				flags[REQUIREMENT_TYPE.DISTANCE_CHECK] = true
+			elif r["type"] == REQUIREMENT_TYPE.ITEM_USE:
+				flags[REQUIREMENT_TYPE.ITEM_USE] = true
 
 		if flags[REQUIREMENT_TYPE.WATCH_VAR]:
 			this.emitm(ctx, &"task/add_watch_vals")
 		if flags[REQUIREMENT_TYPE.BAG_CHECK]:
 			this.emitm(ctx, &"task/add_container_watch")
+		if flags[REQUIREMENT_TYPE.DISTANCE_CHECK]:
+			pass
+		if flags[REQUIREMENT_TYPE.ITEM_USE]:
+			this.emitm(ctx, &"task/add_item_use_watch")
 	else:
 		this.setp(&"processing", false)
 		this.emitm(ctx, &"task/remove_watch_vals")
 		this.emitm(ctx, &"task/remove_task_watcher")
+		this.emitm(ctx, &"task/remove_container_watch")
+		this.emitm(ctx, &"task/remove_item_use_watch")
+
 
 
 func check_vals(ctx, this: Mono, gikou: Mono, r, idx):
@@ -256,6 +315,8 @@ func data_init(ctx: LisperContext, this: Mono):
 			r["current"] = sekai.gikou.callmRSUY(ctx, &"container/count_by_ref_id", r["data"]["key"])
 		elif r["type"] == REQUIREMENT_TYPE.DISTANCE_CHECK:
 			pass
+		elif r["type"] == REQUIREMENT_TYPE.ITEM_USE:
+			r["current"] = 0
 
 		check_vals(ctx, this, sekai.gikou, r, i)
 			
