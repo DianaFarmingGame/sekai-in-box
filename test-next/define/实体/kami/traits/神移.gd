@@ -24,6 +24,12 @@ var props := {
 				await this.callmRSU(ctx, &"position/set", anchor_pos + Vector3(delta_dir.x, delta_dir.y, 0))
 				if sets.releasings.has(&"kami_move"):
 					this.setpB(&"kami_moving", false)
+			for act in sets.pressings.keys():
+				match act:
+					&"kami_move_up":
+						await this.callmRSU(ctx, &"position/set", this.position + Vector3(0, 0, 1))
+					&"kami_move_down":
+						await this.callmRSU(ctx, &"position/set", this.position - Vector3(0, 0, 1))
 			pass,
 	}),
 }

@@ -79,11 +79,9 @@ layout_mode = 2
 [node name="ActionTabs" type="TabContainer" parent="MarginContainer5/HSplitContainer/VBoxContainer"]
 unique_name_in_owner = true
 layout_mode = 2
-current_tab = 1
 tab_focus_mode = 0
 
 [node name="☰" type="VBoxContainer" parent="MarginContainer5/HSplitContainer/VBoxContainer/ActionTabs"]
-visible = false
 layout_mode = 2
 mouse_filter = 2
 
@@ -94,11 +92,19 @@ theme_override_constants/margin_top = 8
 theme_override_constants/margin_right = 8
 theme_override_constants/margin_bottom = 8
 
-[node name="RoundBtn" type="Button" parent="MarginContainer5/HSplitContainer/VBoxContainer/ActionTabs/☰/MarginContainer"]
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer5/HSplitContainer/VBoxContainer/ActionTabs/☰/MarginContainer"]
 layout_mode = 2
-text = "神说: 日月需流转"
+
+[node name="RoundBtn" type="Button" parent="MarginContainer5/HSplitContainer/VBoxContainer/ActionTabs/☰/MarginContainer/VBoxContainer"]
+layout_mode = 2
+text = "神说: 日月当流转"
+
+[node name="PutButton" type="Button" parent="MarginContainer5/HSplitContainer/VBoxContainer/ActionTabs/☰/MarginContainer/VBoxContainer"]
+layout_mode = 2
+text = "神说: 然糖需放置"
 
 [node name="通常" type="VBoxContainer" parent="MarginContainer5/HSplitContainer/VBoxContainer/ActionTabs"]
+visible = false
 layout_mode = 2
 
 [node name="MarginContainer" type="MarginContainer" parent="MarginContainer5/HSplitContainer/VBoxContainer/ActionTabs/通常"]
@@ -182,7 +188,8 @@ text_overrun_behavior = 1
 layout_mode = 2
 mouse_filter = 2
 
-[connection signal="pressed" from="MarginContainer5/HSplitContainer/VBoxContainer/ActionTabs/☰/MarginContainer/RoundBtn" to="." method="_on_round_btn_pressed"]
+[connection signal="pressed" from="MarginContainer5/HSplitContainer/VBoxContainer/ActionTabs/☰/MarginContainer/VBoxContainer/RoundBtn" to="." method="_on_round_btn_pressed"]
+[connection signal="pressed" from="MarginContainer5/HSplitContainer/VBoxContainer/ActionTabs/☰/MarginContainer/VBoxContainer/PutButton" to="." method="_on_put_button_pressed"]
 [connection signal="pressed" from="MarginContainer5/HSplitContainer/VBoxContainer/ActionTabs/通常/MarginContainer/TakeControlBtn" to="." method="_on_take_control_btn_pressed"]
 [connection signal="pressed" from="MarginContainer5/HSplitContainer/VBoxContainer/ActionTabs/区块/MarginContainer/ChunkSetBtn" to="." method="_on_chunk_set_btn_pressed"]
 [connection signal="text_changed" from="MarginContainer5/HSplitContainer/VBoxContainer/VBoxContainer2/HBoxContainer/DefineFilter" to="." method="_on_define_filter_mod"]

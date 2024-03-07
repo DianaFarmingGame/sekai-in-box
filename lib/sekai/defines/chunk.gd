@@ -132,6 +132,11 @@ func do_merge(sets: Array[Dictionary]) -> Array[Dictionary]:
 		
 		
 		&"on_process": null,
+		&"on_round": func (ctx: LisperContext, this: Mono, delta: float) -> void:
+			var contains := this.getpB(&"contains") as Array
+			for mono in contains:
+				if mono.inited:
+					await (mono as Mono).callc(ctx, &"on_round", delta),
 		&"on_init": Prop.puts({
 			&"0:chunk": func (ctx: LisperContext, this: Mono) -> void:
 				var size := this.getp(&"chunk_size") as Vector2

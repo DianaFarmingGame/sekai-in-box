@@ -25,13 +25,13 @@ func _ready() -> void:
 
 func _enter_tree() -> void:
 	this.putsB(&"on_pick", [&"0:kami_ui", _on_kami_hover])
-	this.putsB(&"on_action_primary", [&"0:kami_ui", _on_kami_pick])
-	this.putsB(&"on_action_secondary", [&"0:kami_ui", _on_kami_pick_cancel])
+	#this.putsB(&"on_action_primary", [&"0:kami_ui", _on_kami_pick])
+	#this.putsB(&"on_action_secondary", [&"0:kami_ui", _on_kami_pick_cancel])
 
 func _exit_tree() -> void:
 	this.delsB(&"on_pick", &"0:kami_ui")
-	this.delsB(&"on_action_primary", &"0:kami_ui")
-	this.delsB(&"on_action_secondary", &"0:kami_ui")
+	#this.delsB(&"on_action_primary", &"0:kami_ui")
+	#this.delsB(&"on_action_secondary", &"0:kami_ui")
 
 var _defines := []
 var _filtered_defines := []
@@ -66,8 +66,12 @@ func _on_kami_hover(ctx: LisperContext, this: Mono, ctrl: SekaiControl, pick: Va
 		_on_kami_pick(ctx, this, ctrl, pick, sets)
 	if sets.triggered.has(&"action_secondary"):
 		_on_kami_pick_cancel(ctx, this, ctrl, pick, sets)
+	var dir := sets.direction
+	var pos := (this.position + Vector3(dir.x, dir.y, 0)).round()
 	if pick != null:
-		HoverInfo.text = str(pick.define.id, '[', pick.define.ref, '] ', pick.position.snapped(Vector3(0.1, 0.1, 0.1)))
+		HoverInfo.text = str(pos, " - ", pick.define.id, '[', pick.define.ref, '] ', pick.position.snapped(Vector3(0.1, 0.1, 0.1)))
+	else:
+		HoverInfo.text = str(pos)
 
 var _pick_monos := []
 var _sel_mono: Mono = null:
@@ -103,6 +107,14 @@ func _on_kami_pick(ctx: LisperContext, this: Mono, ctrl: SekaiControl, pick: Var
 			_on_pick_list_item_selected(0)
 	else:
 		match ActionTabs.current_tab:
+			ActionType.NONE:
+				if _sel_define != null:
+					var dir := sets.direction
+					var pos := this.position + Vector3(dir.x, dir.y, 0)
+					var mono := sekai.make_mono(_sel_define.ref, {
+						&"position": pos
+					})
+					ctrl.hako.callmRSU(ctx, &"container/put", mono)
 			ActionType.CHUNK:
 				var chunk := _sel_mono
 				var dir := sets.direction
@@ -196,3 +208,10 @@ func _on_chunk_set_btn_pressed() -> void:
 	var chunk := _sel_mono
 	if _sel_define != null:
 		chunk.callmRSU(context, &"chunk/fill", _sel_define.ref)
+
+func _on_put_button_pressed() -> void:
+	var pos := Vector3(this.position.x, this.position.y, 1)
+	var mono := sekai.make_mono(&"实体/角色/嘉然", {
+		&"position": pos
+	})
+	control.hako.callmRSU(context, &"container/put", mono)
