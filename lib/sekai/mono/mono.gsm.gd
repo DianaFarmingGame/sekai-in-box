@@ -634,13 +634,6 @@ func applym(ctx: LisperContext, key: StringName, argv: Array) -> Variant:
 		lidx -= 1
 	return value
 
-func callf_on_draw(ctx: LisperContext, ctrl: SekaiControl, item: SekaiItem) -> void:
-	for entry in define._props[&"on_draw"]:
-		entry[1].call(ctx, self, ctrl, item)
-	for layer in layers:
-		for entry in layer[1].get(&"on_draw", []):
-			entry[1].call(ctx, self, ctrl, item)
-
 func applymS(ctx: LisperContext, key: StringName, argv: Array) -> Variant:
 	var vargv := [ctx, self]
 	vargv.append_array(argv)
@@ -886,6 +879,14 @@ func applyrRS(ctx: LisperContext, key: StringName, body: Array) -> Variant:
 
 func applyrRSU(ctx: LisperContext, key: StringName, body: Array) -> Variant:
 	return await ctx.call_method_raw(self, define._props[key], body)
+
+## SpeedUP Methods
+func callf_on_draw(ctx: LisperContext, ctrl: SekaiControl, item: SekaiItem) -> void:
+	for entry in define._props[&"on_draw"]:
+		entry[1].call(ctx, self, ctrl, item)
+	for layer in layers:
+		for entry in layer[1].get(&"on_draw", []):
+			entry[1].call(ctx, self, ctrl, item)
 
 
 

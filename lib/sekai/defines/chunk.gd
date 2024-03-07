@@ -69,6 +69,9 @@ func do_merge(sets: Array[Dictionary]) -> Array[Dictionary]:
 			for ctrl in layer_data.keys():
 				Chunk.update_control(ctx, this, ctrl)
 			pass,
+		&"chunk/fill": func (ctx: LisperContext, this: Mono, ref: int) -> void:
+			this.setpB(&"chunk_data", [ref])
+			Chunk.rebuild_mat(ctx, this),
 		&"collect_by_pos": func (ctx: LisperContext, this: Mono, pos: Vector3) -> Mono:
 			var offset := this.position
 			var cell := this.getp(&"chunk_cell") as Vector3

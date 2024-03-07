@@ -1,0 +1,8 @@
+define (load ("block.gd")
+	ref 2000
+	id &环境/空白
+	name "空白"
+	props {
+		groups prop/pushs([&环境/空白])
+	}
+)

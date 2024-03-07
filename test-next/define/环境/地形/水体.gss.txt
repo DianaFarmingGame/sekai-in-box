@@ -40,7 +40,7 @@ fn (sign [ref id name ux uy]
 			}
 			atile_size vec3(3 3 1)
 			groups prop/pushs([&环境/地形/水体])
-			atile_matches [[&环境/地形/水体 &环境/地形/沙滩]]
+			atile_matches [[&环境/地形/水体 &环境/空白 &环境/地形/沙滩]]
 			atile_rules *atile_rules_3x3x1_crossed*
 		}
 	)

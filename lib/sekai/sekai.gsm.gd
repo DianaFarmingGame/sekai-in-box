@@ -23,6 +23,7 @@ const print_head: String = "[sekai] "
 #
 signal gikou_changed
 signal process(delta: float)
+signal round(delta: float)
 signal prepared
 var is_prepared := false
 
@@ -212,6 +213,13 @@ func _process(delta: float) -> void:
 		for hako in hakos:
 			if hako.getp(&"active_level") > 0:
 				await hako.callc(context, &"on_process", delta)
+
+func _round(delta: float) -> void:
+	round.emit(delta)
+	if gikou != null:
+		var hakos := gikou.getpB(&"contains") as Array
+		for hako in hakos:
+			await hako.callc(context, &"on_round", delta)
 
 
 

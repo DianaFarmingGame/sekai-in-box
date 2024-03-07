@@ -15,7 +15,7 @@ var props := {
 		else:
 			this.emitc(ctx, &"on_task_closed")
 			this.emitmRSUY(ctx, &"control/unblock")
-		var node = this.applymRSUY(ctx, &"ui/get", [ctrl, &"slots"])
+		var _node = this.applymRSUY(ctx, &"ui/get", [ctrl, &"slots"])
 		pass,
 	
 	#

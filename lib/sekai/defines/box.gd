@@ -36,6 +36,10 @@ func do_merge(sets: Array[Dictionary]) -> Array[Dictionary]:
 		&"on_process": func (ctx: LisperContext, this: Mono, delta: float) -> void:
 			var contains := this.getpB(&"contains") as Array
 			for mono in contains:
-				await (mono as Mono).callc(ctx, &"on_process", delta)
+				await (mono as Mono).callc(ctx, &"on_process", delta),
+		&"on_round": func (ctx: LisperContext, this: Mono, delta: float) -> void:
+			var contains := this.getpB(&"contains") as Array
+			for mono in contains:
+				await (mono as Mono).callc(ctx, &"on_round", delta),
 	})
 	return sets

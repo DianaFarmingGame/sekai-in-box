@@ -1,19 +1,26 @@
 fn ([]
 
-fn (sign [ref id name offset round]
+fn (sign [ref id name offset level]
 	define (load ("生长物.gd")
 		ref ref
 		id id
 		name name
 		props {
+			level_cost array/unfold (-(level 1) fn ([i] 1))
 			asserts {
 				main load ("庄稼.png")
 			}
 			cur_draw &main
-			cur_draw_variant 4
 			draw_data {
-				main [&diverse array/unfold (round fn ([i] [&static &main clip_cover (i offset)]))]
+				main [&diverse array/unfold (level fn ([i] [&static &main clip_cover (i offset)]))]
 			}
+			state_data array->dict (array/unfold (level fn ([level]
+				[keyword(str("level:" level)) {
+					cover {
+						cur_draw_variant level
+					}
+				}]
+			)))
 		}
 	)
 )

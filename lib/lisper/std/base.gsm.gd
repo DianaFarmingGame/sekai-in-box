@@ -279,6 +279,11 @@ defunc (num :const :gd :pure ',
 		return float(value)
 ,')
 
+defunc (str :const :gd :apply :pure ',
+	func (ctx: LisperContext, args: Array) -> String:
+		return ''.join(args.map(func (i): return str(i)))
+,')
+
 defunc (echo :const :gd :apply ',
 	func (ctx: LisperContext, args: Array) -> Variant:
 		var msg := ' '.join(args.map(func (e): return str(e)))

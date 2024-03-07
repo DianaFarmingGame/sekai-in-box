@@ -40,7 +40,7 @@ defvar (road/make func([ref id name x_offset diverse]
 				[])
 			atile_size vec3(3 3 1)
 			groups prop/pushs([id])
-			atile_matches [[id]]
+			atile_matches [[id &环境/空白]]
 			atile_rules *atile_rules_3x3x1_crossed*
 		})))
 
