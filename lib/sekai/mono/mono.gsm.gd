@@ -880,13 +880,22 @@ func applyrRS(ctx: LisperContext, key: StringName, body: Array) -> Variant:
 func applyrRSU(ctx: LisperContext, key: StringName, body: Array) -> Variant:
 	return await ctx.call_method_raw(self, define._props[key], body)
 
-## SpeedUP Methods
+## speed-up fields
+var prop_on_draw = []
+
+func puts_on_draw(value: Variant) -> void:
+	var stack = prop_on_draw
+	var w := float(String(value[0]))
+	var bidx := 0
+	while bidx < stack.size():
+		if w < float(String(stack[bidx][0])): break
+		bidx += 1
+	stack.insert(bidx, value)
+
+## speed-up methods
 func callf_on_draw(ctx: LisperContext, ctrl: SekaiControl, item: SekaiItem) -> void:
-	for entry in define._props[&"on_draw"]:
+	for entry in prop_on_draw:
 		entry[1].call(ctx, self, ctrl, item)
-	for layer in layers:
-		for entry in layer[1].get(&"on_draw", []):
-			entry[1].call(ctx, self, ctrl, item)
 
 
 
