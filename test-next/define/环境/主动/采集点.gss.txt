@@ -6,17 +6,24 @@ fn (sign [ref id name x y]
 		id id
 		name name
 		props {
+			level_cost [1]
 			asserts {
 				main load ("采集点.png")
 			}
 			cur_draw &main
-			cur_draw_variant 0
 			draw_data {
 				main [&diverse [
 					[&static &main clip_cover (x y)]
 					[&static &main clip_cover (+(1 x) y)]
 				]]
 			}
+			state_data array->dict (array/unfold (2 fn ([level]
+				[keyword(str("level:" level)) {
+					cover {
+						cur_draw_variant level
+					}
+				}]
+			)))
 		}
 	)
 )

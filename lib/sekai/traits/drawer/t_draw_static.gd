@@ -93,7 +93,7 @@ static func draw_handle(ctx: LisperContext, this: Mono, draw: Array) -> void:
 			push_error("unknown draw type: ", this.getp(&"draw_type"))
 
 static func update(ctx: LisperContext, this: Mono) -> void:
-	this.setpB(&"on_draw", Prop.Stack())
+	this.prop_on_draw = []
 	var cur_draw = this.getp(&"cur_draw")
 	if cur_draw == &"": return
 	draw_handle(ctx, this, this.getp(&"draw_data")[cur_draw])
