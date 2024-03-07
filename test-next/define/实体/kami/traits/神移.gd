@@ -27,9 +27,11 @@ var props := {
 			for act in sets.pressings.keys():
 				match act:
 					&"kami_move_up":
-						await this.callmRSU(ctx, &"position/set", this.position + Vector3(0, 0, 1))
+						if not sets.pressings.has(&"kami_zoom_in"):
+							await this.callmRSU(ctx, &"position/set", this.position + Vector3(0, 0, 1))
 					&"kami_move_down":
-						await this.callmRSU(ctx, &"position/set", this.position - Vector3(0, 0, 1))
+						if not sets.pressings.has(&"kami_zoom_out"):
+							await this.callmRSU(ctx, &"position/set", this.position - Vector3(0, 0, 1))
 			pass,
 	}),
 }
