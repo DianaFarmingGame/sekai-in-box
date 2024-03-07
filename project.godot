@@ -201,4 +201,4 @@ define_entry="res://test-next/define_entry.gss.txt"
 render_extra_sight=4
 min_inits_per_frame=8
 gikou_store_dir="res://test-next/gikous"
-debug_draw_chunk=true
+debug_draw_chunk=false
