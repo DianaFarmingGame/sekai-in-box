@@ -618,11 +618,11 @@ func applym(ctx: LisperContext, key: StringName, argv: Array) -> Variant:
 	vargv.append_array(argv)
 	var value = null
 	var data = define._props.get(key)
-	if data is Callable:
-		value = await data.callv(vargv)
-	elif data is Array:
+	if data is Array:
 		for entry in data.duplicate():
 			value = await entry[1].callv(vargv)
+	elif data is Callable:
+		value = await data.callv(vargv)
 	var lidx = layers.size() - 1
 	while lidx >= 0:
 		data = layers[lidx][1].get(key)
@@ -633,6 +633,13 @@ func applym(ctx: LisperContext, key: StringName, argv: Array) -> Variant:
 			value = await data.callv(vargv)
 		lidx -= 1
 	return value
+
+func callf_on_draw(ctx: LisperContext, ctrl: SekaiControl, item: SekaiItem) -> void:
+	for entry in define._props[&"on_draw"]:
+		entry[1].call(ctx, self, ctrl, item)
+	for layer in layers:
+		for entry in layer[1].get(&"on_draw", []):
+			entry[1].call(ctx, self, ctrl, item)
 
 func applymS(ctx: LisperContext, key: StringName, argv: Array) -> Variant:
 	var vargv := [ctx, self]

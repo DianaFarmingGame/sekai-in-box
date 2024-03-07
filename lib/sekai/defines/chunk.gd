@@ -231,7 +231,7 @@ static func update_control(ctx: LisperContext, this: Mono, ctrl: SekaiControl) -
 			item.on_draw.connect(func ():
 				for mono in lconts:
 					if mono.inited:
-						mono.applym(ctx, &"on_draw", [ctrl, item])
+						mono.callf_on_draw(ctx, ctrl, item)
 					else:
 						var mpos := mono.position as Vector3
 						var pos := Vector2(mpos.x, mpos.y - mpos.z * item.ratio_yz)
