@@ -94,9 +94,9 @@ var props := {
 			var mono_id = r_["data"]["mono_id"]
 			if mono_id_map.has(mono_id):
 				continue
-			#TODO switch to global mono get
-			var hako = await sekai.gikou.emitm(ctx, &"get_hako")
-			var mono = await hako.callm(ctx, &"container/get_by_ref_id", mono_id) as Mono
+			
+			var mono = sekai.gikou.callmRSUY(ctx, &"get_uid", mono_id) as Mono
+
 			mono_id_map[mono_id] = true
 			mono.pushs(&"on_contains_mod", [
 				&"0:task_" + this.getp(&"task_data")["id"], func(ctx, mono: Mono):
