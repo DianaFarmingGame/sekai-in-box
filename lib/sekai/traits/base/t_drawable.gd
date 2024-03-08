@@ -33,16 +33,18 @@ var props := {
 	}),
 	&"on_process": Prop.puts({
 		&"0:drawable": func (ctx: LisperContext, this: Mono, _delta) -> void:
-			for item in this.getp(&"layer").values():
-				item.queue_redraw(),
+			if this.getp(&"need_redraw"):
+				for item in this.getp(&"layer").values():
+					item.queue_redraw(),
 		&"0:debug_drawable": func (ctx: LisperContext, this: Mono, _delta) -> void:
 			for layers in this.getp(&"layer_data").values():
 				for item in layers.values():
 					item.queue_redraw(),
 	} if ProjectSettings.get_setting(&"sekai/debug_draw") else {
 		&"0:drawable": func (ctx: LisperContext, this: Mono, _delta) -> void:
-			for item in this.getp(&"layer").values():
-				item.queue_redraw(),
+			if this.getp(&"need_redraw"):
+				for item in this.getp(&"layer").values():
+					item.queue_redraw(),
 	}),
 }
 
