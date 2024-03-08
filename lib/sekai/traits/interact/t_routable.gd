@@ -49,7 +49,7 @@ static func draw_debug(ctx: LisperContext, this: Mono, ctrl: SekaiControl, item:
 	var tar := ctrl.target as Mono
 	if tar != null:
 		if this.getp(&"can_route") and floori(this.position.z) == floori(tar.position.z + tar.getp(&"solid_route_zoffset")):
-			var pos := Vector2(this.position.x, this.position.y - this.position.z * item.ratio_yz + tar.getp(&"solid_route_zoffset") * item.ratio_yz)
+			var pos := Vector2(this.position.x, this.position.y - this.position.z + tar.getp(&"solid_route_zoffset"))
 			var rboxes = this.getp(&"route_boxes")
 			for rbox in rboxes:
 				var box := Rect2(pos + rbox.position, rbox.size)

@@ -12,7 +12,7 @@ var props := {
 }
 
 static func draw_debug(ctx: LisperContext, this: Mono, ctrl: SekaiControl, item: SekaiItem) -> void:
-	var pos := Vector2(this.position.x, this.position.y - this.position.z * item.ratio_yz)
+	var pos := Vector2(this.position.x, this.position.y - this.position.z)
 	var rbox := this.getp(&"solid_box") as Rect2
 	var box := Rect2(pos + rbox.position, rbox.size)
 	item.draw_rect(box, 0x0088ff88)

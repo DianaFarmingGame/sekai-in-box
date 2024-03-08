@@ -10,6 +10,7 @@ func do_merge(sets: Array[Dictionary]) -> Array[Dictionary]:
 		&"chunk_size": Vector2(0, 0),
 		&"chunk_cell": Vector3(1, 1, 1),
 		&"chunk_data": [-1],
+		&"need_process": true,
 		
 		&"chunk_mat": null,
 		
@@ -131,7 +132,23 @@ func do_merge(sets: Array[Dictionary]) -> Array[Dictionary]:
 		
 		
 		
-		&"on_process": null,
+		&"on_process": Prop.Stack({
+			&"0:chunk": func (ctx: LisperContext, this: Mono, _delta) -> void:
+				if this.getp(&"need_process"):
+					var need_process := false
+					var mat := this.getp(&"chunk_mat") as Array
+					var layer_data := this.getp(&"layer_data") as Dictionary
+					for y in mat.size():
+						var need_redraw = mat[y].any(func (m): return m != null and not m.inited)
+						if need_redraw:
+							need_process = true
+							for layers in layer_data.values():
+								layers[str(y as int)].queue_redraw()
+					if not need_process:
+						this.setpBW(ctx, &"need_process", false)
+					for item in this.getp(&"layer").values():
+						item.queue_redraw(),
+		}),
 		&"on_round": func (ctx: LisperContext, this: Mono, delta: float) -> void:
 			var contains := this.getpB(&"contains") as Array
 			for mono in contains:
@@ -154,8 +171,8 @@ func do_merge(sets: Array[Dictionary]) -> Array[Dictionary]:
 		}),
 		&"on_control_enter": Prop.puts({
 			&"0:chunk": func (ctx: LisperContext, this: Mono, ctrl: SekaiControl) -> void:
-				Chunk.update_control(ctx, this, ctrl)
-				Chunk.update_position(ctx, this),
+				Chunk.update_position(ctx, this)
+				Chunk.update_control(ctx, this, ctrl),
 			&"99:chunk_shadow": func (ctx: LisperContext, this: Mono, ctrl: SekaiControl) -> void:
 				var item := this.getpB(&"layer")[ctrl] as SekaiItem
 				item.set_y(this.position.y + floorf(this.position.z + 2) * 64),
@@ -178,12 +195,16 @@ func do_merge(sets: Array[Dictionary]) -> Array[Dictionary]:
 		&"on_position_mod": Prop.puts({
 			&"0:chunk": Chunk.update_position,
 		}),
+		&"after_need_process": Prop.Stack({
+			&"0:chunk": func (ctx: LisperContext, this: Mono, need: bool) -> void:
+				this.setp(&"need_redraw", need),
+		}),
 	})
 	return sets
 
 static func draw_debug(ctx: LisperContext, this: Mono, ctrl: SekaiControl, item: SekaiItem) -> void:
 	if this.getp(&"kami_select"):
-		var offset := Vector2(this.position.x, this.position.y - this.position.z * item.ratio_yz)
+		var offset := Vector2(this.position.x, this.position.y - this.position.z)
 		#var data := this.getp(&"chunk_data") as Array
 		var size := this.getp(&"chunk_size") as Vector2
 		var cell := this.getp(&"chunk_cell") as Vector3
@@ -200,14 +221,10 @@ static func draw_debug(ctx: LisperContext, this: Mono, ctrl: SekaiControl, item:
 const shadow := preload("res/shadow.png")
 
 static func draw_shadow(ctx: LisperContext, this: Mono, ctrl: SekaiControl, item: SekaiItem) -> void:
-	if this.getp(&"need_shadow"):
-		var contains := this.getp(&"contains") as Array
-		var need_shadow := false
-		for mono in contains:
-			if not mono.inited or mono.define.ref == 2000:
-				item.pen_draw_texture(shadow, Rect2(mono.position.x - 3, mono.position.y - 3, 6, 6))
-				need_shadow = true
-		this.setpB(&"need_shadow", need_shadow)
+	var contains := this.getp(&"contains") as Array
+	for mono in contains:
+		if not mono.inited or mono.define.ref == 2000:
+			item.pen_draw_texture(shadow, Rect2(mono.position.x - 3, mono.position.y - 3, 6, 6))
 
 static func rebuild_mat(ctx: LisperContext, this: Mono) -> void:
 	var offset := this.position
@@ -238,18 +255,15 @@ static func rebuild_mat(ctx: LisperContext, this: Mono) -> void:
 	var layer_data := this.getp(&"layer_data") as Dictionary
 	for ctrl in layer_data.keys():
 		Chunk.update_control(ctx, this, ctrl)
-	this.setpB(&"need_shadow", true)
+	this.setpBW(ctx, &"need_process", true)
 
 static func update_control(ctx: LisperContext, this: Mono, ctrl: SekaiControl) -> void:
-	var offset := this.position
 	var mat := this.getp(&"chunk_mat") as Array
-	var cell := this.getp(&"chunk_cell") as Vector3
 	var layers := this.getp(&"layer_data")[ctrl] as Dictionary
 	for y in mat.size():
 		var line := mat[y] as Array
 		var lconts := line.filter(func (i): return i != null)
 		var item := layers[str(y as int)] as SekaiItem
-		var yoffset := offset.y + y * cell.y - offset.z * item.ratio_yz
 		for mono in lconts:
 			var items := mono.getpBD(&"layer", {}) as Dictionary
 			items[ctrl] = item
@@ -258,17 +272,17 @@ static func update_control(ctx: LisperContext, this: Mono, ctrl: SekaiControl) -
 			item.on_draw.disconnect(conn[&"callable"])
 		if lconts.size() > 0:
 			item.on_draw.connect(func ():
-				if ctrl._render_box.position.y < yoffset and yoffset < ctrl._render_box.end.y:
-					for mono in lconts:
-						if mono.inited:
+				for mono in lconts:
+					if mono.inited:
+						mono.callf_on_draw(ctx, ctrl, item)
+					else:
+						var mpos := mono.position as Vector3
+						var pos := Vector2(mpos.x, mpos.y - mpos.z)
+						if ctrl._is_idle(pos):
+							mono.init(ctx)
 							mono.callf_on_draw(ctx, ctrl, item)
 						else:
-							var mpos := mono.position as Vector3
-							var pos := Vector2(mpos.x, mpos.y - mpos.z)
-							if ctrl._is_idle(pos):
-								mono.init(ctx)
-							else:
-								ctrl._update_padding_pos(pos)
+							ctrl._update_padding_pos(pos)
 			)
 
 static func exit_control(ctx: LisperContext, this: Mono, ctrl: SekaiControl) -> void:
@@ -289,7 +303,7 @@ static func update_position(ctx: LisperContext, this: Mono) -> void:
 	var cell := this.getp(&"chunk_cell") as Vector3
 	var data := this.getp(&"layer_data") as Dictionary
 	for y in size.y:
-		var oy := offset.y + cell.y * y + floorf(offset.z) * 64
+		var oy := offset.y + cell.y * y + floorf(offset.z) * 64.0
 		for layers in data.values():
 			var item := layers[str(y as int)] as SekaiItem
 			item.set_y(oy)

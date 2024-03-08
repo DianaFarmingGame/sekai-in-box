@@ -69,11 +69,11 @@ var props := {
 		layers[uid] = layer
 		data[ctrl] = layers
 		this.setpB(&"layer_data", data)
-		ctrl.add_child(layer),
+		ctrl.add_item(layer),
 	&"layer/remove": func (ctx: LisperContext, this: Mono, ctrl: SekaiControl, uid: StringName) -> void:
 		var data := this.getpB(&"layer_data").get(ctrl, {}) as Dictionary
 		var layer := data[uid] as SekaiItem
-		ctrl.remove_child(layer)
+		ctrl.remove_item(layer)
 		layer.free()
 		data.erase(uid),
 	&"on_control_enter": Prop.puts({
@@ -90,9 +90,9 @@ var props := {
 			data[ctrl] = layers
 			this.setpB(&"layer", items)
 			this.setpB(&"layer_data", data)
-			ctrl.add_child(item)
+			ctrl.add_item(item)
 			for layer in layers.values():
-				ctrl.add_child(layer),
+				ctrl.add_item(layer),
 	}),
 	&"on_control_exit": Prop.puts({
 		&"99:with_layer": func (ctx: LisperContext, this: Mono, ctrl: SekaiControl) -> void:
@@ -100,10 +100,10 @@ var props := {
 			var data := this.getpBD(&"layer_data", {}) as Dictionary
 			var item := items[ctrl] as SekaiItem
 			var layers := data[ctrl] as Dictionary
-			ctrl.remove_child(item)
+			ctrl.remove_item(item)
 			item.free()
 			for layer in layers.values():
-				ctrl.remove_child(layer)
+				ctrl.remove_item(layer)
 				layer.free()
 			items.erase(ctrl)
 			data.erase(ctrl),
