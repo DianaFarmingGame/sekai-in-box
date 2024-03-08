@@ -53,6 +53,9 @@ func _draw() -> void:
 func get_time() -> float:
 	return _time
 
+func reset_time(time := 0.0) -> void:
+	_time = time
+
 func get_delta_time() -> float:
 	return _t_delta
 
