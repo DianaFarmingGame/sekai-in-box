@@ -45,7 +45,9 @@ func do_merge(sets: Array[Dictionary]) -> Array[Dictionary]:
 			var layer_data := this.getp(&"layer_data") as Dictionary
 			for ctrl in layer_data.keys():
 				Chunk.update_control(ctx, this, ctrl)
-			pass,
+			for layers in layer_data.values():
+				layers[str(pos.y as int)].queue_redraw()
+			this.setpBW(ctx, &"need_process", true),
 		&"chunk/remove": func (ctx: LisperContext, this: Mono, pos: Vector2) -> void:
 			var data := this.getp(&"chunk_data") as Array
 			var size := this.getp(&"chunk_size") as Vector2
@@ -69,7 +71,9 @@ func do_merge(sets: Array[Dictionary]) -> Array[Dictionary]:
 			var layer_data := this.getp(&"layer_data") as Dictionary
 			for ctrl in layer_data.keys():
 				Chunk.update_control(ctx, this, ctrl)
-			pass,
+			for layers in layer_data.values():
+				layers[str(pos.y as int)].queue_redraw()
+			this.setpBW(ctx, &"need_process", true),
 		&"chunk/fill": func (ctx: LisperContext, this: Mono, ref: int) -> void:
 			this.setpB(&"chunk_data", [ref])
 			Chunk.rebuild_mat(ctx, this),
