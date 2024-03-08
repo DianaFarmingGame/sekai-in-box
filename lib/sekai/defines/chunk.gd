@@ -156,6 +156,9 @@ func do_merge(sets: Array[Dictionary]) -> Array[Dictionary]:
 			&"0:chunk": func (ctx: LisperContext, this: Mono, ctrl: SekaiControl) -> void:
 				Chunk.update_control(ctx, this, ctrl)
 				Chunk.update_position(ctx, this),
+			&"99:chunk_shadow": func (ctx: LisperContext, this: Mono, ctrl: SekaiControl) -> void:
+				var item := this.getpB(&"layer")[ctrl] as SekaiItem
+				item.set_y(this.position.y + floorf(this.position.z + 2) * 64),
 		}),
 		&"on_control_exit": Prop.puts({
 			&"0:chunk": Chunk.exit_control,
@@ -165,6 +168,9 @@ func do_merge(sets: Array[Dictionary]) -> Array[Dictionary]:
 				this.setpB(&"contains", [])
 				this.setpB(&"chunk_mat", null)
 				pass,
+		}),
+		&"on_draw": Prop.puts({
+			&"99:chunk": Chunk.draw_shadow,
 		}),
 		&"on_draw_debug": Prop.puts({
 			&"99:chunk": Chunk.draw_debug,
@@ -190,6 +196,18 @@ static func draw_debug(ctx: LisperContext, this: Mono, ctrl: SekaiControl, item:
 				#var rid = data[i % data.size()]
 				#if rid != -1:
 					#item.draw_rect(Rect2(pos - dcell/2, dcell), Color(1, 1, 1, 0.2), true)
+
+const shadow := preload("res/shadow.png")
+
+static func draw_shadow(ctx: LisperContext, this: Mono, ctrl: SekaiControl, item: SekaiItem) -> void:
+	if this.getp(&"need_shadow"):
+		var contains := this.getp(&"contains") as Array
+		var need_shadow := false
+		for mono in contains:
+			if not mono.inited or mono.define.ref == 2000:
+				item.pen_draw_texture(shadow, Rect2(mono.position.x - 3, mono.position.y - 3, 6, 6))
+				need_shadow = true
+		this.setpB(&"need_shadow", need_shadow)
 
 static func rebuild_mat(ctx: LisperContext, this: Mono) -> void:
 	var offset := this.position
@@ -220,6 +238,7 @@ static func rebuild_mat(ctx: LisperContext, this: Mono) -> void:
 	var layer_data := this.getp(&"layer_data") as Dictionary
 	for ctrl in layer_data.keys():
 		Chunk.update_control(ctx, this, ctrl)
+	this.setpB(&"need_shadow", true)
 
 static func update_control(ctx: LisperContext, this: Mono, ctrl: SekaiControl) -> void:
 	var offset := this.position
@@ -245,7 +264,7 @@ static func update_control(ctx: LisperContext, this: Mono, ctrl: SekaiControl) -
 							mono.callf_on_draw(ctx, ctrl, item)
 						else:
 							var mpos := mono.position as Vector3
-							var pos := Vector2(mpos.x, mpos.y - mpos.z * item.ratio_yz)
+							var pos := Vector2(mpos.x, mpos.y - mpos.z)
 							if ctrl._is_idle(pos):
 								mono.init(ctx)
 							else:

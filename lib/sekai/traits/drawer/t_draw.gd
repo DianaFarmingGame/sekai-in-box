@@ -8,14 +8,17 @@ var props := {
 	&"cur_draw": &"",
 	&"cur_draw_variant": 0,
 	&"draw_flip_h": false,
-	&"on_draw_end": Prop.Stack(), # TODO
+	&"draw_end_emitted": false,
+	&"on_draw_end": Prop.Stack(),
 	
 	&"draw/reset": func (ctx: LisperContext, this: Mono) -> void:
+		this.setp(&"draw_end_emitted", false)
 		var items := this.getp(&"layer") as Dictionary
 		for item in items.values():
 			if item != null:
 				item.reset_time(),
 	&"draw/restick": func (ctx: LisperContext, this: Mono) -> void:
+		this.setp(&"draw_end_emitted", false)
 		var cur_draw = this.getp(&"cur_draw")
 		if cur_draw == &"": return
 		var draw = this.getp(&"draw_data")[cur_draw]
@@ -87,16 +90,25 @@ static func _on_draw(ctx: LisperContext, this: Mono, item: SekaiItem, draw: Arra
 			frame = draw[2]
 		&"fixed":
 			var timeout := draw[2] as float
-			var t := item.get_time()
 			var frames := draw[3] as Array
-			var frame_idx := frames.size() * fposmod(t / timeout, 1) as int
+			var frame_idx := frames.size() * fposmod(item.get_time() / timeout, 1) as int
 			frame = frames[frame_idx]
 		&"sticky":
 			var timeout := draw[2] as float
-			var t := item.get_time()
 			var frames := draw[3] as Array
-			var frame_idx := clampi(frames.size() * (t / timeout + 1) as int, 0, frames.size() - 1)
+			var frame_idx := clampi(frames.size() * (item.get_time() / timeout + 1) as int, 0, frames.size() - 1)
 			frame = frames[frame_idx]
+		&"oneshot":
+			var timeout := draw[2] as float
+			var frames := draw[3] as Array
+			var frame_idx := (frames.size() * item.get_time() / timeout) as int
+			if frame_idx >= frames.size():
+				if not this.getp(&"draw_end_emitted"):
+					this.setp(&"draw_end_emitted", true)
+					this.emitc(ctx, &"on_draw_end")
+				frame = frames[-1]
+			else:
+				frame = frames[frame_idx]
 		&"atile":
 			var tile := this.getp(&"atile_result") as Array
 			if tile.size() == 9:

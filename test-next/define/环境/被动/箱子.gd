@@ -15,6 +15,7 @@ func do_merge(sets: Array[Dictionary]) -> Array[Dictionary]:
 				return true,
 		},
 		&"cur_draw": &"closed",
+		&"cur_state": &"closed",
 		&"init_state": &"closed",
 		&"state_data": {
 			&"opened": {

@@ -216,7 +216,7 @@ func _update_sight() -> void:
 		var render_box := _render_box
 		for mono in contains:
 			counter += 1
-			if counter > 16:
+			if counter > 64:
 				counter = 0
 				await sekai.process
 			if mono.applymRSUY(context, &"render_box_intersects", [self, render_box]):
