@@ -2,6 +2,7 @@ define (load ("../pc.gd")
 	ref 1101
 	id &实体/角色/嘉然
 	uid &实体/角色/嘉然
+	name "嘉然"
 	props {
 		name "嘉然"
 		solid_box rect2(-0.3 -0.1 0.6 0.2)

@@ -12,5 +12,5 @@ define (load ("栅栏.gd")
 		}
 		atile_size vec3(3 3 1)
 		groups prop/pushs([&环境/装饰/栅栏])
-		atile_matches [[&环境/装饰/栅栏]]
+		atile_matches [[&环境/装饰/栅栏 &环境/空白]]
 	})

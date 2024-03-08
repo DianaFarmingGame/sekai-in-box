@@ -8,6 +8,9 @@ var unit_size: Vector3:
 		ratio_yz = v.y / v.z
 var ratio_yz := 1.0
 
+var need_draw_drawers := false
+var drawers := []
+
 func _ready() -> void:
 	base_transform = Transform2D(0, Vector2(unit_size.x, unit_size.y), 0, Vector2(0, -position.y))
 	offset_transform = Transform2D(0, Vector2(1, 1), 0, Vector2())
@@ -44,6 +47,8 @@ func _draw() -> void:
 	offset_transform = Transform2D(0, Vector2(1, 1), 0, _parent._item_offset)
 	pen_clear_transform()
 	on_draw.emit()
+	if need_draw_drawers: for drawer in drawers:
+		drawer.call(null, null, null, self)
 
 func get_time() -> float:
 	return _time

@@ -109,4 +109,12 @@ defunc (array/map-let :const :gd :macro ',
 		]])
 ,')
 
+defunc (array->dict :const :gd :pure ',
+	func (ary: Array) -> Dictionary:
+		var result := {}
+		for entry in ary:
+			result[entry[0]] = entry[1]
+		return result
+,')
+
 ']

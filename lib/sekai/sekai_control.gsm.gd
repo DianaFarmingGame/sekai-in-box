@@ -213,12 +213,13 @@ func _update_sight() -> void:
 		var contains := hako.getpB(&"contains") as Array
 		var nconts := []
 		var counter := 0
+		var render_box := _render_box
 		for mono in contains:
 			counter += 1
 			if counter > 16:
 				counter = 0
 				await sekai.process
-			if mono.applymRSUY(context, &"render_box_intersects", [self, _render_box]):
+			if mono.applymRSUY(context, &"render_box_intersects", [self, render_box]):
 				nconts.append(mono)
 		_monos_in_sight = nconts
 	else:

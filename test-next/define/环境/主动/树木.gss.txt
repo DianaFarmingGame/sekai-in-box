@@ -6,11 +6,11 @@ fn (sign [ref id name offset]
 		id id
 		name name
 		props {
+			level_cost [1 1 1 1 1]
 			asserts {
 				main load ("树木.png")
 			}
 			cur_draw &main
-			cur_draw_variant 0
 			draw_data {
 				main [&diverse [
 					[&static &main [rect2(-0.5 -0.5 1 1) rect2(offset 0 32 32)]]
@@ -21,6 +21,13 @@ fn (sign [ref id name offset]
 					[&static &main [rect2(-1.5 -2.5 3 3) rect2(offset 64 96 96)]]
 				]]
 			}
+			state_data array->dict (array/unfold (6 fn ([level]
+				[keyword(str("level:" level)) {
+					cover {
+						cur_draw_variant level
+					}
+				}]
+			)))
 		}
 	)
 )

@@ -33,7 +33,7 @@ define (load ("构造体.gd")
 		}
 		atile_size vec3(3 3 1)
 		groups prop/pushs([&环境/地形/沙滩])
-		atile_matches [[&环境/地形/沙滩 &环境/地形/土壤 &环境/地形/沙地]]
+		atile_matches [[&环境/地形/沙滩 &环境/空白 &环境/地形/土壤 &环境/地形/沙地]]
 		atile_rules *atile_rules_3x3x1*
 	}
 )

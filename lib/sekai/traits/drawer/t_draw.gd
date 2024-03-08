@@ -37,6 +37,16 @@ var props := {
 	
 	&"on_draw": Prop.puts({&"0:draw": TDraw.on_draw}),
 	&"on_draw_debug": Prop.Stack(),
+	&"on_ready": Prop.puts({
+		&"99:draw": func (ctx: LisperContext, this: Mono) -> void:
+			var stack := []
+			stack.append_array(this.getpR(&"on_draw"))
+			var layers := this.layers.duplicate()
+			layers.reverse()
+			for layer in layers:
+				stack.append_array(layer[1].get(&"on_draw", []))
+			this.prop_on_draw = stack,
+	}),
 }
 
 const TILE_MAP = [

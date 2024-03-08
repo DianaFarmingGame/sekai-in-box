@@ -25,13 +25,13 @@ func _ready() -> void:
 
 func _enter_tree() -> void:
 	this.putsB(&"on_pick", [&"0:kami_ui", _on_kami_hover])
-	this.putsB(&"on_action_primary", [&"0:kami_ui", _on_kami_pick])
-	this.putsB(&"on_action_secondary", [&"0:kami_ui", _on_kami_pick_cancel])
+	#this.putsB(&"on_action_primary", [&"0:kami_ui", _on_kami_pick])
+	#this.putsB(&"on_action_secondary", [&"0:kami_ui", _on_kami_pick_cancel])
 
 func _exit_tree() -> void:
 	this.delsB(&"on_pick", &"0:kami_ui")
-	this.delsB(&"on_action_primary", &"0:kami_ui")
-	this.delsB(&"on_action_secondary", &"0:kami_ui")
+	#this.delsB(&"on_action_primary", &"0:kami_ui")
+	#this.delsB(&"on_action_secondary", &"0:kami_ui")
 
 var _defines := []
 var _filtered_defines := []
@@ -66,8 +66,12 @@ func _on_kami_hover(ctx: LisperContext, this: Mono, ctrl: SekaiControl, pick: Va
 		_on_kami_pick(ctx, this, ctrl, pick, sets)
 	if sets.triggered.has(&"action_secondary"):
 		_on_kami_pick_cancel(ctx, this, ctrl, pick, sets)
+	var dir := sets.direction
+	var pos := (this.position + Vector3(dir.x, dir.y, 0)).round()
 	if pick != null:
-		HoverInfo.text = str(pick.define.id, '[', pick.define.ref, '] ', pick.position.snapped(Vector3(0.1, 0.1, 0.1)))
+		HoverInfo.text = str(pos, " - ", pick.define.id, '[', pick.define.ref, '] ', pick.position.snapped(Vector3(0.1, 0.1, 0.1)))
+	else:
+		HoverInfo.text = str(pos)
 
 var _pick_monos := []
 var _sel_mono: Mono = null:
@@ -81,7 +85,7 @@ var _sel_mono: Mono = null:
 			_on_sel_mono_mod()
 
 func _on_kami_pick(ctx: LisperContext, this: Mono, ctrl: SekaiControl, pick: Variant, sets: InputSet) -> void:
-	if not _locked:
+	if not _locked or sets.triggered.has(&"kami_force_select"):
 		_on_kami_pick_cancel(ctx, this, ctrl, pick, sets)
 		var dir := sets.direction
 		var pos := Vector2(this.position.x, this.position.y - this.position.z * ctrl.unit_size.y / ctrl.unit_size.z) + dir
@@ -103,6 +107,14 @@ func _on_kami_pick(ctx: LisperContext, this: Mono, ctrl: SekaiControl, pick: Var
 			_on_pick_list_item_selected(0)
 	else:
 		match ActionTabs.current_tab:
+			ActionType.NONE:
+				if _sel_define != null:
+					var dir := sets.direction
+					var pos := this.position + Vector3(dir.x, dir.y, 0)
+					var mono := sekai.make_mono(_sel_define.ref, {
+						&"position": pos
+					})
+					ctrl.hako.callmRSU(ctx, &"container/put", mono)
 			ActionType.CHUNK:
 				var chunk := _sel_mono
 				var dir := sets.direction
@@ -117,7 +129,7 @@ func _on_kami_pick(ctx: LisperContext, this: Mono, ctrl: SekaiControl, pick: Var
 						chunk.applymRSU(ctx, &"chunk/set", [cpos, _sel_define.ref])
 
 func _on_kami_pick_cancel(ctx: LisperContext, this: Mono, ctrl: SekaiControl, pick: Variant, sets: InputSet) -> void:
-	if not _locked:
+	if not _locked or sets.triggered.has(&"kami_force_select"):
 		PickList.clear()
 		for mono in hako.getp(&"contains"):
 			mono.setpW(context, &"layer_opacity", 1.0)
@@ -138,7 +150,7 @@ func _on_kami_pick_cancel(ctx: LisperContext, this: Mono, ctrl: SekaiControl, pi
 					chunk.applymRSU(ctx, &"chunk/remove", [cpos])
 
 func _on_pick_list_item_selected(index: int) -> void:
-	if _locked: return
+	#if _locked: return
 	for mono in hako.getp(&"contains"):
 		mono.setpW(context, &"layer_opacity", 0.2)
 	_sel_mono = _pick_monos[index]
@@ -188,3 +200,18 @@ func _on_take_control_btn_pressed() -> void:
 			nwindow.queue_free()
 		)
 		nwindow.show()
+
+func _on_round_btn_pressed() -> void:
+	sekai.gikou.callm(context, &"pass_round", 1)
+
+func _on_chunk_set_btn_pressed() -> void:
+	var chunk := _sel_mono
+	if _sel_define != null:
+		chunk.callmRSU(context, &"chunk/fill", _sel_define.ref)
+
+func _on_put_button_pressed() -> void:
+	var pos := Vector3(this.position.x, this.position.y, 1)
+	var mono := sekai.make_mono(&"实体/角色/嘉然", {
+		&"position": pos
+	})
+	control.hako.callmRSU(context, &"container/put", mono)

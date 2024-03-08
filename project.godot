@@ -34,6 +34,7 @@ gdscript/warnings/confusable_local_declaration=0
 
 window/size/viewport_width=576
 window/size/viewport_height=640
+window/size/mode=2
 window/subwindows/embed_subwindows=false
 window/vsync/vsync_mode=2
 mouse_cursor/custom_image="res://assert/ui/鼠标箭头.png"
@@ -52,6 +53,12 @@ import/fbx/enabled=false
 
 theme/custom_font="res://assert/ui/Cubic_11_1.000_R.ttf"
 theme/lcd_subpixel_layout=2
+
+[importer_defaults]
+
+texture={
+"mipmaps/generate": true
+}
 
 [input]
 
@@ -153,6 +160,16 @@ kami_move={
 "events": [Object(InputEventMouseButton,"resource_local_to_scene":false,"resource_name":"","device":-1,"window_id":0,"alt_pressed":false,"shift_pressed":false,"ctrl_pressed":false,"meta_pressed":false,"button_mask":4,"position":Vector2(171, 12),"global_position":Vector2(837, 393),"factor":1.0,"button_index":3,"canceled":false,"pressed":true,"double_click":false,"script":null)
 ]
 }
+kami_move_up={
+"deadzone": 0.5,
+"events": [Object(InputEventMouseButton,"resource_local_to_scene":false,"resource_name":"","device":-1,"window_id":0,"alt_pressed":false,"shift_pressed":false,"ctrl_pressed":false,"meta_pressed":false,"button_mask":8,"position":Vector2(289, 8),"global_position":Vector2(978, 352),"factor":1.0,"button_index":4,"canceled":false,"pressed":true,"double_click":false,"script":null)
+]
+}
+kami_move_down={
+"deadzone": 0.5,
+"events": [Object(InputEventMouseButton,"resource_local_to_scene":false,"resource_name":"","device":-1,"window_id":0,"alt_pressed":false,"shift_pressed":false,"ctrl_pressed":false,"meta_pressed":false,"button_mask":16,"position":Vector2(77, 13),"global_position":Vector2(766, 357),"factor":1.0,"button_index":5,"canceled":false,"pressed":true,"double_click":false,"script":null)
+]
+}
 kami_zoom_in={
 "deadzone": 0.5,
 "events": [Object(InputEventMouseButton,"resource_local_to_scene":false,"resource_name":"","device":-1,"window_id":0,"alt_pressed":false,"shift_pressed":false,"ctrl_pressed":true,"meta_pressed":false,"button_mask":8,"position":Vector2(162, 18),"global_position":Vector2(828, 399),"factor":1.0,"button_index":4,"canceled":false,"pressed":true,"double_click":false,"script":null)
@@ -166,6 +183,11 @@ kami_zoom_out={
 kami_zoom_reset={
 "deadzone": 0.5,
 "events": [Object(InputEventMouseButton,"resource_local_to_scene":false,"resource_name":"","device":-1,"window_id":0,"alt_pressed":false,"shift_pressed":false,"ctrl_pressed":true,"meta_pressed":false,"button_mask":4,"position":Vector2(130, 11),"global_position":Vector2(796, 392),"factor":1.0,"button_index":3,"canceled":false,"pressed":true,"double_click":false,"script":null)
+]
+}
+kami_force_select={
+"deadzone": 0.5,
+"events": [Object(InputEventKey,"resource_local_to_scene":false,"resource_name":"","device":-1,"window_id":0,"alt_pressed":false,"shift_pressed":false,"ctrl_pressed":false,"meta_pressed":false,"pressed":false,"keycode":0,"physical_keycode":4194326,"key_label":0,"unicode":0,"echo":false,"script":null)
 ]
 }
 task_toggle={
@@ -185,10 +207,16 @@ debugger_visible=false
 
 [rendering]
 
+textures/default_filters/anisotropic_filtering_level=4
 environment/ssao/quality=0
 environment/ssil/quality=0
-anti_aliasing/screen_space_roughness_limiter/enabled=false
 environment/defaults/default_clear_color=Color(0, 0, 0, 1)
+anti_aliasing/quality/msaa_2d=3
+anti_aliasing/quality/msaa_3d=3
+anti_aliasing/quality/screen_space_aa=1
+anti_aliasing/quality/use_taa=true
+2d/snap/snap_2d_transforms_to_pixel=true
+2d/snap/snap_2d_vertices_to_pixel=true
 
 [sekai]
 
@@ -201,4 +229,4 @@ define_entry="res://test-next/define_entry.gss.txt"
 render_extra_sight=4
 min_inits_per_frame=8
 gikou_store_dir="res://test-next/gikous"
-debug_draw_chunk=true
+debug_draw_chunk=false

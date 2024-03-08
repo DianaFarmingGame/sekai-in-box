@@ -32,6 +32,8 @@ func do_merge(sets: Array[Dictionary]) -> Array[Dictionary]:
 				return item
 			else:
 				return null,
+		&"pass_round": func (ctx: LisperContext, this: Mono, delta: float) -> void:
+			await sekai._round(delta),
 		
 		&"on_init": Prop.puts({
 			&"-99:add_base_hako": func (ctx: LisperContext, this: Mono) -> void:

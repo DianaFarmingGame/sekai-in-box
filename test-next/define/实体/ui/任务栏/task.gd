@@ -21,11 +21,11 @@ func _on_input(ctx: LisperContext, this: Mono, ctrl: SekaiControl, sets: InputSe
 func draw_task():
 	var tasks = await sekai.gikou.callm(context, &"taskm/get_by_status", 0)
 	for task in tasks.values():
-		var name = task["data"]["name"]
+		var vname = task["data"]["name"]
 		var desc = task["data"]["desc"]
 		var rewards = task["data"]["rewards"]
 		var node = TaskButton.new()
-		node.text = name
+		node.text = vname
 		node.desc = desc
 		node.rewards = rewards
 		node.connect("press", _on_button_pressed)

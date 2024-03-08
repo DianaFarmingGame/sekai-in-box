@@ -69,6 +69,9 @@ func do_merge(sets: Array[Dictionary]) -> Array[Dictionary]:
 			for ctrl in layer_data.keys():
 				Chunk.update_control(ctx, this, ctrl)
 			pass,
+		&"chunk/fill": func (ctx: LisperContext, this: Mono, ref: int) -> void:
+			this.setpB(&"chunk_data", [ref])
+			Chunk.rebuild_mat(ctx, this),
 		&"collect_by_pos": func (ctx: LisperContext, this: Mono, pos: Vector3) -> Mono:
 			var offset := this.position
 			var cell := this.getp(&"chunk_cell") as Vector3
@@ -87,8 +90,7 @@ func do_merge(sets: Array[Dictionary]) -> Array[Dictionary]:
 					else:
 						return null
 			else:
-				return null
-			return null,
+				return null,
 		&"collect_by_region": func (ctx: LisperContext, this: Mono, region: AABB) -> Variant:
 			var offset := this.position
 			if region.position.z <= offset.z and offset.z <= region.end.z:
@@ -130,6 +132,11 @@ func do_merge(sets: Array[Dictionary]) -> Array[Dictionary]:
 		
 		
 		&"on_process": null,
+		&"on_round": func (ctx: LisperContext, this: Mono, delta: float) -> void:
+			var contains := this.getpB(&"contains") as Array
+			for mono in contains:
+				if mono.inited:
+					await (mono as Mono).callc(ctx, &"on_round", delta),
 		&"on_init": Prop.puts({
 			&"0:chunk": func (ctx: LisperContext, this: Mono) -> void:
 				var size := this.getp(&"chunk_size") as Vector2
@@ -215,12 +222,15 @@ static func rebuild_mat(ctx: LisperContext, this: Mono) -> void:
 		Chunk.update_control(ctx, this, ctrl)
 
 static func update_control(ctx: LisperContext, this: Mono, ctrl: SekaiControl) -> void:
+	var offset := this.position
 	var mat := this.getp(&"chunk_mat") as Array
+	var cell := this.getp(&"chunk_cell") as Vector3
 	var layers := this.getp(&"layer_data")[ctrl] as Dictionary
 	for y in mat.size():
 		var line := mat[y] as Array
 		var lconts := line.filter(func (i): return i != null)
 		var item := layers[str(y as int)] as SekaiItem
+		var yoffset := offset.y + y * cell.y - offset.z * item.ratio_yz
 		for mono in lconts:
 			var items := mono.getpBD(&"layer", {}) as Dictionary
 			items[ctrl] = item
@@ -229,16 +239,17 @@ static func update_control(ctx: LisperContext, this: Mono, ctrl: SekaiControl) -
 			item.on_draw.disconnect(conn[&"callable"])
 		if lconts.size() > 0:
 			item.on_draw.connect(func ():
-				for mono in lconts:
-					if mono.inited:
-						mono.callf_on_draw(ctx, ctrl, item)
-					else:
-						var mpos := mono.position as Vector3
-						var pos := Vector2(mpos.x, mpos.y - mpos.z * item.ratio_yz)
-						if ctrl._is_idle(pos):
-							mono.init(ctx)
+				if ctrl._render_box.position.y < yoffset and yoffset < ctrl._render_box.end.y:
+					for mono in lconts:
+						if mono.inited:
+							mono.callf_on_draw(ctx, ctrl, item)
 						else:
-							ctrl._update_padding_pos(pos)
+							var mpos := mono.position as Vector3
+							var pos := Vector2(mpos.x, mpos.y - mpos.z * item.ratio_yz)
+							if ctrl._is_idle(pos):
+								mono.init(ctx)
+							else:
+								ctrl._update_padding_pos(pos)
 			)
 
 static func exit_control(ctx: LisperContext, this: Mono, ctrl: SekaiControl) -> void:

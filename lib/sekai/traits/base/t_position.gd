@@ -62,6 +62,7 @@ var props := {
 			if pos != this.position:
 				this.position = pos
 				this.emitc(ctx, &"on_position_mod")
+				this.setpB(&"_c_render_box", null)
 			return pos,
 	}),
 	

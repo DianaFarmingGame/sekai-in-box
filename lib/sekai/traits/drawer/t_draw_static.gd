@@ -33,27 +33,25 @@ static func draw_handle(ctx: LisperContext, this: Mono, draw: Array) -> void:
 				var trans := Transform2D(0, Vector2(-1, 1), 0, pos + clip[0].position + clip[0].size / 2)
 				var rect := Rect2(-clip[0].size / 2, clip[0].size)
 				var region := clip[1] as Rect2
-				this.putsB(&"on_draw", [
+				this.puts_on_draw([
 					&"0:draw_static", func (ctx: LisperContext, this: Mono, ctrl: SekaiControl, item: SekaiItem) -> void:
 						item.pen_set_transform(trans)
 						item.pen_draw_texture_region(texture, rect, region)
 						item.pen_clear_transform()
-						pass,
 				])
 			else:
 				var rect := Rect2(pos + clip[0].position, clip[0].size)
 				var region := clip[1] as Rect2
-				this.putsB(&"on_draw", [
+				this.puts_on_draw([
 					&"0:draw_static", func (ctx: LisperContext, this: Mono, ctrl: SekaiControl, item: SekaiItem) -> void:
 						item.pen_draw_texture_region(texture, rect, region)
-						pass,
 				])
 		&"fixed":
 			var timeout := draw[2] as float
 			var frames := draw[3] as Array
 			var timer := this.getp(&"draw_timer") as float
 			if this.getp(&"draw_flip_h"):
-				this.putsB(&"on_draw", [
+				this.puts_on_draw([
 					&"0:draw_static", func (ctx: LisperContext, this: Mono, ctrl: SekaiControl, item: SekaiItem) -> void:
 						var t := (item.get_time() - timer) as float
 						var frame_idx := lerpf(0.0, (frames.size() as float), fmod(t, timeout) / timeout) as int
@@ -61,16 +59,14 @@ static func draw_handle(ctx: LisperContext, this: Mono, draw: Array) -> void:
 						item.pen_set_transform(Transform2D(0, Vector2(-1, 1), 0, pos + frame[0].position + frame[0].size / 2))
 						item.pen_draw_texture_region(texture, Rect2(-frame[0].size / 2, frame[0].size), frame[1])
 						item.pen_clear_transform()
-						pass,
 				])
 			else:
-				this.putsB(&"on_draw", [
+				this.puts_on_draw([
 					&"0:draw_static", func (ctx: LisperContext, this: Mono, ctrl: SekaiControl, item: SekaiItem) -> void:
 						var t := (item.get_time() - timer) as float
 						var frame_idx := lerpf(0.0, (frames.size() as float), fmod(t, timeout) / timeout) as int
 						var frame = frames[frame_idx]
 						item.pen_draw_texture_region(texture, Rect2(pos + frame[0].position, frame[0].size), frame[1])
-						pass,
 				])
 		&"atile":
 			var tile := this.getp(&"atile_result") as Array
@@ -81,21 +77,23 @@ static func draw_handle(ctx: LisperContext, this: Mono, draw: Array) -> void:
 					[TILE_MAP[(tile[3] << 3) + (1 << 2) + ((tile[6] if tile[3] and tile[7] else 0) << 1) + (tile[7] << 0)], Vector2(0, 1)],
 					[TILE_MAP[(1 << 3) + (tile[5] << 2) + (tile[7] << 1) + ((tile[8] if tile[5] and tile[7] else 0) << 0)], Vector2(1, 1)],
 				]
-				this.putsB(&"on_draw", [
+				var list := ts.map(func (t):
+					var dbox := draw[2][0] as Rect2
+					var cbox := draw[2][1] as Rect2
+					dbox.position += dbox.size * t[1] + pos
+					cbox.position += cbox.size * t[0]
+					return [dbox, cbox]
+				)
+				this.puts_on_draw([
 					&"0:draw_static", func (ctx: LisperContext, this: Mono, ctrl: SekaiControl, item: SekaiItem) -> void:
-						for t in ts:
-							var dbox := draw[2][0] as Rect2
-							var cbox := draw[2][1] as Rect2
-							dbox.position += dbox.size * t[1] + pos
-							cbox.position += cbox.size * t[0]
-							item.pen_draw_texture_region(texture, dbox, cbox)
-						pass,
+						for entry in list:
+							item.pen_draw_texture_region(texture, entry[0], entry[1])
 				])
 		_:
 			push_error("unknown draw type: ", this.getp(&"draw_type"))
 
 static func update(ctx: LisperContext, this: Mono) -> void:
-	this.setpB(&"on_draw", Prop.Stack())
+	this.prop_on_draw = []
 	var cur_draw = this.getp(&"cur_draw")
 	if cur_draw == &"": return
 	draw_handle(ctx, this, this.getp(&"draw_data")[cur_draw])
