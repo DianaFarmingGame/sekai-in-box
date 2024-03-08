@@ -102,7 +102,7 @@ func _init(ptarget = null) -> void:
 		_custom_target = ptarget
 	y_sort_enabled = true
 	if texture_filter == CanvasItem.TEXTURE_FILTER_PARENT_NODE:
-		texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST_WITH_MIPMAPS_ANISOTROPIC
+		texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST_WITH_MIPMAPS
 	context = _make_context()
 
 func _ready() -> void:
