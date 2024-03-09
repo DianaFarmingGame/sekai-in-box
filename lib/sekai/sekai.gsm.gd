@@ -79,7 +79,7 @@ func start_gikou(id: String, entry := "") -> void:
 	gikou_changed.emit()
 
 ## 进入一个已有游戏的存档
-func enter_gikou(id: String) -> void:
+func enter_gikou(id: String, entry := "") -> void:
 	if gikou != null: exit_gikou()
 	await process
 	var file := FileAccess.open(gikou_store_dir.path_join(id + ".gikou"), FileAccess.READ)
@@ -88,6 +88,8 @@ func enter_gikou(id: String) -> void:
 		&"gikou": gikou,
 	})
 	await gikou.restore(context)
+	if entry != "": await exec_gsx(entry)
+	await gikou.init(context)
 	gikou_changed.emit()
 
 ## 触发当前游戏保存存档
@@ -327,7 +329,8 @@ func _update_debug_draw() -> void:
 		ProjectSettings.get_setting(&"sekai/debug_draw_pickable") or \
 		ProjectSettings.get_setting(&"sekai/debug_draw_routable") or \
 		ProjectSettings.get_setting(&"sekai/debug_draw_solid") or \
-		ProjectSettings.get_setting(&"sekai/debug_draw_chunk")
+		ProjectSettings.get_setting(&"sekai/debug_draw_chunk") or \
+		ProjectSettings.get_setting(&"sekai/debug_draw_kami_sight")
 	)
 
 var _indent := 0

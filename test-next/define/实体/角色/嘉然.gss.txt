@@ -1,15 +1,15 @@
 define (load ("../pc.gd")
 	ref 1101
 	id &实体/角色/嘉然
-	uid &实体/角色/嘉然
 	name "嘉然"
 	props {
 		name "嘉然"
+		uid &嘉然
 		solid_box rect2(-0.3 -0.1 0.6 0.2)
 		asserts {
 			idle load ("魔女帽站立.png")
 			walk load ("魔女帽行走.png")
-			avatar load ("立绘.png")
+			avatar load ("嘉然立绘.png")
 		}
 		draw_data {
 			idle [&fixed &idle 0.6 anim_char(4)]

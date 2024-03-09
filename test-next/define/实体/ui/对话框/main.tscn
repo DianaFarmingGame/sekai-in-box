@@ -3,7 +3,7 @@
 [ext_resource type="Script" path="res://test-next/define/实体/ui/对话框/main.gd" id="1_fu2rf"]
 [ext_resource type="Texture2D" uid="uid://b2omjxtpcbpqc" path="res://test-next/define/实体/ui/对话框/对话框.png" id="2_b8dov"]
 [ext_resource type="Texture2D" uid="uid://dgo17b2op7ffh" path="res://test-next/define/实体/ui/对话框/下一页标.png" id="3_tqh5y"]
-[ext_resource type="Texture2D" uid="uid://dy1wshsfr4i3u" path="res://test-next/define/实体/角色/立绘.png" id="4_eyi3q"]
+[ext_resource type="Texture2D" uid="uid://dhoo8idakp7lr" path="res://test-next/define/实体/角色/立绘.png" id="4_eyi3q"]
 
 [sub_resource type="Animation" id="Animation_qns6n"]
 length = 0.4
@@ -82,6 +82,7 @@ _data = {
 
 [node name="dialog" type="Control"]
 z_index = 5
+texture_filter = 1
 layout_mode = 3
 anchors_preset = 12
 anchor_top = 1.0
@@ -102,7 +103,7 @@ grow_horizontal = 2
 grow_vertical = 2
 
 [node name="TextureRect" type="TextureRect" parent="MarginContainer"]
-custom_minimum_size = Vector2(576, 145)
+custom_minimum_size = Vector2(868, 174)
 layout_mode = 2
 texture = ExtResource("2_b8dov")
 expand_mode = 2
@@ -125,20 +126,23 @@ autoplay = "new_animation"
 [node name="Name" type="RichTextLabel" parent="MarginContainer/TextureRect"]
 unique_name_in_owner = true
 layout_mode = 0
-offset_left = 141.0
-offset_top = 26.0
-offset_right = 230.0
-offset_bottom = 50.0
+offset_left = 226.0
+offset_top = 22.0
+offset_right = 796.0
+offset_bottom = 46.0
+theme_override_colors/default_color = Color(0.4, 0.117647, 0.12549, 1)
+theme_override_font_sizes/normal_font_size = 20
 bbcode_enabled = true
-text = "[color=pink]嘉然[/color]"
+text = "嘉然"
 
 [node name="Avatar" type="TextureRect" parent="MarginContainer/TextureRect"]
 unique_name_in_owner = true
 layout_mode = 0
-offset_left = 3.0
-offset_top = 3.0
-offset_right = 117.0
-offset_bottom = 117.0
+offset_left = -2.0
+offset_top = -37.5
+offset_right = 112.0
+offset_bottom = 76.5
+scale = Vector2(1.6, 1.6)
 texture = ExtResource("4_eyi3q")
 expand_mode = 2
 stretch_mode = 5
@@ -151,11 +155,12 @@ anchor_left = 0.244403
 anchor_top = 0.308412
 anchor_right = 0.934701
 anchor_bottom = 0.80374
-offset_left = 6.22387
-offset_top = 6.28026
-offset_right = -0.387791
-offset_bottom = -7.5423
+offset_left = 6.347
+offset_top = -1.43004
+offset_right = 0.548889
+offset_bottom = -8.6358
 theme_override_colors/default_color = Color(0.454902, 0.239216, 0, 1)
+theme_override_font_sizes/normal_font_size = 18
 bbcode_enabled = true
 text = "天王盖地虎，[color=green]嘉然[/color]一米五
 天王盖地虎，嘉然一米五"

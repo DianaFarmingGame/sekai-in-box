@@ -26,7 +26,7 @@ var props := {
 			#item.draw_rect(Rect2(sdcursor - Vector2(0.5, 0.5), Vector2(1, 1)), Color(Color.WHITE, 0.4), true)
 			#item.draw_rect(Rect2(sdcursor - Vector2(0.5, 0.5), Vector2(1, 1)), Color.BLACK, false)
 			pass,
-	}),
+	} if ProjectSettings.get_setting(&"sekai/debug_draw_kami_sight") else {}),
 	&"on_position_mod": Prop.puts({
 		&"99:kami_sight": func (ctx: LisperContext, this: Mono) -> void:
 			var items := this.getpB(&"layer") as Dictionary

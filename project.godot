@@ -19,7 +19,6 @@ config/icon="res://icon.png"
 
 [autoload]
 
-DebugMenu="*res://addons/debug_menu/debug_menu.tscn"
 LisperDebugger="*res://addons/lisper-debugger/lisper_debugger.tscn"
 sekai="*res://lib/sekai/sekai.gsm.gd"
 
@@ -34,7 +33,7 @@ gdscript/warnings/confusable_local_declaration=0
 
 window/size/viewport_width=576
 window/size/viewport_height=640
-window/size/mode=2
+window/size/mode=3
 window/subwindows/embed_subwindows=false
 window/vsync/vsync_mode=3
 mouse_cursor/custom_image="res://assert/ui/鼠标箭头.png"
@@ -42,7 +41,7 @@ window/defaults/default_clear_color=Color(0, 0, 0, 1)
 
 [editor_plugins]
 
-enabled=PackedStringArray("res://addons/FileSystemView/plugin.cfg", "res://addons/debug_menu/plugin.cfg", "res://addons/lisper-debugger/plugin.cfg", "res://addons/sekai/plugin.cfg")
+enabled=PackedStringArray("res://addons/FileSystemView/plugin.cfg", "res://addons/lisper-debugger/plugin.cfg", "res://addons/sekai/plugin.cfg")
 
 [filesystem]
 
@@ -224,8 +223,9 @@ debug_draw_routable=false
 debug_draw_solid=false
 debug_draw_contactable=false
 debug_draw_pickable=false
-define_entry="res://test-next/define_entry.gss.txt"
+define_entry="res://test-next/test/demo/define_entry.gsm.gd"
 render_extra_sight=4
 min_inits_per_frame=8
 gikou_store_dir="res://test-next/gikous"
 debug_draw_chunk=false
+debug_draw_kami_sight=false

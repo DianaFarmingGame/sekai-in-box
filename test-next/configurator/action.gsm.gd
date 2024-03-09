@@ -107,7 +107,7 @@ array/for(data func([i record]
 									var (talker add_to_talking_pool(ctrl gikou :eval @(opt &发起者)))
 									do(target msg_dialog/put ctrl {
 										name #(talker . name)
-										avatar #((talker . asserts) @ "avatar")
+										avatar #(talker . asserts . avatar)
 										text :eval @(opt &数据)
 									})
 								))

@@ -1,7 +1,8 @@
-wait (gikou on_inited []
-	var (hako do (gikou get_hako))
-	
-	exec (+(*mod-dir* "/scene.gss.txt"))
+var (hako do (gikou get_hako))
 
-	exec (+(*mod-dir* "../../../configurator/npc.gsm.gd"))
-)
+exec (+(*mod-dir* "../../../configurator/npc.gsm.gd"))
+
+var (嘉然 do (hako add_mono &实体/角色/嘉然 {
+	position vec3(18 45 1)
+	contains []
+}))

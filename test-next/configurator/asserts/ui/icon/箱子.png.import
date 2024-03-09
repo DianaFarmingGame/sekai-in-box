@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://dhoo8idakp7lr"
-path="res://.godot/imported/立绘.png-434d123e6fa22727a640fc857bf16da4.ctex"
+uid="uid://0t7jso20kmjl"
+path="res://.godot/imported/箱子.png-3c2a5b8231108f75e1b026b535a79443.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://test-next/define/实体/角色/立绘.png"
-dest_files=["res://.godot/imported/立绘.png-434d123e6fa22727a640fc857bf16da4.ctex"]
+source_file="res://test-next/configurator/asserts/ui/icon/箱子.png"
+dest_files=["res://.godot/imported/箱子.png-3c2a5b8231108f75e1b026b535a79443.ctex"]
 
 [params]
 

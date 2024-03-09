@@ -1,0 +1,19 @@
+define (load ("../pc.gd")
+	ref 1100
+	id &实体/角色/嘉心糖
+	name "嘉心糖"
+	props {
+		name "嘉心糖"
+		uid &糖
+		solid_box rect2(-0.4 -0.1 0.8 0.2)
+		asserts {
+			idle load ("嘉心糖站立.png")
+			walk load ("嘉心糖行走.png")
+			avatar load ("嘉心糖立绘.png")
+		}
+		draw_data {
+			idle [&fixed &idle 0.6 anim_char(4)]
+			walk [&fixed &walk 0.4 anim_char(8)]
+		}
+	}
+)

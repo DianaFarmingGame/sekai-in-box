@@ -211,7 +211,9 @@ func _on_chunk_set_btn_pressed() -> void:
 
 func _on_put_button_pressed() -> void:
 	var pos := Vector3(this.position.x, this.position.y, 1)
-	var mono := sekai.make_mono(&"实体/角色/嘉然", {
+	control.hako.callmRSU(context, &"container/put", sekai.make_mono(&"实体/角色/嘉然", {
 		&"position": pos
-	})
-	control.hako.callmRSU(context, &"container/put", mono)
+	}))
+	control.hako.callmRSU(context, &"container/put", sekai.make_mono(&"实体/角色/嘉心糖", {
+		&"position": pos
+	}))
