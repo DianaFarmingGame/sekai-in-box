@@ -7,27 +7,39 @@ var props := {
 	&"draw_data": {},
 	&"cur_draw": &"",
 	&"cur_draw_variant": 0,
-	&"draw_timer": 0.0, # FIXME
 	&"draw_flip_h": false,
-	&"on_draw_end": Prop.Stack(), # TODO
+	&"draw_end_emitted": false,
+	&"on_draw_end": Prop.Stack(),
 	
 	&"draw/reset": func (ctx: LisperContext, this: Mono) -> void:
+		this.setp(&"draw_end_emitted", false)
 		var items := this.getp(&"layer") as Dictionary
 		for item in items.values():
 			if item != null:
-				this.setp(&"draw_timer", item.get_time()),
+				item.reset_time(),
 	&"draw/restick": func (ctx: LisperContext, this: Mono) -> void:
+		this.setp(&"draw_end_emitted", false)
 		var cur_draw = this.getp(&"cur_draw")
 		if cur_draw == &"": return
 		var draw = this.getp(&"draw_data")[cur_draw]
-		if draw[0] == &"diverse":
-			draw = draw[1][this.getp(&"cur_draw_variant")]
-		if draw[0] == &"sticky":
-			var timeout := draw[2] as float
-			var items := this.getp(&"layer") as Dictionary
-			for item in items.values():
-				if item != null:
-					this.setp(&"draw_timer", item.get_time() + timeout),
+		while draw[0] != &"sticky":
+			match draw[0]:
+				&"diverse":
+					draw = draw[1][this.getp(&"cur_draw_variant")]
+					continue
+				&"layers":
+					for d in draw[1]:
+						if d[0] == &"sticky":
+							draw = d
+							break
+					return
+				_:
+					return
+		var timeout := draw[2] as float
+		var items := this.getp(&"layer") as Dictionary
+		for item in items.values():
+			if item != null:
+				item.reset_time(-timeout),
 	&"draw/to": func (ctx: LisperContext, this: Mono, draw_id: StringName) -> void:
 		this.setp(&"cur_draw", draw_id),
 	&"draw/reset_to": func (ctx: LisperContext, this: Mono, draw_id: StringName) -> void:
@@ -57,29 +69,46 @@ const TILE_MAP = [
 ]
 
 static func on_draw(ctx: LisperContext, this: Mono, ctrl: SekaiControl, item: SekaiItem) -> void:
-	var pos := Vector2(this.position.x, this.position.y - this.position.z * item.ratio_yz)
 	var cur_draw = this.getp(&"cur_draw")
 	if cur_draw == &"": return
-	var draw = this.getp(&"draw_data")[cur_draw]
-	if draw[0] == &"diverse":
-		draw = draw[1][this.getp(&"cur_draw_variant")]
+	_on_draw(ctx, this, item, this.getp(&"draw_data")[cur_draw])
+
+static func _on_draw(ctx: LisperContext, this: Mono, item: SekaiItem, draw: Array) -> void:
+	match draw[0]:
+		&"layers":
+			for d in draw[1]:
+				_on_draw(ctx, this, item, d)
+			return
+		&"diverse":
+			_on_draw(ctx, this, item, draw[1][this.getp(&"cur_draw_variant")])
+			return
 	var texture = this.getp(&"asserts")[draw[1]]
+	var pos := Vector2(this.position.x, this.position.y - this.position.z)
 	var frame
 	match draw[0]:
 		&"static":
 			frame = draw[2]
 		&"fixed":
 			var timeout := draw[2] as float
-			var t := item.get_time() - this.getp(&"draw_timer") as float
 			var frames := draw[3] as Array
-			var frame_idx := frames.size() * fposmod(t / timeout, 1) as int
+			var frame_idx := frames.size() * fposmod(item.get_time() / timeout, 1) as int
 			frame = frames[frame_idx]
 		&"sticky":
 			var timeout := draw[2] as float
-			var t := item.get_time() - this.getp(&"draw_timer") as float
 			var frames := draw[3] as Array
-			var frame_idx := clampi(frames.size() * (t / timeout + 1) as int, 0, frames.size() - 1)
+			var frame_idx := clampi(frames.size() * (item.get_time() / timeout + 1) as int, 0, frames.size() - 1)
 			frame = frames[frame_idx]
+		&"oneshot":
+			var timeout := draw[2] as float
+			var frames := draw[3] as Array
+			var frame_idx := (frames.size() * item.get_time() / timeout) as int
+			if frame_idx >= frames.size():
+				if not this.getp(&"draw_end_emitted"):
+					this.setp(&"draw_end_emitted", true)
+					this.emitc(ctx, &"on_draw_end")
+				frame = frames[-1]
+			else:
+				frame = frames[frame_idx]
 		&"atile":
 			var tile := this.getp(&"atile_result") as Array
 			if tile.size() == 9:

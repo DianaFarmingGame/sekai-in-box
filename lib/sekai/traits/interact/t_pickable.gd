@@ -45,7 +45,7 @@ var props := {
 
 static func draw_debug(ctx: LisperContext, this: Mono, ctrl: SekaiControl, item: SekaiItem) -> void:
 	var dcolor := 0x0088ff66 if this.getp(&"picker_hovered") else 0xffffff66
-	var pos := Vector2(this.position.x, this.position.y - this.position.z * item.ratio_yz)
+	var pos := Vector2(this.position.x, this.position.y - this.position.z)
 	var box := this.getp(&"pick_box") as Rect2
 	box.position += pos
 	#item.draw_rect(box, dcolor)

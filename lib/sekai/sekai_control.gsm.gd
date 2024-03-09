@@ -84,6 +84,12 @@ func pop_target() -> Mono:
 	else:
 		return null
 
+func add_item(item: SekaiItem) -> void:
+	_panel.add_child(item)
+
+func remove_item(item: SekaiItem) -> void:
+	_panel.remove_child(item)
+
 
 
 #
@@ -98,11 +104,11 @@ signal unit_size_mod
 #
 
 func _init(ptarget = null) -> void:
+	_panel = Node2D.new()
+	_panel.y_sort_enabled = true
+	_panel.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST_WITH_MIPMAPS
 	if ptarget != null:
 		_custom_target = ptarget
-	y_sort_enabled = true
-	if texture_filter == CanvasItem.TEXTURE_FILTER_PARENT_NODE:
-		texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST_WITH_MIPMAPS
 	context = _make_context()
 
 func _ready() -> void:
@@ -111,6 +117,7 @@ func _ready() -> void:
 	sekai.gikou_changed.connect(_update_gikou)
 	sekai.process.connect(_on_process)
 	_input_mapper.updated.connect(_on_mapper_input)
+	add_child(_panel)
 
 func _enter_tree() -> void:
 	LisperDebugger.sign_context("SekaiControl", context)
@@ -138,6 +145,8 @@ func _on_process(delta: float) -> void:
 
 func _draw() -> void:
 	_update_draw_caches()
+	_panel.position = _item_offset * Vector2(unit_size.x, unit_size.y)
+	_panel.scale = Vector2(unit_size.x, unit_size.y)
 
 
 
@@ -216,7 +225,7 @@ func _update_sight() -> void:
 		var render_box := _render_box
 		for mono in contains:
 			counter += 1
-			if counter > 16:
+			if counter > 64:
 				counter = 0
 				await sekai.process
 			if mono.applymRSUY(context, &"render_box_intersects", [self, render_box]):
@@ -224,6 +233,7 @@ func _update_sight() -> void:
 		_monos_in_sight = nconts
 	else:
 		_monos_in_sight = []
+	await sekai.process
 	await _update_items()
 	_sight_updating = false
 
@@ -294,6 +304,8 @@ func _on_mapper_input(sets: InputSet) -> void:
 #
 # 内部变量
 #
+
+var _panel: Node2D
 
 var _custom_target = null
 var _target_stack := []

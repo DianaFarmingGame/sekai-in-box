@@ -40,6 +40,8 @@ func do_merge(sets: Array[Dictionary]) -> Array[Dictionary]:
 		&"on_ready": Prop.Stack(),
 		# 当临近方块更新时触发
 		&"on_update": Prop.Stack(),
+		# 每一帧触发
+		&"on_process": Prop.Stack(),
 		# 当经过一轮（如一天）时触发
 		&"on_round": Prop.Stack(),
 		

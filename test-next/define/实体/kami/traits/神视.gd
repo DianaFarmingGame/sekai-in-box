@@ -13,8 +13,8 @@ var props := {
 			var dis := this.getp(&"kami_sight_distance") as int
 			var cursor := this.getp(&"kami_sight_cursor") as Vector3
 			var cpos := cursor.snapped(Vector3(1, 1, 1))
-			var dpos := Vector2(cpos.x, cpos.y - cpos.z * item.ratio_yz)
-			var rpos := Vector2(cursor.x, cursor.y - cursor.z * item.ratio_yz)
+			var dpos := Vector2(cpos.x, cpos.y - cpos.z)
+			var rpos := Vector2(cursor.x, cursor.y - cursor.z)
 			for ox in range(-dis, dis + 1):
 				for oy in range(-dis, dis + 1):
 					var pos := dpos + Vector2(ox, oy)

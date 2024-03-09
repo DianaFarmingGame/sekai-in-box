@@ -14,7 +14,7 @@ func do_merge(sets: Array[Dictionary]) -> Array[Dictionary]:
 		
 		&"on_draw": Prop.puts({
 			&"0:drop_item": func (ctx: LisperContext, this: Mono, ctrl: SekaiControl, sitem: SekaiItem) -> void:
-				var pos := Vector2(this.position.x, this.position.y - this.position.z * sitem.ratio_yz)
+				var pos := Vector2(this.position.x, this.position.y - this.position.z)
 				var item := this.getp(&"contains")[0] as Mono
 				var t := sitem.get_time()
 				var hoffset := sin(2 * PI * t / this.getp(&"float_cycle_time")) * this.getp(&"float_radius") as float

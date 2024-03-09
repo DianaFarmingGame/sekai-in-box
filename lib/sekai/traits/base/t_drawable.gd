@@ -4,6 +4,7 @@ var id := &"drawable"
 var requires := [&"with_layer", &"position"]
 
 var props := {
+	&"need_redraw": true,
 	&"on_draw": Prop.Stack(),
 	&"on_draw_debug": Prop.Stack(),
 	
@@ -29,6 +30,21 @@ var props := {
 				item.set_y(this.position.y + floorf(this.position.z) * 64 + 4096),
 	} if ProjectSettings.get_setting(&"sekai/debug_draw") else {
 		&"0:drawable": TDrawable.handle_position_mod,
+	}),
+	&"on_process": Prop.puts({
+		&"0:drawable": func (ctx: LisperContext, this: Mono, _delta) -> void:
+			if this.getp(&"need_redraw"):
+				for item in this.getp(&"layer").values():
+					item.queue_redraw(),
+		&"0:debug_drawable": func (ctx: LisperContext, this: Mono, _delta) -> void:
+			for layers in this.getp(&"layer_data").values():
+				for item in layers.values():
+					item.queue_redraw(),
+	} if ProjectSettings.get_setting(&"sekai/debug_draw") else {
+		&"0:drawable": func (ctx: LisperContext, this: Mono, _delta) -> void:
+			if this.getp(&"need_redraw"):
+				for item in this.getp(&"layer").values():
+					item.queue_redraw(),
 	}),
 }
 

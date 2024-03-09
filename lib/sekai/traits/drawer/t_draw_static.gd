@@ -17,13 +17,14 @@ var props := {
 const TILE_MAP := TDraw.TILE_MAP
 
 static func draw_handle(ctx: LisperContext, this: Mono, draw: Array) -> void:
-	if draw[0] == &"layers":
-		for d in draw[1]:
-			draw_handle(ctx, this, d)
-		return
-	if draw[0] == &"diverse":
-		draw_handle(ctx, this, draw[1][this.getp(&"cur_draw_variant")])
-		return
+	match draw[0]:
+		&"layers":
+			for d in draw[1]:
+				draw_handle(ctx, this, d)
+			return
+		&"diverse":
+			draw_handle(ctx, this, draw[1][this.getp(&"cur_draw_variant")])
+			return
 	var texture = this.getp(&"asserts")[draw[1]]
 	var pos := Vector2(this.position.x, this.position.y - this.position.z)
 	match draw[0]:
@@ -49,12 +50,10 @@ static func draw_handle(ctx: LisperContext, this: Mono, draw: Array) -> void:
 		&"fixed":
 			var timeout := draw[2] as float
 			var frames := draw[3] as Array
-			var timer := this.getp(&"draw_timer") as float
 			if this.getp(&"draw_flip_h"):
 				this.puts_on_draw([
 					&"0:draw_static", func (ctx: LisperContext, this: Mono, ctrl: SekaiControl, item: SekaiItem) -> void:
-						var t := (item.get_time() - timer) as float
-						var frame_idx := lerpf(0.0, (frames.size() as float), fmod(t, timeout) / timeout) as int
+						var frame_idx := lerpf(0.0, (frames.size() as float), fmod(item.get_time(), timeout) / timeout) as int
 						var frame = frames[frame_idx]
 						item.pen_set_transform(Transform2D(0, Vector2(-1, 1), 0, pos + frame[0].position + frame[0].size / 2))
 						item.pen_draw_texture_region(texture, Rect2(-frame[0].size / 2, frame[0].size), frame[1])
@@ -63,8 +62,7 @@ static func draw_handle(ctx: LisperContext, this: Mono, draw: Array) -> void:
 			else:
 				this.puts_on_draw([
 					&"0:draw_static", func (ctx: LisperContext, this: Mono, ctrl: SekaiControl, item: SekaiItem) -> void:
-						var t := (item.get_time() - timer) as float
-						var frame_idx := lerpf(0.0, (frames.size() as float), fmod(t, timeout) / timeout) as int
+						var frame_idx := lerpf(0.0, (frames.size() as float), fmod(item.get_time(), timeout) / timeout) as int
 						var frame = frames[frame_idx]
 						item.pen_draw_texture_region(texture, Rect2(pos + frame[0].position, frame[0].size), frame[1])
 				])
