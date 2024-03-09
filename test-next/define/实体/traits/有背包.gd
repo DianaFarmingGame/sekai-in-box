@@ -11,7 +11,12 @@ var props := {
 		var inputs = []
 
 		for item in input_item:
-			var item_id = item
+			var item_id
+			if item.is_valid_int():
+				item_id = int(item)
+			else:
+				item_id = item
+
 			var item_num = input_item[item]
 
 			var item_mono = sekai.make_mono(item_id, {&"stack_count": item_num})
