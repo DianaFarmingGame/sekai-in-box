@@ -31,15 +31,7 @@ var props := {
 	#		tar: Mono | null: 行为可能指向的目标对象,
 	#		InputSet
 	&"on_action": {
-		&"0:set_db_val": func (ctx: LisperContext, this: Mono, type: StringName, ctrl: SekaiControl, src: Mono, tar: Variant, sets: InputSet) -> void:
-			var name = this.getpBD(&"id", "")
-			var key = StringName(name + "_is_" + type)
-			var count = sekai.gikou.applymRSUY(ctx, &"db/get", [key, &"vals"])
-			if count == null:
-				push_error("[有交互] ", key ,"not exists")
-			count += 1
-			sekai.gikou.applymRSUY(ctx, &"db/set", [key, count, &"vals"])
-			,
+
 	},
 	
 	

@@ -32,9 +32,7 @@ var(add_to_talking_pool :const ', func(ctrl: SekaiControl, gikou: Mono, mono_id:
 	if await gikou.callmRSU(ctx, &"db/has", mono_id):
 		return await gikou.applymRSU(ctx, &"db/getp", [&"talking_pool", mono_id])
 
-	var hako := ctrl.hako
-	var mono = await hako.callmRSU(ctx, &"container/get_by_ref_id", mono_id)
-
+	var mono = gikou.callmRSUY(ctx, &"get_uid", mono_id)
 
 	await gikou.applymRSU(ctx, &"db/setp", [&"talking_pool", mono_id, mono])
 	
