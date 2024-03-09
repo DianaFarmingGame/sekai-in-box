@@ -2,7 +2,10 @@ var (hako do (gikou get_hako))
 
 exec (+(*mod-dir* "../../../configurator/npc.gsm.gd"))
 
+var (嘉然 do (hako add_mono &实体/角色/嘉心糖 {
+	position vec3(19 45 1)
+}))
+
 var (嘉然 do (hako add_mono &实体/角色/嘉然 {
 	position vec3(18 45 1)
-	contains []
 }))
